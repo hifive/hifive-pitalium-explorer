@@ -1,0 +1,28 @@
+/*
+ * Copyright (C) 2015 NS Solutions Corporation, All Rights Reserved.
+ */
+
+@charset "utf-8";
+
+.image-diff {
+	padding-left: 0;
+	padding-right: 0;
+}
+
+.image-diff img {
+	width: 100%;
+}
+
+.image-label {
+	font-size: 14pt;
+	color: #ffffff;
+	text-align: center;
+}
+
+.expected .image-label {
+	background: #0000ff;
+}
+
+.actual .image-label {
+	background: #ff0000;
+}

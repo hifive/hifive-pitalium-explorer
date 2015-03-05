@@ -1,0 +1,60 @@
+<!--Copyright (C) 2015 NS Solutions Corporation, All Rights Reserved.  -->
+<!doctype html>
+<html>
+<head>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+	<meta http-equiv="Pragma" content="no-cache">
+	<meta http-equiv="Cache-Control" content="no-cache">
+	<meta http-equiv="Expires" content="-1">
+
+	<title>Test Result Detail- hifiveTestResultExplorer</title>
+	<link rel="stylesheet" href="res/lib/bootstrap/css/bootstrap.min.css">
+	<link rel="stylesheet" href="res/lib/bootstrap/css/bootstrap-theme.min.css">
+	<link rel="stylesheet" href="res/lib/hifive/h5.css" data-h5-module="hifive">
+	<link rel="stylesheet" href="src/common.css">
+	<link rel="stylesheet" href="src/diff.css">
+
+	<script src="res/lib/jquery/jquery.min.js"></script>
+	<script src="res/lib/bootstrap/js/bootstrap.min.js"></script>
+	<script src="res/lib/hifive/ejs-h5mod.js" data-h5-module="hifive:ejs"></script>
+	<script src="res/lib/hifive/h5.js" data-h5-module="hifive"></script>
+
+	<script src="src/common/constant.js"></script>
+	<script src="src/common/util.js"></script>
+	<script src="src/diff.js"></script>
+	</head>
+	<body>
+		<!-- Navigation -->
+		<nav class="navbar navbar-default navbar-fixed-top">
+			<div class="container">
+				<div class="navbar-header">
+					<!--
+					<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+						<span class="sr-only">Toggle navigation</span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+					</button>
+					 -->
+					<a class="navbar-brand" href="list.html">hifiveTestResultExplorer</a>
+				</div>
+			</div>
+		</nav>
+		<!-- Navigation -->
+
+		<div class="container">
+			<div class="row">
+				<div class="col-xs-6 image-diff expected">
+					<div class="image-label">EXPECTED</div>
+					<img>
+				</div>
+				<div class="col-xs-6 image-diff actual">
+					<div class="image-label">ACTUAL</div>
+					<img>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

@@ -1,0 +1,141 @@
+{
+	"expectedId": null,
+	"executeTime": "2015_03_05_18_16_16",
+	"screenShots": [
+		{
+			"result": null,
+			"fileName": "testCaptureTutorial13_sampleCapture_WINDOWS_internet explorer",
+			"capability": {
+				"platformVersion": "",
+				"platform": "WINDOWS",
+				"browserVersion": "",
+				"deviceName": "",
+				"browserName": "internet explorer",
+				"testClass": "SampleTest",
+				"label": "",
+				"testMethod": "testCaptureTutorial13"
+			},
+			"screenshotId": "sampleCapture"
+		},
+		{
+			"result": null,
+			"fileName": "testCaptureTutorial13_sampleCapture_WINDOWS_firefox",
+			"capability": {
+				"platformVersion": "",
+				"platform": "WINDOWS",
+				"browserVersion": "",
+				"deviceName": "",
+				"browserName": "firefox",
+				"testClass": "SampleTest",
+				"label": "",
+				"testMethod": "testCaptureTutorial13"
+			},
+			"screenshotId": "sampleCapture"
+		},
+		{
+			"result": null,
+			"fileName": "testCaptureTutorial13_sampleCapture_WINDOWS_chrome",
+			"capability": {
+				"platformVersion": "",
+				"platform": "WINDOWS",
+				"browserVersion": "",
+				"deviceName": "",
+				"browserName": "chrome",
+				"testClass": "SampleTest",
+				"label": "",
+				"testMethod": "testCaptureTutorial13"
+			},
+			"screenshotId": "sampleCapture"
+		},
+		{
+			"result": null,
+			"fileName": "testCaptureTop_sampleCapture_WINDOWS_internet explorer",
+			"capability": {
+				"platformVersion": "",
+				"platform": "WINDOWS",
+				"browserVersion": "",
+				"deviceName": "",
+				"browserName": "internet explorer",
+				"testClass": "SampleTest",
+				"label": "",
+				"testMethod": "testCaptureTop"
+			},
+			"screenshotId": "sampleCapture"
+		},
+		{
+			"result": null,
+			"fileName": "testCaptureTop_sampleCapture_WINDOWS_firefox",
+			"capability": {
+				"platformVersion": "",
+				"platform": "WINDOWS",
+				"browserVersion": "",
+				"deviceName": "",
+				"browserName": "firefox",
+				"testClass": "SampleTest",
+				"label": "",
+				"testMethod": "testCaptureTop"
+			},
+			"screenshotId": "sampleCapture"
+		},
+		{
+			"result": null,
+			"fileName": "testCaptureTutorialTop_sampleCapture_WINDOWS_internet explorer",
+			"capability": {
+				"platformVersion": "",
+				"platform": "WINDOWS",
+				"browserVersion": "",
+				"deviceName": "",
+				"browserName": "internet explorer",
+				"testClass": "SampleTest",
+				"label": "",
+				"testMethod": "testCaptureTutorialTop"
+			},
+			"screenshotId": "sampleCapture"
+		},
+		{
+			"result": null,
+			"fileName": "testCaptureTop_sampleCapture_WINDOWS_chrome",
+			"capability": {
+				"platformVersion": "",
+				"platform": "WINDOWS",
+				"browserVersion": "",
+				"deviceName": "",
+				"browserName": "chrome",
+				"testClass": "SampleTest",
+				"label": "",
+				"testMethod": "testCaptureTop"
+			},
+			"screenshotId": "sampleCapture"
+		},
+		{
+			"result": null,
+			"fileName": "testCaptureTutorialTop_sampleCapture_WINDOWS_firefox",
+			"capability": {
+				"platformVersion": "",
+				"platform": "WINDOWS",
+				"browserVersion": "",
+				"deviceName": "",
+				"browserName": "firefox",
+				"testClass": "SampleTest",
+				"label": "",
+				"testMethod": "testCaptureTutorialTop"
+			},
+			"screenshotId": "sampleCapture"
+		},
+		{
+			"result": null,
+			"fileName": "testCaptureTutorialTop_sampleCapture_WINDOWS_chrome",
+			"capability": {
+				"platformVersion": "",
+				"platform": "WINDOWS",
+				"browserVersion": "",
+				"deviceName": "",
+				"browserName": "chrome",
+				"testClass": "SampleTest",
+				"label": "",
+				"testMethod": "testCaptureTutorialTop"
+			},
+			"screenshotId": "sampleCapture"
+		}
+	]
+}

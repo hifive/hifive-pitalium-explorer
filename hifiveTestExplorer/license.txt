@@ -1,0 +1,27 @@
+Unless otherwise stated, all source files are licensed under
+the Apache License, Version 2.0(http://www.apache.org/licenses/LICENSE-2.0).
+
+-----
+Code under:
+src/main/webapp/res/lib/jquery
+
+jQuery
+URL:http://jquery.com/
+License:
+		MIT license
+		https://jquery.org/license/
+Local Modifications: None.
+
+-----
+Code under:
+src/main/webapp/res/lib/bootstrap/js
+src/main/webapp/res/lib/bootstrap/css
+
+Bootstrap
+URL:https://github.com/twbs/bootstrap
+License:
+	(before ver.3) the Apache License, Version 2.0
+			http://www.apache.org/licenses/LICENSE-2.0
+	(ver.3 and later versions) MIT license
+		https://github.com/twbs/bootstrap/blob/master/LICENSE
+Local Modifications: None.

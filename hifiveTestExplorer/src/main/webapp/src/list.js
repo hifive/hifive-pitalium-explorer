@@ -1,0 +1,254 @@
+/*
+ * Copyright (C) 2015 NS Solutions Corporation, All Rights Reserved.
+ */
+(function($) {
+	/**
+	 * This class is a &quot;Logic&quot; for the list page of test results.
+	 * 
+	 * @class
+	 * @memberOf hifive.test.explorer.logic
+	 * @name TestResultListLogic
+	 */
+	var testResultListLogic = {
+		/**
+		 * @memberOf hifive.test.explorer.logic.TestResultListLogic
+		 */
+		__name: 'hifive.test.explorer.logic.TestResultListLogic',
+
+		/**
+		 * Gets a list of test exection time.
+		 * 
+		 * @memberOf hifive.test.explorer.logic.TestResultListLogic
+		 * @returns {JqXHRWrapper}
+		 */
+		getTestExectionTimeList: function() {
+			return h5.ajax({
+				type: 'get',
+				dataType: 'json',
+				url: hifive.test.explorer.utils.formatUrl('api/listTestExectionTime')
+			});
+		},
+
+		/**
+		 * Gets a list of test exection time which is narrowed down by parameters.
+		 * 
+		 * @memberOf hifive.test.explorer.logic.TestResultListLogic
+		 * @param {Object} params search parameters
+		 * @return {JqXHRWrapper}
+		 */
+		getTestExectionTimeListWithParams: function(params) {
+			var data = {};
+			this._copyObjectByKey(params, data, ['criteria']);
+
+			return h5.ajax({
+				type: 'get',
+				dataType: 'json',
+				url: 'api/listTestExectionTime/search',
+				data: data
+			});
+		},
+
+		/**
+		 * Gets a list of test result details.
+		 * 
+		 * @memberOf hifive.test.explorer.logic.TestResultListLogic
+		 * @param {string} executionTime The time the test was run.
+		 * @returns {JqXHRWrapper}
+		 */
+		getTestResultList: function(executionTime) {
+			return h5.ajax({
+				type: 'get',
+				dataType: 'json',
+				url: 'api/listTestResult',
+				data: {
+					executionTime: executionTime
+				}
+			});
+		},
+
+		/**
+		 * Copy values which are specified by "keys" parameter from one object to other.
+		 * 
+		 * @memberOf hifive.test.explorer.logic.TestResultListLogic
+		 * @param {Object} from The object copy from.
+		 * @param {Object} to The object copy to.
+		 * @param {Array} keys
+		 */
+		_copyObjectByKey: function(from, to, keys) {
+			for ( var index in keys) {
+				var key = keys[index];
+				if (from.hasOwnProperty(key)) {
+					to[key] = from[key];
+				}
+			}
+		}
+	};
+	h5.core.expose(testResultListLogic);
+})(jQuery);
+(function($) {
+	/**
+	 * This class is a controller for the list page of test results.
+	 * 
+	 * @class
+	 * @memberOf hifive.test.explorer.controller
+	 * @name TestResultListController
+	 */
+	var testResultListController = {
+		/**
+		 * @memberOf hifive.test.explorer.controller.TestResultListController
+		 */
+		__name: 'hifive.test.explorer.controller.TestResultListController',
+
+		/**
+		 * The &quot;logic&quot; class
+		 * 
+		 * @type Logic
+		 * @memberOf hifive.test.explorer.controller.TestResultListController
+		 */
+		_testResultListLogic: hifive.test.explorer.logic.TestResultListLogic,
+
+		/**
+		 * Called after the controller has been initialized.<br>
+		 * Load list of test exection time asynchronously and update views.
+		 * 
+		 * @memberOf hifive.test.explorer.controller.TestResultListController
+		 */
+		__ready: function() {
+			var indicator = this.indicator({
+				message: 'Loading...',
+				target: document
+			}).show();
+
+			// Load list of test exection time
+			this._testResultListLogic.getTestExectionTimeList().done(
+					this.own(function(testExectionTimeList) {
+						// Update views
+						this.view.update('#testExectionTimeList', 'testExectionTimeListTemplate', {
+							testExectionTimes: testExectionTimeList
+						});
+					})).always(function() {
+				indicator.hide();
+			});
+		},
+
+		/**
+		 * Called when a label of test execution time has been clicked.<br>
+		 * Load list of test results of selected item asynchronously, and update views.
+		 * 
+		 * @memberOf hifive.test.explorer.controller.TestResultListController
+		 * @param {Object} context the event context
+		 * @param {jQuery} $el the event target element
+		 */
+		'.explorer-collapsable show.bs.collapse': function(context, $el) {
+			var $panelBody = $el.find('.panel-body');
+
+			// Check the loaded flag and do nothing if exists.
+			if ($panelBody.hasClass('hifive.test.explorer-load'))
+				return;
+
+			var executionTime = $el.data('executionTime');
+
+			$panelBody.addClass('hifive.test.explorer-load');
+
+			// Show indicator
+			var indicator = this.indicator({
+				message: 'Loading...',
+				target: document
+			}).show();
+
+			this._testResultListLogic.getTestResultList(executionTime).done(
+					this.own(function(testResultList) {
+						// Update views
+						this.view.update($panelBody, 'testResultListTemplate', {
+							testResults: testResultList
+						});
+					})).always(function() {
+				indicator.hide();
+			});
+		},
+
+		/**
+		 * Called when a test result has been clicked.<br>
+		 * Go to a new page which shows the difference images of the selected test result.
+		 * 
+		 * @memberOf hifive.test.explorer.controller.TestResultListController
+		 * @param {Object} context the event context
+		 * @param {jQuery} $el the event target element
+		 */
+		'.explorer-test-result click': function(context, $el) {
+			var id = $el.data('testResultId');
+			var url = hifive.test.explorer.utils.formatUrl('diff.html', {
+				id: id
+			});
+
+			location.href = url;
+		},
+
+		/**
+		 * Called when the search form has been opened.<br>
+		 * Update button label.
+		 * 
+		 * @memberOf hifive.test.explorer.controller.TestResultListController
+		 * @param {Object} context the event context
+		 * @param {jQuery} $el the event target element
+		 */
+		'#searchPanel show.bs.collapse': function(context, $el) {
+			this.$find('#toggleSearchPanel').text('Close search');
+		},
+
+		/**
+		 * Called when the search form has been closed.<br>
+		 * Update button label.
+		 * 
+		 * @memberOf hifive.test.explorer.controller.TestResultListController
+		 * @param {Object} context the event context
+		 * @param {jQuery} $el the event target element
+		 */
+		'#searchPanel hide.bs.collapse': function(context, $el) {
+			this.$find('#toggleSearchPanel').text('Open search');
+		},
+
+		/**
+		 * Called when the search form has been submitted.<br>
+		 * Collect input parameters, search test results asynchronously, and update views.
+		 * 
+		 * @memberOf hifive.test.explorer.controller.TestResultListController
+		 * @param {Object} context the event context
+		 * @param {jQuery} $el the event target element
+		 */
+		'#searchTest submit': function(context, $el) {
+			// Stop submit
+			context.event.preventDefault();
+
+			// Collect search parameters
+			var params = {};
+			$el.find('input').each(function(index) {
+				var $elem = $(this);
+				params[$elem.attr('name')] = $elem.val();
+			});
+
+			// Show indicator
+			var indicator = this.indicator({
+				message: 'Loading...',
+				target: document
+			}).show();
+
+			// Reset views
+			this.$find('#testExectionTimeList').empty();
+
+			// Search test results
+			this._testResultListLogic.getTestExectionTimeListWithParams(params).done(
+					this.own(function(testExectionTimeList) {
+						this.view.update('#testExectionTimeList', 'testExectionTimeList', {
+							testExectionTimes: testExectionTimeList
+						});
+					})).always(function() {
+				indicator.hide();
+			});
+		}
+	};
+	h5.core.expose(testResultListController);
+})(jQuery);
+$(function() {
+	h5.core.controller('body>div.container', hifive.test.explorer.controller.TestResultListController);
+});
