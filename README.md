@@ -1,7 +1,7 @@
 # hifive-test-explorer
 
-This tool is the Test Result Explorer which complements hifive-test-library.  
-You can see easily your test results, details and wrong points,
+This is the Test Result Explorer tool which supports hifive-test-library.  
+You can easily access your test results and understand what is wrong,
 if these tests are written with hifive-test-library.
 
 This product is licensed under the Apache License, Version 2.0.  
@@ -13,7 +13,7 @@ Our developer site is located at
 Let's hifive !
 
 ------------------------------------------------------------------------------
-●Preparation
+●Preparation  
 Prepare the following development tools.
 
 + [eclipse-jee-kepler-SR2](https://eclipse.org/downloads/packages/release/Kepler/SR2)
@@ -32,20 +32,19 @@ Prepare the following development tools.
 ------------------------------------------------------------
 ●Procedure
 
-1. Check out hifiveTestExplorer project.
+1. Check out hifive-test-explorer project.
 2.  Run ivy_build.xml.  
-     	Right-click on "hifiveTestExplorer ivy\_build.xml.launch" and choose "Run As" > "hifiveTestExplorer ivy_build.xml".
+     	Right-click on "hifive-test-explorer ivy\_build.xml.launch" and choose "Run As" > "hifiveTestExplorer ivy_build.xml".
 3.  Modify "api-conf.properties".  
     "api-conf.properties" is located in the following folder.  
-        "hifiveTestExplorer" > "src/main/resources" > "appConf"  
+        "hifive-test-explorer" > "src/main/resources" > "appConf"  
     Modify the value of the key "resultDir" to your absolute path of the sample data folder.  
     "sampleData" folder is located in "hifiveTestExplorer" project.  
-    ex)  
-        resultsDir=C:\\hifive\\workspace\\hifiveTestExplorer\\sampleData
+    ex)  resultsDir=C:\\hifive\\workspace\\hifive-test-explorer\\sampleData
 4.  Update Tomcat context definition.  
-    Right-click "hifiveTestExplorer" project and choose "Tomcat project" > "Update context definition".
+    Right-click "hifive-test-explorer" project and choose "Tomcat project" > "Update context definition".
 5.  Start Tomcat.
 6.  Access this application URL:  
-	http://localhost:8080/hifiveTestExplorer/list.html
+	http://localhost:8080/hifive-test-explorer/list.html
 
 ------------------------------------------------------------
