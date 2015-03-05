@@ -1,47 +1,71 @@
-●前提
-・tomcatPlugin（com.sysdeo.eclipse.tomcat_3.3.0）がインストール、設定されていること。
-    com.sysdeo.eclipse.tomcat_3.3.0
+●Preparation
+Prepare the following development tools.
 
-    注意
-      "com.sysdeo.eclipse.tomcat_3.3.0"フォルダーにある"DevloaderTomcat7.jar"を
-      "TOMCAT_HOME/lib"へコピーすること。
+・eclipse-jee-kepler-SR2
+    https://eclipse.org/downloads/packages/release/Kepler/SR2
 
-・以下のいずれかのブラウザがインストールされていること。
-    - chrome（最新版）
+・apache-tomcat-7.0.59
+    http://tomcat.apache.org/download-70.cgi
+
+・com.sysdeo.eclipse.tomcat_3.3.0
+    http://www.eclipsetotale.com/tomcatPlugin.html
+
+    Note:
+       Copy "DevloaderTomcat7.jar" to "TOMCAT_HOME/lib"
+      "DevloaderTomcat7.jar" is located in "com.sysdeo.eclipse.tomcat_3.3.0" folder.
+
+・Any one of browsers is installed.
+    - chrome (latest version)
     - Internet Explorer11
-    - Firefox（最新版）
-
-●手順
-1． ivy_build.xmlを実行します。
-    hifiveTestExplorer ivy_build.xml.launchを選択し、右クリックし、Run As > hifiveTestExplorer ivy_build.xml で実行します。
-
-2.  『hifiveTestExplorer』プロジェクト - 『src/main/resources』 - 『appConf』のapi-conf.propertiesの中身を書き換えます。
-    テストデータを格納したsampleDataフォルダはプロジェクトの直下にあります。各自の環境に合わせて絶対パスを書き換えてください。
-    例）
-        resultsDir=C:\\hifive\\workspace\\hifiveTestExplorer\\sampleData
-
-3.  Tomcatのコンテキスト定義を更新します。
-    プロジェクトを選択し、右クリックし、『Tomcatプロジェクト』→『コンテキスト定義を更新』で実行します。
-
-4.  Tomcatを起動します。
-
-5. 下記にアクセスできることを確認してください。
-        http://localhost:8080/hifiveTestExplorer/list.html
+    - Firefox (latest version)
 
 ------------------------------------------------------------
-APIドキュメント（JSDocドキュメント）の生成方法:
+●Procedure
+1.  Run ivy_build.xml.
+    Right-click on "hifiveTestExplorer ivy_build.xml.launch" and choose "Run As" > "hifiveTestExplorer ivy_build.xml".
 
-1.jsdoc3をダウンロード
+2.  Modify "api-conf.properties".
+    "api-conf.properties" is located in the following folder.
+        "hifiveTestExplorer" > "src/main/resources" > "appConf"
+    Modify the value of the key "resultDir" to your absolute path of the sample data folder.
+    "sampleData" folder is located in "hifiveTestExplorer" project.
+    ex)
+        resultsDir=C:\\hifive\\workspace\\hifiveTestExplorer\\sampleData
 
-  - jsdoc3はここからダウンロードできます
-    https://github.com/jsdoc3/jsdoc
+3.  Update Tomcat context definition.
+    Right-click "hifiveTestExplorer" project and choose "Tomcat project" > "Update context definition".
 
-  - Tagなどからすべてのファイルをダウンロードし、 hifive/jsTool/jsdoc/bin に配置します。
-    ("jsdoc"コマンドが"bin"フォルダに存在するようにします。)
+4.  Start Tomcat.
 
-2.生成
+5.  Access this application URL:
+	http://localhost:8080/hifiveTestExplorer/list.html
 
-  - build_for_js.xmlのjsdocターゲットを実行します。
-    hifive/src/main/webapp/doc の下にドキュメントが生成されます。
+------------------------------------------------------------
+●About Web APIs
+You can see the list of this application's APIs from below:
+	http://localhost:8080/hifiveTestExplorer/spec/api.html
+
+By clicking the buttons labeled "Get a sample result" in that page,
+you can see the example data.
+	Note: You need to complete the above procedure.
+
+------------------------------------------------------------
+●How to generate API Documents（JSDoc）:
+
+1. Download jsdoc3
+
+  - You can download jsdoc3 from as follow:
+    https://github.com/jsdoc3/jsdoc.
+
+  - Download all fils from Tag to hifiveTestExplorer/jsTool/jsdoc/bin.
+    (make "jsdoc.bat" be in the "bin" folder)
+
+2. Generate
+
+  - Right-click hifiveTestExplorer/jsTool/jsdoc/jsdoc.bat and select open in the command prompt.
+
+  - Run jsdoc.bat.
+
+  - JSDocs are generated in hifiveTestExplorer/doc/jsdoc.
 
 ------------------------------------------------------------
