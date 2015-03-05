@@ -20,7 +20,7 @@ Prepare the following development tools.
 
 + [apache-tomcat-7.0.59](http://tomcat.apache.org/download-70.cgi)
 
-+ [com.sysdeo.eclipse.tomcat_3.3.0](http://www.eclipsetotale.com/tomcatPlugin.html)
++ [com.sysdeo.eclipse.tomcat_3.3.0](http://www.eclipsetotale.com/tomcatPlugin.html)  
    **Note:** Copy "DevloaderTomcat7.jar" to "TOMCAT_HOME/lib".  
    "DevloaderTomcat7.jar" is located in "com.sysdeo.eclipse.tomcat_3.3.0" folder.
 
