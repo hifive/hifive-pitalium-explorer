@@ -3,8 +3,9 @@
  */
 package com.htmlhifive.testexplorer.model;
 
+import java.io.Serializable;
 
-public class ScreenShot {
+public class ScreenShot implements Serializable {
 	private String fileName;
 	private String screenshotId;
 	private Boolean result;

@@ -3,7 +3,9 @@
  */
 package com.htmlhifive.testexplorer.model;
 
-public class ExpectedId {
+import java.io.Serializable;
+
+public class ExpectedId implements Serializable {
 
 	private String id;
 

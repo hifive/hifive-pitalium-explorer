@@ -3,7 +3,9 @@
  */
 package com.htmlhifive.testexplorer.model;
 
-public class Capability {
+import java.io.Serializable;
+
+public class Capability implements Serializable {
 	private String testClass;
 	private String testMethod;
 	private String platform;
@@ -17,57 +19,75 @@ public class Capability {
 	public String getTestClass() {
 		return testClass;
 	}
+
 	public void setTestClass(String testClass) {
 		this.testClass = testClass;
 	}
+
 	public String getTestMethod() {
 		return testMethod;
 	}
+
 	public void setTestMethod(String testMethod) {
 		this.testMethod = testMethod;
 	}
+
 	public String getPlatform() {
 		return platform;
 	}
+
 	public void setPlatform(String platform) {
 		this.platform = platform;
 	}
+
 	public String getPlatformVersion() {
 		return platformVersion;
 	}
+
 	public void setPlatformVersion(String plartformVersion) {
 		this.platformVersion = plartformVersion;
 	}
+
 	public String getDeviceName() {
 		return deviceName;
 	}
+
 	public void setDeviceName(String deviceName) {
 		this.deviceName = deviceName;
 	}
+
 	public String getBrowserName() {
 		return browserName;
 	}
+
 	public void setBrowserName(String browserName) {
 		this.browserName = browserName;
 	}
+
 	public String getBrowserVersion() {
 		return browserVersion;
 	}
+
 	public void setBrowserVersion(String browserVersion) {
 		this.browserVersion = browserVersion;
 	}
+
 	public String getLabel() {
 		return label;
 	}
+
 	public void setLabel(String label) {
 		this.label = label;
 	}
+
 	public ScreenShot getScreenShot() {
 		return screenShot;
 	}
+
 	public void setScreenShot(ScreenShot screenShot) {
 		this.screenShot = screenShot;
 	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -82,6 +102,7 @@ public class Capability {
 		result = prime * result + ((testMethod == null) ? 0 : testMethod.hashCode());
 		return result;
 	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)

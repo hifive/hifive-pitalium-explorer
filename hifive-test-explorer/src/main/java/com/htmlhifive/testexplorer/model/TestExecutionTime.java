@@ -3,7 +3,9 @@
  */
 package com.htmlhifive.testexplorer.model;
 
-public class TestExecutionTime {
+import java.io.Serializable;
+
+public class TestExecutionTime implements Serializable {
 
 	private final String executionTime;
 	private Boolean comparisonResult;
