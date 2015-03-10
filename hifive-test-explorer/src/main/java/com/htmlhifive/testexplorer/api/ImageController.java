@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.htmlhifive.testexplorer.model.Capability;
 import com.htmlhifive.testexplorer.model.ScreenShot;
-import com.htmlthifive.testlib.image.utlity.ImageUtility;
+import com.htmlhifive.testlib.image.utlity.ImageUtility;
 
 @Controller
 @RequestMapping("/image")
