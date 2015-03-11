@@ -85,15 +85,14 @@ public class ImageController {
 	}
 
 	/**
-	 * Get the image With a marker of comparison result. If there is no difference, not attached marker.
+	 * Get the diff image With a marker of comparison result. If there is no difference, return normal image.
 	 *
 	 * @param sourceId comparison source image id
 	 * @param targetId comparison target image id
-	 * @param includeId id of the included area to be used for image comparison
 	 * @param response HttpServletResponse
 	 */
-	@RequestMapping(value = "/getWithMarker", method = RequestMethod.GET)
-	public void getImageWithMarker(@RequestParam String sourceId, @RequestParam String targetId,
+	@RequestMapping(value = "/getDiff", method = RequestMethod.GET)
+	public void getDiffImage(@RequestParam String sourceId, @RequestParam String targetId,
 			HttpServletResponse response) {
 
 		@SuppressWarnings("unchecked")

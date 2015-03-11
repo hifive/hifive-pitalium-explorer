@@ -165,7 +165,7 @@
 		 * @param {Object} params extra paramters
 		 */
 		_setImageSrc: function(selector, withMarker, params) {
-			var url = withMarker ? 'image/getWithMarker' : 'image/get';
+			var url = withMarker ? 'image/getDiff' : 'image/get';
 			this.$find(selector).attr('src', hifive.test.explorer.utils.formatUrl(url, params));
 		}
 	};
@@ -173,7 +173,6 @@
 	h5.core.expose(testResultDiffController);
 })(jQuery);
 $(function() {
-	h5.core
-			.controller('body>div.container',
-					hifive.test.explorer.controller.TestResultDiffController);
+	h5.core.controller('body>div.container',
+			hifive.test.explorer.controller.TestResultDiffController);
 });
