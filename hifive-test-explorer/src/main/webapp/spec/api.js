@@ -74,13 +74,13 @@
 			case 'image':
 				// Get image
 				this._showImage(apiName, hifive.test.explorer.utils.formatUrl('../image/get', {
-					id: 17
+					id: 57
 				}));
 				break;
 
-			case 'imageWithMarker':
+			case 'diffImage':
 				// Get image
-				this._showImage(apiName, hifive.test.explorer.utils.formatUrl('../image/getWithMarker', {
+				this._showImage(apiName, hifive.test.explorer.utils.formatUrl('../image/getDiff', {
 					sourceId: 57,
 					targetId: 30
 				}));
