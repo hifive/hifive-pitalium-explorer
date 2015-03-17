@@ -11,34 +11,11 @@
 		http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa-1.0.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd">
 
-	<!-- 設定プロパティファイルの読み込み -->
-	<context:property-placeholder
-		location="classpath:appConf/*.properties" />
+	<!-- リソースクラス本体のScan設定 -->
+	<context:component-scan	base-package="com.htmlhifive.testexplorer.entity" />
 
-	<!-- API用設定情報 -->
-	<util:properties id="apiConfig" location="classpath:appConf/api-conf.properties" />
-
-	<!-- dataアクセス系の設定ファイルのインポート -->
-	<import resource="database.xml" />
-
-	<!-- 個別リソースの設定 -->
-	<import resource="resourceConf/**.xml" />
-
-	<!-- JPA EntityManagerの設定 -->
-	<bean id="abstractEntityManagerFactory"
-		class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean"
-		abstract="true">
-		<property name="dataSource" ref="dataSource" />
-		<property name="jpaVendorAdapter" ref="jpaVendorAdapter" />
-		<property name="persistenceXmlLocation" value="classpath:persistence.xml" />
-	</bean>
-
-	<!-- トランザクションマネージャ(JPA用)の設定 -->
-	<bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager"
-		p:dataSource-ref="dataSource">
-		<property name="defaultTimeout" value="100" />
-	</bean>
-
-	<bean id="entityManagerFactory" parent="abstractEntityManagerFactory"/>
+	<!-- JPAリポジトリのパッケージ設定 -->
+	<jpa:repositories base-package="com.htmlhifive.testexplorer.entity"
+		transaction-manager-ref="transactionManager" />
 
 </beans>

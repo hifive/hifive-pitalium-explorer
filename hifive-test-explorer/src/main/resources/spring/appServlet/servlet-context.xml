@@ -6,9 +6,7 @@
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd">
 
-	<!-- resource frameworkの使用(同時にmvc:annotation-drivenが有効になる) -->
 	<mvc:annotation-driven/>
-	<context:property-placeholder location="classpath:appConf/*.properties" />
 
 	<!-- コントローラ登録用Bean定義ファイルをインポート -->
 	<import resource="controllers.xml" />
