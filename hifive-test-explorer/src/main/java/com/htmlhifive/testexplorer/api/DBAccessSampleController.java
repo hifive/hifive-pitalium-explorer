@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.htmlhifive.testexplorer.entity.Result;
 import com.htmlhifive.testexplorer.entity.ResultRepository;
+import com.htmlhifive.testexplorer.entity.Screenshot;
+import com.htmlhifive.testexplorer.entity.ScreenshotRepository;
 
 @Controller
 @RequestMapping("/dbaccess")
@@ -20,6 +22,8 @@ public class DBAccessSampleController {
 
 	@Autowired
 	private ResultRepository resultRepo;
+	@Autowired
+	private ScreenshotRepository screenshotRepo;
 
 	@RequestMapping(value = "/findAll", method = RequestMethod.GET, produces = "application/json;charset=utf-8")
 	@ResponseBody
@@ -51,12 +55,26 @@ public class DBAccessSampleController {
 	
 	@RequestMapping(value = "/save", method = RequestMethod.GET, produces = "application/json;charset=utf-8")
 	@ResponseBody
-	public ResponseEntity<Integer> save(@RequestParam String executeTime, @RequestParam String expectedId) {
+	public ResponseEntity<Result> save(@RequestParam String executeTime, @RequestParam String expectedId) {
 		Result result = new Result();
 		result.setExecuteTime(executeTime);
 		result.setExpectedId(expectedId);
 		result = resultRepo.save(result);
-		return new ResponseEntity<>(result.getResultId(), HttpStatus.OK);
+		return new ResponseEntity<>(result, HttpStatus.OK);
+	}
+
+	@RequestMapping(value = "/findScreenshotAll", method = RequestMethod.GET, produces = "application/json;charset=utf-8")
+	@ResponseBody
+	public ResponseEntity<List<Screenshot>> findScreenshotAll() {
+		List<Screenshot> resultList = screenshotRepo.findAll();
+		return new ResponseEntity<>(resultList, HttpStatus.OK);
+	}
+
+	@RequestMapping(value = "/findByExecuteTime", method = RequestMethod.GET, produces = "application/json;charset=utf-8")
+	@ResponseBody
+	public ResponseEntity<List<Screenshot>> findByExecuteTime(@RequestParam String executeTime) {
+		List<Screenshot> resultList = screenshotRepo.find(executeTime);
+		return new ResponseEntity<>(resultList, HttpStatus.OK);
 	}
 
 }

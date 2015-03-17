@@ -10,7 +10,7 @@
 	<!-- 組み込みのメモリDB用 -->
 	<!-- server.database.0 に相対パスが指定された場合は、HSqlDBServerManagerがプロジェクトフォルダを基点とした絶対パスに変換する -->
 	<beans profile="embedded">
-		<bean id="hsqldb" class="com.htmlhifive.testexplorer.db.HSqlDBServerManager">
+		<bean id="hsqldb" class="com.htmlhifive.testexplorer.hsqldb.HSqlDBServerManager">
 			<property name="serverProperties">
 				<props>
 					<prop key="server.database.0">${hsqldb.server.database.0}</prop>

@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2015 NS Solutions Corporation, All Rights Reserved.
  */
-package com.htmlhifive.testexplorer.db;
+package com.htmlhifive.testexplorer.hsqldb;
 
 import java.io.IOException;
 import java.nio.file.Path;

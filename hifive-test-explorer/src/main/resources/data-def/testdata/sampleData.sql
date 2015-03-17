@@ -5,3 +5,6 @@ insert into result values (4, '2015_03_05_22_01_58', null);
 insert into result values (5, '2015_03_05_22_03_10', '2015_03_05_22_01_58');
 insert into result values (6, '2015_03_05_22_14_18', '2015_03_05_22_01_58');
 insert into result values (7, '2015_03_05_22_18_29', '2015_03_05_22_01_58');
+
+
+insert into Screenshot values (1, 'sampleCapture', 'testCaptureTutorial13_sampleCapture_WINDOWS_internet explorer', null, 1);

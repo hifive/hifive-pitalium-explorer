@@ -32,5 +32,5 @@ public class Result {
 	public void setExpectedId(String expectedId) {
 		this.expectedId = expectedId;
 	}
-	
+
 }
