@@ -8,6 +8,8 @@ import org.springframework.data.repository.query.Param;
 
 public interface ScreenshotRepository extends JpaRepository<Screenshot, Integer> {
 
-	@Query("select s from Screenshot as s, Result as r where r.executeTime = :executeTime and s.result = r.resultId")
+	@Query("select s from Screenshot as s, Result as r "
+			+ "where r.executeTime = :executeTime and s.result = r.resultId "
+			+ "order by s.comparisonResult asc")
 	public List<Screenshot> find(@Param("executeTime") String executeTime);
 }

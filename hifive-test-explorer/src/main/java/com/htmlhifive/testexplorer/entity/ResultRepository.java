@@ -15,6 +15,6 @@ public interface ResultRepository extends JpaRepository<Result, Integer> {
 	@Query("select r from Result as r where expectedId like %:expectedId%")
 	public List<Result> findKeyword(@Param("expectedId") String expectedId);
 
-	@Query("select r from Result as r where executetime between :start and :end")
+	@Query("select r from Result as r where executeTime between :start and :end")
 	public List<Result> findRange(@Param("start") String start, @Param("end") String end);
 }

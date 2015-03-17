@@ -3,6 +3,8 @@ package com.htmlhifive.testexplorer.api;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -28,7 +30,7 @@ public class DBAccessSampleController {
 	@RequestMapping(value = "/findAll", method = RequestMethod.GET, produces = "application/json;charset=utf-8")
 	@ResponseBody
 	public ResponseEntity<List<Result>> findAll() {
-		List<Result> resultList = resultRepo.findAll();
+		List<Result> resultList = resultRepo.findAll(new Sort(Direction.ASC, "executeTime"));
 		return new ResponseEntity<>(resultList, HttpStatus.OK);
 	}
 
