@@ -166,6 +166,9 @@ public class ImageController {
 		} catch (IOException e) {
 			log.error(e.getMessage(), e);
 			throw e;
+		} catch (IndexOutOfBoundsException e2) {
+			// Even if an exception occurs, no problem in the subsequent processing.
+			log.warn(e2.getMessage(), e2);
 		}
 	}
 
