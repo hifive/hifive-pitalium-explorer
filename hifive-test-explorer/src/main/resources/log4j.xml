@@ -24,7 +24,7 @@
 	</appender>
 
 	<root>
-		<level value="error" />
+		<level value="warn" />
 		<appender-ref ref="console" />
 		<appender-ref ref="file" />
 	</root>
