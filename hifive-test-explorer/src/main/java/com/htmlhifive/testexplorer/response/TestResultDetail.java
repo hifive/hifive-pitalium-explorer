@@ -1,15 +1,20 @@
 /*
  * Copyright (C) 2015 NS Solutions Corporation, All Rights Reserved.
  */
-package com.htmlhifive.testexplorer.model;
+package com.htmlhifive.testexplorer.response;
 
 import java.io.Serializable;
+
+import com.htmlhifive.testexplorer.model.Capability;
+import com.htmlhifive.testexplorer.model.ExecutionMode;
+import com.htmlhifive.testexplorer.model.ResultFile;
+import com.htmlhifive.testexplorer.model.ScreenShot;
 
 /**
  * TestResult
  *
  */
-public class TestResult implements Serializable {
+public class TestResultDetail implements Serializable {
 	/** serialVersionUID */
 	private static final long serialVersionUID = 3123785836289311875L;
 
@@ -27,10 +32,10 @@ public class TestResult implements Serializable {
 	private Boolean comparisonResult;
 	private ExecutionMode mode;
 
-	public TestResult() {
+	public TestResultDetail() {
 	}
 
-	public TestResult(ScreenShot screenShot) {
+	public TestResultDetail(ScreenShot screenShot) {
 		ResultFile resultFile = screenShot.getResultFile();
 		mode = resultFile.getExpectedId() == null ? ExecutionMode.EXPECTED : ExecutionMode.ACTUAL;
 		executionTime = resultFile.getExecuteTime();

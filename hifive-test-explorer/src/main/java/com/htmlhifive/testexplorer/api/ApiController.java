@@ -33,11 +33,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.htmlhifive.testexplorer.model.Capability;
-import com.htmlhifive.testexplorer.model.ExpectedId;
 import com.htmlhifive.testexplorer.model.ResultFile;
 import com.htmlhifive.testexplorer.model.ScreenShot;
-import com.htmlhifive.testexplorer.model.TestExecutionTime;
-import com.htmlhifive.testexplorer.model.TestResult;
+import com.htmlhifive.testexplorer.response.ExpectedId;
+import com.htmlhifive.testexplorer.response.TestExecutionTime;
+import com.htmlhifive.testexplorer.response.TestResultDetail;
 
 @Controller
 @RequestMapping("/api")
@@ -135,22 +135,22 @@ public class ApiController {
 	 */
 	@RequestMapping(value = "/listTestResult", method = RequestMethod.GET, produces = "application/json;charset=utf-8")
 	@ResponseBody
-	public ResponseEntity<List<TestResult>> listTestResult(@RequestParam String executionTime) {
+	public ResponseEntity<List<TestResultDetail>> listTestResult(@RequestParam String executionTime) {
 		@SuppressWarnings("unchecked")
 		Map<String, List<ResultFile>> resultFileMap = (Map<String, List<ResultFile>>) request.getSession(false)
 				.getAttribute(KEY_RESULT_MAP);
 		List<ResultFile> list = resultFileMap.get(executionTime);
 		if (list == null) {
 			log.error("executionTime(" + executionTime + ") is invalid parameter.");
-			return new ResponseEntity<List<TestResult>>(HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<List<TestResultDetail>>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 
 		@SuppressWarnings("unchecked")
 		Map<String, ScreenShot> screenShotMap = (Map<String, ScreenShot>) request.getSession(false).getAttribute(
 				KEY_INDEX_MAP);
 
-		List<TestResult> resultList = makeTestResultList(list, screenShotMap);
-		return new ResponseEntity<List<TestResult>>(resultList, HttpStatus.OK);
+		List<TestResultDetail> resultList = makeTestResultList(list, screenShotMap);
+		return new ResponseEntity<List<TestResultDetail>>(resultList, HttpStatus.OK);
 	}
 
 	/**
@@ -161,7 +161,7 @@ public class ApiController {
 	 */
 	@RequestMapping(value = "/getDetail", method = RequestMethod.GET, produces = "application/json;charset=utf-8")
 	@ResponseBody
-	public ResponseEntity<TestResult> getDetail(@RequestParam String id) {
+	public ResponseEntity<TestResultDetail> getDetail(@RequestParam String id) {
 		@SuppressWarnings("unchecked")
 		Map<String, ScreenShot> screenShotMap = (Map<String, ScreenShot>) request.getSession(false).getAttribute(
 				KEY_INDEX_MAP);
@@ -169,12 +169,12 @@ public class ApiController {
 		ScreenShot screenShot = screenShotMap.get(id);
 		if (screenShot == null) {
 			log.error("id(" + id + ") is invalid parameter.");
-			return new ResponseEntity<TestResult>(HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<TestResultDetail>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 
-		TestResult detail = new TestResult(screenShot);
+		TestResultDetail detail = new TestResultDetail(screenShot);
 		detail.setId(id);
-		return new ResponseEntity<TestResult>(detail, HttpStatus.OK);
+		return new ResponseEntity<TestResultDetail>(detail, HttpStatus.OK);
 	}
 
 	/**
@@ -235,15 +235,15 @@ public class ApiController {
 		return resultFiles;
 	}
 
-	private List<TestResult> makeTestResultList(final List<ResultFile> resultFileList, final Map<String, ScreenShot> map) {
-		List<TestResult> resultList = new ArrayList<TestResult>();
+	private List<TestResultDetail> makeTestResultList(final List<ResultFile> resultFileList, final Map<String, ScreenShot> map) {
+		List<TestResultDetail> resultList = new ArrayList<TestResultDetail>();
 		for (ResultFile resultFile : resultFileList) {
 			String executionTime = resultFile.getExecuteTime();
 			for (ScreenShot screenShot : resultFile.getScreenShots()) {
 				for (Entry<String, ScreenShot> entry : map.entrySet()) {
 					ScreenShot other = entry.getValue();
 					if (screenShot.equals(other) && executionTime.equals(other.getResultFile().getExecuteTime())) {
-						TestResult result = new TestResult(screenShot);
+						TestResultDetail result = new TestResultDetail(screenShot);
 						result.setId(entry.getKey());
 						resultList.add(result);
 						break;

@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2015 NS Solutions Corporation, All Rights Reserved.
  */
-package com.htmlhifive.testexplorer.model;
+package com.htmlhifive.testexplorer.response;
 
 import java.io.Serializable;
 

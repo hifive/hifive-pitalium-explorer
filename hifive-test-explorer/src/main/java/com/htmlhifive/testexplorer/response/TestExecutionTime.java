@@ -1,9 +1,12 @@
 /*
  * Copyright (C) 2015 NS Solutions Corporation, All Rights Reserved.
  */
-package com.htmlhifive.testexplorer.model;
+package com.htmlhifive.testexplorer.response;
 
 import java.io.Serializable;
+
+import com.htmlhifive.testexplorer.model.ResultFile;
+import com.htmlhifive.testexplorer.model.ScreenShot;
 
 public class TestExecutionTime implements Serializable {
 
