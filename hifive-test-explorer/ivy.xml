@@ -16,11 +16,14 @@
 		<artifact name="hifive-test-explorer" type="war" conf="default"/>
 	</publications>
 	<dependencies>
-		<dependency org="org.slf4j" name="jcl-over-slf4j" rev="1.7.10" conf="default,test->default(*)" />
-		<dependency org="org.slf4j" name="slf4j-log4j12" rev="1.7.10" conf="default,test->default(*)" />
-		<dependency org="log4j" name="log4j" rev="1.2.17" conf="default,test->default(*)" />
-		<dependency org="org.codehaus.jackson" name="jackson-mapper-asl" rev="1.9.12" conf="default,test->default(*)" />
-		<dependency org="org.apache.commons" name="commons-lang3" rev="3.1" conf="default,test->default(*)" />
+		<dependency org="org.slf4j" name="slf4j-api" rev="1.7.10" conf="default,test->default(*)" />
+		<dependency org="org.slf4j" name="slf4j-ext" rev="1.7.10" conf="default,test->default(*)" />
+		<dependency org="org.apache.logging.log4j" name="log4j-slf4j-impl" rev="2.2" conf="default,test->default(*)"/>
+		<dependency org="org.apache.logging.log4j" name="log4j-api" rev="2.2" conf="default,test->default(*)" />
+		<dependency org="org.apache.logging.log4j" name="log4j-core" rev="2.2" conf="default,test->default(*)" />
+		<dependency org="commons-logging" name="commons-logging" rev="1.2" conf="default,test->default(*)" />
+		<dependency org="com.fasterxml.jackson.core" name="jackson-databind" rev="2.5.1" conf="default,test->default(*)" />
+		<dependency org="org.apache.commons" name="commons-lang3" rev="3.3.2" conf="default,test->default(*)" />
 		<dependency org="commons-io" name="commons-io" rev="2.4" conf="default,test->default(*)" />
 		<dependency org="org.springframework" name="spring-core" rev="3.2.13.RELEASE" conf="default,test->default(*)" />
 		<dependency org="org.springframework" name="spring-beans" rev="3.2.13.RELEASE" conf="default,test->default(*)" />
@@ -29,6 +32,5 @@
 		<dependency org="org.springframework" name="spring-context" rev="3.2.13.RELEASE" conf="default,test->default(*)" />
 		<dependency org="org.springframework" name="spring-orm" rev="3.2.13.RELEASE" conf="default,test->default(*)" />
 		<dependency org="org.springframework" name="spring-webmvc" rev="3.2.13.RELEASE" conf="default,test->default(*)" />
-		<exclude artifact="commons-logging" />
 	</dependencies>
 </ivy-module>

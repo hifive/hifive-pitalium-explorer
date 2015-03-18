@@ -20,9 +20,8 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.commons.io.filefilter.TrueFileFilter;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.codehaus.jackson.map.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,6 +31,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.htmlhifive.testexplorer.model.Capability;
 import com.htmlhifive.testexplorer.model.ResultFile;
 import com.htmlhifive.testexplorer.model.ScreenShot;
@@ -55,7 +55,7 @@ public class ApiController {
 	@Autowired
 	private Properties apiConfig;
 
-	private static Log log = LogFactory.getLog(ApiController.class);
+	private static Logger log = LoggerFactory.getLogger(ApiController.class);
 
 	/**
 	 * Gets list of the test execution date and time. Parses the Result file and create the object list. Also, store the

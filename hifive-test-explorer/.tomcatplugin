@@ -10,15 +10,19 @@
     <webPath>/hifive-test-explorer</webPath>
     <webClassPathEntries>
         <webClassPathEntry>/hifive-test-explorer/lib/aopalliance-1.0.jar</webClassPathEntry>
+        <webClassPathEntry>/hifive-test-explorer/lib/cal10n-api-0.8.1.jar</webClassPathEntry>
         <webClassPathEntry>/hifive-test-explorer/lib/commons-io-2.4.jar</webClassPathEntry>
-        <webClassPathEntry>/hifive-test-explorer/lib/commons-lang3-3.1.jar</webClassPathEntry>
+        <webClassPathEntry>/hifive-test-explorer/lib/commons-lang3-3.3.2.jar</webClassPathEntry>
+        <webClassPathEntry>/hifive-test-explorer/lib/commons-logging-1.2.jar</webClassPathEntry>
         <webClassPathEntry>/hifive-test-explorer/lib/hifive-test-library.jar</webClassPathEntry>
-        <webClassPathEntry>/hifive-test-explorer/lib/jackson-core-asl-1.9.12.jar</webClassPathEntry>
-        <webClassPathEntry>/hifive-test-explorer/lib/jackson-mapper-asl-1.9.12.jar</webClassPathEntry>
-        <webClassPathEntry>/hifive-test-explorer/lib/jcl-over-slf4j-1.7.10.jar</webClassPathEntry>
-        <webClassPathEntry>/hifive-test-explorer/lib/log4j-1.2.17.jar</webClassPathEntry>
+        <webClassPathEntry>/hifive-test-explorer/lib/jackson-annotations-2.5.0.jar</webClassPathEntry>
+        <webClassPathEntry>/hifive-test-explorer/lib/jackson-core-2.5.1.jar</webClassPathEntry>
+        <webClassPathEntry>/hifive-test-explorer/lib/jackson-databind-2.5.1.jar</webClassPathEntry>
+        <webClassPathEntry>/hifive-test-explorer/lib/log4j-api-2.2.jar</webClassPathEntry>
+        <webClassPathEntry>/hifive-test-explorer/lib/log4j-core-2.2.jar</webClassPathEntry>
+        <webClassPathEntry>/hifive-test-explorer/lib/log4j-slf4j-impl-2.2.jar</webClassPathEntry>
         <webClassPathEntry>/hifive-test-explorer/lib/slf4j-api-1.7.10.jar</webClassPathEntry>
-        <webClassPathEntry>/hifive-test-explorer/lib/slf4j-log4j12-1.7.10.jar</webClassPathEntry>
+        <webClassPathEntry>/hifive-test-explorer/lib/slf4j-ext-1.7.10.jar</webClassPathEntry>
         <webClassPathEntry>/hifive-test-explorer/lib/spring-aop-3.2.13.RELEASE.jar</webClassPathEntry>
         <webClassPathEntry>/hifive-test-explorer/lib/spring-beans-3.2.13.RELEASE.jar</webClassPathEntry>
         <webClassPathEntry>/hifive-test-explorer/lib/spring-context-3.2.13.RELEASE.jar</webClassPathEntry>
@@ -30,6 +34,5 @@
         <webClassPathEntry>/hifive-test-explorer/lib/spring-web-3.2.13.RELEASE.jar</webClassPathEntry>
         <webClassPathEntry>/hifive-test-explorer/lib/spring-webmvc-3.2.13.RELEASE.jar</webClassPathEntry>
         <webClassPathEntry>/hifive-test-explorer/src/main/webapp/WEB-INF/classes</webClassPathEntry>
-        <webClassPathEntry>/hifive-test-explorer/target/classes</webClassPathEntry>
     </webClassPathEntries>
 </tomcatProjectProperties>
