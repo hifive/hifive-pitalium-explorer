@@ -5,27 +5,27 @@ package com.htmlhifive.testexplorer.response;
 
 import java.io.Serializable;
 
-import com.htmlhifive.testexplorer.model.ResultFile;
-import com.htmlhifive.testexplorer.model.ScreenShot;
+import com.htmlhifive.testexplorer.model.TestCaseResult;
+import com.htmlhifive.testexplorer.model.Screenshot;
 
 public class TestExecutionTime implements Serializable {
 
 	private final String executionTime;
 	private Boolean comparisonResult;
 
-	public TestExecutionTime(ResultFile resultFile) {
-		executionTime = resultFile.getExecuteTime();
+	public TestExecutionTime(TestCaseResult testCaseResult) {
+		executionTime = testCaseResult.getExecuteTime();
 
-		ScreenShot[] screenShots = resultFile.getScreenShots();
-		for (int j = 0, screenLen = screenShots.length; j < screenLen; j++) {
-			Boolean result = screenShots[j].getResult();
+		Screenshot[] screenshots = testCaseResult.getScreenShots();
+		for (int j = 0, screenLen = screenshots.length; j < screenLen; j++) {
+			Boolean result = screenshots[j].getResult();
 			if (result == null) {
 				continue;
 			}
 			if (comparisonResult == null) {
 				comparisonResult = result;
 			} else {
-				comparisonResult = comparisonResult & screenShots[j].getResult();
+				comparisonResult = comparisonResult & screenshots[j].getResult();
 			}
 		}
 	}

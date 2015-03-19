@@ -7,8 +7,8 @@ import java.io.Serializable;
 
 import com.htmlhifive.testexplorer.model.Capability;
 import com.htmlhifive.testexplorer.model.ExecutionMode;
-import com.htmlhifive.testexplorer.model.ResultFile;
-import com.htmlhifive.testexplorer.model.ScreenShot;
+import com.htmlhifive.testexplorer.model.TestCaseResult;
+import com.htmlhifive.testexplorer.model.Screenshot;
 
 /**
  * TestResult
@@ -22,7 +22,7 @@ public class TestResultDetail implements Serializable {
 	private String executionTime;
 	private String testClass;
 	private String testMethod;
-	private String screenShotId;
+	private String screenshotId;
 	private String platform;
 	private String platformVersion;
 	private String deviceName;
@@ -35,15 +35,15 @@ public class TestResultDetail implements Serializable {
 	public TestResultDetail() {
 	}
 
-	public TestResultDetail(ScreenShot screenShot) {
-		ResultFile resultFile = screenShot.getResultFile();
-		mode = resultFile.getExpectedId() == null ? ExecutionMode.EXPECTED : ExecutionMode.ACTUAL;
-		executionTime = resultFile.getExecuteTime();
+	public TestResultDetail(Screenshot screenshot) {
+		TestCaseResult testCaseResult = screenshot.getTestCaseResult();
+		mode = testCaseResult.getExpectedId() == null ? ExecutionMode.EXPECTED : ExecutionMode.ACTUAL;
+		executionTime = testCaseResult.getExecuteTime();
 
-		screenShotId = screenShot.getScreenshotId();
-		comparisonResult = screenShot.getResult();
+		screenshotId = screenshot.getScreenshotId();
+		comparisonResult = screenshot.getResult();
 
-		Capability capability =  screenShot.getCapability();
+		Capability capability =  screenshot.getCapability();
 		testClass = capability.getTestClass();
 		testMethod = capability.getTestMethod();
 		platform = capability.getPlatform();
@@ -86,12 +86,12 @@ public class TestResultDetail implements Serializable {
 		this.testMethod = testMethod;
 	}
 
-	public String getScreenShotId() {
-		return screenShotId;
+	public String getScreenshotId() {
+		return screenshotId;
 	}
 
-	public void setScreenShotId(String screenShotId) {
-		this.screenShotId = screenShotId;
+	public void setScreenshotId(String screenshotId) {
+		this.screenshotId = screenshotId;
 	}
 
 	public String getPlatform() {

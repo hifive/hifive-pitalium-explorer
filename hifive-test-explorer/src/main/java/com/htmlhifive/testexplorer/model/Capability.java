@@ -14,7 +14,7 @@ public class Capability implements Serializable {
 	private String browserName;
 	private String browserVersion;
 	private String label;
-	private ScreenShot screenShot;
+	private Screenshot screenshot;
 
 	public String getTestClass() {
 		return testClass;
@@ -80,12 +80,12 @@ public class Capability implements Serializable {
 		this.label = label;
 	}
 
-	public ScreenShot getScreenShot() {
-		return screenShot;
+	public Screenshot getScreenshot() {
+		return screenshot;
 	}
 
-	public void setScreenShot(ScreenShot screenShot) {
-		this.screenShot = screenShot;
+	public void setScreenshot(Screenshot screenshot) {
+		this.screenshot = screenshot;
 	}
 
 	@Override
