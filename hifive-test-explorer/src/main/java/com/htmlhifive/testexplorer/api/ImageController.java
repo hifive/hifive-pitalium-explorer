@@ -17,8 +17,8 @@ import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.htmlhifive.testexplorer.model.Capability;
-import com.htmlhifive.testexplorer.model.ScreenShot;
+import com.htmlhifive.testexplorer.model.Screenshot;
 import com.htmlhifive.testlib.image.utlity.ImageUtility;
 
 @Controller
@@ -45,7 +45,7 @@ public class ImageController {
 	@Autowired
 	private Properties apiConfig;
 
-	private static Log log = LogFactory.getLog(ImageController.class);
+	private static Logger log = LoggerFactory.getLogger(ImageController.class);
 
 	/**
 	 * Get the image from id.
@@ -57,12 +57,12 @@ public class ImageController {
 	public void getImage(@RequestParam String id, HttpServletResponse response) {
 
 		@SuppressWarnings("unchecked")
-		Map<String, ScreenShot> screenShotMap = (Map<String, ScreenShot>) request.getSession(false).getAttribute(
+		Map<String, Screenshot> screenshotMap = (Map<String, Screenshot>) request.getSession(false).getAttribute(
 				KEY_INDEX_MAP);
 
 		// Validate Parameters.
-		ScreenShot screenShot = screenShotMap.get(id);
-		if (screenShot == null) {
+		Screenshot screenshot = screenshotMap.get(id);
+		if (screenshot == null) {
 			log.error("id(" + id + ") is invalid parameter.");
 			response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
 			return;
@@ -70,7 +70,7 @@ public class ImageController {
 
 		File pngFile;
 		try {
-			pngFile = findPngFile(screenShot);
+			pngFile = findPngFile(screenshot);
 		} catch (IOException e) {
 			response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
 			return;
@@ -96,18 +96,18 @@ public class ImageController {
 			HttpServletResponse response) {
 
 		@SuppressWarnings("unchecked")
-		Map<String, ScreenShot> screenShotMap = (Map<String, ScreenShot>) request.getSession(false).getAttribute(
+		Map<String, Screenshot> screenshotMap = (Map<String, Screenshot>) request.getSession(false).getAttribute(
 				KEY_INDEX_MAP);
 
 		// Validate Parameters.
-		ScreenShot sourceScreenShot = screenShotMap.get(sourceId);
-		if (sourceScreenShot == null) {
+		Screenshot sourceScreenshot = screenshotMap.get(sourceId);
+		if (sourceScreenshot == null) {
 			log.error("id(" + sourceId + ") is invalid parameter.");
 			response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
 			return;
 		}
-		ScreenShot targetScreenShot = screenShotMap.get(targetId);
-		if (targetScreenShot == null) {
+		Screenshot targetScreenshot = screenshotMap.get(targetId);
+		if (targetScreenshot == null) {
 			log.error("id(" + targetId + ") is invalid parameter.");
 			response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
 			return;
@@ -117,8 +117,8 @@ public class ImageController {
 		File targetPngFile;
 
 		try {
-			sourcePngFile = findPngFile(sourceScreenShot);
-			targetPngFile = findPngFile(targetScreenShot);
+			sourcePngFile = findPngFile(sourceScreenshot);
+			targetPngFile = findPngFile(targetScreenshot);
 		} catch (IOException e) {
 			response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
 			return;
@@ -166,12 +166,15 @@ public class ImageController {
 		} catch (IOException e) {
 			log.error(e.getMessage(), e);
 			throw e;
+		} catch (IndexOutOfBoundsException e2) {
+			// Even if an exception occurs, no problem in the subsequent processing.
+			log.warn(e2.getMessage(), e2);
 		}
 	}
 
-	private File getBaseDirectory(ScreenShot screenShot) throws NoSuchFileException {
-		Capability capability = screenShot.getCapability();
-		String directoryName = screenShot.getResultFile().getExecuteTime() + File.separatorChar
+	private File getBaseDirectory(Screenshot screenshot) throws NoSuchFileException {
+		Capability capability = screenshot.getCapability();
+		String directoryName = screenshot.getTestCaseResult().getExecuteTime() + File.separatorChar
 				+ capability.getTestClass();
 		File base = new File(apiConfig.getProperty(RESULTS_DIR), directoryName);
 		if (!base.exists() || !base.isDirectory()) {
@@ -181,14 +184,14 @@ public class ImageController {
 		return base;
 	}
 
-	private File findPngFile(ScreenShot screenShot) throws IOException {
-		return findFile(screenShot, ".png");
+	private File findPngFile(Screenshot screenshot) throws IOException {
+		return findFile(screenshot, ".png");
 	}
 
-	private File findFile(ScreenShot screenShot, String extension) throws IOException {
-		File root = getBaseDirectory(screenShot);
+	private File findFile(Screenshot screenshot, String extension) throws IOException {
+		File root = getBaseDirectory(screenshot);
 
-		String fileName = screenShot.getFileName() + extension;
+		String fileName = screenshot.getFileName() + extension;
 		File file = new File(root, fileName);
 		if (!file.exists() || !file.isFile()) {
 			throw new FileNotFoundException(file.getAbsolutePath() + " Not Found.");

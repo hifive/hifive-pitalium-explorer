@@ -20,9 +20,8 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.commons.io.filefilter.TrueFileFilter;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.codehaus.jackson.map.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,12 +31,13 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.htmlhifive.testexplorer.model.Capability;
-import com.htmlhifive.testexplorer.model.ExpectedId;
-import com.htmlhifive.testexplorer.model.ResultFile;
-import com.htmlhifive.testexplorer.model.ScreenShot;
-import com.htmlhifive.testexplorer.model.TestExecutionTime;
-import com.htmlhifive.testexplorer.model.TestResult;
+import com.htmlhifive.testexplorer.model.TestCaseResult;
+import com.htmlhifive.testexplorer.model.Screenshot;
+import com.htmlhifive.testexplorer.response.ExpectedId;
+import com.htmlhifive.testexplorer.response.TestExecutionTime;
+import com.htmlhifive.testexplorer.response.TestResultDetail;
 
 @Controller
 @RequestMapping("/api")
@@ -55,7 +55,7 @@ public class ApiController {
 	@Autowired
 	private Properties apiConfig;
 
-	private static Log log = LogFactory.getLog(ApiController.class);
+	private static Logger log = LoggerFactory.getLogger(ApiController.class);
 
 	/**
 	 * Gets list of the test execution date and time. Parses the Result file and create the object list. Also, store the
@@ -72,42 +72,42 @@ public class ApiController {
 			return new ResponseEntity<List<TestExecutionTime>>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 
-		ResultFile[] resultFiles;
+		TestCaseResult[] testCaseResults;
 		try {
-			resultFiles = parseResultFile(root);
+			testCaseResults = parseResultFile(root);
 		} catch (IOException e) {
 			return new ResponseEntity<List<TestExecutionTime>>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 
 		List<TestExecutionTime> list = new ArrayList<TestExecutionTime>();
-		for (ResultFile resultFile : resultFiles) {
-			TestExecutionTime execution = new TestExecutionTime(resultFile);
+		for (TestCaseResult testCaseResult : testCaseResults) {
+			TestExecutionTime execution = new TestExecutionTime(testCaseResult);
 			if (!list.contains(execution)) {
 				list.add(execution);
 			}
 		}
 
 		HttpSession session = request.getSession(true);
-		Map<String, List<ResultFile>> resultFileMap = new HashMap<String, List<ResultFile>>();
-		session.setAttribute(KEY_RESULT_MAP, resultFileMap);
+		Map<String, List<TestCaseResult>> testCaseResutlMap = new HashMap<String, List<TestCaseResult>>();
+		session.setAttribute(KEY_RESULT_MAP, testCaseResutlMap);
 
-		for (ResultFile resultFile : resultFiles) {
-			String executionTime = resultFile.getExecuteTime();
-			List<ResultFile> tempList = resultFileMap.get(executionTime);
+		for (TestCaseResult testCaseResult : testCaseResults) {
+			String executionTime = testCaseResult.getExecuteTime();
+			List<TestCaseResult> tempList = testCaseResutlMap.get(executionTime);
 			if (tempList == null) {
-				tempList = new ArrayList<ResultFile>();
-				resultFileMap.put(executionTime, tempList);
+				tempList = new ArrayList<TestCaseResult>();
+				testCaseResutlMap.put(executionTime, tempList);
 			}
-			tempList.add(resultFile);
+			tempList.add(testCaseResult);
 		}
 
-		Map<String, ScreenShot> screenShotMap = new HashMap<String, ScreenShot>();
-		session.setAttribute(KEY_INDEX_MAP, screenShotMap);
+		Map<String, Screenshot> screenshotMap = new HashMap<String, Screenshot>();
+		session.setAttribute(KEY_INDEX_MAP, screenshotMap);
 
 		int index = 0;
-		for (ResultFile resultFile : resultFiles) {
-			for (ScreenShot screenShot : resultFile.getScreenShots()) {
-				screenShotMap.put(String.valueOf(index++), screenShot);
+		for (TestCaseResult testCaseResult : testCaseResults) {
+			for (Screenshot screenshot : testCaseResult.getScreenShots()) {
+				screenshotMap.put(String.valueOf(index++), screenshot);
 			}
 		}
 
@@ -135,22 +135,22 @@ public class ApiController {
 	 */
 	@RequestMapping(value = "/listTestResult", method = RequestMethod.GET, produces = "application/json;charset=utf-8")
 	@ResponseBody
-	public ResponseEntity<List<TestResult>> listTestResult(@RequestParam String executionTime) {
+	public ResponseEntity<List<TestResultDetail>> listTestResult(@RequestParam String executionTime) {
 		@SuppressWarnings("unchecked")
-		Map<String, List<ResultFile>> resultFileMap = (Map<String, List<ResultFile>>) request.getSession(false)
+		Map<String, List<TestCaseResult>> testCaseResultMap = (Map<String, List<TestCaseResult>>) request.getSession(false)
 				.getAttribute(KEY_RESULT_MAP);
-		List<ResultFile> list = resultFileMap.get(executionTime);
+		List<TestCaseResult> list = testCaseResultMap.get(executionTime);
 		if (list == null) {
 			log.error("executionTime(" + executionTime + ") is invalid parameter.");
-			return new ResponseEntity<List<TestResult>>(HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<List<TestResultDetail>>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 
 		@SuppressWarnings("unchecked")
-		Map<String, ScreenShot> screenShotMap = (Map<String, ScreenShot>) request.getSession(false).getAttribute(
+		Map<String, Screenshot> screenshotMap = (Map<String, Screenshot>) request.getSession(false).getAttribute(
 				KEY_INDEX_MAP);
 
-		List<TestResult> resultList = makeTestResultList(list, screenShotMap);
-		return new ResponseEntity<List<TestResult>>(resultList, HttpStatus.OK);
+		List<TestResultDetail> resultList = makeTestResultList(list, screenshotMap);
+		return new ResponseEntity<List<TestResultDetail>>(resultList, HttpStatus.OK);
 	}
 
 	/**
@@ -161,20 +161,20 @@ public class ApiController {
 	 */
 	@RequestMapping(value = "/getDetail", method = RequestMethod.GET, produces = "application/json;charset=utf-8")
 	@ResponseBody
-	public ResponseEntity<TestResult> getDetail(@RequestParam String id) {
+	public ResponseEntity<TestResultDetail> getDetail(@RequestParam String id) {
 		@SuppressWarnings("unchecked")
-		Map<String, ScreenShot> screenShotMap = (Map<String, ScreenShot>) request.getSession(false).getAttribute(
+		Map<String, Screenshot> screenshotMap = (Map<String, Screenshot>) request.getSession(false).getAttribute(
 				KEY_INDEX_MAP);
 
-		ScreenShot screenShot = screenShotMap.get(id);
-		if (screenShot == null) {
+		Screenshot screenshot = screenshotMap.get(id);
+		if (screenshot == null) {
 			log.error("id(" + id + ") is invalid parameter.");
-			return new ResponseEntity<TestResult>(HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<TestResultDetail>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 
-		TestResult detail = new TestResult(screenShot);
+		TestResultDetail detail = new TestResultDetail(screenshot);
 		detail.setId(id);
-		return new ResponseEntity<TestResult>(detail, HttpStatus.OK);
+		return new ResponseEntity<TestResultDetail>(detail, HttpStatus.OK);
 	}
 
 	/**
@@ -187,19 +187,19 @@ public class ApiController {
 	@ResponseBody
 	public ResponseEntity<ExpectedId> getExpectedId(@RequestParam String id) {
 		@SuppressWarnings("unchecked")
-		Map<String, ScreenShot> screenShotMap = (Map<String, ScreenShot>) request.getSession(false).getAttribute(
+		Map<String, Screenshot> screenshotMap = (Map<String, Screenshot>) request.getSession(false).getAttribute(
 				KEY_INDEX_MAP);
 
-		ScreenShot screenShot = screenShotMap.get(id);
-		if (screenShot == null) {
+		Screenshot screenshot = screenshotMap.get(id);
+		if (screenshot == null) {
 			log.error("id(" + id + ") is invalid parameter.");
 			return new ResponseEntity<ExpectedId>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 
-		Entry<String, ScreenShot> entry = findExpectedScreenshot(screenShot, screenShotMap);
+		Entry<String, Screenshot> entry = findExpectedScreenshot(screenshot, screenshotMap);
 		if (entry == null) {
-			if (screenShot.getResult() != null) {
-				log.error("find Expected ScreenShot.");
+			if (screenshot.getResult() != null) {
+				log.error("find Expected Screenshot.");
 			}
 			return new ResponseEntity<ExpectedId>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
@@ -209,41 +209,41 @@ public class ApiController {
 		return new ResponseEntity<ExpectedId>(obj, HttpStatus.OK);
 	}
 
-	private ResultFile[] parseResultFile(File root) throws IOException {
+	private TestCaseResult[] parseResultFile(File root) throws IOException {
 		String resultFileName = apiConfig.getProperty(RESULT_FILE_NAME);
 		IOFileFilter filter = FileFilterUtils.nameFileFilter(resultFileName);
 		Collection<File> collection = FileUtils.listFiles(root, filter, TrueFileFilter.INSTANCE);
 
 		int size = collection.size();
 		File[] files = collection.toArray(new File[size]);
-		ResultFile[] resultFiles = new ResultFile[size];
+		TestCaseResult[] testCaseResults = new TestCaseResult[size];
 		for (int i = 0; i < size; i++) {
 			try {
-				resultFiles[i] = new ObjectMapper().readValue(files[i], ResultFile.class);
+				testCaseResults[i] = new ObjectMapper().readValue(files[i], TestCaseResult.class);
 				// Unsorted
-				ScreenShot[] screenShots = resultFiles[i].getScreenShots();
-				for (int j = 0, len = screenShots.length; j < len; j++) {
-					Capability capability = screenShots[j].getCapability();
-					capability.setScreenShot(screenShots[j]);
-					screenShots[j].setResultFile(resultFiles[i]);
+				Screenshot[] screenshots = testCaseResults[i].getScreenShots();
+				for (int j = 0, len = screenshots.length; j < len; j++) {
+					Capability capability = screenshots[j].getCapability();
+					capability.setScreenshot(screenshots[j]);
+					screenshots[j].setTestCaseResult(testCaseResults[i]);
 				}
 			} catch (IOException e) {
 				log.error("Invalid file(" + resultFileName + ").", e);
 				throw e;
 			}
 		}
-		return resultFiles;
+		return testCaseResults;
 	}
 
-	private List<TestResult> makeTestResultList(final List<ResultFile> resultFileList, final Map<String, ScreenShot> map) {
-		List<TestResult> resultList = new ArrayList<TestResult>();
-		for (ResultFile resultFile : resultFileList) {
-			String executionTime = resultFile.getExecuteTime();
-			for (ScreenShot screenShot : resultFile.getScreenShots()) {
-				for (Entry<String, ScreenShot> entry : map.entrySet()) {
-					ScreenShot other = entry.getValue();
-					if (screenShot.equals(other) && executionTime.equals(other.getResultFile().getExecuteTime())) {
-						TestResult result = new TestResult(screenShot);
+	private List<TestResultDetail> makeTestResultList(final List<TestCaseResult> resultFileList, final Map<String, Screenshot> map) {
+		List<TestResultDetail> resultList = new ArrayList<TestResultDetail>();
+		for (TestCaseResult testCaseResult : resultFileList) {
+			String executionTime = testCaseResult.getExecuteTime();
+			for (Screenshot screenshot : testCaseResult.getScreenShots()) {
+				for (Entry<String, Screenshot> entry : map.entrySet()) {
+					Screenshot other = entry.getValue();
+					if (screenshot.equals(other) && executionTime.equals(other.getTestCaseResult().getExecuteTime())) {
+						TestResultDetail result = new TestResultDetail(screenshot);
 						result.setId(entry.getKey());
 						resultList.add(result);
 						break;
@@ -254,19 +254,19 @@ public class ApiController {
 		return resultList;
 	}
 
-	private Entry<String, ScreenShot> findExpectedScreenshot(ScreenShot screenShot, final Map<String, ScreenShot> map) {
-		if (screenShot.getResultFile().getExpectedId() == null) {
+	private Entry<String, Screenshot> findExpectedScreenshot(Screenshot screenshot, final Map<String, Screenshot> map) {
+		if (screenshot.getTestCaseResult().getExpectedId() == null) {
 			return null;
 		}
-		for (Entry<String, ScreenShot> entrySet : map.entrySet()) {
-			ScreenShot other = entrySet.getValue();
-			if (!screenShot.getScreenshotId().equals(other.getScreenshotId())) {
+		for (Entry<String, Screenshot> entrySet : map.entrySet()) {
+			Screenshot other = entrySet.getValue();
+			if (!screenshot.getScreenshotId().equals(other.getScreenshotId())) {
 				continue;
 			}
-			if (!screenShot.getResultFile().getExpectedId().equals(other.getResultFile().getExecuteTime())) {
+			if (!screenshot.getTestCaseResult().getExpectedId().equals(other.getTestCaseResult().getExecuteTime())) {
 				continue;
 			}
-			if (screenShot.getCapability().equals(other.getCapability())) {
+			if (screenshot.getCapability().equals(other.getCapability())) {
 				return entrySet;
 			}
 		}

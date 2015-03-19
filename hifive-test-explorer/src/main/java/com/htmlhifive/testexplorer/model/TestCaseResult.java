@@ -5,10 +5,10 @@ package com.htmlhifive.testexplorer.model;
 
 import java.io.Serializable;
 
-public class ResultFile implements Serializable {
+public class TestCaseResult implements Serializable {
 	private String executeTime;
 	private String expectedId;
-	private ScreenShot[] screenShots;
+	private Screenshot[] screenshots;
 
 	public String getExecuteTime() {
 		return executeTime;
@@ -26,11 +26,11 @@ public class ResultFile implements Serializable {
 		this.expectedId = expectedId;
 	}
 
-	public ScreenShot[] getScreenShots() {
-		return screenShots;
+	public Screenshot[] getScreenShots() {
+		return screenshots;
 	}
 
-	public void setScreenShots(ScreenShot[] screenShots) {
-		this.screenShots = screenShots;
+	public void setScreenShots(Screenshot[] screenshots) {
+		this.screenshots = screenshots;
 	}
 }

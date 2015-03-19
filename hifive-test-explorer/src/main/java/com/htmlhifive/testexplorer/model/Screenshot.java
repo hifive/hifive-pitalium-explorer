@@ -5,12 +5,12 @@ package com.htmlhifive.testexplorer.model;
 
 import java.io.Serializable;
 
-public class ScreenShot implements Serializable {
+public class Screenshot implements Serializable {
 	private String fileName;
 	private String screenshotId;
 	private Boolean result;
 	private Capability capability;
-	private ResultFile resultFile;
+	private TestCaseResult testCaseResult;
 
 	public String getFileName() {
 		return fileName;
@@ -44,12 +44,12 @@ public class ScreenShot implements Serializable {
 		this.capability = capability;
 	}
 
-	public ResultFile getResultFile() {
-		return resultFile;
+	public TestCaseResult getTestCaseResult() {
+		return testCaseResult;
 	}
 
-	public void setResultFile(ResultFile resultFile) {
-		this.resultFile = resultFile;
+	public void setTestCaseResult(TestCaseResult testCaseResult) {
+		this.testCaseResult = testCaseResult;
 	}
 
 	@Override
@@ -58,7 +58,7 @@ public class ScreenShot implements Serializable {
 		int result = 1;
 		result = prime * result + ((capability == null) ? 0 : capability.hashCode());
 		result = prime * result + ((fileName == null) ? 0 : fileName.hashCode());
-		result = prime * result + ((resultFile == null) ? 0 : resultFile.hashCode());
+		result = prime * result + ((testCaseResult == null) ? 0 : testCaseResult.hashCode());
 		result = prime * result + ((screenshotId == null) ? 0 : screenshotId.hashCode());
 		return result;
 	}
@@ -71,7 +71,7 @@ public class ScreenShot implements Serializable {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		ScreenShot other = (ScreenShot) obj;
+		Screenshot other = (Screenshot) obj;
 		if (capability == null) {
 			if (other.capability != null)
 				return false;
@@ -82,10 +82,10 @@ public class ScreenShot implements Serializable {
 				return false;
 		} else if (!fileName.equals(other.fileName))
 			return false;
-		if (resultFile == null) {
-			if (other.resultFile != null)
+		if (testCaseResult == null) {
+			if (other.testCaseResult != null)
 				return false;
-		} else if (!resultFile.equals(other.resultFile))
+		} else if (!testCaseResult.equals(other.testCaseResult))
 			return false;
 		if (screenshotId == null) {
 			if (other.screenshotId != null)
