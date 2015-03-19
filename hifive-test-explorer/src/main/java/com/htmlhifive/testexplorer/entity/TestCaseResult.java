@@ -7,18 +7,18 @@ import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 
 @Entity
-public class Result {
-	@SequenceGenerator(name="Result_generator", sequenceName="Seq_Result", allocationSize=1)
+public class TestCaseResult {
+	@SequenceGenerator(name="Result_generator", sequenceName="Seq_TestCaseResult", allocationSize=1)
 	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="Result_generator")
 	@Id
-	private Integer resultId;
+	private Integer id;
 	private String executeTime;
 	private String expectedId;
-	public Integer getResultId() {
-		return resultId;
+	public Integer getId() {
+		return id;
 	}
-	public void setResultId(Integer resultId) {
-		this.resultId = resultId;
+	public void setId(Integer id) {
+		this.id = id;
 	}
 	public String getExecuteTime() {
 		return executeTime;

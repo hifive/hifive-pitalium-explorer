@@ -13,18 +13,18 @@ public class Screenshot {
 	@SequenceGenerator(name="Screenshot_generator", sequenceName="Seq_Screenshot", allocationSize=1)
 	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="Screenshot_generator")
 	@Id
-	private Integer sid;
+	private Integer id;
 	private String screenshotId;
-	private Boolean comparisonResult;
+	private Boolean result;
 	private String fileName;
 	@ManyToOne
-	@JoinColumn(name="resultId", nullable=false, updatable=false)
-	private Result result;
-	public Integer getSid() {
-		return sid;
+	@JoinColumn(name="testCaseResultId", nullable=false, updatable=false)
+	private TestCaseResult testCaseResult;
+	public Integer getId() {
+		return id;
 	}
-	public void setSid(Integer sid) {
-		this.sid = sid;
+	public void setId(Integer id) {
+		this.id = id;
 	}
 	public String getScreenshotId() {
 		return screenshotId;
@@ -32,11 +32,11 @@ public class Screenshot {
 	public void setScreenshotId(String screenshotId) {
 		this.screenshotId = screenshotId;
 	}
-	public Boolean getComparisonResult() {
-		return comparisonResult;
+	public Boolean getResult() {
+		return result;
 	}
-	public void setComparisonResult(Boolean comparisonResult) {
-		this.comparisonResult = comparisonResult;
+	public void setResult(Boolean result) {
+		this.result = result;
 	}
 	public String getFileName() {
 		return fileName;
@@ -44,10 +44,10 @@ public class Screenshot {
 	public void setFileName(String fileName) {
 		this.fileName = fileName;
 	}
-	public Result getResult() {
-		return result;
+	public TestCaseResult getTestCaseResult() {
+		return testCaseResult;
 	}
-	public void setResult(Result result) {
-		this.result = result;
+	public void setTestCaseResult(TestCaseResult testCaseResult) {
+		this.testCaseResult = testCaseResult;
 	}
 }

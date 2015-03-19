@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.htmlhifive.testexplorer.entity.Result;
-import com.htmlhifive.testexplorer.entity.ResultRepository;
+import com.htmlhifive.testexplorer.entity.TestCaseResult;
+import com.htmlhifive.testexplorer.entity.TestCaseResultRepository;
 import com.htmlhifive.testexplorer.entity.Screenshot;
 import com.htmlhifive.testexplorer.entity.ScreenshotRepository;
 
@@ -23,42 +23,42 @@ import com.htmlhifive.testexplorer.entity.ScreenshotRepository;
 public class DBAccessSampleController {
 
 	@Autowired
-	private ResultRepository resultRepo;
+	private TestCaseResultRepository resultRepo;
 	@Autowired
 	private ScreenshotRepository screenshotRepo;
 
 	@RequestMapping(value = "/findAll", method = RequestMethod.GET, produces = "application/json;charset=utf-8")
 	@ResponseBody
-	public ResponseEntity<List<Result>> findAll() {
-		List<Result> resultList = resultRepo.findAll(new Sort(Direction.ASC, "executeTime"));
+	public ResponseEntity<List<TestCaseResult>> findAll() {
+		List<TestCaseResult> resultList = resultRepo.findAll(new Sort(Direction.ASC, "executeTime"));
 		return new ResponseEntity<>(resultList, HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/find", method = RequestMethod.GET, produces = "application/json;charset=utf-8")
 	@ResponseBody
-	public ResponseEntity<List<Result>> find(@RequestParam String expectedId) {
-		List<Result> resultList = resultRepo.find(expectedId);
+	public ResponseEntity<List<TestCaseResult>> find(@RequestParam String expectedId) {
+		List<TestCaseResult> resultList = resultRepo.find(expectedId);
 		return new ResponseEntity<>(resultList, HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/findKeyword", method = RequestMethod.GET, produces = "application/json;charset=utf-8")
 	@ResponseBody
-	public ResponseEntity<List<Result>> findKeyword(@RequestParam String expectedId) {
-		List<Result> resultList = resultRepo.findKeyword(expectedId);
+	public ResponseEntity<List<TestCaseResult>> findKeyword(@RequestParam String expectedId) {
+		List<TestCaseResult> resultList = resultRepo.findKeyword(expectedId);
 		return new ResponseEntity<>(resultList, HttpStatus.OK);
 	}
 	
 	@RequestMapping(value = "/findRage", method = RequestMethod.GET, produces = "application/json;charset=utf-8")
 	@ResponseBody
-	public ResponseEntity<List<Result>> findRage(@RequestParam String start, @RequestParam String end) {
-		List<Result> resultList = resultRepo.findRange(start, end);
+	public ResponseEntity<List<TestCaseResult>> findRage(@RequestParam String start, @RequestParam String end) {
+		List<TestCaseResult> resultList = resultRepo.findRange(start, end);
 		return new ResponseEntity<>(resultList, HttpStatus.OK);
 	}
 	
 	@RequestMapping(value = "/save", method = RequestMethod.GET, produces = "application/json;charset=utf-8")
 	@ResponseBody
-	public ResponseEntity<Result> save(@RequestParam String executeTime, @RequestParam String expectedId) {
-		Result result = new Result();
+	public ResponseEntity<TestCaseResult> save(@RequestParam String executeTime, @RequestParam String expectedId) {
+		TestCaseResult result = new TestCaseResult();
 		result.setExecuteTime(executeTime);
 		result.setExpectedId(expectedId);
 		result = resultRepo.save(result);
