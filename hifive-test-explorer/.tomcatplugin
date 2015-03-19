@@ -11,27 +11,28 @@
     <webClassPathEntries>
         <webClassPathEntry>/hifive-test-explorer/lib/antlr-2.7.7.jar</webClassPathEntry>
         <webClassPathEntry>/hifive-test-explorer/lib/aopalliance-1.0.jar</webClassPathEntry>
-        <webClassPathEntry>/hifive-test-explorer/lib/aspectjrt-1.7.4.jar</webClassPathEntry>
+        <webClassPathEntry>/hifive-test-explorer/lib/aspectjrt-1.8.4.jar</webClassPathEntry>
         <webClassPathEntry>/hifive-test-explorer/lib/cal10n-api-0.8.1.jar</webClassPathEntry>
-        <webClassPathEntry>/hifive-test-explorer/lib/commons-collections-3.2.1.jar</webClassPathEntry>
-        <webClassPathEntry>/hifive-test-explorer/lib/commons-dbcp-1.4.jar</webClassPathEntry>
+        <webClassPathEntry>/hifive-test-explorer/lib/commons-dbcp2-2.1.jar</webClassPathEntry>
         <webClassPathEntry>/hifive-test-explorer/lib/commons-io-2.4.jar</webClassPathEntry>
         <webClassPathEntry>/hifive-test-explorer/lib/commons-lang3-3.3.2.jar</webClassPathEntry>
         <webClassPathEntry>/hifive-test-explorer/lib/commons-logging-1.2.jar</webClassPathEntry>
-        <webClassPathEntry>/hifive-test-explorer/lib/commons-pool-1.5.4.jar</webClassPathEntry>
+        <webClassPathEntry>/hifive-test-explorer/lib/commons-pool2-2.3.jar</webClassPathEntry>
         <webClassPathEntry>/hifive-test-explorer/lib/dom4j-1.6.1.jar</webClassPathEntry>
-        <webClassPathEntry>/hifive-test-explorer/lib/hibernate-commons-annotations-4.0.1.Final.jar</webClassPathEntry>
-        <webClassPathEntry>/hifive-test-explorer/lib/hibernate-core-4.0.1.Final.jar</webClassPathEntry>
-        <webClassPathEntry>/hifive-test-explorer/lib/hibernate-entitymanager-4.0.1.Final.jar</webClassPathEntry>
-        <webClassPathEntry>/hifive-test-explorer/lib/hibernate-jpa-2.0-api-1.0.1.Final.jar</webClassPathEntry>
+        <webClassPathEntry>/hifive-test-explorer/lib/hibernate-commons-annotations-4.0.5.Final.jar</webClassPathEntry>
+        <webClassPathEntry>/hifive-test-explorer/lib/hibernate-core-4.3.8.Final.jar</webClassPathEntry>
+        <webClassPathEntry>/hifive-test-explorer/lib/hibernate-entitymanager-4.3.8.Final.jar</webClassPathEntry>
+        <webClassPathEntry>/hifive-test-explorer/lib/hibernate-jpa-2.1-api-1.0.0.Final.jar</webClassPathEntry>
         <webClassPathEntry>/hifive-test-explorer/lib/hifive-test-library.jar</webClassPathEntry>
         <webClassPathEntry>/hifive-test-explorer/lib/hsqldb-2.3.2.jar</webClassPathEntry>
         <webClassPathEntry>/hifive-test-explorer/lib/jackson-annotations-2.5.0.jar</webClassPathEntry>
         <webClassPathEntry>/hifive-test-explorer/lib/jackson-core-2.5.1.jar</webClassPathEntry>
         <webClassPathEntry>/hifive-test-explorer/lib/jackson-databind-2.5.1.jar</webClassPathEntry>
-        <webClassPathEntry>/hifive-test-explorer/lib/javassist-3.15.0-GA.jar</webClassPathEntry>
-        <webClassPathEntry>/hifive-test-explorer/lib/jboss-logging-3.1.0.CR2.jar</webClassPathEntry>
-        <webClassPathEntry>/hifive-test-explorer/lib/jboss-transaction-api_1.1_spec-1.0.0.Final.jar</webClassPathEntry>
+        <webClassPathEntry>/hifive-test-explorer/lib/jandex-1.1.0.Final.jar</webClassPathEntry>
+        <webClassPathEntry>/hifive-test-explorer/lib/javassist-3.18.1-GA.jar</webClassPathEntry>
+        <webClassPathEntry>/hifive-test-explorer/lib/jboss-logging-3.1.3.GA.jar</webClassPathEntry>
+        <webClassPathEntry>/hifive-test-explorer/lib/jboss-logging-annotations-1.2.0.Beta1.jar</webClassPathEntry>
+        <webClassPathEntry>/hifive-test-explorer/lib/jboss-transaction-api_1.2_spec-1.0.0.Final.jar</webClassPathEntry>
         <webClassPathEntry>/hifive-test-explorer/lib/log4j-api-2.2.jar</webClassPathEntry>
         <webClassPathEntry>/hifive-test-explorer/lib/log4j-core-2.2.jar</webClassPathEntry>
         <webClassPathEntry>/hifive-test-explorer/lib/log4j-slf4j-impl-2.2.jar</webClassPathEntry>
@@ -41,15 +42,14 @@
         <webClassPathEntry>/hifive-test-explorer/lib/spring-beans-3.2.13.RELEASE.jar</webClassPathEntry>
         <webClassPathEntry>/hifive-test-explorer/lib/spring-context-3.2.13.RELEASE.jar</webClassPathEntry>
         <webClassPathEntry>/hifive-test-explorer/lib/spring-core-3.2.13.RELEASE.jar</webClassPathEntry>
-        <webClassPathEntry>/hifive-test-explorer/lib/spring-data-commons-1.7.3.RELEASE.jar</webClassPathEntry>
-        <webClassPathEntry>/hifive-test-explorer/lib/spring-data-jpa-1.5.3.RELEASE.jar</webClassPathEntry>
+        <webClassPathEntry>/hifive-test-explorer/lib/spring-data-commons-1.8.5.RELEASE.jar</webClassPathEntry>
+        <webClassPathEntry>/hifive-test-explorer/lib/spring-data-jpa-1.6.5.RELEASE.jar</webClassPathEntry>
         <webClassPathEntry>/hifive-test-explorer/lib/spring-expression-3.2.13.RELEASE.jar</webClassPathEntry>
         <webClassPathEntry>/hifive-test-explorer/lib/spring-jdbc-3.2.13.RELEASE.jar</webClassPathEntry>
         <webClassPathEntry>/hifive-test-explorer/lib/spring-orm-3.2.13.RELEASE.jar</webClassPathEntry>
         <webClassPathEntry>/hifive-test-explorer/lib/spring-tx-3.2.13.RELEASE.jar</webClassPathEntry>
         <webClassPathEntry>/hifive-test-explorer/lib/spring-web-3.2.13.RELEASE.jar</webClassPathEntry>
         <webClassPathEntry>/hifive-test-explorer/lib/spring-webmvc-3.2.13.RELEASE.jar</webClassPathEntry>
-        <webClassPathEntry>/hifive-test-explorer/lib/xml-apis-1.0.b2.jar</webClassPathEntry>
         <webClassPathEntry>/hifive-test-explorer/src/main/webapp/WEB-INF/classes</webClassPathEntry>
     </webClassPathEntries>
 </tomcatProjectProperties>
