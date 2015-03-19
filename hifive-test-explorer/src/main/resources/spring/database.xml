@@ -10,16 +10,7 @@
 	<!-- 組み込みのメモリDB用 -->
 	<!-- server.database.0 に相対パスが指定された場合は、HSqlDBServerManagerがプロジェクトフォルダを基点とした絶対パスに変換する -->
 	<beans profile="embedded">
-		<bean id="hsqldb" class="com.htmlhifive.testexplorer.hsqldb.HSqlDBServerManager">
-			<property name="serverProperties">
-				<props>
-					<prop key="server.database.0">${hsqldb.server.database.0}</prop>
-					<prop key="server.dbname.0">${hsqldb.server.dbname.0}</prop>
-				</props>
-			</property>
-		</bean>
-
-		<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" depends-on="hsqldb">
+		<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
 			<property name="driverClassName" value="${jdbc.driverClassName}" />
 			<property name="url" value="${jdbc.url}" />
 			<property name="username" value="${jdbc.username}" />
@@ -38,23 +29,4 @@
 			<property name="databasePlatform" value="org.hibernate.dialect.HSQLDialect" />
 		</bean>
 	</beans>
-
-	<!-- その他のRDBMS用 -->
-	<beans profile="rdbms">
-		<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
-			<property name="driverClassName" value="${jdbc.driverClassName}" />
-			<property name="url" value="${jdbc.url}" />
-			<property name="username" value="${jdbc.username}" />
-			<property name="password" value="${jdbc.password}" />
-			<property name="defaultAutoCommit" value="false" />
-		</bean>
-
-		<bean id="jpaVendorAdapter"
-			class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
-			<property name="showSql" value="false" />
-			<property name="generateDdl" value="true" />
-			<property name="databasePlatform" value="${jdbc.dialect}" />
-		</bean>
-	</beans>
-
 </beans>
