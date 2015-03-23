@@ -33,6 +33,7 @@
 		<dependency org="org.springframework" name="spring-orm" rev="3.2.13.RELEASE" conf="default,test->default(*)" />
 		<dependency org="org.springframework" name="spring-webmvc" rev="3.2.13.RELEASE" conf="default,test->default(*)" />
 		<dependency org="org.hsqldb" name="hsqldb" rev="2.3.2" conf="default,test->default(*)" />
+		<dependency org="org.hsqldb" name="sqltool" rev="2.3.2" conf="default,test->default(*)" />
 		<dependency org="org.apache.commons" name="commons-dbcp2" rev="2.1" conf="default,test->default(*)" />
 		<dependency org="org.hibernate" name="hibernate-entitymanager" rev="4.3.8.Final" conf="default,test->default(*)" />
 		<dependency org="org.springframework.data" name="spring-data-jpa" rev="1.6.5.RELEASE" conf="default,test->default(*)" />
