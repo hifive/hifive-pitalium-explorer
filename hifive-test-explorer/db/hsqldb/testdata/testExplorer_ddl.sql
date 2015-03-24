@@ -1,3 +1,10 @@
+drop TABLE Screenshot;
+drop TABLE TestCaseResult;
+
+drop SEQUENCE Seq_TestCaseResult;
+drop SEQUENCE Seq_Screenshot;
+
+
 /* Create Sequences */
 
 CREATE SEQUENCE Seq_TestCaseResult AS INTEGER START WITH 8;

@@ -30,3 +30,4 @@ insert into Screenshot values (19, 'sampleCapture', 'testCaptureTutorial13_sampl
 insert into Screenshot values (20, 'sampleCapture', 'testCaptureTutorial13_sampleCapture_WINDOWS_firefox', true, 7);
 insert into Screenshot values (21, 'sampleCapture', 'testCaptureTutorial13_sampleCapture_WINDOWS_chrome', false, 7);
 
+commit;

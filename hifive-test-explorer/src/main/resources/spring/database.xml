@@ -18,11 +18,6 @@
 			<property name="defaultAutoCommit" value="true" />
 		</bean>
 
-		<jdbc:initialize-database data-source="dataSource" ignore-failures="ALL">
-			<jdbc:script location="classpath:data-def/testExplorer_ddl.sql" encoding="UTF-8" />
-			<jdbc:script location="classpath:data-def/testdata/sampleData.sql" encoding="UTF-8" />
-		</jdbc:initialize-database>
-
 		<bean id="jpaVendorAdapter"
 			class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter" depends-on="dataSource">
 			<property name="showSql" value="true" />
