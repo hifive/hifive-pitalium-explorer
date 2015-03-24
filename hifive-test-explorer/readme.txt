@@ -35,9 +35,12 @@ Prepare the following development tools.
 3.  Update Tomcat context definition.
     Right-click "hifive-test-explorer" project and choose "Tomcat project" > "Update context definition".
 
-4.  Start Tomcat.
+4.  Start HSQLDB.
+    Run db/hsqldb/startHSQLDB.bat.
 
-5.  Access this application URL:
+5.  Start Tomcat.
+
+6.  Access this application URL:
 	http://localhost:8080/hifive-test-explorer/list.html
 
 ------------------------------------------------------------
