@@ -1,9 +1,10 @@
+\c true
 drop TABLE Screenshot;
 drop TABLE TestCaseResult;
 
 drop SEQUENCE Seq_TestCaseResult;
 drop SEQUENCE Seq_Screenshot;
-
+\c false
 
 /* Create Sequences */
 
