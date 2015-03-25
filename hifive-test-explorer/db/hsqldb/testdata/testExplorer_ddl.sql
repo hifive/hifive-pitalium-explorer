@@ -1,17 +1,31 @@
+
 \c true
+\p ******* DROP TABLE START *******
+
 drop TABLE Screenshot;
 drop TABLE TestCaseResult;
 
+\p ******* DROP TABLE END *******
+
+\p ******* DROP SEQUENCE START *******
+
 drop SEQUENCE Seq_TestCaseResult;
 drop SEQUENCE Seq_Screenshot;
+
+\p ******* DROP SEQUENCE END *******
+
 \c false
 
 /* Create Sequences */
+\p ******* CREATE SEQUENCE START *******
 
 CREATE SEQUENCE Seq_TestCaseResult AS INTEGER START WITH 8;
 CREATE SEQUENCE Seq_Screenshot AS INTEGER START WITH 22;
 
+\p ******* CREATE SEQUENCE END *******
+
 /* Create Tables */
+\p ******* CREATE TABLE START *******
 
 CREATE TABLE TestCaseResult
 (
@@ -32,9 +46,11 @@ CREATE TABLE Screenshot
 	PRIMARY KEY (id)
 );
 
+\p ******* CREATE TABLE END *******
 
 
 /* Create Foreign Keys */
+\p ******* ALTER TABLE START *******
 
 ALTER TABLE Screenshot
 	ADD FOREIGN KEY (testCaseResultId)
@@ -43,4 +59,5 @@ ALTER TABLE Screenshot
 	ON DELETE RESTRICT
 ;
 
+\p ******* ALTER TABLE END *******
 
