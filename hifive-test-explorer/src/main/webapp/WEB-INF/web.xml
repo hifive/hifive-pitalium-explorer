@@ -16,12 +16,6 @@
 		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
 	</listener>
 
-	<!-- プロファイル用の初期化設定 -->
-	<context-param>
-		<param-name>spring.profiles.active</param-name>
-		<param-value>embedded</param-value>
-	</context-param>
-
 	<!-- ルートコンテキストの読み込み -->
 	<context-param>
 		<param-name>contextConfigLocation</param-name>
