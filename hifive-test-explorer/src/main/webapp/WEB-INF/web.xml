@@ -6,23 +6,23 @@
 
 	<display-name>hifive-resource-framework</display-name>
 
-	<!-- リクエストコンテキストリスナーの設定 -->
+	<!-- Servlet listener that exposes the request to the current thread, through both LocaleContextHolder and RequestContextHolder.  -->
 	<listener>
 		<listener-class>org.springframework.web.context.request.RequestContextListener</listener-class>
 	</listener>
 
-	<!-- コンテキストローダリスナーの設定 -->
+	<!-- Loads the Spring web application context. -->
 	<listener>
 		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
 	</listener>
 
-	<!-- ルートコンテキストの読み込み -->
+	<!-- The master configuration file for this Spring web application. -->
 	<context-param>
 		<param-name>contextConfigLocation</param-name>
 		<param-value>classpath:spring/root-context.xml</param-value>
 	</context-param>
 
-	<!-- エンコーディングフィルター -->
+	<!-- Servlet Filter that allows one to specify a character encoding for requests.ー -->
 	<filter>
 		<filter-name>characterEncodingFilter</filter-name>
 		<filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
@@ -40,7 +40,7 @@
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
 
-	<!-- Dispatcherサーブレット設定 -->
+	<!-- declare the servlet class. -->
 	<servlet>
 		<servlet-name>appServlet</servlet-name>
 		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
@@ -50,12 +50,13 @@
 		</init-param>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
+	<!-- define a mapping from a URL path to a servlet declaration with the <servlet-mapping> element. -->
 	<servlet-mapping>
 		<servlet-name>appServlet</servlet-name>
 		<url-pattern>/*</url-pattern>
 	</servlet-mapping>
 
-	<!-- セッションに関する設定 -->
+	<!-- define the parameters of the Web application session. -->
 	<session-config>
 		<session-timeout>360</session-timeout>
 		<cookie-config>
