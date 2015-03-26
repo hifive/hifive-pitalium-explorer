@@ -3,3 +3,5 @@
 /db/hsqldb/db/
 /lib/
 /bin/
+.idea/
+*.iml
