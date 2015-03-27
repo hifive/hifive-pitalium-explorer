@@ -24,8 +24,8 @@ Prepare the following development tools.
 1.  Run ivy_build.xml.
     Right-click on "hifive-test-explorer ivy_build.xml.launch" and choose "Run As" > "hifive-test-explorer ivy_build.xml".
 
-2.  Modify "api-conf.properties".
-    "api-conf.properties" is located in the following folder.
+2.  Copy "api-conf.properties.sample" to "api-conf.properties" and modify "api-conf.properties".
+    "api-conf.properties.sample" is located in the following folder.
         "hifive-test-explorer" > "src/main/resources" > "appConf"
     Modify the value of the key "resultDir" to your absolute path of the sample data folder.
     "sampleData" folder is located in "hifive-test-explorer" project.

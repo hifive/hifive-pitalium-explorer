@@ -15,7 +15,7 @@
 1． ivy_build.xmlを実行します。
     hifive-test-explorer ivy_build.xml.launchを選択し、右クリックし、Run As > hifive-test-explorer ivy_build.xml で実行します。
 
-2.  『hifive-test-explorer』プロジェクト - 『src/main/resources』 - 『appConf』のapi-conf.propertiesの中身を書き換えます。
+2.  『hifive-test-explorer』プロジェクト - 『src/main/resources』 - 『appConf』のapi-conf.properties.sampleをコピーしてapi-conf.propertiesを作ってその中身を書き換えます。
     テストデータを格納したsampleDataフォルダはプロジェクトの直下にあります。各自の環境に合わせて絶対パスを書き換えてください。
     例）
         resultsDir=C:\\hifive\\workspace\\hifive-test-explorer\\sampleData
