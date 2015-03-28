@@ -134,6 +134,8 @@
 					}
 				}));
 			}));
+
+			this._initializeSwipeHandle();
 		},
 
 		/**
@@ -177,6 +179,26 @@
 
 		_hideExpectedMode: function() {
 			this.$find('#expected-mode').hide();
+		},
+
+		_initializeSwipeHandle: function() {
+			var min = 0,max = 1000,step = 1;
+
+			var $handle = this.$find('#swipe-handle');
+			var $actual = this.$find('#swipe .actual');
+			var $actualImg = this.$find('#swipe .actual > img');
+
+			$handle.attr('min', min);
+			$handle.attr('max', max);
+			$handle.attr('step', step);
+			$handle.val(min);
+
+			$handle.on('input', function() {
+				var val = $handle.val();
+				var percentage = ((val - min) / (max - min) * 100);
+				$actual.css('left', percentage + '%');
+				$actualImg.css('margin-left', (-percentage) + '%');
+			});
 		},
 	};
 

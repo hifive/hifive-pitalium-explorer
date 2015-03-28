@@ -4,6 +4,10 @@
 
 @charset "utf-8";
 
+body {
+	overflow-x: hidden;
+}
+
 .image-diff {
 	padding-left: 0;
 	padding-right: 0;
@@ -19,10 +23,39 @@
 	text-align: center;
 }
 
+.expected img {
+	border: 1px solid blue;
+}
+
+.actual img {
+	border: 1px solid red;
+}
+
 .expected .image-label {
 	background: #0000ff;
 }
 
 .actual .image-label {
 	background: #ff0000;
+}
+
+.image-overlay {
+	position: relative;
+}
+
+.image-overlay .actual {
+	position: absolute;
+	overflow: hidden;
+	width: 100%;
+	left: 0;
+	top: 0;
+}
+
+.image-overlay .swipe-bar {
+	position: absolute;
+	left: 0;
+	top: 0;
+	bottom: 0;
+	width: 1px;
+	background-color: gray;
 }
