@@ -48,45 +48,53 @@
 
 		<div class="container">
 
-			<ul class="nav nav-tabs">
-				<li><a href="#quick-flipping" data-toggle="tab">Quick flipping</a></li>
-				<li class="active"><a href="#two-up" data-toggle="tab">2-up</a></li>
-				<li><a href="#swipe" data-toggle="tab">Swipe</a></li>
-				<li><a href="#onion-skin" data-toggle="tab">Onion skin</a></li>
-				<li><a href="#edge-overlapping" data-toggle="tab">Edge overlapping</a></li>
-			</ul>
-
-			<div class="tab-content">
-
-				<div class="tab-pane" id="quick-flipping">
-					Quick flipping
+			<div id="expected-mode" class="row">
+				<div class="col-xs-12 image-diff actual">
+					<img>
 				</div>
+			</div>
 
-				<div class="tab-pane active" id="two-up">
-					<div class="row">
-						<div class="col-xs-6 image-diff expected">
-							<div class="image-label">EXPECTED</div>
-							<img>
-						</div>
-						<div class="col-xs-6 image-diff actual">
-							<div class="image-label">ACTUAL</div>
-							<img>
+			<div id="actual-mode">
+				<ul class="nav nav-tabs">
+					<li><a href="#quick-flipping" data-toggle="tab">Quick flipping</a></li>
+					<li class="active"><a href="#two-up" data-toggle="tab">2-up</a></li>
+					<li><a href="#swipe" data-toggle="tab">Swipe</a></li>
+					<li><a href="#onion-skin" data-toggle="tab">Onion skin</a></li>
+					<li><a href="#edge-overlapping" data-toggle="tab">Edge overlapping</a></li>
+				</ul>
+	
+				<div class="tab-content">
+	
+					<div class="tab-pane" id="quick-flipping">
+						Quick flipping
+					</div>
+	
+					<div class="tab-pane active" id="two-up">
+						<div class="row">
+							<div class="col-xs-6 image-diff expected">
+								<div class="image-label">EXPECTED</div>
+								<img>
+							</div>
+							<div class="col-xs-6 image-diff actual">
+								<div class="image-label">ACTUAL</div>
+								<img>
+							</div>
 						</div>
 					</div>
+	
+					<div class="tab-pane" id="swipe">
+						Swipe
+					</div>
+	
+					<div class="tab-pane" id="onion-skin">
+						Onion skin
+					</div>
+	
+					<div class="tab-pane" id="edge-overlapping">
+						Edge overlapping
+					</div>
+	
 				</div>
-
-				<div class="tab-pane" id="swipe">
-					Swipe
-				</div>
-
-				<div class="tab-pane" id="onion-skin">
-					Onion skin
-				</div>
-
-				<div class="tab-pane" id="edge-overlapping">
-					Edge overlapping
-				</div>
-
 			</div>
 		</div>
 	</body>

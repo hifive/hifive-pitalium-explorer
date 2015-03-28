@@ -97,8 +97,10 @@
 					this._setActualImageSrc(false, {
 						id: id
 					});
+					this._hideActualMode();
 					return;
 				}
+				this._hideExpectedMode();
 
 				this._testResultDiffLogic.getExpectedId(id).done(this.own(function(result) {
 					// Test not executed
@@ -167,7 +169,15 @@
 		_setImageSrc: function(selector, withMarker, params) {
 			var url = withMarker ? 'image/getDiff' : 'image/get';
 			this.$find(selector).attr('src', hifive.test.explorer.utils.formatUrl(url, params));
-		}
+		},
+
+		_hideActualMode: function() {
+			this.$find('#actual-mode').hide();
+		},
+
+		_hideExpectedMode: function() {
+			this.$find('#expected-mode').hide();
+		},
 	};
 
 	h5.core.expose(testResultDiffController);
