@@ -136,6 +136,7 @@
 			}));
 
 			this._initializeSwipeHandle();
+			this._initializeOnionHandle();
 		},
 
 		/**
@@ -198,6 +199,24 @@
 				var percentage = ((val - min) / (max - min) * 100);
 				$actual.css('left', percentage + '%');
 				$actualImg.css('margin-left', (-percentage) + '%');
+			});
+		},
+
+		_initializeOnionHandle: function() {
+			var min = 0,max = 1000,step = 1;
+
+			var $handle = this.$find('#onion-handle');
+			var $actual = this.$find('#onion-skin .actual');
+
+			$handle.attr('min', min);
+			$handle.attr('max', max);
+			$handle.attr('step', step);
+			$handle.val(max);
+
+			$handle.on('input', function() {
+				var val = $handle.val();
+				var ratio = (val - min) / (max - min);
+				$actual.css('opacity', ratio);
 			});
 		},
 	};
