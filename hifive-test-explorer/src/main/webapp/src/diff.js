@@ -139,6 +139,15 @@
 			this._initializeOnionHandle();
 		},
 
+		'input[name=flip-image] change': function() {
+			var imageToBeShown = this.$find('input[name=flip-image]:checked').val();
+			var $actual = this.$find('#quick-flipping .actual');
+			if (imageToBeShown === 'actual')
+				$actual.show();
+			else
+				$actual.hide();
+		},
+
 		/**
 		 * Show actual image.
 		 * 

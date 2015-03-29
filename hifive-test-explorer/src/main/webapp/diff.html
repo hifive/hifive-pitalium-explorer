@@ -66,7 +66,18 @@
 				<div class="tab-content">
 	
 					<div class="tab-pane" id="quick-flipping">
-						Quick flipping
+						<input type="radio" name="flip-image" value="expected">EXPECTED
+						<input type="radio" name="flip-image" value="actual" checked>ACTUAL
+						<div class="row">
+							<div class="col-xs-12 image-diff image-overlay">
+								<div class="expected">
+									<img>
+								</div>
+								<div class="actual">
+									<img>
+								</div>
+							</div>
+						</div>
 					</div>
 	
 					<div class="tab-pane active" id="two-up">
