@@ -133,13 +133,13 @@ public class EdgeDetector {
 
         /* Edge detection */
         byte[] cannyEdge = new byte[height * width];
-        Stack<Coordinate2D<Integer>> follow = new Stack();
+        Stack<Coordinate2D<Integer>> follow = new Stack<>();
         for (int i = 1; i < height - 1; i++) {
             for (int j = 1; j < width - 1; j++) {
                 if (cannyEdge[i * width + j] != 0) continue;
                 if (maximumEdges[i][j] >= absoluteThresholdHigh) {
                     cannyEdge[i * width + j] = (byte) 255;
-                    follow.push(new Coordinate2D(j, i));
+                    follow.push(new Coordinate2D<>(j, i));
                     while (!follow.isEmpty()) {
                         Coordinate2D<Integer> top = follow.pop();
                         for (int ny = Math.max(0, top.y - 1); ny <= Math.min(height - 1, top.y + 1); ny++) {
@@ -147,7 +147,7 @@ public class EdgeDetector {
                                 if (cannyEdge[ny * width + nx] != 0) continue;
                                 if (maximumEdges[ny][nx] >= absoluteThresholdLow) {
                                     cannyEdge[ny * width + nx] = (byte) 255;
-                                    follow.push(new Coordinate2D(nx, ny));
+                                    follow.push(new Coordinate2D<>(nx, ny));
                                 }
                             }
                         }
