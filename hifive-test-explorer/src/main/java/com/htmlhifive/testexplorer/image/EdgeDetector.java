@@ -75,11 +75,11 @@ public class EdgeDetector {
 
         int[] imageRGBs = image.getRGB(0, 0, width, height, null, 0, width);
 
-        float[][] gradientX = new float[height][width];
-        float[][] gradientY = new float[height][width];
+        int[][] gradientX = new int[height][width];
+        int[][] gradientY = new int[height][width];
         float[][] gradientAbs = new float[height][width];
 
-        float maximumValue = (float) (4080 * Math.sqrt(2) * 3);
+        float maximumValue = (float) (4080 * Math.sqrt(2) * 6);
 
         /* Calculate gradients for each pixel */
         for (int i = 0; i < height; i++) {
@@ -100,9 +100,9 @@ public class EdgeDetector {
                 int gY = (p20.getGreen() * 3 + p21.getGreen() * 10 + p22.getGreen() * 3) - (p00.getGreen() * 3 + p01.getGreen() * 10 + p02.getGreen() * 3);
                 int bY = (p20.getBlue() * 3 + p21.getBlue() * 10 + p22.getBlue() * 3) - (p00.getBlue() * 3 + p01.getBlue() * 10 + p02.getBlue() * 3);
 
-                double x = rX + gX + bX, y = rY + gY + bY;
-                gradientX[i][j] = (float) x;
-                gradientY[i][j] = (float) y;
+                int x = 2*rX + 3*gX + bX, y = 2*rY + 3*gY + bY;
+                gradientX[i][j] = x;
+                gradientY[i][j] = y;
                 gradientAbs[i][j] = (float) Math.hypot(x, y);
             }
         }
