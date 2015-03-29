@@ -107,11 +107,15 @@ public class EdgeDetector {
             }
         }
 
+        float absoluteThresholdHigh = (float) (maximumValue * this.thresholdHigh);
+        float absoluteThresholdLow = (float) (maximumValue * this.thresholdLow);
 
         /* Non maximal suppression */
         float[][] maximumEdges = new float[height][width];
         for (int i = 1; i < height - 1; i++) {
             for (int j = 1; j < width - 1; j++) {
+                if (gradientAbs[i][j] < absoluteThresholdLow)
+                    continue;
                 double angle = Math.atan2(gradientY[i][j], gradientX[i][j]);
                 if (angle < 0) angle += Math.PI;
                 boolean isMaximum;
@@ -127,9 +131,6 @@ public class EdgeDetector {
                 maximumEdges[i][j] = isMaximum ? gradientAbs[i][j] : 0f;
             }
         }
-
-        float absoluteThresholdHigh = (float) (maximumValue * this.thresholdHigh);
-        float absoluteThresholdLow = (float) (maximumValue * this.thresholdLow);
 
         /* Edge detection */
         byte[] cannyEdge = new byte[height * width];
