@@ -203,12 +203,14 @@
 			$handle.attr('step', step);
 			$handle.val(min);
 
-			$handle.on('input', function() {
+			var inputHandler = function() {
 				var val = $handle.val();
 				var percentage = ((val - min) / (max - min) * 100);
 				$actual.css('left', percentage + '%');
 				$actualImg.css('margin-left', (-percentage) + '%');
-			});
+			};
+			$handle.on('input', inputHandler);
+			$handle.on('change', inputHandler); // for IE
 		},
 
 		_initializeOnionHandle: function() {
@@ -222,11 +224,13 @@
 			$handle.attr('step', step);
 			$handle.val(max);
 
-			$handle.on('input', function() {
+			var inputHandler = function() {
 				var val = $handle.val();
 				var ratio = (val - min) / (max - min);
 				$actual.css('opacity', ratio);
-			});
+			};
+			$handle.on('input', inputHandler);
+			$handle.on('change', inputHandler); // for IE
 		},
 	};
 
