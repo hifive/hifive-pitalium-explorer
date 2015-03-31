@@ -45,8 +45,8 @@ public class EdgeDetector {
         this.sigma = sigma;
         this.gaussianX = ConvolveOpGenerator.GenerateGaussianX(sigma);
         this.gaussianY = ConvolveOpGenerator.GenerateGaussianY(sigma);
-        this.thresholdHigh = 1.0 / 30;
-        this.thresholdLow = 1.0 / 60;
+        this.thresholdHigh = 1.0 / 40 / sigma;
+        this.thresholdLow = 1.0 / 90 / sigma;
     }
 
     /**
@@ -75,11 +75,11 @@ public class EdgeDetector {
 
         int[] imageRGBs = image.getRGB(0, 0, width, height, null, 0, width);
 
-        float[][] gradientX = new float[height][width];
-        float[][] gradientY = new float[height][width];
+        int[][] gradientX = new int[height][width];
+        int[][] gradientY = new int[height][width];
         float[][] gradientAbs = new float[height][width];
 
-        float maximumValue = (float) (4080 * Math.sqrt(2) * 3);
+        float maximumValue = (float) (4080 * Math.sqrt(2) * 6);
 
         /* Calculate gradients for each pixel */
         for (int i = 0; i < height; i++) {
@@ -100,18 +100,22 @@ public class EdgeDetector {
                 int gY = (p20.getGreen() * 3 + p21.getGreen() * 10 + p22.getGreen() * 3) - (p00.getGreen() * 3 + p01.getGreen() * 10 + p02.getGreen() * 3);
                 int bY = (p20.getBlue() * 3 + p21.getBlue() * 10 + p22.getBlue() * 3) - (p00.getBlue() * 3 + p01.getBlue() * 10 + p02.getBlue() * 3);
 
-                double x = rX + gX + bX, y = rY + gY + bY;
-                gradientX[i][j] = (float) x;
-                gradientY[i][j] = (float) y;
+                int x = 2*rX + 3*gX + bX, y = 2*rY + 3*gY + bY;
+                gradientX[i][j] = x;
+                gradientY[i][j] = y;
                 gradientAbs[i][j] = (float) Math.hypot(x, y);
             }
         }
 
+        float absoluteThresholdHigh = (float) (maximumValue * this.thresholdHigh);
+        float absoluteThresholdLow = (float) (maximumValue * this.thresholdLow);
 
         /* Non maximal suppression */
         float[][] maximumEdges = new float[height][width];
         for (int i = 1; i < height - 1; i++) {
             for (int j = 1; j < width - 1; j++) {
+                if (gradientAbs[i][j] < absoluteThresholdLow)
+                    continue;
                 double angle = Math.atan2(gradientY[i][j], gradientX[i][j]);
                 if (angle < 0) angle += Math.PI;
                 boolean isMaximum;
@@ -127,9 +131,6 @@ public class EdgeDetector {
                 maximumEdges[i][j] = isMaximum ? gradientAbs[i][j] : 0f;
             }
         }
-
-        float absoluteThresholdHigh = (float) (maximumValue * this.thresholdHigh);
-        float absoluteThresholdLow = (float) (maximumValue * this.thresholdLow);
 
         /* Edge detection */
         byte[] cannyEdge = new byte[height * width];
