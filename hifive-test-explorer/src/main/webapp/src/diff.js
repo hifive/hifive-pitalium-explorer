@@ -97,8 +97,10 @@
 					this._setActualImageSrc(false, {
 						id: id
 					});
+					this._hideActualMode();
 					return;
 				}
+				this._hideExpectedMode();
 
 				this._testResultDiffLogic.getExpectedId(id).done(this.own(function(result) {
 					// Test not executed
@@ -132,6 +134,18 @@
 					}
 				}));
 			}));
+
+			this._initializeSwipeHandle();
+			this._initializeOnionHandle();
+		},
+
+		'input[name=flip-image] change': function() {
+			var imageToBeShown = this.$find('input[name=flip-image]:checked').val();
+			var $actual = this.$find('#quick-flipping .actual');
+			if (imageToBeShown === 'actual')
+				$actual.show();
+			else
+				$actual.hide();
 		},
 
 		/**
@@ -167,7 +181,57 @@
 		_setImageSrc: function(selector, withMarker, params) {
 			var url = withMarker ? 'image/getDiff' : 'image/get';
 			this.$find(selector).attr('src', hifive.test.explorer.utils.formatUrl(url, params));
-		}
+		},
+
+		_hideActualMode: function() {
+			this.$find('#actual-mode').hide();
+		},
+
+		_hideExpectedMode: function() {
+			this.$find('#expected-mode').hide();
+		},
+
+		_initializeSwipeHandle: function() {
+			var min = 0,max = 1000,step = 1;
+
+			var $handle = this.$find('#swipe-handle');
+			var $actual = this.$find('#swipe .actual');
+			var $actualImg = this.$find('#swipe .actual > img');
+
+			$handle.attr('min', min);
+			$handle.attr('max', max);
+			$handle.attr('step', step);
+			$handle.val(min);
+
+			var inputHandler = function() {
+				var val = $handle.val();
+				var percentage = ((val - min) / (max - min) * 100);
+				$actual.css('left', percentage + '%');
+				$actualImg.css('margin-left', (-percentage) + '%');
+			};
+			$handle.on('input', inputHandler);
+			$handle.on('change', inputHandler); // for IE
+		},
+
+		_initializeOnionHandle: function() {
+			var min = 0,max = 1000,step = 1;
+
+			var $handle = this.$find('#onion-handle');
+			var $actual = this.$find('#onion-skin .actual');
+
+			$handle.attr('min', min);
+			$handle.attr('max', max);
+			$handle.attr('step', step);
+			$handle.val(max);
+
+			var inputHandler = function() {
+				var val = $handle.val();
+				var ratio = (val - min) / (max - min);
+				$actual.css('opacity', ratio);
+			};
+			$handle.on('input', inputHandler);
+			$handle.on('change', inputHandler); // for IE
+		},
 	};
 
 	h5.core.expose(testResultDiffController);

@@ -47,14 +47,85 @@
 		<!-- Navigation -->
 
 		<div class="container">
-			<div class="row">
-				<div class="col-xs-6 image-diff expected">
-					<div class="image-label">EXPECTED</div>
+
+			<div id="expected-mode" class="row">
+				<div class="col-xs-12 image-diff actual">
 					<img>
 				</div>
-				<div class="col-xs-6 image-diff actual">
-					<div class="image-label">ACTUAL</div>
-					<img>
+			</div>
+
+			<div id="actual-mode">
+				<ul class="nav nav-tabs">
+					<li><a href="#quick-flipping" data-toggle="tab">Quick flipping</a></li>
+					<li class="active"><a href="#two-up" data-toggle="tab">2-up</a></li>
+					<li><a href="#swipe" data-toggle="tab">Swipe</a></li>
+					<li><a href="#onion-skin" data-toggle="tab">Onion skin</a></li>
+					<li><a href="#edge-overlapping" data-toggle="tab">Edge overlapping</a></li>
+				</ul>
+	
+				<div class="tab-content">
+	
+					<div class="tab-pane" id="quick-flipping">
+						<input type="radio" name="flip-image" value="expected">EXPECTED
+						<input type="radio" name="flip-image" value="actual" checked>ACTUAL
+						<div class="row">
+							<div class="col-xs-12 image-diff image-overlay">
+								<div class="expected">
+									<img>
+								</div>
+								<div class="actual">
+									<img>
+								</div>
+							</div>
+						</div>
+					</div>
+	
+					<div class="tab-pane active" id="two-up">
+						<div class="row">
+							<div class="col-xs-6 image-diff expected">
+								<div class="image-label">EXPECTED</div>
+								<img>
+							</div>
+							<div class="col-xs-6 image-diff actual">
+								<div class="image-label">ACTUAL</div>
+								<img>
+							</div>
+						</div>
+					</div>
+	
+					<div class="tab-pane" id="swipe">
+						<input type="range" id="swipe-handle">
+						<div class="row">
+							<div class="col-xs-12 image-diff image-overlay">
+								<div class="expected">
+									<img>
+								</div>
+								<div class="actual">
+									<div class="swipe-bar"></div>
+									<img>
+								</div>
+							</div>
+						</div>
+					</div>
+	
+					<div class="tab-pane" id="onion-skin">
+						<input type="range" id="onion-handle">
+						<div class="row">
+							<div class="col-xs-12 image-diff image-overlay">
+								<div class="expected">
+									<img>
+								</div>
+								<div class="actual">
+									<img>
+								</div>
+							</div>
+						</div>
+					</div>
+	
+					<div class="tab-pane" id="edge-overlapping">
+						Edge overlapping
+					</div>
+	
 				</div>
 			</div>
 		</div>
