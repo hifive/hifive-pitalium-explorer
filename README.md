@@ -5,9 +5,12 @@ can easily access your test results and understand what is wrong, if these tests
 are written with hifive-test-library.
 
 This product is licensed under the [Apache License, Version 2.0][license].
-Our developer site is located at [htmlhifive.com].
+Our developer site is located at [htmlhifive.com][].
 
 Let's **hifive**!
+
+[license]: http://www.apache.org/licenses/LICENSE-2.0)
+[htmlhifive.com]: http://www.htmlhifive.com
 
 ### Preparation
 *   [eclipse-jee-kepler-SR2](https://eclipse.org/downloads/packages/release/Kepler/SR2)
@@ -41,8 +44,26 @@ Let's **hifive**!
 
 5.  Start Tomcat.
 
-6.  Access this application URL: [http://localhost:8080/hifive-test-explorer/list.html][url]
+6.  Go [http://localhost:8080/hifive-test-explorer/list.html][url-list]
 
-[license]: http://www.apache.org/licenses/LICENSE-2.0)
-[htmlhifive.com]: http://www.htmlhifive.com
-[url]: http://localhost:8080/hifive-test-explorer/list.html
+[url-list]: http://localhost:8080/hifive-test-explorer/list.html
+
+### About Web APIs
+You can see the list of this application's APIs from
+[http://localhost:8080/hifive-test-explorer/spec/api.html][url-api]
+
+By clicking the buttons labeled "Get a sample result" in that page, you can see
+the example data.
+
+[url-api]: http://localhost:8080/hifive-test-explorer/spec/api.html
+
+### How to generate API Documents (JSDoc)
+1.  Download jsdoc3
+    - Download [jsdoc](https://github.com/jsdoc3/jsdoc)
+    - Download all fils from Tag to `hifive-test-explorer/jsTool/jsdoc/bin`. Let
+      `jsdoc.bat` be in the `bin` folder.
+2.  Generate
+    - Right-click `hifive-test-explorer/jsTool/jsdoc/jsdoc.bat` and select open
+      in the command prompt.
+    - Run `jsdoc.bat`.
+    - JSDocs are generated in `hifive-test-explorer/doc/jsdoc`.
