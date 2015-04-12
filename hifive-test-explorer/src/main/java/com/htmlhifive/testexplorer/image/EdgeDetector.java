@@ -2,6 +2,7 @@ package com.htmlhifive.testexplorer.image;
 
 import java.awt.*;
 import java.awt.image.*;
+import java.util.Arrays;
 import java.util.Stack;
 
 /**
@@ -30,6 +31,16 @@ public class EdgeDetector {
     private ConvolveOp gaussianX, gaussianY;
 
     /**
+     * color used to fill background
+     */
+    private Color backgroundColor;
+
+    /**
+     * color used to paint edges
+     */
+    private Color foregroundColor;
+
+    /**
      * Default Constructor
      */
     public EdgeDetector() {
@@ -47,6 +58,9 @@ public class EdgeDetector {
         this.gaussianY = ConvolveOpGenerator.GenerateGaussianY(sigma);
         this.thresholdHigh = 1.0 / 40 / sigma;
         this.thresholdLow = 1.0 / 90 / sigma;
+
+        this.backgroundColor = Color.black;
+        this.foregroundColor = Color.white;
     }
 
     /**
@@ -133,21 +147,30 @@ public class EdgeDetector {
         }
 
         /* Edge detection */
-        byte[] cannyEdge = new byte[height * width];
+
+        /* value used for painting */
+        int backgroundNumber = this.backgroundColor.getRGB();
+        int foregroundNumber = this.foregroundColor.getRGB();
+
+        /* prepare result image */
+        BufferedImage result = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        int[] cannyEdge = ((DataBufferInt) result.getRaster().getDataBuffer()).getData();
+        Arrays.fill(cannyEdge, backgroundNumber);
+
         Stack<Coordinate2D<Integer>> follow = new Stack<>();
         for (int i = 1; i < height - 1; i++) {
             for (int j = 1; j < width - 1; j++) {
-                if (cannyEdge[i * width + j] != 0) continue;
+                if (cannyEdge[i * width + j] != backgroundNumber) continue;
                 if (maximumEdges[i][j] >= absoluteThresholdHigh) {
-                    cannyEdge[i * width + j] = (byte) 255;
+                    cannyEdge[i * width + j] = foregroundNumber;
                     follow.push(new Coordinate2D<>(j, i));
                     while (!follow.isEmpty()) {
                         Coordinate2D<Integer> top = follow.pop();
                         for (int ny = Math.max(0, top.y - 1); ny <= Math.min(height - 1, top.y + 1); ny++) {
                             for (int nx = Math.max(0, top.x - 1); nx <= Math.min(height - 1, top.x + 1); nx++) {
-                                if (cannyEdge[ny * width + nx] != 0) continue;
+                                if (cannyEdge[ny * width + nx] != backgroundNumber) continue;
                                 if (maximumEdges[ny][nx] >= absoluteThresholdLow) {
-                                    cannyEdge[ny * width + nx] = (byte) 255;
+                                    cannyEdge[ny * width + nx] = foregroundNumber;
                                     follow.push(new Coordinate2D<>(nx, ny));
                                 }
                             }
@@ -157,10 +180,6 @@ public class EdgeDetector {
             }
         }
 
-        /* Convert the result into BufferedImage */
-        BufferedImage result = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY);
-        byte[] array = ((DataBufferByte) result.getRaster().getDataBuffer()).getData();
-        System.arraycopy(cannyEdge, 0, array, 0, cannyEdge.length);
         return result;
     }
 
@@ -190,5 +209,33 @@ public class EdgeDetector {
     public void setThreshold(double thresholdHigh, double thresholdLow) {
         this.thresholdHigh = thresholdHigh;
         this.thresholdLow = thresholdLow;
+    }
+
+    /**
+     * Get color used to fill background
+     */
+    public Color getBackgroundColor() {
+        return backgroundColor;
+    }
+
+    /**
+     * Set color used to fill background
+     */
+    public void setBackgroundColor(Color backgroundColor) {
+        this.backgroundColor = backgroundColor;
+    }
+
+    /**
+     * Get color used to paint edges
+     */
+    public Color getForegroundColor() {
+        return foregroundColor;
+    }
+
+    /**
+     * Set color used to paint edges
+     */
+    public void setForegroundColor(Color foregroundColor) {
+        this.foregroundColor = foregroundColor;
     }
 }
