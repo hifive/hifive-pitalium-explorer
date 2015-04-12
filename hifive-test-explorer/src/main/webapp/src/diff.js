@@ -132,6 +132,13 @@
 							targetId: id
 						});
 					}
+
+					this._setActualEdgeImageSrc({
+						id: id
+					});
+					this._setExpectedEdgeImageSrc({
+						id: result.id
+					});
 				}));
 			}));
 
@@ -171,6 +178,26 @@
 		},
 
 		/**
+		 * Show actual edge image.
+		 *
+		 * @memberOf hifive.test.explorer.controller.TestResultDiffController
+		 * @param {Object} params extra paramters
+		 */
+		_setActualEdgeImageSrc: function(params) {
+			this._setEdgeImageSrc('.actual-edge img', jQuery.extend({colorIndex: 0}, params));
+		},
+
+		/**
+		 * Show expected edge image.
+		 *
+		 * @memberOf hifive.test.explorer.controller.TestResultDiffController
+		 * @param {Object} params extra paramters
+		 */
+		_setExpectedEdgeImageSrc: function(params) {
+			this._setEdgeImageSrc('.expected-edge img', jQuery.extend({colorIndex: 1}, params));
+		},
+
+		/**
 		 * Show image.
 		 * 
 		 * @memberOf hifive.test.explorer.controller.TestResultDiffController
@@ -180,6 +207,18 @@
 		 */
 		_setImageSrc: function(selector, withMarker, params) {
 			var url = withMarker ? 'image/getDiff' : 'image/get';
+			this.$find(selector).attr('src', hifive.test.explorer.utils.formatUrl(url, params));
+		},
+
+		/**
+		 * Show edge image.
+		 *
+		 * @memberOf hifive.test.explorer.controller.TestResultDiffController
+		 * @param {String} selector jQuery selector expression which determines the image node
+		 * @param {Object} params extra paramters
+		 */
+		_setEdgeImageSrc: function(selector, params) {
+			var url = 'image/getEdge';
 			this.$find(selector).attr('src', hifive.test.explorer.utils.formatUrl(url, params));
 		},
 
