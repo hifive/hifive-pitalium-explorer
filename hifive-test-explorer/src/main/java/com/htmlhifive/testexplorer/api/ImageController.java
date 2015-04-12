@@ -3,7 +3,7 @@
  */
 package com.htmlhifive.testexplorer.api;
 
-import java.awt.Point;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -92,7 +92,8 @@ public class ImageController {
 	 * @param response HttpServletResponse
 	 */
 	@RequestMapping(value = "/getEdge", method = RequestMethod.GET)
-	public void getEdgeImage(@RequestParam String imageId, HttpServletResponse response)
+	public void getEdgeImage(@RequestParam String imageId,
+							 @RequestParam(defaultValue = "-1") int colorIndex, HttpServletResponse response)
 	{
 		@SuppressWarnings("unchecked")
 		Map<String, Screenshot> screenshotMap = (Map<String, Screenshot>) request.getSession(false).getAttribute(
@@ -123,6 +124,18 @@ public class ImageController {
 		}
 		
 		EdgeDetector edgeDetector = new EdgeDetector(0.5);
+		switch (colorIndex)
+		{
+			case 0:
+				edgeDetector.setBackgroundColor(new Color(0, 0, 0, 255));
+				edgeDetector.setForegroundColor(new Color(255, 0, 0, 255));
+				break;
+			case 1:
+				edgeDetector.setBackgroundColor(new Color(0, 0, 0, 0));
+				edgeDetector.setForegroundColor(new Color(0, 0, 255, 128));
+				break;
+		}
+
 		BufferedImage edgeImage = edgeDetector.DetectEdge(image);
 
 		// Send png file.
