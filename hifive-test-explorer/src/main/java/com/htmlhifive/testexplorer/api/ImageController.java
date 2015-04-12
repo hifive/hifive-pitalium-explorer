@@ -88,11 +88,11 @@ public class ImageController {
 	/**
 	 * Get edge detection result of an image.
 	 * 
-	 * @param imageId id of an image to be processed by edge detector.
+	 * @param id id of an image to be processed by edge detector.
 	 * @param response HttpServletResponse
 	 */
 	@RequestMapping(value = "/getEdge", method = RequestMethod.GET)
-	public void getEdgeImage(@RequestParam String imageId,
+	public void getEdgeImage(@RequestParam String id,
 							 @RequestParam(defaultValue = "-1") int colorIndex, HttpServletResponse response)
 	{
 		@SuppressWarnings("unchecked")
@@ -100,9 +100,9 @@ public class ImageController {
 				KEY_INDEX_MAP);
 
 		// Validate Parameters.
-		Screenshot screenshot = screenshotMap.get(imageId);
+		Screenshot screenshot = screenshotMap.get(id);
 		if (screenshot == null) {
-			log.error("id(" + imageId + ") is invalid parameter.");
+			log.error("id(" + id + ") is invalid parameter.");
 			response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
 			return;
 		}
