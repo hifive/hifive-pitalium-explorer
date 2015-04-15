@@ -75,11 +75,13 @@ public class EdgeDetector {
 
         int[] imageRGBs = image.getRGB(0, 0, width, height, null, 0, width);
 
-        int[][] gradientX = new int[height][width];
-        int[][] gradientY = new int[height][width];
+        float[][] gradientDirection = new float[height][width];
         float[][] gradientAbs = new float[height][width];
 
         float maximumValue = (float) (4080 * Math.sqrt(2) * 6);
+
+        float absoluteThresholdHigh = (float) (maximumValue * this.thresholdHigh);
+        float absoluteThresholdLow = (float) (maximumValue * this.thresholdLow);
 
         /* Calculate gradients for each pixel */
         for (int i = 0; i < height; i++) {
@@ -101,14 +103,12 @@ public class EdgeDetector {
                 int bY = (p20.getBlue() * 3 + p21.getBlue() * 10 + p22.getBlue() * 3) - (p00.getBlue() * 3 + p01.getBlue() * 10 + p02.getBlue() * 3);
 
                 int x = 2*rX + 3*gX + bX, y = 2*rY + 3*gY + bY;
-                gradientX[i][j] = x;
-                gradientY[i][j] = y;
-                gradientAbs[i][j] = (float) Math.hypot(x, y);
+                if (Math.abs(x) + Math.abs(y) >= absoluteThresholdLow) {
+                    gradientAbs[i][j] = (float) Math.hypot(x, y);
+                    gradientDirection[i][j] = (float) Math.atan2(y, x);
+                }
             }
         }
-
-        float absoluteThresholdHigh = (float) (maximumValue * this.thresholdHigh);
-        float absoluteThresholdLow = (float) (maximumValue * this.thresholdLow);
 
         /* Non maximal suppression */
         float[][] maximumEdges = new float[height][width];
@@ -116,7 +116,7 @@ public class EdgeDetector {
             for (int j = 1; j < width - 1; j++) {
                 if (gradientAbs[i][j] < absoluteThresholdLow)
                     continue;
-                double angle = Math.atan2(gradientY[i][j], gradientX[i][j]);
+                double angle = gradientDirection[i][j];
                 if (angle < 0) angle += Math.PI;
                 boolean isMaximum;
                 if (angle <= Math.PI / 8 || angle > Math.PI * 7 / 8) {
