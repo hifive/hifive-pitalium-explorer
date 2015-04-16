@@ -29,10 +29,10 @@ Let's **hifive**!
     `hifive-test-explorer ivy_build.xml.launch`を選択し、右クリックし、`Run As`
     → `hifive-test-explorer ivy_build.xml` で実行します。
 
-2.  `hifive-test-explorer/src/main/webapp/WEB-INF/classes/appConf`の
-    `api-conf.properties.sample`をコピーして`api-conf.properties`を作ってその中
-    身を書き換えます。テストデータを格納した`sampleData`フォルダはプロジェクトの
-    直下にあります。各自の環境に合わせて絶対パスを書き換えてください。
+2.  `hifive-test-explorer`プロジェクト - `src/main/resources` →
+    `appConf`の`api-conf.properties.sample`をコピーして`api-conf.properties`を作
+    ってその中身を書き換えます。テストデータを格納した`sampleData`フォルダはプロ
+    ジェクトの直下にあります。各自の環境に合わせて絶対パスを書き換えてください。
 
     例）`resultsDir=C:\\hifive\\workspace\\hifive-test-explorer\\sampleData`
 
