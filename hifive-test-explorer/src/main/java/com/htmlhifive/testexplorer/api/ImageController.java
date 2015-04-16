@@ -3,7 +3,7 @@
  */
 package com.htmlhifive.testexplorer.api;
 
-import java.awt.Point;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.htmlhifive.testexplorer.image.EdgeDetector;
 import com.htmlhifive.testexplorer.model.Capability;
 import com.htmlhifive.testexplorer.model.Screenshot;
 import com.htmlhifive.testlib.image.utlity.ImageUtility;
@@ -79,6 +80,67 @@ public class ImageController {
 		// Send png file.
 		try {
 			writeFileToResponse(pngFile, response);
+		} catch (IOException e) {
+			response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+		}
+	}
+	
+	/**
+	 * Get edge detection result of an image.
+	 * 
+	 * @param id id of an image to be processed by edge detector.
+	 * @param response HttpServletResponse
+	 */
+	@RequestMapping(value = "/getEdge", method = RequestMethod.GET)
+	public void getEdgeImage(@RequestParam String id,
+							 @RequestParam(defaultValue = "-1") int colorIndex, HttpServletResponse response)
+	{
+		@SuppressWarnings("unchecked")
+		Map<String, Screenshot> screenshotMap = (Map<String, Screenshot>) request.getSession(false).getAttribute(
+				KEY_INDEX_MAP);
+
+		// Validate Parameters.
+		Screenshot screenshot = screenshotMap.get(id);
+		if (screenshot == null) {
+			log.error("id(" + id + ") is invalid parameter.");
+			response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+			return;
+		}
+
+		File pngFile;
+		try {
+			pngFile = findPngFile(screenshot);
+		} catch (IOException e) {
+			response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+			return;
+		}
+
+		BufferedImage image;
+		try {
+			image = createImage(pngFile);
+		} catch (IOException e) {
+			response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+			return;
+		}
+		
+		EdgeDetector edgeDetector = new EdgeDetector(0.5);
+		switch (colorIndex)
+		{
+			case 0:
+				edgeDetector.setBackgroundColor(new Color(0, 0, 0, 255));
+				edgeDetector.setForegroundColor(new Color(255, 0, 0, 255));
+				break;
+			case 1:
+				edgeDetector.setBackgroundColor(new Color(0, 0, 0, 0));
+				edgeDetector.setForegroundColor(new Color(0, 0, 255, 128));
+				break;
+		}
+
+		BufferedImage edgeImage = edgeDetector.DetectEdge(image);
+
+		// Send png file.
+		try {
+			writeImageToResponse(edgeImage, response);
 		} catch (IOException e) {
 			response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
 		}
