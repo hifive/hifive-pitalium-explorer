@@ -26,8 +26,7 @@ Let's **hifive**!
 ### Procedure
 1.  Check out hifive-test-explorer project.
 
-2.  Run `ivy_build.xml`. Right-click on `ivy_build.xml.launch`and choose `Run
-    As` → `ivy_build.xml`.
+2.  Right-click on `ivy_build.xml.launch`and choose `Run As` → `ivy_build.xml`.
 
 3.  Copy `api-conf.properties.sample` to `api-conf.properties` and modify
     `api-conf.properties`. `api-conf.properties.sample` is located in the
