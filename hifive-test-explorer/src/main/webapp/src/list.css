@@ -7,3 +7,11 @@
 #testExectionTimeList {
 	margin-top: 20px;
 }
+
+.explorer-test-result {
+	cursor: pointer;
+}
+
+.explorer-test-result:hover {
+	text-decoration: underline;
+}
