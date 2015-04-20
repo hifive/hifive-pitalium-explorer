@@ -1,7 +1,15 @@
+# Ignore binraies and build results
 /target/
 /work/
 /db/hsqldb/db/
 /lib/
 /bin/
-.idea/
+/src/main/webapp/WEB-INF/classes
+
+# Ignore configuration file
+api-conf.properties
+
+# Misc
 *.iml
+.idea
+.#webclasspath
