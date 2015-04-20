@@ -13,16 +13,21 @@ Let's **hifive**!
 [htmlhifive.com]: http://www.htmlhifive.com
 
 ### 前提
-*   [eclipse-jee-kepler-SR2](https://eclipse.org/downloads/packages/release/Kepler/SR2)
-*   [apache-tomcat-7.0.59](http://tomcat.apache.org/download-70.cgi)
-*   [com.sysdeo.eclipse.tomcat_3.3.0](http://www.eclipsetotale.com/tomcatPlugin.html)
-    * **注意**:
-      `com.sysdeo.eclipse.tomcat_3.3.0`フォルダーにある`DevloaderTomcat7.jar`を
-      `TOMCAT_HOME/lib`へコピーすること。
-*   以下のいずれかのブラウザがインストールされていること。
-    * chrome (最新版)
-    * Internet Explorer11
-    * Firefox (最新版)
+* [Eclipse IDE for Java EE (Luna SR2)][ide]
+* [Tomcat 7][tomcat]
+* [Sysdeo Eclipse Tomcat Launcher plugin (3.3.1)][plugin]
+  * Set `Tomcat home` in `Window` → `Preferences` → `Tomcat` in *Eclipse*.
+  * `com.sysdeo.eclipse.tomcat_3.3.1.jar`フォルダーにある`DevloaderTomcat7.jar`
+    を`$TOMCAT_HOME/lib`へコピーすること。
+
+[ide]: https://eclipse.org/downloads/packages/release/Luna/SR2
+[tomcat]: http://tomcat.apache.org/download-70.cgi
+[plugin]: http://www.eclipsetotale.com/tomcatPlugin.html
+
+### Supported browsers
+* Chrome *≥ 44*
+* Internet Explorer 11
+* Firefox *≥ 37*
 
 ### 手順
 1.  `ivy_build.xml.launch`を選択し、右クリックし、`Run As` → `ivy_build.xml`で実

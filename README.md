@@ -9,40 +9,46 @@ Our developer site is located at [htmlhifive.com][].
 
 Let's **hifive**!
 
-[license]: http://www.apache.org/licenses/LICENSE-2.0)
+[license]: http://www.apache.org/licenses/LICENSE-2.0
 [htmlhifive.com]: http://www.htmlhifive.com
 
-### Preparation
-*   [eclipse-jee-kepler-SR2](https://eclipse.org/downloads/packages/release/Kepler/SR2)
-*   [apache-tomcat-7.0.59](http://tomcat.apache.org/download-70.cgi)
-*   [com.sysdeo.eclipse.tomcat_3.3.0](http://www.eclipsetotale.com/tomcatPlugin.html)
-    * **Note**: Copy `DevloaderTomcat7.jar` from
-      `com.sysdeo.eclipse.tomcat_3.3.0` directory to `$TOMCAT_HOME/lib`.
-*   Any one of browsers is installed.
-    * Chrome (latest version)
-    * Internet Explorer11
-    * Firefox (latest version)
+### Prerequisite
+* [Eclipse IDE for Java EE (Luna SR2)][ide]
+* [Tomcat 7][tomcat]
+* [Sysdeo Eclipse Tomcat Launcher plugin (3.3.1)][plugin]
+  * Set `Tomcat home` in `Window` → `Preferences` → `Tomcat` in *Eclipse*.
+  * Copy `DevloaderTomcat7.jar` from `com.sysdeo.eclipse.tomcat_3.3.1.jar` to
+    `$TOMCAT_HOME/lib`.
+
+[ide]: https://eclipse.org/downloads/packages/release/Luna/SR2
+[tomcat]: http://tomcat.apache.org/download-70.cgi
+[plugin]: http://www.eclipsetotale.com/tomcatPlugin.html
+
+### Supported browsers
+* Chrome *≥ 44*
+* Internet Explorer 11
+* Firefox *≥ 37*
 
 ### Procedure
-1.  Check out hifive-test-explorer project.
+1.  Right-click on `ivy_build.xml.launch`and choose `Run As` → `ivy_build.xml`.
 
-2.  Right-click on `ivy_build.xml.launch`and choose `Run As` → `ivy_build.xml`.
+2.  Copy `api-conf.properties.sample` to `api-conf.properties` and modify it.
+    `api-conf.properties.sample` is located in
+    `hifive-test-explorer/src/main/resources/appConf`. Modify the value of the
+    key `resultDir` to your absolute path of the sample data folder like below;
 
-3.  Copy `api-conf.properties.sample` to `api-conf.properties` and modify
-    `api-conf.properties`. `api-conf.properties.sample` is located in the
-    following folder. `hifive-test-explorer` → `src/main/resources` → `appConf`
-    Modify the value of the key `resultDir` to your absolute path of the sample
-    data folder. `sampleData` folder is located in `hifiveTestExplorer`
-    project.
+    ```
+    resultsDir=C:\\hifive\\workspace\\hifive-test-explorer\\sampleData
+    ```
 
-    ex) `resultsDir=C:\\hifive\\workspace\\hifive-test-explorer\\sampleData`
+    `sampleData` folder is located in `hifiveTestExplorer`.
 
-4.  Update Tomcat context definition. Right-click `hifive-test-explorer`
+3.  Update Tomcat context definition. Right-click `hifive-test-explorer`
     project and choose `Tomcat project` → `Update context definition`.
 
-5.  Start Tomcat.
+4.  Start Tomcat.
 
-6.  Go [http://localhost:8080/hifive-test-explorer/list.html][url-list]
+5.  Go [http://localhost:8080/hifive-test-explorer/list.html][url-list]
 
 [url-list]: http://localhost:8080/hifive-test-explorer/list.html
 
