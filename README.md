@@ -30,7 +30,8 @@ Let's **hifive**!
 * Firefox *≥ 37*
 
 ### Procedure
-1.  Right-click on `ivy_build.xml.launch`and choose `Run As` → `ivy_build.xml`.
+1.  Run `ivy_build.xml`. To do so, right-click on `ivy_build.xml.launch` and
+    choose `Run As` → `ivy_build.xml`.
 
 2.  Copy `api-conf.properties.sample` to `api-conf.properties` and modify it.
     `api-conf.properties.sample` is located in

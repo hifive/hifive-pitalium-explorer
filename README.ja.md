@@ -30,8 +30,8 @@ Let's **hifive**!
 * Firefox *≥ 37*
 
 ### 手順
-1.  `ivy_build.xml.launch`を選択し、右クリックし、`Run As` → `ivy_build.xml`で実
-    行します。
+1.  `ivy_build.xml`を実行します。`ivy_build.xml.launch`を選択し、右クリックし、
+    `Run As` → `ivy_build.xml` で実行します。
 
 2.  `hifive-test-explorer`プロジェクト - `src/main/resources` →
     `appConf`の`api-conf.properties.sample`をコピーして`api-conf.properties`を作
