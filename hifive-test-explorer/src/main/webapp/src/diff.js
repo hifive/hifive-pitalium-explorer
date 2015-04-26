@@ -133,12 +133,7 @@
 						});
 					}
 
-					this._setActualEdgeImageSrc({
-						id: id
-					});
-					this._setExpectedEdgeImageSrc({
-						id: result.id
-					});
+					this._initEdgeOverlapping(result.id, id);
 				}));
 			}));
 
@@ -177,24 +172,33 @@
 			this._setImageSrc('.expected img', withMarker, params);
 		},
 
-		/**
-		 * Show actual edge image.
-		 *
-		 * @memberOf hifive.test.explorer.controller.TestResultDiffController
-		 * @param {Object} params extra paramters
-		 */
-		_setActualEdgeImageSrc: function(params) {
-			this._setEdgeImageSrc('.actual-edge img', jQuery.extend({colorIndex: 0}, params));
-		},
 
 		/**
-		 * Show expected edge image.
-		 *
 		 * @memberOf hifive.test.explorer.controller.TestResultDiffController
-		 * @param {Object} params extra paramters
+		 * @param {Number} expectedId ID of expected image
+		 * @param {Number} actualId ID of actual image
 		 */
-		_setExpectedEdgeImageSrc: function(params) {
-			this._setEdgeImageSrc('.expected-edge img', jQuery.extend({colorIndex: 1}, params));
+		_initEdgeOverlapping: function(expectedId, actualId) {
+			var expected = new Image(), actual = new Image();
+
+			var d1 = $.Deferred(), d2 = $.Deferred();
+			expected.onload = d1.resolve;
+			actual.onload = d2.resolve;
+
+			var format = hifive.test.explorer.utils.formatUrl;
+			expected.src = format('image/getEdge', { id: expectedId, colorIndex: 1 });
+			actual.src = format('image/getEdge', { id: actualId, colorIndex: 0 });
+
+			$.when.apply($, [d1.promise(), d2.promise()]).done(function() {
+				var canvas = $('#edge-overlapping canvas')[0];
+				canvas.width = expected.width;
+				canvas.height = expected.height;
+
+				var context = canvas.getContext('2d');
+				context.globalCompositeOperation = 'multiply';
+				context.drawImage(expected, 0, 0);
+				context.drawImage(actual, 0, 0);
+			});
 		},
 
 		/**
@@ -207,18 +211,6 @@
 		 */
 		_setImageSrc: function(selector, withMarker, params) {
 			var url = withMarker ? 'image/getDiff' : 'image/get';
-			this.$find(selector).attr('src', hifive.test.explorer.utils.formatUrl(url, params));
-		},
-
-		/**
-		 * Show edge image.
-		 *
-		 * @memberOf hifive.test.explorer.controller.TestResultDiffController
-		 * @param {String} selector jQuery selector expression which determines the image node
-		 * @param {Object} params extra paramters
-		 */
-		_setEdgeImageSrc: function(selector, params) {
-			var url = 'image/getEdge';
 			this.$find(selector).attr('src', hifive.test.explorer.utils.formatUrl(url, params));
 		},
 
