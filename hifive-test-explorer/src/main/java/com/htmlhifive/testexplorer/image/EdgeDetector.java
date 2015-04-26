@@ -59,8 +59,8 @@ public class EdgeDetector {
         this.thresholdHigh = 1.0 / 40 / sigma;
         this.thresholdLow = 1.0 / 90 / sigma;
 
-        this.backgroundColor = Color.black;
-        this.foregroundColor = Color.white;
+        this.backgroundColor = new Color(255, 255, 255, 0);
+        this.foregroundColor = Color.black;
     }
 
     /**
