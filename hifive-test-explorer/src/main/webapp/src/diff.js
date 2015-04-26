@@ -4,7 +4,7 @@
 (function($) {
 	/**
 	 * This class is a &qout;logic&quot; for the test result comparison page.
-	 * 
+	 *
 	 * @class
 	 * @memberOf hifive.test.explorer.logic
 	 * @name TestResultDiffLogic
@@ -17,7 +17,7 @@
 
 		/**
 		 * Get details of the test result.
-		 * 
+		 *
 		 * @memberOf hifive.test.explorer.logic.TestResultDiffLogic
 		 * @param {string} id the id of the test result
 		 * @returns {JqXHRWrapper}
@@ -34,7 +34,7 @@
 
 		/**
 		 * Get the ID of the right screenshot of the test result.
-		 * 
+		 *
 		 * @memberOf hifive.test.explorer.logic.TestResultDiffLogic
 		 * @param {string} id the id of the test result
 		 * @returns {JqXHRWrapper}
@@ -55,7 +55,7 @@
 (function($) {
 	/**
 	 * This class is a controller for the test result comparison page.
-	 * 
+	 *
 	 * @class
 	 * @memberOf hifive.test.explorer.controller
 	 * @name TestResultDiffController
@@ -68,7 +68,7 @@
 
 		/**
 		 * The &quot;Logic&quot; class
-		 * 
+		 *
 		 * @type Logic
 		 * @memberOf hifive.test.explorer.controller.TestResultDiffController
 		 */
@@ -77,7 +77,7 @@
 		/**
 		 * Called after the controller has been initialized.<br>
 		 * Get the id of the right screenshot, and update views.
-		 * 
+		 *
 		 * @memberOf hifive.test.explorer.controller.TestResultDiffController
 		 */
 		__ready: function() {
@@ -157,7 +157,7 @@
 
 		/**
 		 * Show actual image.
-		 * 
+		 *
 		 * @memberOf hifive.test.explorer.controller.TestResultDiffController
 		 * @param {Boolean} withMarker whether or not to display the image with markers.
 		 * @param {Object} params extra paramters
@@ -168,7 +168,7 @@
 
 		/**
 		 * Show expected image.
-		 * 
+		 *
 		 * @memberOf hifive.test.explorer.controller.TestResultDiffController
 		 * @param {Boolean} withMarker whether or not to display the image with markers.
 		 * @param {Object} params extra paramters
@@ -199,7 +199,7 @@
 
 		/**
 		 * Show image.
-		 * 
+		 *
 		 * @memberOf hifive.test.explorer.controller.TestResultDiffController
 		 * @param {String} selector jQuery selector expression which determines the image node
 		 * @param {Boolean} withMarker whether or not to display the image with markers.
