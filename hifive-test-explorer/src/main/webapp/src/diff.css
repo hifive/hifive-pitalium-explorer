@@ -67,3 +67,7 @@ body {
 	left: 0;
 	top: 0;
 }
+
+.image-overlay .expected-edge > img {
+	mix-blend-mode: multiply;
+}
