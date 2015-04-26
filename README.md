@@ -12,7 +12,9 @@ Let's **hifive**!
 [license]: http://www.apache.org/licenses/LICENSE-2.0
 [htmlhifive.com]: http://www.htmlhifive.com
 
-![screenshot](https://hifive-snu.github.io/hifive-test-explorer/screenshot.png)
+![screenshot 1](https://hifive-snu.github.io/hifive-test-explorer/img0.png)
+
+![screenshot 2](https://hifive-snu.github.io/hifive-test-explorer/img1.png)
 
 ### Prerequisite
 * [Eclipse IDE for Java EE (Luna SR2)][ide]
