@@ -1,6 +1,6 @@
 Hifive Test Explorer
 ========
-This is the Test Result Explorer tool which supports hifive-test-library. You
+This is the Test Result Explorer tool which supports `hifive-test-library`. You
 can easily access your test results and understand what is wrong, if these tests
 are written with hifive-test-library.
 
@@ -11,6 +11,8 @@ Let's **hifive**!
 
 [license]: http://www.apache.org/licenses/LICENSE-2.0
 [htmlhifive.com]: http://www.htmlhifive.com
+
+![screenshot](https://hifive-snu.github.io/hifive-test-explorer/screenshot.png)
 
 ### Prerequisite
 * [Eclipse IDE for Java EE (Luna SR2)][ide]
