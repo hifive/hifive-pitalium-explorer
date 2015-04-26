@@ -6,9 +6,9 @@ package com.htmlhifive.testexplorer.api;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.file.NoSuchFileException;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -17,6 +17,7 @@ import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +28,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.htmlhifive.testexplorer.image.EdgeDetector;
-import com.htmlhifive.testexplorer.model.Capability;
 import com.htmlhifive.testexplorer.model.Screenshot;
 import com.htmlhifive.testlib.image.utlity.ImageUtility;
 
@@ -56,12 +56,10 @@ public class ImageController {
 	 */
 	@RequestMapping(value = "/get", method = RequestMethod.GET)
 	public void getImage(@RequestParam String id, HttpServletResponse response) {
-
 		@SuppressWarnings("unchecked")
-		Map<String, Screenshot> screenshotMap = (Map<String, Screenshot>) request.getSession(false).getAttribute(
-				KEY_INDEX_MAP);
+		Map<String, Screenshot> screenshotMap = (Map<String, Screenshot>) request.getSession(false).getAttribute(KEY_INDEX_MAP);
 
-		// Validate Parameters.
+		// Parameter validation
 		Screenshot screenshot = screenshotMap.get(id);
 		if (screenshot == null) {
 			log.error("id(" + id + ") is invalid parameter.");
@@ -69,25 +67,18 @@ public class ImageController {
 			return;
 		}
 
-		File pngFile;
+		// Send PNG image
 		try {
-			pngFile = findPngFile(screenshot);
-		} catch (IOException e) {
-			response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
-			return;
-		}
-
-		// Send png file.
-		try {
-			writeFileToResponse(pngFile, response);
-		} catch (IOException e) {
+			File file = getFile(screenshot);
+			sendFile(file, response);
+		}  catch (IOException e) {
 			response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
 		}
 	}
-	
+
 	/**
 	 * Get edge detection result of an image.
-	 * 
+	 *
 	 * @param id id of an image to be processed by edge detector.
 	 * @param response HttpServletResponse
 	 */
@@ -96,10 +87,9 @@ public class ImageController {
 							 @RequestParam(defaultValue = "-1") int colorIndex, HttpServletResponse response)
 	{
 		@SuppressWarnings("unchecked")
-		Map<String, Screenshot> screenshotMap = (Map<String, Screenshot>) request.getSession(false).getAttribute(
-				KEY_INDEX_MAP);
+		Map<String, Screenshot> screenshotMap = (Map<String, Screenshot>) request.getSession(false).getAttribute(KEY_INDEX_MAP);
 
-		// Validate Parameters.
+		// Parameter validation
 		Screenshot screenshot = screenshotMap.get(id);
 		if (screenshot == null) {
 			log.error("id(" + id + ") is invalid parameter.");
@@ -107,40 +97,24 @@ public class ImageController {
 			return;
 		}
 
-		File pngFile;
 		try {
-			pngFile = findPngFile(screenshot);
-		} catch (IOException e) {
-			response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
-			return;
-		}
+			BufferedImage image = ImageIO.read(getFile(screenshot));
+			EdgeDetector edgeDetector = new EdgeDetector(0.5);
 
-		BufferedImage image;
-		try {
-			image = createImage(pngFile);
-		} catch (IOException e) {
-			response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
-			return;
-		}
-		
-		EdgeDetector edgeDetector = new EdgeDetector(0.5);
-		switch (colorIndex)
-		{
-			case 0:
-				edgeDetector.setBackgroundColor(new Color(0, 0, 0, 255));
-				edgeDetector.setForegroundColor(new Color(255, 0, 0, 255));
-				break;
-			case 1:
-				edgeDetector.setBackgroundColor(new Color(0, 0, 0, 0));
-				edgeDetector.setForegroundColor(new Color(0, 0, 255, 128));
-				break;
-		}
+			switch (colorIndex)
+			{
+				case 0:
+					edgeDetector.setBackgroundColor(new Color(0, 0, 0, 255));
+					edgeDetector.setForegroundColor(new Color(255, 0, 0, 255));
+					break;
+				case 1:
+					edgeDetector.setBackgroundColor(new Color(0, 0, 0, 0));
+					edgeDetector.setForegroundColor(new Color(0, 0, 255, 128));
+					break;
+			}
 
-		BufferedImage edgeImage = edgeDetector.DetectEdge(image);
-
-		// Send png file.
-		try {
-			writeImageToResponse(edgeImage, response);
+			BufferedImage edgeImage = edgeDetector.DetectEdge(image);
+			sendImage(edgeImage, response);
 		} catch (IOException e) {
 			response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
 		}
@@ -154,12 +128,9 @@ public class ImageController {
 	 * @param response HttpServletResponse
 	 */
 	@RequestMapping(value = "/getDiff", method = RequestMethod.GET)
-	public void getDiffImage(@RequestParam String sourceId, @RequestParam String targetId,
-			HttpServletResponse response) {
-
+	public void getDiffImage(@RequestParam String sourceId, @RequestParam String targetId, HttpServletResponse response) {
 		@SuppressWarnings("unchecked")
-		Map<String, Screenshot> screenshotMap = (Map<String, Screenshot>) request.getSession(false).getAttribute(
-				KEY_INDEX_MAP);
+		Map<String, Screenshot> screenshotMap = (Map<String, Screenshot>) request.getSession(false).getAttribute(KEY_INDEX_MAP);
 
 		// Validate Parameters.
 		Screenshot sourceScreenshot = screenshotMap.get(sourceId);
@@ -168,6 +139,7 @@ public class ImageController {
 			response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
 			return;
 		}
+
 		Screenshot targetScreenshot = screenshotMap.get(targetId);
 		if (targetScreenshot == null) {
 			log.error("id(" + targetId + ") is invalid parameter.");
@@ -175,98 +147,51 @@ public class ImageController {
 			return;
 		}
 
-		File sourcePngFile;
-		File targetPngFile;
-
 		try {
-			sourcePngFile = findPngFile(sourceScreenshot);
-			targetPngFile = findPngFile(targetScreenshot);
-		} catch (IOException e) {
-			response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
-			return;
-		}
+			File source = getFile(sourceScreenshot);
+			File target = getFile(targetScreenshot);
 
-		// Create a partial image.
-		BufferedImage actualImage;
-		BufferedImage expectedImage;
-		try {
-			actualImage = createImage(sourcePngFile);
-			expectedImage = createImage(targetPngFile);
-		} catch (IOException e) {
-			response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
-			return;
-		}
+			// Create a partial image
+			BufferedImage actual = ImageIO.read(source);
+			BufferedImage expected = ImageIO.read(target);
 
-		// Compare.
-		List<Point> diffPoints = ImageUtility.compareImages(expectedImage, null, actualImage, null, null, null);
-		BufferedImage image = !diffPoints.isEmpty() ? ImageUtility.getMarkedImage(actualImage, diffPoints)
-				: actualImage;
-		// Send png file.
-		try {
-			writeImageToResponse(image, response);
+			// Compare.
+			List<Point> diffPoints = ImageUtility.compareImages(expected, null, actual, null, null, null);
+			if (diffPoints.isEmpty()) {
+				sendFile(source, response);
+			} else {
+				BufferedImage marked = ImageUtility.getMarkedImage(actual, diffPoints);
+				sendImage(marked, response);
+			}
 		} catch (IOException e) {
 			response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
 		}
 	}
 
-	private void writeFileToResponse(File file, HttpServletResponse response) throws IOException {
-		BufferedImage image = null;
-		try {
-			image = ImageIO.read(file);
-		} catch (IOException e) {
-			log.error(e.getMessage(), e);
-			throw e;
-		}
-		writeImageToResponse(image, response);
-	}
+	private File getFile(Screenshot screenshot) throws FileNotFoundException {
+		String path =
+				apiConfig.getProperty(RESULTS_DIR) +
+				File.separatorChar +
+				screenshot.getTestCaseResult().getExecuteTime() +
+				File.separatorChar +
+				screenshot.getCapability().getTestClass() +
+				File.separatorChar +
+				screenshot.getFileName() + ".png";
 
-	private void writeImageToResponse(BufferedImage image, HttpServletResponse response) throws IOException {
-		// Send png file.
-		response.setContentType("image/png");
-		try {
-			ImageIO.write(image, "png", response.getOutputStream());
-		} catch (IOException e) {
-			log.error(e.getMessage(), e);
-			throw e;
-		} catch (IndexOutOfBoundsException e2) {
-			// Even if an exception occurs, no problem in the subsequent processing.
-			log.warn(e2.getMessage(), e2);
-		}
-	}
-
-	private File getBaseDirectory(Screenshot screenshot) throws NoSuchFileException {
-		Capability capability = screenshot.getCapability();
-		String directoryName = screenshot.getTestCaseResult().getExecuteTime() + File.separatorChar
-				+ capability.getTestClass();
-		File base = new File(apiConfig.getProperty(RESULTS_DIR), directoryName);
-		if (!base.exists() || !base.isDirectory()) {
-			log.error("Directory(" + base.getAbsolutePath() + ") Not Found.");
-			throw new NoSuchFileException(base.getAbsolutePath());
-		}
-		return base;
-	}
-
-	private File findPngFile(Screenshot screenshot) throws IOException {
-		return findFile(screenshot, ".png");
-	}
-
-	private File findFile(Screenshot screenshot, String extension) throws IOException {
-		File root = getBaseDirectory(screenshot);
-
-		String fileName = screenshot.getFileName() + extension;
-		File file = new File(root, fileName);
-		if (!file.exists() || !file.isFile()) {
-			throw new FileNotFoundException(file.getAbsolutePath() + " Not Found.");
-		}
+		File file = new File(path);
+		if (!file.exists() || !file.isFile()) { throw new FileNotFoundException(path + " Not Found."); }
 		return file;
 	}
 
-	private BufferedImage createImage(File pngFile) throws IOException {
-		try {
-			return ImageIO.read(pngFile);
-		} catch (IOException e) {
-			log.error(e.getMessage(), e);
-			throw e;
-		}
+	private void sendFile(File file, HttpServletResponse response) throws IOException {
+		response.setContentType("image/png");
+		response.flushBuffer();
+		IOUtils.copy(new FileInputStream(file), response.getOutputStream());
+	}
+
+	private void sendImage(BufferedImage image, HttpServletResponse response) throws IOException {
+		response.setContentType("image/png");
+		response.flushBuffer();
+		ImageIO.write(image, "png", response.getOutputStream());
 	}
 }
