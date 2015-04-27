@@ -179,6 +179,7 @@
 		 * @param {Number} actualId ID of actual image
 		 */
 		_initEdgeOverlapping: function(expectedId, actualId) {
+			// Initialize <canvas>
 			var expected = new Image(), actual = new Image();
 
 			var d1 = $.Deferred(), d2 = $.Deferred();
@@ -191,13 +192,36 @@
 
 			$.when.apply($, [d1.promise(), d2.promise()]).done(function() {
 				var canvas = $('#edge-overlapping canvas')[0];
-				canvas.width = expected.width;
-				canvas.height = expected.height;
+				var native_width  = canvas.width  = expected.width;
+				var native_height = canvas.height = expected.height;
 
 				var context = canvas.getContext('2d');
 				context.globalCompositeOperation = 'multiply';
 				context.drawImage(expected, 0, 0);
 				context.drawImage(actual, 0, 0);
+
+				// Image magnifier
+				$('.large').css('background-image', 'url('+canvas.toDataURL('image/png')+')');
+				$('#edge-overlapping .image-overlay').mousemove(function(e) {
+					var magnify_offset = $(this).offset();
+					var mx = e.pageX - magnify_offset.left;
+					var my = e.pageY - magnify_offset.top;
+
+					if(mx < $(this).width() && my < $(this).height() && mx > 0 && my > 0) {
+						$('.large').fadeIn(100);
+					} else {
+						$('.large').fadeOut(100);
+					} if($('.large').is(':visible')) {
+						var rx = Math.round(mx/$('.small').width()*native_width - $('.large').width()/2)*-1;
+						var ry = Math.round(my/$('.small').height()*native_height - $('.large').height()/2)*-1;
+
+						$('.large').css({
+							left: mx - $('.large').width()/2,
+							top: my - $('.large').height()/2,
+							backgroundPosition: rx + 'px ' + ry + 'px'
+						});
+					}
+				})
 			});
 		},
 
