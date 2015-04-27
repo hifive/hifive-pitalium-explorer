@@ -101,16 +101,13 @@ public class ImageController {
 			BufferedImage image = ImageIO.read(getFile(screenshot));
 			EdgeDetector edgeDetector = new EdgeDetector(0.5);
 
-			switch (colorIndex)
-			{
-				case 0:
-					edgeDetector.setBackgroundColor(new Color(0, 0, 0, 255));
-					edgeDetector.setForegroundColor(new Color(255, 0, 0, 255));
-					break;
-				case 1:
-					edgeDetector.setBackgroundColor(new Color(0, 0, 0, 0));
-					edgeDetector.setForegroundColor(new Color(0, 0, 255, 128));
-					break;
+			switch (colorIndex) {
+			case 0:
+				edgeDetector.setForegroundColor(new Color(255, 0, 0, 255));
+				break;
+			case 1:
+				edgeDetector.setForegroundColor(new Color(0, 0, 255, 255));
+				break;
 			}
 
 			BufferedImage edgeImage = edgeDetector.DetectEdge(image);
