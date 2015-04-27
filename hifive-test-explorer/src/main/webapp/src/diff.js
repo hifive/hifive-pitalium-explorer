@@ -197,31 +197,48 @@
 
 				var context = canvas.getContext('2d');
 				context.globalCompositeOperation = 'multiply';
-				context.drawImage(expected, 0, 0);
-				context.drawImage(actual, 0, 0);
-
-				// Image magnifier
-				$('.large').css('background-image', 'url('+canvas.toDataURL('image/png')+')');
-				$('#edge-overlapping .image-overlay').mousemove(function(e) {
-					var magnify_offset = $(this).offset();
-					var mx = e.pageX - magnify_offset.left;
-					var my = e.pageY - magnify_offset.top;
-
-					if(mx < $(this).width() && my < $(this).height() && mx > 0 && my > 0) {
-						$('.large').fadeIn(100);
-					} else {
-						$('.large').fadeOut(100);
-					} if($('.large').is(':visible')) {
-						var rx = Math.round(mx/$('.small').width()*native_width - $('.large').width()/2)*-1;
-						var ry = Math.round(my/$('.small').height()*native_height - $('.large').height()/2)*-1;
-
-						$('.large').css({
-							left: mx - $('.large').width()/2,
-							top: my - $('.large').height()/2,
-							backgroundPosition: rx + 'px ' + ry + 'px'
-						});
+				if (context.globalCompositeOperation == 'multiply') {
+					context.drawImage(expected, 0, 0);
+					context.drawImage(actual, 0, 0);
+					initImageMagnifier();
+				} else {
+					// IE workaround
+					var actualBlack = new Image();
+					actualBlack.onload = function() {
+						context.drawImage(expected, 0, 0);
+						context.globalCompositeOperation = 'source-atop';
+						context.drawImage(actualBlack, 0, 0);
+						context.globalCompositeOperation = 'destination-over';
+						context.drawImage(actual, 0, 0);
+						initImageMagnifier();
 					}
-				})
+					actualBlack.src = format('image/getEdge', { id: actualId, colorIndex: 2 });
+				}
+
+				function initImageMagnifier() {
+					// Image magnifier
+					$('.large').css('background-image', 'url('+canvas.toDataURL('image/png')+')');
+					$('#edge-overlapping .image-overlay').mousemove(function(e) {
+						var magnify_offset = $(this).offset();
+						var mx = e.pageX - magnify_offset.left;
+						var my = e.pageY - magnify_offset.top;
+
+						if(mx < $(this).width() && my < $(this).height() && mx > 0 && my > 0) {
+							$('.large').fadeIn(100);
+						} else {
+							$('.large').fadeOut(100);
+						} if($('.large').is(':visible')) {
+							var rx = Math.round(mx/$('.small').width()*native_width - $('.large').width()/2)*-1;
+							var ry = Math.round(my/$('.small').height()*native_height - $('.large').height()/2)*-1;
+
+							$('.large').css({
+								left: mx - $('.large').width()/2,
+								top: my - $('.large').height()/2,
+								backgroundPosition: rx + 'px ' + ry + 'px'
+							});
+						}
+				});
+			}
 			});
 		},
 
