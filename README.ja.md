@@ -33,12 +33,9 @@ Let's **hifive**!
 1.  `ivy_build.xml`を実行します。`ivy_build.xml.launch`を選択し、右クリックし、
     `Run As` → `ivy_build.xml` で実行します。
 
-2.  `hifive-test-explorer`プロジェクト - `src/main/resources` →
-    `appConf`の`api-conf.properties.sample`をコピーして`api-conf.properties`を作
-    ってその中身を書き換えます。テストデータを格納した`sampleData`フォルダはプロ
-    ジェクトの直下にあります。各自の環境に合わせて絶対パスを書き換えてください。
-
-    例）`resultsDir=C:\\hifive\\workspace\\hifive-test-explorer\\sampleData`
+2.  データベースを初期化して起動します。カレントディレクトリーを
+    `hifive-test-explorer/db/hsql`に変わって`./init.sh`や`init.bat`を実行します。
+    その後に`./start.sh`や`start.bat`を実行します。
 
 3.  Tomcatのコンテキスト定義を更新します。プロジェクトを選択し、右クリックし、
     `Tomcatプロジェクト` → `コンテキスト定義を更新`で実行します。

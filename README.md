@@ -37,16 +37,9 @@ Let's **hifive**!
 1.  Run `ivy_build.xml`. To do so, right-click on `ivy_build.xml.launch` and
     choose `Run As` → `ivy_build.xml`.
 
-2.  Copy `api-conf.properties.sample` to `api-conf.properties` and modify it.
-    `api-conf.properties.sample` is located in
-    `hifive-test-explorer/src/main/resources/appConf`. Modify the value of the
-    key `resultDir` to your absolute path of the sample data folder like below;
-
-    ```
-    resultsDir=C:\\hifive\\workspace\\hifive-test-explorer\\sampleData
-    ```
-
-    `sampleData` folder is located in `hifiveTestExplorer`.
+2.  Initialize and start database. Change current directory to
+    `hifive-test-explorer/db/hsql` and run `./init.sh` or `init.bat`.
+    And then, run `./start.sh` or `start.bat`.
 
 3.  Update Tomcat context definition. Right-click `hifive-test-explorer`
     project and choose `Tomcat project` → `Update context definition`.
