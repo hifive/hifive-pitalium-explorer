@@ -2,12 +2,10 @@
 /target/
 /work/
 /db/hsqldb/db/
+/db/hsqldb/images/
 /lib/
 /bin/
 /src/main/webapp/WEB-INF/classes
-
-# Ignore configuration file
-api-conf.properties
 
 # Misc
 *.iml

@@ -25,20 +25,20 @@
 	<script src="src/common/util.js"></script>
 	<script src="src/list.js"></script>
 
-	<script type="text/ejs" id="testExectionTimeListTemplate">
-			<div class="panel-group" id="testExectionTimeAccordion" role="tablist" aria-multiselectable="true">
+	<script type="text/ejs" id="testExecutionListTemplate">
+			<div class="panel-group" id="testExecutionAccordion" role="tablist" aria-multiselectable="true">
 				[%
-					for (var i = 0, len = testExectionTimes.length; i < len; i++) {
-						var testExectionTime = testExectionTimes[i];
+					for (var i = 0, len = testExecutions.length; i < len; i++) {
+						var testExecution = testExecutions[i];
 						var headerTarget = 'heading' + i;
 						var collapseTarget = 'collapse' + i;
 				%]
-				<div class="panel panel-default explorer-collapsable" data-execution-time="[%= testExectionTime.executionTime %]">
+				<div class="panel panel-default explorer-collapsable" data-test-execution-id="[%= testExecution.id %]">
 					<div class="panel-heading" role="tab" id="[%= headerTarget %]">
 						<h4 class="panel-title">
-							<a data-toggle="collapse" data-parent="#testExectionTimeAccordion" href="#[%= collapseTarget %]"
+							<a data-toggle="collapse" data-parent="#testExecutionAccordion" href="#[%= collapseTarget %]"
 								aria-expanded="false" aria-controls="[%= collapseTarget %]">
-								[%= testExectionTime.executionTime %]
+								[%= testExecution.timeString %]
 							</a>
 						</h4>
 					</div>
@@ -52,28 +52,28 @@
 				[% } %]
 			</div>
 	</script>
-	<script type="text/ejs" id="testResultListTemplate">
+	<script type="text/ejs" id="screenshotListTemplate">
 		<table class="table table-striped table-hover">
 			<thead>
 				<tr>
-					<th>Test method name</th>
-					<th>ScreenShot ID</th>
+					<th>Test method</th>
+					<th>Test screen</th>
 					<th>Platform</th>
 					<th>Browser name</th>
-					<th>Test result</th>
+					<th>Comparison result</th>
 				</tr>
 			</thead>
 			<tbody>
 				[%
-					for (var i = 0; i < testResults.length; i++) {
-						var testResult = testResults[i];
+					for (var i = 0; i < screenshots.length; i++) {
+						var screenshot = screenshots[i];
 				%]
-				<tr class="explorer-test-result" data-test-result-id="[%= testResult.id %]">
-					<td>[%= testResult.testMethod %]</td>
-					<td>[%= testResult.screenShotId %]</td>
-					<td>[%= testResult.platform %]</td>
-					<td>[%= testResult.browserName %]</td>
-					<td>[%= testResult.comparisonResult ? "○" : testResult.comparisonResult == null ? "-" : "×" %]</td>
+				<tr class="explorer-test-result" data-screenshot-id="[%= screenshot.id %]">
+					<td>[%= screenshot.testMethod %]</td>
+					<td>[%= screenshot.testScreen %]</td>
+					<td>[%= screenshot.platform %]</td>
+					<td>[%= screenshot.browserName %]</td>
+					<td>[%= screenshot.comparisonResult ? "○" : screenshot.comparisonResult == null ? "-" : "×" %]</td>
 				</tr>
 				[% } %]
 			</tbody>
@@ -109,7 +109,7 @@
 					<button type="submit" class="btn btn-default">Search</button>
 				</form>
 			</div>
-			<div id="testExectionTimeList"></div>
+			<div id="testExecutionList"></div>
 		</div>
 	</body>
 </html>

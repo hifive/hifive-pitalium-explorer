@@ -16,33 +16,16 @@
 		__name: 'hifive.test.explorer.logic.TestResultDiffLogic',
 
 		/**
-		 * Get details of the test result.
 		 *
+		 * Get details of the screenshot.
 		 * @memberOf hifive.test.explorer.logic.TestResultDiffLogic
-		 * @param {string} id the id of the test result
+		 * @param {string} id the id of the screenshot
 		 * @returns {JqXHRWrapper}
 		 */
-		getDetail: function(id) {
+		getScreenshot: function(id) {
 			return h5.ajax({
 				type: 'get',
-				url: 'api/getDetail',
-				data: {
-					id: id
-				}
-			});
-		},
-
-		/**
-		 * Get the ID of the right screenshot of the test result.
-		 *
-		 * @memberOf hifive.test.explorer.logic.TestResultDiffLogic
-		 * @param {string} id the id of the test result
-		 * @returns {JqXHRWrapper}
-		 */
-		getExpectedId: function(id) {
-			return h5.ajax({
-				type: 'get',
-				url: 'api/getExpectedId',
+				url: 'api/getScreenshot',
 				data: {
 					id: id
 				}
@@ -90,10 +73,10 @@
 
 			var id = queryParams.id;
 
-			// Get test result details
-			this._testResultDiffLogic.getDetail(id).done(this.own(function(detail) {
+			// Get screenshot details
+			this._testResultDiffLogic.getScreenshot(id).done(this.own(function(screenshot) {
 				// Expected mode
-				if (detail.mode == 'EXPECTED') {
+				if (screenshot.expectedScreenshot == null) {
 					this._setActualImageSrc(false, {
 						id: id
 					});
@@ -101,40 +84,39 @@
 					return;
 				}
 				this._hideExpectedMode();
+				var expectedScreenshot = screenshot.expectedScreenshot;
 
-				this._testResultDiffLogic.getExpectedId(id).done(this.own(function(result) {
-					// Test not executed
-					if (detail.comparisonResult == null) {
-						this._setExpectedImageSrc(false, {
-							id: result.id
-						});
-						return;
-					}
+				// Test not executed
+				if (screenshot.comparisonResult == null) {
+					this._setExpectedImageSrc(false, {
+						id: expectedScreenshot.id
+					});
+					return;
+				}
 
-					if (detail.comparisonResult) {
-						// Test succeeded
-						this._setActualImageSrc(false, {
-							id: id
-						});
+				if (screenshot.comparisonResult) {
+					// Test succeeded
+					this._setActualImageSrc(false, {
+						id: id
+					});
 
-						this._setExpectedImageSrc(false, {
-							id: result.id
-						});
-					} else {
-						// Test failed
-						this._setActualImageSrc(true, {
-							sourceId: id,
-							targetId: result.id
-						});
+					this._setExpectedImageSrc(false, {
+						id: expectedScreenshot.id
+					});
+				} else {
+					// Test failed
+					this._setActualImageSrc(true, {
+						sourceId: id,
+						targetId: expectedScreenshot.id
+					});
 
-						this._setExpectedImageSrc(true, {
-							sourceId: result.id,
-							targetId: id
-						});
-					}
+					this._setExpectedImageSrc(true, {
+						sourceId: expectedScreenshot.id,
+						targetId: id
+					});
+				}
 
-					this._initEdgeOverlapping(result.id, id);
-				}));
+				this._initEdgeOverlapping(expectedScreenshot.id, id);
 			}));
 
 			this._initializeSwipeHandle();
@@ -223,11 +205,11 @@
 						var mx = e.pageX - magnify_offset.left;
 						var my = e.pageY - magnify_offset.top;
 
-						if(mx < $(this).width() && my < $(this).height() && mx > 0 && my > 0) {
+						if (mx < $(this).width() && my < $(this).height() && mx > 0 && my > 0) {
 							$('.large').fadeIn(100);
 						} else {
 							$('.large').fadeOut(100);
-						} if($('.large').is(':visible')) {
+						} if ($('.large').is(':visible')) {
 							var rx = Math.round(mx/$('.small').width()*native_width - $('.large').width()/2)*-1;
 							var ry = Math.round(my/$('.small').height()*native_height - $('.large').height()/2)*-1;
 
@@ -237,8 +219,8 @@
 								backgroundPosition: rx + 'px ' + ry + 'px'
 							});
 						}
-				});
-			}
+					});
+				}
 			});
 		},
 

@@ -10,8 +10,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
-import java.util.Properties;
 
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
@@ -27,51 +25,42 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.htmlhifive.testexplorer.entity.ConfigRepository;
+import com.htmlhifive.testexplorer.entity.Screenshot;
+import com.htmlhifive.testexplorer.entity.ScreenshotRepository;
 import com.htmlhifive.testexplorer.image.EdgeDetector;
-import com.htmlhifive.testexplorer.model.Screenshot;
 import com.htmlhifive.testlib.image.utlity.ImageUtility;
 
 @Controller
 @RequestMapping("/image")
 public class ImageController {
 
-	// PropertyKey
-	private static final String RESULTS_DIR = "resultsDir";
-
-	// SessionKey
-	private static final String KEY_INDEX_MAP = "INDEX_MAP";
+	@Autowired
+	private ConfigRepository configRepo;
+	@Autowired
+	private ScreenshotRepository screenshotRepo;
 
 	@Autowired
 	private HttpServletRequest request;
-	@Autowired
-	private Properties apiConfig;
 
+	@SuppressWarnings("unused")
 	private static Logger log = LoggerFactory.getLogger(ImageController.class);
 
 	/**
 	 * Get the image from id.
 	 *
-	 * @param id test execution result id or right image id
+	 * @param id screenshot id
 	 * @param response HttpServletResponse
 	 */
 	@RequestMapping(value = "/get", method = RequestMethod.GET)
-	public void getImage(@RequestParam String id, HttpServletResponse response) {
-		@SuppressWarnings("unchecked")
-		Map<String, Screenshot> screenshotMap = (Map<String, Screenshot>) request.getSession(false).getAttribute(KEY_INDEX_MAP);
-
-		// Parameter validation
-		Screenshot screenshot = screenshotMap.get(id);
-		if (screenshot == null) {
-			log.error("id(" + id + ") is invalid parameter.");
-			response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
-			return;
-		}
+	public void getImage(@RequestParam Integer id, HttpServletResponse response) {
+		Screenshot screenshot = screenshotRepo.findOne(id);
 
 		// Send PNG image
 		try {
 			File file = getFile(screenshot);
 			sendFile(file, response);
-		}  catch (IOException e) {
+		} catch (IOException e) {
 			response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
 		}
 	}
@@ -79,23 +68,14 @@ public class ImageController {
 	/**
 	 * Get edge detection result of an image.
 	 *
-	 * @param id id of an image to be processed by edge detector.
+	 * @param id id of screenshot to be processed by edge detector.
 	 * @param response HttpServletResponse
 	 */
 	@RequestMapping(value = "/getEdge", method = RequestMethod.GET)
-	public void getEdgeImage(@RequestParam String id,
+	public void getEdgeImage(@RequestParam Integer id,
 							 @RequestParam(defaultValue = "-1") int colorIndex, HttpServletResponse response)
 	{
-		@SuppressWarnings("unchecked")
-		Map<String, Screenshot> screenshotMap = (Map<String, Screenshot>) request.getSession(false).getAttribute(KEY_INDEX_MAP);
-
-		// Parameter validation
-		Screenshot screenshot = screenshotMap.get(id);
-		if (screenshot == null) {
-			log.error("id(" + id + ") is invalid parameter.");
-			response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
-			return;
-		}
+		Screenshot screenshot = screenshotRepo.findOne(id);
 
 		try {
 			BufferedImage image = ImageIO.read(getFile(screenshot));
@@ -118,31 +98,16 @@ public class ImageController {
 	}
 
 	/**
-	 * Get the diff image With a marker of comparison result. If there is no difference, return normal image.
+	 * Get the diff image with a marker of comparison result. If there is no difference, return normal image.
 	 *
 	 * @param sourceId comparison source image id
 	 * @param targetId comparison target image id
 	 * @param response HttpServletResponse
 	 */
 	@RequestMapping(value = "/getDiff", method = RequestMethod.GET)
-	public void getDiffImage(@RequestParam String sourceId, @RequestParam String targetId, HttpServletResponse response) {
-		@SuppressWarnings("unchecked")
-		Map<String, Screenshot> screenshotMap = (Map<String, Screenshot>) request.getSession(false).getAttribute(KEY_INDEX_MAP);
-
-		// Validate Parameters.
-		Screenshot sourceScreenshot = screenshotMap.get(sourceId);
-		if (sourceScreenshot == null) {
-			log.error("id(" + sourceId + ") is invalid parameter.");
-			response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
-			return;
-		}
-
-		Screenshot targetScreenshot = screenshotMap.get(targetId);
-		if (targetScreenshot == null) {
-			log.error("id(" + targetId + ") is invalid parameter.");
-			response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
-			return;
-		}
+	public void getDiffImage(@RequestParam Integer sourceId, @RequestParam Integer targetId, HttpServletResponse response) {
+		Screenshot sourceScreenshot = screenshotRepo.findOne(sourceId);
+		Screenshot targetScreenshot = screenshotRepo.findOne(targetId);
 
 		try {
 			File source = getFile(sourceScreenshot);
@@ -167,11 +132,13 @@ public class ImageController {
 
 	private File getFile(Screenshot screenshot) throws FileNotFoundException {
 		String path =
-				apiConfig.getProperty(RESULTS_DIR) +
+				configRepo.findOne(ConfigRepository.ABSOLUTE_PATH_KEY).getValue() +
 				File.separatorChar +
-				screenshot.getTestCaseResult().getExecuteTime() +
+				"images" +
 				File.separatorChar +
-				screenshot.getCapability().getTestClass() +
+				screenshot.getTestExecution().getTimeString() +
+				File.separatorChar +
+				screenshot.getTestClass() +
 				File.separatorChar +
 				screenshot.getFileName() + ".png";
 

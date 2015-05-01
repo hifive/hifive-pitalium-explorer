@@ -1,5 +1,7 @@
 package com.htmlhifive.testexplorer.entity;
 
+import java.io.Serializable;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -9,45 +11,107 @@ import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 
 @Entity
-public class Screenshot {
+public class Screenshot implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
 	@SequenceGenerator(name="Screenshot_generator", sequenceName="Seq_Screenshot", allocationSize=1)
 	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="Screenshot_generator")
 	@Id
 	private Integer id;
-	private String screenshotId;
-	private Boolean result;
-	private String fileName;
+
 	@ManyToOne
-	@JoinColumn(name="testCaseResultId", nullable=false, updatable=false)
-	private TestCaseResult testCaseResult;
+	@JoinColumn(name="expectedId", nullable=true, updatable=false)
+	private Screenshot expectedScreenshot;
+
+	private String fileName;
+
+	private Boolean comparisonResult;
+
+	private String testClass;
+
+	private String testMethod;
+
+	private String testScreen;
+
+	@ManyToOne
+	@JoinColumn(name="testExecutionId", nullable=false, updatable=false)
+	private TestExecution testExecution;
+
+	@ManyToOne
+	@JoinColumn(name="testEnvironmentId", nullable=false, updatable=false)
+	private TestEnvironment testEnvironment;
+
 	public Integer getId() {
 		return id;
 	}
+
 	public void setId(Integer id) {
 		this.id = id;
 	}
-	public String getScreenshotId() {
-		return screenshotId;
+
+	public Screenshot getExpectedScreenshot() {
+		return expectedScreenshot;
 	}
-	public void setScreenshotId(String screenshotId) {
-		this.screenshotId = screenshotId;
+
+	public void setExpectedScreenshot(Screenshot expectedScreenshot) {
+		this.expectedScreenshot = expectedScreenshot;
 	}
-	public Boolean getResult() {
-		return result;
-	}
-	public void setResult(Boolean result) {
-		this.result = result;
-	}
+
 	public String getFileName() {
 		return fileName;
 	}
+
 	public void setFileName(String fileName) {
 		this.fileName = fileName;
 	}
-	public TestCaseResult getTestCaseResult() {
-		return testCaseResult;
+
+	public Boolean getComparisonResult() {
+		return comparisonResult;
 	}
-	public void setTestCaseResult(TestCaseResult testCaseResult) {
-		this.testCaseResult = testCaseResult;
+
+	public void setComparisonResult(Boolean comparisonResult) {
+		this.comparisonResult = comparisonResult;
 	}
+
+	public String getTestClass() {
+		return testClass;
+	}
+
+	public void setTestClass(String testClass) {
+		this.testClass = testClass;
+	}
+
+	public String getTestMethod() {
+		return testMethod;
+	}
+
+	public void setTestMethod(String testMethod) {
+		this.testMethod = testMethod;
+	}
+
+	public String getTestScreen() {
+		return testScreen;
+	}
+
+	public void setTestScreen(String testScreen) {
+		this.testScreen = testScreen;
+	}
+
+	public TestExecution getTestExecution() {
+		return testExecution;
+	}
+
+	public void setTestExecution(TestExecution testExecution) {
+		this.testExecution = testExecution;
+	}
+
+	public TestEnvironment getTestEnvironment() {
+		return testEnvironment;
+	}
+
+	public void setTestEnvironment(TestEnvironment testEnvironment) {
+		this.testEnvironment = testEnvironment;
+	}
+
 }

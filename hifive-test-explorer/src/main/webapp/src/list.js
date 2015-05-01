@@ -16,52 +16,52 @@
 		__name: 'hifive.test.explorer.logic.TestResultListLogic',
 
 		/**
-		 * Gets a list of test exection time.
+		 * Gets a list of test execution.
 		 * 
 		 * @memberOf hifive.test.explorer.logic.TestResultListLogic
 		 * @returns {JqXHRWrapper}
 		 */
-		getTestExectionTimeList: function() {
+		getTestExecutionList: function() {
 			return h5.ajax({
 				type: 'get',
 				dataType: 'json',
-				url: hifive.test.explorer.utils.formatUrl('api/listTestExectionTime')
+				url: hifive.test.explorer.utils.formatUrl('api/listTestExecution')
 			});
 		},
 
 		/**
-		 * Gets a list of test exection time which is narrowed down by parameters.
+		 * Gets a list of test execution which is narrowed down by parameters.
 		 * 
 		 * @memberOf hifive.test.explorer.logic.TestResultListLogic
 		 * @param {Object} params search parameters
 		 * @return {JqXHRWrapper}
 		 */
-		getTestExectionTimeListWithParams: function(params) {
+		getTestExecutionListWithParams: function(params) {
 			var data = {};
 			this._copyObjectByKey(params, data, ['criteria']);
 
 			return h5.ajax({
 				type: 'get',
 				dataType: 'json',
-				url: 'api/listTestExectionTime/search',
+				url: 'api/listTestExecution/search',
 				data: data
 			});
 		},
 
 		/**
-		 * Gets a list of test result details.
+		 * Gets a list of screenshots.
 		 * 
 		 * @memberOf hifive.test.explorer.logic.TestResultListLogic
-		 * @param {string} executionTime The time the test was run.
+		 * @param {string} testExecutionId The time the test was run.
 		 * @returns {JqXHRWrapper}
 		 */
-		getTestResultList: function(executionTime) {
+		getScreenshotList: function(testExecutionId) {
 			return h5.ajax({
 				type: 'get',
 				dataType: 'json',
-				url: 'api/listTestResult',
+				url: 'api/listScreenshot',
 				data: {
-					executionTime: executionTime
+					testExecutionId: testExecutionId
 				}
 			});
 		},
@@ -109,7 +109,7 @@
 
 		/**
 		 * Called after the controller has been initialized.<br>
-		 * Load list of test exection time asynchronously and update views.
+		 * Load list of test execution time asynchronously and update views.
 		 * 
 		 * @memberOf hifive.test.explorer.controller.TestResultListController
 		 */
@@ -119,12 +119,12 @@
 				target: document
 			}).show();
 
-			// Load list of test exection time
-			this._testResultListLogic.getTestExectionTimeList().done(
-					this.own(function(testExectionTimeList) {
+			// Load list of test execution
+			this._testResultListLogic.getTestExecutionList().done(
+					this.own(function(testExecutionList) {
 						// Update views
-						this.view.update('#testExectionTimeList', 'testExectionTimeListTemplate', {
-							testExectionTimes: testExectionTimeList
+						this.view.update('#testExecutionList', 'testExecutionListTemplate', {
+							testExecutions: testExecutionList
 						});
 					})).always(function() {
 				indicator.hide();
@@ -132,7 +132,7 @@
 		},
 
 		/**
-		 * Called when a label of test execution time has been clicked.<br>
+		 * Called when a label of test execution has been clicked.<br>
 		 * Load list of test results of selected item asynchronously, and update views.
 		 * 
 		 * @memberOf hifive.test.explorer.controller.TestResultListController
@@ -146,7 +146,7 @@
 			if ($panelBody.hasClass('hifive.test.explorer-load'))
 				return;
 
-			var executionTime = $el.data('executionTime');
+			var testExecutionId = $el.data('testExecutionId');
 
 			$panelBody.addClass('hifive.test.explorer-load');
 
@@ -156,11 +156,11 @@
 				target: document
 			}).show();
 
-			this._testResultListLogic.getTestResultList(executionTime).done(
-					this.own(function(testResultList) {
+			this._testResultListLogic.getScreenshotList(testExecutionId).done(
+					this.own(function(screenshotList) {
 						// Update views
-						this.view.update($panelBody, 'testResultListTemplate', {
-							testResults: testResultList
+						this.view.update($panelBody, 'screenshotListTemplate', {
+							screenshots: screenshotList
 						});
 					})).always(function() {
 				indicator.hide();
@@ -176,7 +176,7 @@
 		 * @param {jQuery} $el the event target element
 		 */
 		'.explorer-test-result click': function(context, $el) {
-			var id = $el.data('testResultId');
+			var id = $el.data('screenshotId');
 			var url = hifive.test.explorer.utils.formatUrl('diff.html', {
 				id: id
 			});
@@ -234,13 +234,13 @@
 			}).show();
 
 			// Reset views
-			this.$find('#testExectionTimeList').empty();
+			this.$find('#testExecutionList').empty();
 
 			// Search test results
-			this._testResultListLogic.getTestExectionTimeListWithParams(params).done(
-					this.own(function(testExectionTimeList) {
-						this.view.update('#testExectionTimeList', 'testExectionTimeList', {
-							testExectionTimes: testExectionTimeList
+			this._testResultListLogic.getTestExecutionListWithParams(params).done(
+					this.own(function(testExecutionList) {
+						this.view.update('#testExecutionList', 'testExecutionList', {
+							testExecutions: testExecutionList
 						});
 					})).always(function() {
 				indicator.hide();
