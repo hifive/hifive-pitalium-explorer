@@ -22,7 +22,6 @@ INSERT INTO TestEnvironment VALUES (DEFAULT, NULL, 'WINDOWS', NULL, NULL, 'chrom
 
 INSERT INTO Screenshot VALUES (DEFAULT, NULL, 'testCaptureTutorial13_sampleCapture_WINDOWS_internet explorer', NULL, 'SampleTest', 'testCaptureTutorial13', 'sampleCapture', 1, 1);
 INSERT INTO Screenshot VALUES (DEFAULT, NULL, 'testCaptureTutorial13_sampleCapture_WINDOWS_firefox', NULL, 'SampleTest', 'testCaptureTutorial13', 'sampleCapture', 1, 2);
-COMMIT;
 INSERT INTO Screenshot VALUES (DEFAULT, NULL, 'testCaptureTutorial13_sampleCapture_WINDOWS_chrome', NULL, 'SampleTest', 'testCaptureTutorial13', 'sampleCapture', 1, 3);
 INSERT INTO Screenshot VALUES (DEFAULT, NULL, 'testCaptureTop_sampleCapture_WINDOWS_internet explorer', NULL, 'SampleTest', 'testCaptureTop', 'sampleCapture', 1, 1);
 INSERT INTO Screenshot VALUES (DEFAULT, NULL, 'testCaptureTop_sampleCapture_WINDOWS_firefox', NULL, 'SampleTest', 'testCaptureTop', 'sampleCapture', 1, 2);
