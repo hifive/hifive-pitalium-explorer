@@ -57,6 +57,10 @@ public class EdgeDetectorTest {
         e.setSigma(0.5);
         Assert.assertEquals(e.getSigma(), 0.5, 0.0);
         e.setThreshold(1.0/20, 1.0/60);
+        
+        e.setBackgroundColor(Color.black);
+        e.setForegroundColor(Color.white);
+        
         BufferedImage result = e.DetectEdge(image);
         Assert.assertEquals(result.getWidth(), image.getWidth());
         Assert.assertEquals(result.getHeight(), image.getHeight());
