@@ -31,6 +31,7 @@
 		<dependency org="org.springframework" name="spring-expression" rev="3.2.13.RELEASE" conf="default,test->default(*)" />
 		<dependency org="org.springframework" name="spring-context" rev="3.2.13.RELEASE" conf="default,test->default(*)" />
 		<dependency org="org.springframework" name="spring-orm" rev="3.2.13.RELEASE" conf="default,test->default(*)" />
+		<dependency org="org.springframework" name="spring-test" rev="3.2.13.RELEASE" conf="default,test->default(*)" />
 		<dependency org="org.springframework" name="spring-webmvc" rev="3.2.13.RELEASE" conf="default,test->default(*)" />
 		<dependency org="org.hsqldb" name="hsqldb" rev="2.3.2" conf="default,test->default(*)" />
 		<dependency org="org.hsqldb" name="sqltool" rev="2.3.2" conf="default,test->default(*)" />
