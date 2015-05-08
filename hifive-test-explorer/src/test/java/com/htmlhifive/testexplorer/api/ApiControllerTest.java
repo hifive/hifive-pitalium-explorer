@@ -200,4 +200,25 @@ public class ApiControllerTest {
 			verify(screenshotRepo).findByTestExecutionId(testExecuteId);
 		}
 	}
+
+	@Test
+	public void testGetDetail()
+	{
+		for (int i = 0; i < screenshots.size(); i++)
+		{
+			int id = screenshots.get(i).getId().intValue();
+			when(screenshotRepo.findOne(i)).thenReturn(screenshots.get(i));
+			ResponseEntity<Screenshot> response = this.apiController.getDetail(id);
+			Assert.assertEquals(200,  response.getStatusCode().value());
+			Assert.assertEquals(id, response.getBody().getId().intValue());
+			verify(screenshotRepo).findOne(id);
+		}
+	}
+
+	@Test
+	public void testGetDetailFail()
+	{
+		ResponseEntity<Screenshot> response = this.apiController.getDetail(-1);
+		Assert.assertEquals(null, response.getBody());
+	}
 }
