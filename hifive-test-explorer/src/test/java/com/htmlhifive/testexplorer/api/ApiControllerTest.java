@@ -23,10 +23,10 @@ import com.htmlhifive.testexplorer.entity.TestExecutionRepository;
 public class ApiControllerTest {
 	@Autowired
 	private ApiController apiController;
-	
+
 	@Autowired
 	private TestExecutionRepository testExecutionRepo;
-	
+
 	@Test
 	public void testListTestExecution()
 	{
@@ -37,9 +37,9 @@ public class ApiControllerTest {
 		testExecution1.setTime(new Timestamp(111111));
 		executionList.add(testExecution1);
 		when(testExecutionRepo.findAll()).thenReturn(executionList);
-		
+
 		ResponseEntity<List<TestExecution>> response = this.apiController.listTestExecution();
-		
+
 		Assert.assertEquals(200, response.getStatusCode().value());
 		Assert.assertEquals(executionList, response.getBody());
 		verify(testExecutionRepo).findAll();

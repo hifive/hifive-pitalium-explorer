@@ -4,9 +4,9 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.FactoryBean;
 
 public class MockFactory<T> implements FactoryBean<T> {
-	
+
 	private Class<T> mockClass;
-	
+
 	public MockFactory(Class<T> mockClass) {
 		this.mockClass = mockClass;
 	}
