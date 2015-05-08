@@ -107,7 +107,7 @@ public class ApiControllerTest {
 		for (int i = 0; i < 40; i++)
 		{
 			Screenshot sc = new Screenshot();
-			if (i%3 == 0 && i > 0)
+			if (i%3 != 0 && i > 0)
 			{
 				sc.setExpectedScreenshot(screenshots.get(1000000007%i));
 				sc.setComparisonResult(i%2 == 0);
