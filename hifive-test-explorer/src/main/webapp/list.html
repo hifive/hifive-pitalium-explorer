@@ -60,18 +60,26 @@
 						var totalPages = testExecutionsPage.totalPages;
 						if (!testExecutionsPage.first) {
 							%]<li><a class="btn-page btn-first-page" href="#" data-page="1">&lt;&lt;</a></li>[%
+						} else {
+							%]<li class="disabled"><a>&lt;&lt;</a></li>[%
 						}
 					%]
 					[%
 						var start = Math.max(1, currentPage - 5);
 						var end = Math.min(totalPages, currentPage + 5);
 						for (var i = start; i <= end; i++) {
-							%]<li><a class="btn-page" href="#" data-page="[%= i %]">[%= i %]</a></li>[%
+							if (i != currentPage) {
+								%]<li><a class="btn-page" href="#" data-page="[%= i %]">[%= i %]</a></li>[%
+							} else {
+								%]<li class="active"><a>[%= i %]</a></li>[%
+							}
 						}
 					%]
 					[%
 						if (!testExecutionsPage.last) {
 							%]<li><a class="btn-page btn-last-page" href="#" data-page="[%= totalPages %]">&gt;&gt;</a></li>[%
+						} else {
+							%]<li class="disabled"><a>&gt;&gt;</a></li>[%
 						}
 					%]
 					</ul>
