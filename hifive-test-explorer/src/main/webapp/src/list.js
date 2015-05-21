@@ -21,11 +21,16 @@
 		 * @memberOf hifive.test.explorer.logic.TestResultListLogic
 		 * @returns {JqXHRWrapper}
 		 */
-		getTestExecutionList: function() {
+		getTestExecutionList: function(page) {
+			var data = {};
+			if (typeof page != 'undefined') {
+				data['page'] = page;
+			}
 			return h5.ajax({
 				type: 'get',
 				dataType: 'json',
-				url: hifive.test.explorer.utils.formatUrl('api/listTestExecution')
+				url: hifive.test.explorer.utils.formatUrl('api/listTestExecution'),
+				data: data
 			});
 		},
 
@@ -245,6 +250,33 @@
 					})).always(function() {
 				indicator.hide();
 			});
+		},
+
+		/**
+		 * Called when the page link has been clicked. Update view.
+		 *
+		 * @memberOf hifive.test.explorer.controller.TestResultListController
+		 * @param {Object} context the event context
+		 * @param {jQuery} $el the event target element
+		 */
+		'.pagination a click': function(context, $el) {
+			var page = $el.data('page');
+			if (typeof page != 'undefined') {
+				// Show indicator
+				var indicator = this.indicator({
+					message: 'Loading...',
+					target: document
+				}).show();
+
+				this._testResultListLogic.getTestExecutionList(page).done(this.own(function(testExecutionList) {
+					// Update views
+					this.view.update('#testExecutionList', 'testExecutionListTemplate', {
+						testExecutionsPage: testExecutionList
+					});
+				})).always(function() {
+					indicator.hide();
+				});
+			}
 		}
 	};
 	h5.core.expose(testResultListController);

@@ -52,6 +52,35 @@
 				</div>
 				[% } %]
 			</div>
+			<div class="page-bar">
+				<div>
+					<ul class="pagination">
+					[%
+						var currentPage = testExecutionsPage.number + 1;
+						var totalPages = testExecutionsPage.totalPages;
+						if (!testExecutionsPage.first) {
+							%]<li><a class="btn-page btn-first-page" href="#" data-page="1">&lt;&lt;</a></li>[%
+						}
+					%]
+					[%
+						var start = Math.max(1, currentPage - 5);
+						var end = Math.min(totalPages, currentPage + 5);
+						for (var i = start; i <= end; i++) {
+							%]<li><a class="btn-page" href="#" data-page="[%= i %]">[%= i %]</a></li>[%
+						}
+					%]
+					[%
+						if (!testExecutionsPage.last) {
+							%]<li><a class="btn-page btn-last-page" href="#" data-page="[%= totalPages %]">&gt;&gt;</a></li>[%
+						}
+					%]
+					</ul>
+				</div>
+
+				<div class="page-info">
+				[%= testExecutionsPage.number + 1 %] / [%= testExecutionsPage.totalPages %]
+				</div>
+			</div>
 	</script>
 	<script type="text/ejs" id="screenshotListTemplate">
 		<table class="table table-striped table-hover">
