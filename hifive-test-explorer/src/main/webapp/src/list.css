@@ -15,3 +15,8 @@
 .explorer-test-result:hover {
 	text-decoration: underline;
 }
+
+.test-result-icon {
+	width: 17px;
+	height: 17px;
+}

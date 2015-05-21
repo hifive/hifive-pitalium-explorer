@@ -73,7 +73,16 @@
 					<td>[%= screenshot.testScreen %]</td>
 					<td>[%= screenshot.platform %]</td>
 					<td>[%= screenshot.browserName %]</td>
-					<td>[%= screenshot.comparisonResult ? "○" : screenshot.comparisonResult == null ? "-" : "×" %]</td>
+					<td>[%
+						if (screenshot.comparisonResult === true) {
+							%]<img class="test-result-icon" src="res/img/checkmark.png" alt="○">[%
+						}
+						else if (screenshot.comparisonResult === false) {
+							%]<img class="test-result-icon" src="res/img/xmark.png" alt="×">[%
+						} else {
+							%]-[%
+						}
+					%]</td>
 				</tr>
 				[% } %]
 			</tbody>
