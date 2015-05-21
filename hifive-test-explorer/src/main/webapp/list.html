@@ -75,10 +75,10 @@
 					<td>[%= screenshot.browserName %]</td>
 					<td>[%
 						if (screenshot.comparisonResult === true) {
-							%]<img class="test-result-icon" src="res/img/checkmark.png" alt="○">[%
+							%]<img class="test-result-icon" src="res/img/checkmark.png" alt="○" aria-label="Passed">[%
 						}
 						else if (screenshot.comparisonResult === false) {
-							%]<img class="test-result-icon" src="res/img/xmark.png" alt="×">[%
+							%]<img class="test-result-icon" src="res/img/xmark.png" alt="×" aria-label="Failed">[%
 						} else {
 							%]-[%
 						}
