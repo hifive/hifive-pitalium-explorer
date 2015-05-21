@@ -124,7 +124,7 @@
 					this.own(function(testExecutionList) {
 						// Update views
 						this.view.update('#testExecutionList', 'testExecutionListTemplate', {
-							testExecutions: testExecutionList
+							testExecutionsPage: testExecutionList
 						});
 					})).always(function() {
 				indicator.hide();

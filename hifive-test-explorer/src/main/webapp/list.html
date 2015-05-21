@@ -28,6 +28,7 @@
 	<script type="text/ejs" id="testExecutionListTemplate">
 			<div class="panel-group" id="testExecutionAccordion" role="tablist" aria-multiselectable="true">
 				[%
+					var testExecutions = testExecutionsPage.content;
 					for (var i = 0, len = testExecutions.length; i < len; i++) {
 						var testExecution = testExecutions[i];
 						var headerTarget = 'heading' + i;
