@@ -17,12 +17,12 @@ public abstract class ConvolveOpGenerator {
         return result;
     }
 
-    public static ConvolveOp GenerateGaussianX(double sigma) {
+    public static ConvolveOp generateGaussianX(double sigma) {
         float[] gaussian1D = getGaussianValues(sigma);
         return new ConvolveOp(new Kernel(gaussian1D.length, 1, gaussian1D), ConvolveOp.EDGE_NO_OP, null);
     }
 
-    public static ConvolveOp GenerateGaussianY(double sigma) {
+    public static ConvolveOp generateGaussianY(double sigma) {
         float[] gaussian1D = getGaussianValues(sigma);
         return new ConvolveOp(new Kernel(1, gaussian1D.length, gaussian1D), ConvolveOp.EDGE_NO_OP, null);
     }

@@ -54,8 +54,8 @@ public class EdgeDetector {
      */
     public EdgeDetector(double sigma) {
         this.sigma = sigma;
-        this.gaussianX = ConvolveOpGenerator.GenerateGaussianX(sigma);
-        this.gaussianY = ConvolveOpGenerator.GenerateGaussianY(sigma);
+        this.gaussianX = ConvolveOpGenerator.generateGaussianX(sigma);
+        this.gaussianY = ConvolveOpGenerator.generateGaussianY(sigma);
         this.thresholdHigh = 1.0 / 40 / sigma;
         this.thresholdLow = 1.0 / 90 / sigma;
 
@@ -197,8 +197,8 @@ public class EdgeDetector {
      */
     public void setSigma(double sigma) {
         this.sigma = sigma;
-        this.gaussianX = ConvolveOpGenerator.GenerateGaussianX(sigma);
-        this.gaussianY = ConvolveOpGenerator.GenerateGaussianY(sigma);
+        this.gaussianX = ConvolveOpGenerator.generateGaussianX(sigma);
+        this.gaussianY = ConvolveOpGenerator.generateGaussianY(sigma);
     }
 
     /**
