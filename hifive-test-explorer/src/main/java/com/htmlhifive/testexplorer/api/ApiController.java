@@ -46,6 +46,9 @@ public class ApiController {
 	/**
 	 * Gets list of the test execution.
 	 * 
+	 * If pageSize equals to zero, the default page size is used.
+	 * If pageSize equals to -1, the entire list is returned.
+	 * 
 	 * @param page Which page to show.
 	 * @param pageSize Page size.
 	 * @return Page of test execution
@@ -57,6 +60,9 @@ public class ApiController {
 			@RequestParam(value = "limit", defaultValue = "0") int pageSize) {
 		if (pageSize == 0) {
 			pageSize = defaultPageSize;
+		}
+		else if (pageSize == -1) {
+			pageSize = (int)Math.min(testExecutionRepo.count(), Integer.MAX_VALUE);
 		}
 		PageRequest pageRequest = new PageRequest(page - 1, pageSize, new Sort("id"));
 		Page<TestExecution> list = testExecutionRepo.findAll(pageRequest);
