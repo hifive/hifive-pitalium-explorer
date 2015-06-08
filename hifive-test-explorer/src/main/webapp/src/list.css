@@ -20,3 +20,9 @@
 	width: 17px;
 	height: 17px;
 }
+
+.page-bar {
+	display: block;
+	width: 100%;
+	text-align: center;
+}

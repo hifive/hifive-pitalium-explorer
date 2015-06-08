@@ -19,6 +19,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -159,11 +162,14 @@ public class ApiControllerTest {
 	public void testListTestExecution() throws ClassNotFoundException, IOException
 	{
 		List<TestExecution> cloned = getTestExecutionMockClone();
+		Page<TestExecution> page = new PageImpl<TestExecution>(cloned);
+		reset(testExecutionRepo);
 		when(testExecutionRepo.findAll()).thenReturn(cloned);
+		when(testExecutionRepo.findAll((PageRequest)anyObject())).thenReturn(page);
 
-		ResponseEntity<List<TestExecution>> response = this.apiController.listTestExecution();
+		ResponseEntity<Page<TestExecution>> response = this.apiController.listTestExecution(1, 0);
 		Assert.assertEquals(200, response.getStatusCode().value());
-		List<TestExecution> responseBody = response.getBody();
+		List<TestExecution> responseBody = response.getBody().getContent();
 		for (int i = 0; i < responseBody.size(); i++)
 		{
 			Assert.assertEquals(testExecutions.get(i).getId().intValue(),
@@ -171,7 +177,51 @@ public class ApiControllerTest {
 			Assert.assertEquals(testExecutions.get(i).getTimeString(),
 					responseBody.get(i).getTimeString());
 		}
-		verify(testExecutionRepo).findAll();
+		verify(testExecutionRepo).findAll((PageRequest)anyObject());
+	}
+
+	@Test
+	public void testListTestExecutionWithPageSize() throws ClassNotFoundException, IOException
+	{
+		List<TestExecution> cloned = getTestExecutionMockClone();
+		Page<TestExecution> page = new PageImpl<TestExecution>(cloned);
+		reset(testExecutionRepo);
+		when(testExecutionRepo.findAll()).thenReturn(cloned);
+		when(testExecutionRepo.findAll((PageRequest)anyObject())).thenReturn(page);
+
+		ResponseEntity<Page<TestExecution>> response = this.apiController.listTestExecution(1, 20);
+		Assert.assertEquals(200, response.getStatusCode().value());
+		List<TestExecution> responseBody = response.getBody().getContent();
+		for (int i = 0; i < responseBody.size(); i++)
+		{
+			Assert.assertEquals(testExecutions.get(i).getId().intValue(),
+					responseBody.get(i).getId().intValue());
+			Assert.assertEquals(testExecutions.get(i).getTimeString(),
+					responseBody.get(i).getTimeString());
+		}
+		verify(testExecutionRepo).findAll((PageRequest)anyObject());
+	}
+
+	@Test
+	public void testSearch() throws ClassNotFoundException, IOException
+	{
+		List<TestExecution> cloned = getTestExecutionMockClone();
+		Page<TestExecution> page = new PageImpl<TestExecution>(cloned);
+		reset(testExecutionRepo);
+		when(testExecutionRepo.findAll()).thenReturn(cloned);
+		when(testExecutionRepo.findAll((PageRequest)anyObject())).thenReturn(page);
+
+		ResponseEntity<Page<TestExecution>> response = this.apiController.search(1, 20, "");
+		Assert.assertEquals(200, response.getStatusCode().value());
+		List<TestExecution> responseBody = response.getBody().getContent();
+		for (int i = 0; i < responseBody.size(); i++)
+		{
+			Assert.assertEquals(testExecutions.get(i).getId().intValue(),
+					responseBody.get(i).getId().intValue());
+			Assert.assertEquals(testExecutions.get(i).getTimeString(),
+					responseBody.get(i).getTimeString());
+		}
+		verify(testExecutionRepo).findAll((PageRequest)anyObject());
 	}
 
 	@Test

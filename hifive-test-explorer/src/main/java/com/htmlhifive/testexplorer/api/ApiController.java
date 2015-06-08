@@ -10,6 +10,9 @@ import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -37,30 +40,51 @@ public class ApiController {
 
 	@SuppressWarnings("unused")
 	private static Logger log = LoggerFactory.getLogger(ApiController.class);
+	
+	private static final int defaultPageSize = 20;
 
 	/**
 	 * Gets list of the test execution.
-	 *
-	 * @return list of test execution
+	 * 
+	 * If pageSize equals to zero, the default page size is used.
+	 * If pageSize equals to -1, the entire list is returned.
+	 * 
+	 * @param page Which page to show.
+	 * @param pageSize Page size.
+	 * @return Page of test execution
 	 */
 	@RequestMapping(value = "/listTestExecution", method = RequestMethod.GET, produces = "application/json;charset=utf-8")
 	@ResponseBody
-	public ResponseEntity<List<TestExecution>> listTestExecution() {
-		List<TestExecution> list = testExecutionRepo.findAll();
-		return new ResponseEntity<List<TestExecution>>(list, HttpStatus.OK);
+	public ResponseEntity<Page<TestExecution>> listTestExecution(
+			@RequestParam(defaultValue = "1") int page,
+			@RequestParam(value = "limit", defaultValue = "0") int pageSize) {
+		if (pageSize == 0) {
+			pageSize = defaultPageSize;
+		}
+		else if (pageSize == -1) {
+			pageSize = (int)Math.min(testExecutionRepo.count(), Integer.MAX_VALUE);
+		}
+		PageRequest pageRequest = new PageRequest(page - 1, pageSize, new Sort("id"));
+		Page<TestExecution> list = testExecutionRepo.findAll(pageRequest);
+		return new ResponseEntity<Page<TestExecution>>(list, HttpStatus.OK);
 	}
 
 	/**
 	 * Gets list of the test execution which is narrowed down by parameters.
 	 *
+	 * @param page Which page to show.
+	 * @param pageSize Page size.
 	 * @param criteria parameter to narrow
-	 * @return list of test execution
+	 * @return Page of test execution
 	 */
 	@RequestMapping(value = "/listTestExecution/search", method = RequestMethod.GET, produces = "application/json;charset=utf-8")
 	@ResponseBody
-	public ResponseEntity<List<TestExecution>> search(@RequestParam String criteria) {
+	public ResponseEntity<Page<TestExecution>> search(
+			@RequestParam(defaultValue = "1") int page,
+			@RequestParam(defaultValue = "0") int pageSize,
+			@RequestParam String criteria) {
 		// Not implemented.
-		return listTestExecution();
+		return listTestExecution(page, pageSize);
 	}
 
 	/**

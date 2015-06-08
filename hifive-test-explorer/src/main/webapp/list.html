@@ -28,6 +28,7 @@
 	<script type="text/ejs" id="testExecutionListTemplate">
 			<div class="panel-group" id="testExecutionAccordion" role="tablist" aria-multiselectable="true">
 				[%
+					var testExecutions = testExecutionsPage.content;
 					for (var i = 0, len = testExecutions.length; i < len; i++) {
 						var testExecution = testExecutions[i];
 						var headerTarget = 'heading' + i;
@@ -50,6 +51,43 @@
 					</div>
 				</div>
 				[% } %]
+			</div>
+			<div class="page-bar">
+				<div>
+					<ul class="pagination">
+					[%
+						var currentPage = testExecutionsPage.number + 1;
+						var totalPages = testExecutionsPage.totalPages;
+						if (!testExecutionsPage.first) {
+							%]<li><a class="btn-page btn-first-page" href="#" data-page="1">&lt;&lt;</a></li>[%
+						} else {
+							%]<li class="disabled"><a>&lt;&lt;</a></li>[%
+						}
+					%]
+					[%
+						var start = Math.max(1, currentPage - 5);
+						var end = Math.min(totalPages, currentPage + 5);
+						for (var i = start; i <= end; i++) {
+							if (i != currentPage) {
+								%]<li><a class="btn-page" href="#" data-page="[%= i %]">[%= i %]</a></li>[%
+							} else {
+								%]<li class="active"><a>[%= i %]</a></li>[%
+							}
+						}
+					%]
+					[%
+						if (!testExecutionsPage.last) {
+							%]<li><a class="btn-page btn-last-page" href="#" data-page="[%= totalPages %]">&gt;&gt;</a></li>[%
+						} else {
+							%]<li class="disabled"><a>&gt;&gt;</a></li>[%
+						}
+					%]
+					</ul>
+				</div>
+
+				<div class="page-info">
+				[%= testExecutionsPage.number + 1 %] / [%= testExecutionsPage.totalPages %]
+				</div>
 			</div>
 	</script>
 	<script type="text/ejs" id="screenshotListTemplate">
@@ -118,7 +156,24 @@
 					<button type="submit" class="btn btn-default">Search</button>
 				</form>
 			</div>
+
 			<div id="testExecutionList"></div>
+
+			<div class="well">
+				<div class="row">
+					<div class="col-sm-6 input-group">
+						<label class="input-group-addon" for="select-page-size">Number of items per page</label>
+						<select class="form-control" id="select-page-size">
+							<option value="5">5</option>
+							<option value="10">10</option>
+							<option value="20" selected>20</option>
+							<option value="50">50</option>
+							<option value="100">100</option>
+							<option value="-1">All</option>
+						</select>
+					</div>
+				</div>
+			</div>
 		</div>
 	</body>
 </html>

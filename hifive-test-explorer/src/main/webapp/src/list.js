@@ -19,13 +19,18 @@
 		 * Gets a list of test execution.
 		 * 
 		 * @memberOf hifive.test.explorer.logic.TestResultListLogic
+		 * @param {Object} params list parameters
 		 * @returns {JqXHRWrapper}
 		 */
-		getTestExecutionList: function() {
+		getTestExecutionList: function(params) {
+			var data = {};
+			this._copyObjectByKey(params, data, ['page', 'limit']);
+
 			return h5.ajax({
 				type: 'get',
 				dataType: 'json',
-				url: hifive.test.explorer.utils.formatUrl('api/listTestExecution')
+				url: hifive.test.explorer.utils.formatUrl('api/listTestExecution'),
+				data: data
 			});
 		},
 
@@ -108,6 +113,23 @@
 		_testResultListLogic: hifive.test.explorer.logic.TestResultListLogic,
 
 		/**
+		 * The number of items to show in one page.
+		 *
+		 * @type Number
+		 * @memberOf hifive.test.explorer.controller.TestResultListController
+		 */
+		pageSize: 20,
+
+		/**
+		 * The index of the item at the top of the current page.
+		 *
+		 * @type Number
+		 * @memberOf hifive.test.explorer.controller.TestResultListController
+		 */
+		pageStart: 0,
+
+
+		/**
 		 * Called after the controller has been initialized.<br>
 		 * Load list of test execution time asynchronously and update views.
 		 * 
@@ -120,11 +142,11 @@
 			}).show();
 
 			// Load list of test execution
-			this._testResultListLogic.getTestExecutionList().done(
+			this._testResultListLogic.getTestExecutionList({'limit': this.pageSize}).done(
 					this.own(function(testExecutionList) {
 						// Update views
 						this.view.update('#testExecutionList', 'testExecutionListTemplate', {
-							testExecutions: testExecutionList
+							testExecutionsPage: testExecutionList
 						});
 					})).always(function() {
 				indicator.hide();
@@ -243,6 +265,64 @@
 							testExecutions: testExecutionList
 						});
 					})).always(function() {
+				indicator.hide();
+			});
+		},
+
+		/**
+		 * Called when the page link has been clicked. Update view.
+		 *
+		 * @memberOf hifive.test.explorer.controller.TestResultListController
+		 * @param {Object} context the event context
+		 * @param {jQuery} $el the event target element
+		 */
+		'.pagination a click': function(context, $el) {
+			var page = $el.data('page');
+			if (typeof page != 'undefined') {
+				// Show indicator
+				var indicator = this.indicator({
+					message: 'Loading...',
+					target: document
+				}).show();
+
+				this._testResultListLogic.getTestExecutionList({'page': page, 'limit': this.pageSize}).done(this.own(function(testExecutionList) {
+					this.pageStart = (page-1) * this.pageSize;
+					// Update views
+					this.view.update('#testExecutionList', 'testExecutionListTemplate', {
+						testExecutionsPage: testExecutionList
+					});
+				})).always(function() {
+					indicator.hide();
+				});
+			}
+		},
+
+		/**
+		 * Called when the page size select value has been changed. Updates view.
+		 *
+		 * @memberOf hifive.test.explorer.controller.TestResultListController
+		 * @param {Object} context the event context
+		 * @param {jQuery} $el the event target element
+		 */
+		'#select-page-size change': function(context, $el) {
+			// update pagination parameters
+			this.pageSize = $el.val();
+			this.pageStart = Math.floor(this.pageStart / this.pageSize) * this.pageSize;
+
+			var page = 1 + Math.floor(this.pageStart / this.pageSize);
+
+			// Show indicator
+			var indicator = this.indicator({
+				message: 'Loading...',
+				target: document
+			}).show();
+
+			this._testResultListLogic.getTestExecutionList({'page': page, 'limit': this.pageSize}).done(this.own(function(testExecutionList) {
+				// Update views
+				this.view.update('#testExecutionList', 'testExecutionListTemplate', {
+					testExecutionsPage: testExecutionList
+				});
+			})).always(function() {
 				indicator.hide();
 			});
 		}
