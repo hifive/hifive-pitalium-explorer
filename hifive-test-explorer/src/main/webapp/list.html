@@ -71,8 +71,8 @@
 				<tr class="explorer-test-result" data-screenshot-id="[%= screenshot.id %]">
 					<td>[%= screenshot.testMethod %]</td>
 					<td>[%= screenshot.testScreen %]</td>
-					<td>[%= screenshot.platform %]</td>
-					<td>[%= screenshot.browserName %]</td>
+					<td>[%= screenshot.testEnvironment.platform %]</td>
+					<td>[%= screenshot.testEnvironment.browserName %]</td>
 					<td>[%
 						if (screenshot.comparisonResult === true) {
 							%]<img class="test-result-icon" src="res/img/checkmark.png" alt="○" aria-label="Passed">[%
