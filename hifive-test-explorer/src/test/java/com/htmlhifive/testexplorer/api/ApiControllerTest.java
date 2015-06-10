@@ -211,7 +211,7 @@ public class ApiControllerTest {
 		when(testExecutionRepo.findAll()).thenReturn(cloned);
 		when(testExecutionRepo.findAll((PageRequest)anyObject())).thenReturn(page);
 
-		ResponseEntity<Page<TestExecution>> response = this.apiController.search(1, 20, "");
+		ResponseEntity<Page<TestExecution>> response = this.apiController.search(1, 20, "", "");
 		Assert.assertEquals(200, response.getStatusCode().value());
 		List<TestExecution> responseBody = response.getBody().getContent();
 		for (int i = 0; i < responseBody.size(); i++)

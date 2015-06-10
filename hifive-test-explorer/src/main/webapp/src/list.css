@@ -26,3 +26,7 @@
 	width: 100%;
 	text-align: center;
 }
+
+.test-execution-summary {
+	float: right;
+}

@@ -30,7 +30,9 @@
 				[%
 					var testExecutions = testExecutionsPage.content;
 					for (var i = 0, len = testExecutions.length; i < len; i++) {
-						var testExecution = testExecutions[i];
+						var testExecution = testExecutions[i].testExecution;
+						var passedCount = testExecutions[i].passedCount;
+						var totalCount = testExecutions[i].totalCount;
 						var headerTarget = 'heading' + i;
 						var collapseTarget = 'collapse' + i;
 				%]
@@ -41,6 +43,9 @@
 								aria-expanded="false" aria-controls="[%= collapseTarget %]">
 								[%= testExecution.timeString %]
 							</a>
+							<span class="test-execution-summary">
+								[%= passedCount %] / [%= totalCount %]
+							</span>
 						</h4>
 					</div>
 					<div id="[%= collapseTarget %]" class="panel-collapse collapse" role="tabpanel"
@@ -146,12 +151,12 @@
 			<div class="collapse" id="searchPanel">
 				<form id="searchTest" class="form-inline">
 					<div class="form-group">
-						<label for="searchCriteria">Criteria</label>
-						<input type="text" id="searchCriteria" name="criteria" class="form-control" placeholder="Criteria">
+						<label for="searchTestMethod">Test Method</label>
+						<input type="text" id="searchTestMethod" name="searchTestMethod" class="form-control" placeholder="Test method to search">
 					</div>
 					<div class="form-group">
-						<label for="search2">Search2</label>
-						<input type="text" id="search2" name="search2" class="form-control" placeholder="search2">
+						<label for="searchTestScreen">Test Screen</label>
+						<input type="text" id="searchTestScreen" name="searchTestScreen" class="form-control" placeholder="Test screen to search">
 					</div>
 					<button type="submit" class="btn btn-default">Search</button>
 				</form>

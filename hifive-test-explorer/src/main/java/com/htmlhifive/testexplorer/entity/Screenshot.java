@@ -34,9 +34,7 @@ public class Screenshot implements Serializable {
 
 	private String testScreen;
 
-	@ManyToOne
-	@JoinColumn(name="testExecutionId", nullable=false, updatable=false)
-	private TestExecution testExecution;
+	private Integer testExecutionId;
 
 	@ManyToOne
 	@JoinColumn(name="testEnvironmentId", nullable=false, updatable=false)
@@ -98,12 +96,12 @@ public class Screenshot implements Serializable {
 		this.testScreen = testScreen;
 	}
 
-	public TestExecution getTestExecution() {
-		return testExecution;
+	public Integer getTestExecutionId() {
+		return testExecutionId;
 	}
 
-	public void setTestExecution(TestExecution testExecution) {
-		this.testExecution = testExecution;
+	public void setTestExecutionId(Integer testExecutionId) {
+		this.testExecutionId = testExecutionId;
 	}
 
 	public TestEnvironment getTestEnvironment() {

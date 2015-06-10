@@ -23,8 +23,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.htmlhifive.testexplorer.entity.Screenshot;
 import com.htmlhifive.testexplorer.entity.ScreenshotRepository;
-import com.htmlhifive.testexplorer.entity.TestExecution;
 import com.htmlhifive.testexplorer.entity.TestExecutionRepository;
+import com.htmlhifive.testexplorer.response.TestExecutionResult;
 
 @Controller
 @RequestMapping("/api")
@@ -55,9 +55,11 @@ public class ApiController {
 	 */
 	@RequestMapping(value = "/listTestExecution", method = RequestMethod.GET, produces = "application/json;charset=utf-8")
 	@ResponseBody
-	public ResponseEntity<Page<TestExecution>> listTestExecution(
+	public ResponseEntity<Page<TestExecutionResult>> listTestExecution(
 			@RequestParam(defaultValue = "1") int page,
-			@RequestParam(value = "limit", defaultValue = "0") int pageSize) {
+			@RequestParam(value = "limit", defaultValue = "0") int pageSize,
+			@RequestParam(defaultValue = "") String searchTestMethod,
+			@RequestParam(defaultValue = "") String searchTestScreen) {
 		if (pageSize == 0) {
 			pageSize = defaultPageSize;
 		}
@@ -65,26 +67,8 @@ public class ApiController {
 			pageSize = (int)Math.min(testExecutionRepo.count(), Integer.MAX_VALUE);
 		}
 		PageRequest pageRequest = new PageRequest(page - 1, pageSize, new Sort("id"));
-		Page<TestExecution> list = testExecutionRepo.findAll(pageRequest);
-		return new ResponseEntity<Page<TestExecution>>(list, HttpStatus.OK);
-	}
-
-	/**
-	 * Gets list of the test execution which is narrowed down by parameters.
-	 *
-	 * @param page Which page to show.
-	 * @param pageSize Page size.
-	 * @param criteria parameter to narrow
-	 * @return Page of test execution
-	 */
-	@RequestMapping(value = "/listTestExecution/search", method = RequestMethod.GET, produces = "application/json;charset=utf-8")
-	@ResponseBody
-	public ResponseEntity<Page<TestExecution>> search(
-			@RequestParam(defaultValue = "1") int page,
-			@RequestParam(defaultValue = "0") int pageSize,
-			@RequestParam String criteria) {
-		// Not implemented.
-		return listTestExecution(page, pageSize);
+		Page<TestExecutionResult> list = testExecutionRepo.search(searchTestMethod, searchTestScreen, pageRequest);
+		return new ResponseEntity<Page<TestExecutionResult>>(list, HttpStatus.OK);
 	}
 
 	/**
@@ -95,8 +79,12 @@ public class ApiController {
 	 */
 	@RequestMapping(value = "/listScreenshot", method = RequestMethod.GET, produces = "application/json;charset=utf-8")
 	@ResponseBody
-	public ResponseEntity<List<Screenshot>> listScreenshot(@RequestParam Integer testExecutionId) {
-		List<Screenshot> list = screenshotRepo.findByTestExecutionId(testExecutionId);
+	public ResponseEntity<List<Screenshot>> listScreenshot(
+			@RequestParam Integer testExecutionId,
+			@RequestParam(defaultValue = "") String searchTestMethod,
+			@RequestParam(defaultValue = "") String searchTestScreen) {
+		List<Screenshot> list = screenshotRepo.findByTestExecutionIdAndTestMethodContainingAndTestScreenContaining(
+				testExecutionId, searchTestMethod, searchTestScreen);
 		return new ResponseEntity<List<Screenshot>>(list, HttpStatus.OK);
 	}
 
