@@ -16,39 +16,58 @@
 		__name: 'hifive.test.explorer.logic.TestResultListLogic',
 
 		/**
+		 * The number of items to show in one page.
+		 *
+		 * @type Number
+		 * @memberOf hifive.test.explorer.logic.TestResultListLogic
+		 */
+		pageSize: 20,
+
+		/**
+		 * The index of the item at the top of the current page.
+		 *
+		 * @type Number
+		 * @memberOf hifive.test.explorer.logic.TestResultListLogic
+		 */
+		pageStart: 1,
+
+		/**
+		 * The search keyword for test method.
+		 *
+		 * @type String
+		 * @memberOf hifive.test.explorer.logic.TestResultListLogic
+		 */
+		searchTestMethod: "",
+
+		/**
+		 * The search keyword for test screen.
+		 *
+		 * @type String
+		 * @memberOf hifive.test.explorer.logic.TestResultListLogic
+		 */
+		searchTestScreen: "",
+
+		/**
 		 * Gets a list of test execution.
 		 * 
 		 * @memberOf hifive.test.explorer.logic.TestResultListLogic
-		 * @param {Object} params list parameters
+		 * @param {Number} page desired
 		 * @returns {JqXHRWrapper}
 		 */
-		getTestExecutionList: function(params) {
-			var data = {};
-			this._copyObjectByKey(params, data, ['page', 'limit']);
+		getTestExecutionList: function(page) {
+			this.pageStart = (page - 1) * this.pageSize;
+
+			var data = {
+				'page': page,
+				'limit': this.pageSize,
+				'searchTestMethod': this.searchTestMethod,
+				'searchTestScreen': this.searchTestScreen,
+			};
 
 			return h5.ajax({
 				type: 'get',
 				dataType: 'json',
 				url: hifive.test.explorer.utils.formatUrl('api/listTestExecution'),
-				data: data
-			});
-		},
-
-		/**
-		 * Gets a list of test execution which is narrowed down by parameters.
-		 * 
-		 * @memberOf hifive.test.explorer.logic.TestResultListLogic
-		 * @param {Object} params search parameters
-		 * @return {JqXHRWrapper}
-		 */
-		getTestExecutionListWithParams: function(params) {
-			var data = {};
-			this._copyObjectByKey(params, data, ['criteria']);
-
-			return h5.ajax({
-				type: 'get',
-				dataType: 'json',
-				url: 'api/listTestExecution/search',
 				data: data
 			});
 		},
@@ -66,27 +85,12 @@
 				dataType: 'json',
 				url: 'api/listScreenshot',
 				data: {
-					testExecutionId: testExecutionId
+					testExecutionId: testExecutionId,
+					searchTestMethod: this.searchTestMethod,
+					searchTestScreen: this.searchTestScreen,
 				}
 			});
 		},
-
-		/**
-		 * Copy values which are specified by "keys" parameter from one object to other.
-		 * 
-		 * @memberOf hifive.test.explorer.logic.TestResultListLogic
-		 * @param {Object} from The object copy from.
-		 * @param {Object} to The object copy to.
-		 * @param {Array} keys
-		 */
-		_copyObjectByKey: function(from, to, keys) {
-			for ( var index in keys) {
-				var key = keys[index];
-				if (from.hasOwnProperty(key)) {
-					to[key] = from[key];
-				}
-			}
-		}
 	};
 	h5.core.expose(testResultListLogic);
 })(jQuery);
@@ -113,44 +117,13 @@
 		_testResultListLogic: hifive.test.explorer.logic.TestResultListLogic,
 
 		/**
-		 * The number of items to show in one page.
-		 *
-		 * @type Number
-		 * @memberOf hifive.test.explorer.controller.TestResultListController
-		 */
-		pageSize: 20,
-
-		/**
-		 * The index of the item at the top of the current page.
-		 *
-		 * @type Number
-		 * @memberOf hifive.test.explorer.controller.TestResultListController
-		 */
-		pageStart: 0,
-
-
-		/**
 		 * Called after the controller has been initialized.<br>
 		 * Load list of test execution time asynchronously and update views.
 		 * 
 		 * @memberOf hifive.test.explorer.controller.TestResultListController
 		 */
 		__ready: function() {
-			var indicator = this.indicator({
-				message: 'Loading...',
-				target: document
-			}).show();
-
-			// Load list of test execution
-			this._testResultListLogic.getTestExecutionList({'limit': this.pageSize}).done(
-					this.own(function(testExecutionList) {
-						// Update views
-						this.view.update('#testExecutionList', 'testExecutionListTemplate', {
-							testExecutionsPage: testExecutionList
-						});
-					})).always(function() {
-				indicator.hide();
-			});
+			this.loadTestExecutionList(1);
 		},
 
 		/**
@@ -249,24 +222,9 @@
 				params[$elem.attr('name')] = $elem.val();
 			});
 
-			// Show indicator
-			var indicator = this.indicator({
-				message: 'Loading...',
-				target: document
-			}).show();
-
-			// Reset views
-			this.$find('#testExecutionList').empty();
-
-			// Search test results
-			this._testResultListLogic.getTestExecutionListWithParams(params).done(
-					this.own(function(testExecutionList) {
-						this.view.update('#testExecutionList', 'testExecutionList', {
-							testExecutions: testExecutionList
-						});
-					})).always(function() {
-				indicator.hide();
-			});
+			this._testResultListLogic.searchTestMethod = params['searchTestMethod'];
+			this._testResultListLogic.searchTestScreen = params['searchTestScreen'];
+			this.loadTestExecutionList(1);
 		},
 
 		/**
@@ -278,23 +236,11 @@
 		 */
 		'.pagination a click': function(context, $el) {
 			var page = $el.data('page');
-			if (typeof page != 'undefined') {
-				// Show indicator
-				var indicator = this.indicator({
-					message: 'Loading...',
-					target: document
-				}).show();
-
-				this._testResultListLogic.getTestExecutionList({'page': page, 'limit': this.pageSize}).done(this.own(function(testExecutionList) {
-					this.pageStart = (page-1) * this.pageSize;
-					// Update views
-					this.view.update('#testExecutionList', 'testExecutionListTemplate', {
-						testExecutionsPage: testExecutionList
-					});
-				})).always(function() {
-					indicator.hide();
-				});
+			if (typeof page == 'undefined') {
+				(console && console.error && console.error('page undefined'));
+				return;
 			}
+			this.loadTestExecutionList(page);
 		},
 
 		/**
@@ -306,26 +252,32 @@
 		 */
 		'#select-page-size change': function(context, $el) {
 			// update pagination parameters
-			this.pageSize = $el.val();
-			this.pageStart = Math.floor(this.pageStart / this.pageSize) * this.pageSize;
+			var pageSize = $el.val();
+			var pageStart = this._testResultListLogic.pageStart;
+			pageStart = Math.floor(pageStart / pageSize) * pageSize;
 
-			var page = 1 + Math.floor(this.pageStart / this.pageSize);
+			var page = 1 + Math.floor(pageStart / pageSize);
 
-			// Show indicator
+			this._testResultListLogic.pageSize = pageSize;
+			this.loadTestExecutionList(page);
+		},
+
+		loadTestExecutionList: function(page) {
 			var indicator = this.indicator({
 				message: 'Loading...',
 				target: document
 			}).show();
 
-			this._testResultListLogic.getTestExecutionList({'page': page, 'limit': this.pageSize}).done(this.own(function(testExecutionList) {
+			// Load list of test execution
+			this._testResultListLogic.getTestExecutionList(page).done(this.own(function(response) {
 				// Update views
 				this.view.update('#testExecutionList', 'testExecutionListTemplate', {
-					testExecutionsPage: testExecutionList
+					testExecutionsPage: response
 				});
 			})).always(function() {
 				indicator.hide();
 			});
-		}
+		},
 	};
 	h5.core.expose(testResultListController);
 })(jQuery);

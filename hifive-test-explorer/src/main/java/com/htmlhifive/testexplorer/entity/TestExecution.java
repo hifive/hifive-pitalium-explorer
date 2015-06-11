@@ -53,4 +53,18 @@ public class TestExecution implements Serializable {
 		return directoryFormat.format(time);
 	}
 
+	@Override
+	public int hashCode() {
+		return this.id;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (!(obj instanceof TestExecution))
+			return false;
+		if (obj == this)
+			return true;
+		TestExecution other = (TestExecution)obj;
+		return this.id == other.id;
+	}
 }

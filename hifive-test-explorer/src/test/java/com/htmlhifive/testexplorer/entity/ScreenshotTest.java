@@ -11,7 +11,6 @@ public class ScreenshotTest {
 	{
 		Screenshot s = new Screenshot();
 		Screenshot s2 = new Screenshot();
-		TestExecution te = new TestExecution();
 		TestEnvironment tenv = new TestEnvironment();
 
 		s.setId(7357);
@@ -21,7 +20,7 @@ public class ScreenshotTest {
 		s.setTestClass("TEST CLASS");
 		s.setTestMethod("TEST METHOD");
 		s.setTestScreen("TEST SCREEN");
-		s.setTestExecution(te);
+		s.setTestExecutionId(111);
 		s.setTestEnvironment(tenv);
 
 		Assert.assertEquals(7357, s.getId().intValue());
@@ -31,7 +30,7 @@ public class ScreenshotTest {
 		Assert.assertEquals("TEST CLASS", s.getTestClass());
 		Assert.assertEquals("TEST METHOD", s.getTestMethod());
 		Assert.assertEquals("TEST SCREEN", s.getTestScreen());
-		Assert.assertEquals(te, s.getTestExecution());
+		Assert.assertEquals(111, s.getTestExecutionId().intValue());
 		Assert.assertEquals(tenv, s.getTestEnvironment());
 
 		s = (Screenshot)new SerializeTestUtil().serializeAndDeserialize(s);

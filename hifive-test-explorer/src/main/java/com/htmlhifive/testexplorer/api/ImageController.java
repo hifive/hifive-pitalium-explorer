@@ -28,6 +28,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.htmlhifive.testexplorer.entity.ConfigRepository;
 import com.htmlhifive.testexplorer.entity.Screenshot;
 import com.htmlhifive.testexplorer.entity.ScreenshotRepository;
+import com.htmlhifive.testexplorer.entity.TestExecution;
+import com.htmlhifive.testexplorer.entity.TestExecutionRepository;
 import com.htmlhifive.testexplorer.image.EdgeDetector;
 import com.htmlhifive.testlib.image.utlity.ImageUtility;
 
@@ -39,6 +41,8 @@ public class ImageController {
 	private ConfigRepository configRepo;
 	@Autowired
 	private ScreenshotRepository screenshotRepo;
+	@Autowired
+	private TestExecutionRepository testExecutionRepo;
 
 	@Autowired
 	private HttpServletRequest request;
@@ -131,12 +135,13 @@ public class ImageController {
 	}
 
 	private File getFile(Screenshot screenshot) throws FileNotFoundException {
+		TestExecution testExecution = testExecutionRepo.getOne(screenshot.getTestExecutionId());
 		String path =
 				configRepo.findOne(ConfigRepository.ABSOLUTE_PATH_KEY).getValue() +
 				File.separatorChar +
 				"images" +
 				File.separatorChar +
-				screenshot.getTestExecution().getTimeString() +
+				testExecution.getTimeString() +
 				File.separatorChar +
 				screenshot.getTestClass() +
 				File.separatorChar +
