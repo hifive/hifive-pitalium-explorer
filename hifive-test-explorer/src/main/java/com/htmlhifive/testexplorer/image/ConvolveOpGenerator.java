@@ -3,7 +3,7 @@ package com.htmlhifive.testexplorer.image;
 import java.awt.image.ConvolveOp;
 import java.awt.image.Kernel;
 
-public abstract class ConvolveOpGenerator {
+public class ConvolveOpGenerator {
     protected static float[] getGaussianValues(double sigma) {
         int halfSize = (int) (sigma * 3);
         float[] result = new float[halfSize * 2 + 1];

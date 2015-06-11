@@ -2,6 +2,7 @@ package com.htmlhifive.testexplorer.entity;
 
 import java.io.IOException;
 import java.sql.Timestamp;
+import java.util.HashSet;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -32,5 +33,34 @@ public class TestExecutionTest {
 		Assert.assertEquals(7357, t.getId().intValue());
 		Assert.assertEquals("TEST LABEL", t.getLabel());
 		Assert.assertEquals(0, t.getTime().compareTo(now));
+	}
+
+	@Test
+	public void testEquality()
+	{
+		TestExecution t1 = new TestExecution();
+		TestExecution t2 = new TestExecution();
+		t1.setId(42);
+		t2.setId(43);
+		Assert.assertFalse(t1.equals(t2));
+		Assert.assertFalse(t2.equals(t1));
+		Assert.assertFalse(t1.equals(42));
+		Assert.assertFalse(t1.equals(null));
+		Assert.assertTrue(t1.equals(t1));
+		t2.setId(42);
+		Assert.assertTrue(t1.equals(t2));
+		Assert.assertTrue(t2.equals(t1));
+	}
+
+	@Test
+	public void testHashCode()
+	{
+		TestExecution t1 = new TestExecution();
+		TestExecution t2 = new TestExecution();
+		t1.setId(42);
+		t2.setId(43);
+		HashSet<TestExecution> hs = new HashSet<TestExecution>();
+		hs.add(t1);
+		hs.add(t2);
 	}
 }
