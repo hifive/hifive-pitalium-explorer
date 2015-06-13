@@ -203,7 +203,7 @@ public class ImageController {
 	 * @return a file related with the input screenshot 
 	 * @throws FileNotFoundException
 	 */
-	private File getFile(Screenshot screenshot) throws FileNotFoundException {
+	protected File getFile(Screenshot screenshot) throws FileNotFoundException {
 		TestExecution testExecution = testExecutionRepo.findOne(screenshot.getTestExecutionId());
 		String relativePath =
 				"images" +

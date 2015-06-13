@@ -2,10 +2,13 @@ package com.htmlhifive.testexplorer.api;
 
 import static org.mockito.Mockito.*;
 
+import java.io.File;
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
@@ -235,5 +238,84 @@ public class ImageControllerTest {
 		params.put("colorIndex", "-1");
 		this.imageController.getProcessed(0, "edge", params, response);
 		verify(response).setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+	}
+
+	@Test
+	public void testGetProcessedEdgeNoColorIndex() throws IOException
+	{
+		HttpServletResponse response = mock(HttpServletResponse.class);
+		HashMap<String,String> params = new HashMap<String, String>();
+		params.put("id", "0");
+		params.put("algorithm", "edge");
+
+		ImageController spy = spy(this.imageController);
+		Screenshot sc = screenshotRepo.findOne(0);
+		doReturn(new File("src/test/resources/images/edge_detector_0.png")).
+			when(spy).getFile(sc);
+		when(response.getOutputStream()).thenReturn(mock(ServletOutputStream.class));
+
+		spy.getProcessed(0, "edge", params, response);
+
+		verify(response).setContentType("image/png");
+	}
+
+	@Test
+	public void testGetProcessedEdgeColorIndex0() throws IOException
+	{
+		HttpServletResponse response = mock(HttpServletResponse.class);
+		HashMap<String,String> params = new HashMap<String, String>();
+		params.put("id", "0");
+		params.put("algorithm", "edge");
+		params.put("colorIndex", "0");
+
+		ImageController spy = spy(this.imageController);
+		Screenshot sc = screenshotRepo.findOne(0);
+		doReturn(new File("src/test/resources/images/edge_detector_0.png")).
+			when(spy).getFile(sc);
+		when(response.getOutputStream()).thenReturn(mock(ServletOutputStream.class));
+
+		spy.getProcessed(0, "edge", params, response);
+
+		verify(response).setContentType("image/png");
+	}
+
+	@Test
+	public void testGetProcessedEdgeColorIndex1() throws IOException
+	{
+		HttpServletResponse response = mock(HttpServletResponse.class);
+		HashMap<String,String> params = new HashMap<String, String>();
+		params.put("id", "0");
+		params.put("algorithm", "edge");
+		params.put("colorIndex", "1");
+
+		ImageController spy = spy(this.imageController);
+		Screenshot sc = screenshotRepo.findOne(0);
+		doReturn(new File("src/test/resources/images/edge_detector_0.png")).
+			when(spy).getFile(sc);
+		when(response.getOutputStream()).thenReturn(mock(ServletOutputStream.class));
+
+		spy.getProcessed(0, "edge", params, response);
+
+		verify(response).setContentType("image/png");
+	}
+
+	@Test
+	public void testGetProcessedEdgeColorIndexInvalid() throws IOException
+	{
+		HttpServletResponse response = mock(HttpServletResponse.class);
+		HashMap<String,String> params = new HashMap<String, String>();
+		params.put("id", "0");
+		params.put("algorithm", "edge");
+		params.put("colorIndex", "invalid");
+
+		ImageController spy = spy(this.imageController);
+		Screenshot sc = screenshotRepo.findOne(0);
+		doReturn(new File("src/test/resources/images/edge_detector_0.png")).
+			when(spy).getFile(sc);
+		when(response.getOutputStream()).thenReturn(mock(ServletOutputStream.class));
+
+		spy.getProcessed(0, "edge", params, response);
+
+		verify(response).setContentType("image/png");
 	}
 }
