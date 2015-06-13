@@ -95,7 +95,6 @@ public class ImageController {
 		}
 
 		try {
-			BufferedImage image = ImageIO.read(getFile(screenshot));
 			EdgeDetector edgeDetector = new EdgeDetector(0.5);
 			
 			int colorIndex = -1;
@@ -114,6 +113,7 @@ public class ImageController {
 				break;
 			}
 
+			BufferedImage image = ImageIO.read(getFile(screenshot));
 			BufferedImage edgeImage = edgeDetector.DetectEdge(image);
 			sendImage(edgeImage, response);
 		} catch (IOException e) {
