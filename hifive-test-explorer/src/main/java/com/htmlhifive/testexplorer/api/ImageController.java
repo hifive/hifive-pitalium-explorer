@@ -135,7 +135,7 @@ public class ImageController {
 	}
 
 	private File getFile(Screenshot screenshot) throws FileNotFoundException {
-		TestExecution testExecution = testExecutionRepo.getOne(screenshot.getTestExecutionId());
+		TestExecution testExecution = testExecutionRepo.findOne(screenshot.getTestExecutionId());
 		String path =
 				configRepo.findOne(ConfigRepository.ABSOLUTE_PATH_KEY).getValue() +
 				File.separatorChar +
