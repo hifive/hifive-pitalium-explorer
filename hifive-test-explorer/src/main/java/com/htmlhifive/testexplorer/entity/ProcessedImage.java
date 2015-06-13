@@ -4,30 +4,28 @@ import java.io.Serializable;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.IdClass;
 
 @Entity
+@IdClass(ProcessedImageKey.class)
 public class ProcessedImage implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@ManyToOne
-	@JoinColumn(name="screenshotId", nullable=false, updatable=false)
-	private Screenshot screenshot;
+	private Integer screenshotId;
 
 	@Id
 	private String algorithm;
 
 	private String fileName;
-
-	public Screenshot getScreenshot() {
-		return screenshot;
+	
+	public Integer getScreenshotId() {
+		return screenshotId;
 	}
 
-	public void setScreenshot(Screenshot screenshot) {
-		this.screenshot = screenshot;
+	public void setScreenshotId(Integer screenshotId) {
+		this.screenshotId = screenshotId;
 	}
 
 	public String getAlgorithm() {

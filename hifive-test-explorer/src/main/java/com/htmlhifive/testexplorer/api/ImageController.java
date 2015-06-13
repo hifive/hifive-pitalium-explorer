@@ -27,6 +27,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.htmlhifive.testexplorer.entity.ConfigRepository;
+import com.htmlhifive.testexplorer.entity.ProcessedImage;
+import com.htmlhifive.testexplorer.entity.ProcessedImageRepository;
+import com.htmlhifive.testexplorer.entity.ProcessedImageKey;
 import com.htmlhifive.testexplorer.entity.Screenshot;
 import com.htmlhifive.testexplorer.entity.ScreenshotRepository;
 import com.htmlhifive.testexplorer.entity.TestExecution;
@@ -44,6 +47,8 @@ public class ImageController {
 	private ScreenshotRepository screenshotRepo;
 	@Autowired
 	private TestExecutionRepository testExecutionRepo;
+	@Autowired
+	private ProcessedImageRepository processedImageRepo;
 
 	@Autowired
 	private HttpServletRequest request;
@@ -102,6 +107,13 @@ public class ImageController {
 				try {
 					colorIndex = Integer.parseInt(allparams.get("colorIndex"));
 				} catch (NumberFormatException nfe) { }
+			}
+
+			File cachedFile = searchProcessedImageFile(id, "edge;" + Integer.toString(colorIndex));
+			if (cachedFile != null)
+			{
+				sendFile(cachedFile, response);
+				return;
 			}
 
 			switch (colorIndex) {
@@ -217,6 +229,25 @@ public class ImageController {
 		File file = new File(getAbsoluteFilePath(relativePath));
 		if (!file.exists() || !file.isFile()) { throw new FileNotFoundException(file.getAbsolutePath() + " Not Found."); }
 		return file;
+	}
+
+	/**
+	 * Get a File of the processed image if exists
+	 *  
+	 * @param id image id to search for
+	 * @param algorithm algorithm to search for
+	 * @return null if no such file exists, or requested file otherwise.
+	 */
+	public File searchProcessedImageFile(Integer id, String algorithm)
+	{
+		File result = null;
+		ProcessedImage p = processedImageRepo.findOne(new ProcessedImageKey(id, algorithm));
+		if (p != null)
+		{
+			result = new File(getAbsoluteFilePath(p.getFileName()));
+		}
+
+		return result;
 	}
 
 	/**

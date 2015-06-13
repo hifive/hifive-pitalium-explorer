@@ -22,6 +22,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import com.htmlhifive.testexplorer.entity.Config;
 import com.htmlhifive.testexplorer.entity.ConfigRepository;
 import com.htmlhifive.testexplorer.entity.ProcessedImage;
+import com.htmlhifive.testexplorer.entity.ProcessedImageRepository;
 import com.htmlhifive.testexplorer.entity.Screenshot;
 import com.htmlhifive.testexplorer.entity.ScreenshotRepository;
 import com.htmlhifive.testexplorer.entity.TestEnvironment;
@@ -43,10 +44,14 @@ public class ImageControllerTest {
 	@Autowired
 	private ConfigRepository configRepo;
 
+	@Autowired
+	private ProcessedImageRepository processedImageRepo;
+
 	private ArrayList<Config> configs;
 	private ArrayList<Screenshot> screenshots;
 	private ArrayList<TestExecution> testExecutions;
 	private ArrayList<TestEnvironment> testEnvironments;
+	private ArrayList<ProcessedImage> processedImages;
 	
 	private void initializeDefaultTestExecution()
 	{
@@ -138,7 +143,7 @@ public class ImageControllerTest {
 	{
 		configs = new ArrayList<Config>();
 		screenshots = new ArrayList<Screenshot>();
-		new ArrayList<ProcessedImage>();
+		processedImages = new ArrayList<ProcessedImage>();
 		testExecutions = new ArrayList<TestExecution>();
 		testEnvironments = new ArrayList<TestEnvironment>();
 
