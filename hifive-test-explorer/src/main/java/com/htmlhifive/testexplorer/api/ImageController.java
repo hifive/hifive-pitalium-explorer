@@ -74,9 +74,10 @@ public class ImageController {
 	 * Get edge detection result of an image.
 	 *
 	 * @param id id of screenshot to be processed by edge detector.
+	 * @param allparams all parameters received by API
 	 * @param response HttpServletResponse
 	 */
-	public void getEdgeImage(@RequestParam Integer id,
+	public void getEdgeImage(Integer id,
 							Map<String, String> allparams, HttpServletResponse response)
 	{
 		Screenshot screenshot = screenshotRepo.findOne(id);
@@ -108,6 +109,14 @@ public class ImageController {
 		}
 	}
 
+	/**
+	 * Get processed image.
+	 * 
+	 * @param id id of an image to be processed  
+	 * @param algorithm currently only "edge" is supported
+	 * @param allparams received all parameters
+	 * @param response HttpServletResponse
+	 */
 	@RequestMapping(value = "/getProcessed", method = RequestMethod.GET)
 	public void getProcessed(@RequestParam Integer id,
 			@RequestParam String algorithm,
@@ -157,11 +166,28 @@ public class ImageController {
 		}
 	}
 
+	/**
+	 * Convert relativePath from DB into absolute path 
+	 * 
+	 * @param relativePath
+	 * @return converted path
+	 */
+	public String getAbsoluteFilePath(String relativePath) {
+		File file = new File(configRepo.findOne(ConfigRepository.ABSOLUTE_PATH_KEY).getValue(),
+				relativePath);
+		return file.getPath();
+	}
+
+	/**
+	 * Get the file of a screenshot
+	 * 
+	 * @param screenshot the input screenshot
+	 * @return a file related with the input screenshot 
+	 * @throws FileNotFoundException
+	 */
 	private File getFile(Screenshot screenshot) throws FileNotFoundException {
 		TestExecution testExecution = testExecutionRepo.findOne(screenshot.getTestExecutionId());
-		String path =
-				configRepo.findOne(ConfigRepository.ABSOLUTE_PATH_KEY).getValue() +
-				File.separatorChar +
+		String relativePath =
 				"images" +
 				File.separatorChar +
 				testExecution.getTimeString() +
@@ -170,17 +196,31 @@ public class ImageController {
 				File.separatorChar +
 				screenshot.getFileName() + ".png";
 
-		File file = new File(path);
-		if (!file.exists() || !file.isFile()) { throw new FileNotFoundException(path + " Not Found."); }
+		File file = new File(getAbsoluteFilePath(relativePath));
+		if (!file.exists() || !file.isFile()) { throw new FileNotFoundException(file.getAbsolutePath() + " Not Found."); }
 		return file;
 	}
 
+	/**
+	 * Send a file over http response
+	 * 
+	 * @param file file to send
+	 * @param response response to use
+	 * @throws IOException
+	 */
 	private void sendFile(File file, HttpServletResponse response) throws IOException {
 		response.setContentType("image/png");
 		response.flushBuffer();
 		IOUtils.copy(new FileInputStream(file), response.getOutputStream());
 	}
 
+	/**
+	 * Send image over response
+	 * 
+	 * @param image image to send
+	 * @param response response to use
+	 * @throws IOException
+	 */
 	private void sendImage(BufferedImage image, HttpServletResponse response) throws IOException {
 		response.setContentType("image/png");
 		response.flushBuffer();
