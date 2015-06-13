@@ -181,6 +181,21 @@ public class ImageControllerTest {
 	}
 
 	@Test
+	public void testGetImageOk() throws IOException
+	{
+		HttpServletResponse response = mock(HttpServletResponse.class);
+		ImageController spy = spy(this.imageController);
+		Screenshot sc = screenshotRepo.findOne(0);
+		doReturn(new File("src/test/resources/images/edge_detector_0.png")).
+			when(spy).getFile(sc);
+		when(response.getOutputStream()).thenReturn(mock(ServletOutputStream.class));
+
+		spy.getImage(0, response);
+
+		verify(response).setContentType("image/png");
+	}
+
+	@Test
 	public void testGetDiffImageNotFoundSource()
 	{
 		HttpServletResponse response = mock(HttpServletResponse.class);
@@ -202,6 +217,39 @@ public class ImageControllerTest {
 		HttpServletResponse response = mock(HttpServletResponse.class);
 		this.imageController.getDiffImage(0, 1, response);
 		verify(response).setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+	}
+
+	@Test
+	public void testGetDiffImageOk() throws IOException
+	{
+		HttpServletResponse response = mock(HttpServletResponse.class);
+		ImageController spy = spy(this.imageController);
+		Screenshot sc = screenshotRepo.findOne(0);
+		doReturn(new File("src/test/resources/images/edge_detector_0.png")).
+			when(spy).getFile(sc);
+		when(response.getOutputStream()).thenReturn(mock(ServletOutputStream.class));
+
+		spy.getDiffImage(0, 0, response);
+
+		verify(response).setContentType("image/png");
+	}
+
+	@Test
+	public void testGetDiffImageOkDifferent() throws IOException
+	{
+		HttpServletResponse response = mock(HttpServletResponse.class);
+		ImageController spy = spy(this.imageController);
+		Screenshot sc0 = screenshotRepo.findOne(0);
+		doReturn(new File("src/test/resources/images/edge_detector_0.png")).
+			when(spy).getFile(sc0);
+		Screenshot sc1 = screenshotRepo.findOne(1);
+		doReturn(new File("src/test/resources/images/edge_detector_0_edge.png")).
+			when(spy).getFile(sc1);
+		when(response.getOutputStream()).thenReturn(mock(ServletOutputStream.class));
+
+		spy.getDiffImage(0, 1, response);
+
+		verify(response).setContentType("image/png");
 	}
 
 	@Test
@@ -317,5 +365,34 @@ public class ImageControllerTest {
 		spy.getProcessed(0, "edge", params, response);
 
 		verify(response).setContentType("image/png");
+	}
+	
+
+	@Test
+	public void testGetDiffImageFileExists() throws IOException
+	{
+		HttpServletResponse response = mock(HttpServletResponse.class);
+		ImageController spy = spy(this.imageController);
+		doReturn("src/test/resources/images/edge_detector_0.png").
+			when(spy).getAbsoluteFilePath(any(String.class));
+		when(response.getOutputStream()).thenReturn(mock(ServletOutputStream.class));
+
+		spy.getDiffImage(0, 0, response);
+
+		verify(response).setContentType("image/png");
+	}
+
+	@Test
+	public void testGetDiffImageFileDirectory() throws IOException
+	{
+		HttpServletResponse response = mock(HttpServletResponse.class);
+		ImageController spy = spy(this.imageController);
+		doReturn("src/test/resources/images/").
+			when(spy).getAbsoluteFilePath(any(String.class));
+		when(response.getOutputStream()).thenReturn(mock(ServletOutputStream.class));
+
+		spy.getDiffImage(0, 0, response);
+
+		verify(response).setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 	}
 }
