@@ -61,6 +61,12 @@ public class ImageController {
 	public void getImage(@RequestParam Integer id, HttpServletResponse response) {
 		Screenshot screenshot = screenshotRepo.findOne(id);
 
+		if (screenshot == null)
+		{
+			response.setStatus(HttpStatus.NOT_FOUND.value());
+			return;
+		}
+
 		// Send PNG image
 		try {
 			File file = getFile(screenshot);
@@ -81,6 +87,12 @@ public class ImageController {
 							Map<String, String> allparams, HttpServletResponse response)
 	{
 		Screenshot screenshot = screenshotRepo.findOne(id);
+
+		if (screenshot == null)
+		{
+			response.setStatus(HttpStatus.NOT_FOUND.value());
+			return;
+		}
 
 		try {
 			BufferedImage image = ImageIO.read(getFile(screenshot));
@@ -128,7 +140,7 @@ public class ImageController {
 			getEdgeImage(id, allparams, response);
 			break;
 		default:
-			response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+			response.setStatus(HttpStatus.BAD_REQUEST.value());
 			break;
 		}
 	}
@@ -144,6 +156,12 @@ public class ImageController {
 	public void getDiffImage(@RequestParam Integer sourceId, @RequestParam Integer targetId, HttpServletResponse response) {
 		Screenshot sourceScreenshot = screenshotRepo.findOne(sourceId);
 		Screenshot targetScreenshot = screenshotRepo.findOne(targetId);
+
+		if (sourceScreenshot == null || targetScreenshot == null)
+		{
+			response.setStatus(HttpStatus.NOT_FOUND.value());
+			return;
+		}
 
 		try {
 			File source = getFile(sourceScreenshot);
