@@ -169,8 +169,8 @@
 			actual.onload = d2.resolve;
 
 			var format = hifive.test.explorer.utils.formatUrl;
-			expected.src = format('image/getEdge', { id: expectedId, colorIndex: 1 });
-			actual.src = format('image/getEdge', { id: actualId, colorIndex: 0 });
+			expected.src = format('image/getProcessed', { id: expectedId, algorithm: 'edge', colorIndex: 1 });
+			actual.src = format('image/getProcessed', { id: actualId, algorithm: 'edge', colorIndex: 0 });
 
 			$.when.apply($, [d1.promise(), d2.promise()]).done(function() {
 				var canvas = $('#edge-overlapping canvas')[0];
@@ -194,7 +194,7 @@
 						context.drawImage(actual, 0, 0);
 						initImageMagnifier();
 					}
-					actualBlack.src = format('image/getEdge', { id: actualId, colorIndex: 2 });
+					actualBlack.src = format('image/getProcessed', { id: actualId, algorithm: 'edge', colorIndex: 2 });
 				}
 
 				function initImageMagnifier() {

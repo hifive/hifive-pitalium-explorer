@@ -10,6 +10,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
@@ -75,15 +76,21 @@ public class ImageController {
 	 * @param id id of screenshot to be processed by edge detector.
 	 * @param response HttpServletResponse
 	 */
-	@RequestMapping(value = "/getEdge", method = RequestMethod.GET)
 	public void getEdgeImage(@RequestParam Integer id,
-							 @RequestParam(defaultValue = "-1") int colorIndex, HttpServletResponse response)
+							Map<String, String> allparams, HttpServletResponse response)
 	{
 		Screenshot screenshot = screenshotRepo.findOne(id);
 
 		try {
 			BufferedImage image = ImageIO.read(getFile(screenshot));
 			EdgeDetector edgeDetector = new EdgeDetector(0.5);
+			
+			int colorIndex = -1;
+			if (allparams.containsKey("colorIndex")) {
+				try {
+					colorIndex = Integer.parseInt(allparams.get("colorIndex"));
+				} catch (NumberFormatException nfe) { }
+			}
 
 			switch (colorIndex) {
 			case 0:
@@ -98,6 +105,22 @@ public class ImageController {
 			sendImage(edgeImage, response);
 		} catch (IOException e) {
 			response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+		}
+	}
+
+	@RequestMapping(value = "/getProcessed", method = RequestMethod.GET)
+	public void getProcessed(@RequestParam Integer id,
+			@RequestParam String algorithm,
+			@RequestParam Map<String, String> allparams, HttpServletResponse response)
+	{
+		switch(algorithm)
+		{
+		case "edge":
+			getEdgeImage(id, allparams, response);
+			break;
+		default:
+			response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+			break;
 		}
 	}
 
