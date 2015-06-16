@@ -64,7 +64,7 @@
 						var currentPage = testExecutionsPage.number + 1;
 						var totalPages = testExecutionsPage.totalPages;
 						if (!testExecutionsPage.first) {
-							%]<li><a class="btn-page btn-first-page" href="#" data-page="1">&lt;&lt;</a></li>[%
+							%]<li><a class="btn-page btn-first-page" href="#0" data-page="1">&lt;&lt;</a></li>[%
 						} else {
 							%]<li class="disabled"><a>&lt;&lt;</a></li>[%
 						}
@@ -72,9 +72,10 @@
 					[%
 						var start = Math.max(1, currentPage - 5);
 						var end = Math.min(totalPages, currentPage + 5);
+						var size = testExecutionsPage.size;
 						for (var i = start; i <= end; i++) {
 							if (i != currentPage) {
-								%]<li><a class="btn-page" href="#" data-page="[%= i %]">[%= i %]</a></li>[%
+								%]<li><a class="btn-page" href="#[%= (i-1)*size %]" data-page="[%= i %]">[%= i %]</a></li>[%
 							} else {
 								%]<li class="active"><a>[%= i %]</a></li>[%
 							}
@@ -82,7 +83,7 @@
 					%]
 					[%
 						if (!testExecutionsPage.last) {
-							%]<li><a class="btn-page btn-last-page" href="#" data-page="[%= totalPages %]">&gt;&gt;</a></li>[%
+							%]<li><a class="btn-page btn-last-page" href="#[%= (totalPages-1)*size %]" data-page="[%= totalPages %]">&gt;&gt;</a></li>[%
 						} else {
 							%]<li class="disabled"><a>&gt;&gt;</a></li>[%
 						}
