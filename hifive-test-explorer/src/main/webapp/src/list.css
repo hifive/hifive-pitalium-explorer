@@ -27,6 +27,6 @@
 	text-align: center;
 }
 
-.test-execution-summary {
-	float: right;
+.panel-title .progress {
+	margin: 0;
 }

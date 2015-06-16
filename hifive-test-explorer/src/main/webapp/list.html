@@ -33,20 +33,38 @@
 						var testExecution = testExecutions[i].testExecution;
 						var passedCount = testExecutions[i].passedCount;
 						var totalCount = testExecutions[i].totalCount;
+						var passedPercentage = parseInt(passedCount / totalCount * 100);
 						var headerTarget = 'heading' + i;
 						var collapseTarget = 'collapse' + i;
 				%]
 				<div class="panel panel-default explorer-collapsable" data-test-execution-id="[%= testExecution.id %]">
 					<div class="panel-heading" role="tab" id="[%= headerTarget %]">
-						<h4 class="panel-title">
-							<a data-toggle="collapse" data-parent="#testExecutionAccordion" href="#[%= collapseTarget %]"
-								aria-expanded="false" aria-controls="[%= collapseTarget %]">
-								[%= testExecution.timeString %]
-							</a>
-							<span class="test-execution-summary">
+						<div class="panel-title row">
+							<div class="col-xs-6">
+								<a data-toggle="collapse" data-parent="#testExecutionAccordion" href="#[%= collapseTarget %]"
+									aria-expanded="false" aria-controls="[%= collapseTarget %]">
+									[%= testExecution.timeString %]
+								</a>
+							</div>
+							<div class="col-xs-2 text-center">
 								[%= passedCount %] / [%= totalCount %]
-							</span>
-						</h4>
+							</div>
+							<div class="col-xs-3">
+								<div class="progress">
+									<div class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100"
+										aria-valuenow="[%= passedPercentage %]"
+										style="width: [%= passedPercentage %]%;">
+									</div>
+								</div>
+							</div>
+							<div class="col-xs-1">
+								[% if (passedCount == totalCount) { %]
+									<img class="test-result-icon" src="res/img/checkmark.png" alt="○" aria-label="All tests passed">
+								[% } else { %]
+									<img class="test-result-icon" src="res/img/xmark.png" alt="×" aria-label="Some tests failed">
+								[% } %]
+							</div>
+						</div>
 					</div>
 					<div id="[%= collapseTarget %]" class="panel-collapse collapse" role="tabpanel"
 						aria-labelledby="[%= headerTarget %]">
