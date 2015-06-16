@@ -24,12 +24,12 @@
 		pageSize: 20,
 
 		/**
-		 * The index of the item at the top of the current page.
+		 * The 0-based index of the item at the top of the current page.
 		 *
 		 * @type Number
 		 * @memberOf hifive.test.explorer.logic.TestResultListLogic
 		 */
-		pageStart: 1,
+		pageStart: 0,
 
 		/**
 		 * The search keyword for test method.
@@ -123,7 +123,8 @@
 		 * @memberOf hifive.test.explorer.controller.TestResultListController
 		 */
 		__ready: function() {
-			this.loadTestExecutionList(1);
+			this.onHashChange();
+			$(window).on('hashchange', this.own(this.onHashChange));
 		},
 
 		/**
@@ -228,22 +229,6 @@
 		},
 
 		/**
-		 * Called when the page link has been clicked. Update view.
-		 *
-		 * @memberOf hifive.test.explorer.controller.TestResultListController
-		 * @param {Object} context the event context
-		 * @param {jQuery} $el the event target element
-		 */
-		'.pagination a click': function(context, $el) {
-			var page = $el.data('page');
-			if (typeof page == 'undefined') {
-				(console && console.error && console.error('page undefined'));
-				return;
-			}
-			this.loadTestExecutionList(page);
-		},
-
-		/**
 		 * Called when the page size select value has been changed. Updates view.
 		 *
 		 * @memberOf hifive.test.explorer.controller.TestResultListController
@@ -251,14 +236,36 @@
 		 * @param {jQuery} $el the event target element
 		 */
 		'#select-page-size change': function(context, $el) {
-			// update pagination parameters
 			var pageSize = $el.val();
 			var pageStart = this._testResultListLogic.pageStart;
-			pageStart = Math.floor(pageStart / pageSize) * pageSize;
+			this.updatePageSize(pageSize, pageStart);
+		},
 
-			var page = 1 + Math.floor(pageStart / pageSize);
+		/**
+		 * Called when the page link has been clicked. Update view.
+		 *
+		 * @memberOf hifive.test.explorer.controller.TestResultListController
+		 */
+		onHashChange: function(){
+			var pageSize = $("#select-page-size").val();
+			var pageStart = Math.max(0, parseInt(window.location.hash.substr(1)));
+			if (isNaN(pageStart)) { pageStart = 0; }
 
+			this.updatePageSize(pageSize, pageStart);
+		},
+
+		/**
+		 * Set pageSize and pageStart, and update view.
+		 *
+		 * @memberOf hifive.test.explorer.controller.TestResultListController
+		 * @param {number} pageSize new page size
+		 * @param {number} pageStart new page start
+		 */
+		updatePageSize: function(pageSize, pageStart) {
+			// update pagination parameters
+			this._testResultListLogic.pageStart = pageStart;
 			this._testResultListLogic.pageSize = pageSize;
+			var page = 1 + Math.floor(pageStart / pageSize);
 			this.loadTestExecutionList(page);
 		},
 
