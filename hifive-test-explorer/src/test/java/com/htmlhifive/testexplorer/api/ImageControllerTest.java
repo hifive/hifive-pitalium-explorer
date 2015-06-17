@@ -28,6 +28,7 @@ import com.htmlhifive.testexplorer.entity.ScreenshotRepository;
 import com.htmlhifive.testexplorer.entity.TestEnvironment;
 import com.htmlhifive.testexplorer.entity.TestExecution;
 import com.htmlhifive.testexplorer.entity.TestExecutionRepository;
+import com.htmlhifive.testexplorer.file.ImageFileUtility;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("/spring/test-context.xml")
@@ -162,14 +163,6 @@ public class ImageControllerTest {
 	}
 
 	@Test
-	public void testGetAbsoluteFilePath()
-	{
-		String path = this.imageController.getAbsoluteFilePath("test.png");
-		Assert.assertTrue(path.endsWith("test.png"));
-		Assert.assertTrue(path.contains("test1234"));
-	}
-
-	@Test
 	public void testGetImageNotFound()
 	{
 		HttpServletResponse response = mock(HttpServletResponse.class);
@@ -190,9 +183,10 @@ public class ImageControllerTest {
 	{
 		HttpServletResponse response = mock(HttpServletResponse.class);
 		ImageController spy = spy(this.imageController);
+		spy.imageFileUtil = spy(spy.imageFileUtil);
 		Screenshot sc = screenshotRepo.findOne(0);
 		doReturn(new File("src/test/resources/images/edge_detector_0.png")).
-			when(spy).getFile(sc);
+			when(spy.imageFileUtil).getFile(sc);
 		when(response.getOutputStream()).thenReturn(mock(ServletOutputStream.class));
 
 		spy.getImage(0, response);
@@ -229,9 +223,10 @@ public class ImageControllerTest {
 	{
 		HttpServletResponse response = mock(HttpServletResponse.class);
 		ImageController spy = spy(this.imageController);
+		spy.imageFileUtil = spy(spy.imageFileUtil);
 		Screenshot sc = screenshotRepo.findOne(0);
 		doReturn(new File("src/test/resources/images/edge_detector_0.png")).
-			when(spy).getFile(sc);
+			when(spy.imageFileUtil).getFile(sc);
 		when(response.getOutputStream()).thenReturn(mock(ServletOutputStream.class));
 
 		spy.getDiffImage(0, 0, response);
@@ -244,12 +239,13 @@ public class ImageControllerTest {
 	{
 		HttpServletResponse response = mock(HttpServletResponse.class);
 		ImageController spy = spy(this.imageController);
+		spy.imageFileUtil = spy(spy.imageFileUtil);
 		Screenshot sc0 = screenshotRepo.findOne(0);
 		doReturn(new File("src/test/resources/images/edge_detector_0.png")).
-			when(spy).getFile(sc0);
+			when(spy.imageFileUtil).getFile(sc0);
 		Screenshot sc1 = screenshotRepo.findOne(1);
 		doReturn(new File("src/test/resources/images/edge_detector_0_edge.png")).
-			when(spy).getFile(sc1);
+			when(spy.imageFileUtil).getFile(sc1);
 		when(response.getOutputStream()).thenReturn(mock(ServletOutputStream.class));
 
 		spy.getDiffImage(0, 1, response);
@@ -302,9 +298,10 @@ public class ImageControllerTest {
 		params.put("algorithm", "edge");
 
 		ImageController spy = spy(this.imageController);
+		spy.imageFileUtil = spy(spy.imageFileUtil);
 		Screenshot sc = screenshotRepo.findOne(0);
 		doReturn(new File("src/test/resources/images/edge_detector_0.png")).
-			when(spy).getFile(sc);
+			when(spy.imageFileUtil).getFile(sc);
 		when(response.getOutputStream()).thenReturn(mock(ServletOutputStream.class));
 
 		spy.getProcessed(0, "edge", params, response);
@@ -322,9 +319,10 @@ public class ImageControllerTest {
 		params.put("colorIndex", "0");
 
 		ImageController spy = spy(this.imageController);
+		spy.imageFileUtil = spy(spy.imageFileUtil);
 		Screenshot sc = screenshotRepo.findOne(0);
 		doReturn(new File("src/test/resources/images/edge_detector_0.png")).
-			when(spy).getFile(sc);
+			when(spy.imageFileUtil).getFile(sc);
 		when(response.getOutputStream()).thenReturn(mock(ServletOutputStream.class));
 
 		spy.getProcessed(0, "edge", params, response);
@@ -342,9 +340,10 @@ public class ImageControllerTest {
 		params.put("colorIndex", "1");
 
 		ImageController spy = spy(this.imageController);
+		spy.imageFileUtil = spy(spy.imageFileUtil);
 		Screenshot sc = screenshotRepo.findOne(0);
 		doReturn(new File("src/test/resources/images/edge_detector_0.png")).
-			when(spy).getFile(sc);
+			when(spy.imageFileUtil).getFile(sc);
 		when(response.getOutputStream()).thenReturn(mock(ServletOutputStream.class));
 
 		spy.getProcessed(0, "edge", params, response);
@@ -362,9 +361,10 @@ public class ImageControllerTest {
 		params.put("colorIndex", "invalid");
 
 		ImageController spy = spy(this.imageController);
+		spy.imageFileUtil = spy(spy.imageFileUtil);
 		Screenshot sc = screenshotRepo.findOne(0);
 		doReturn(new File("src/test/resources/images/edge_detector_0.png")).
-			when(spy).getFile(sc);
+			when(spy.imageFileUtil).getFile(sc);
 		when(response.getOutputStream()).thenReturn(mock(ServletOutputStream.class));
 
 		spy.getProcessed(0, "edge", params, response);
@@ -378,8 +378,9 @@ public class ImageControllerTest {
 	{
 		HttpServletResponse response = mock(HttpServletResponse.class);
 		ImageController spy = spy(this.imageController);
+		spy.imageFileUtil = spy(spy.imageFileUtil);
 		doReturn("src/test/resources/images/edge_detector_0.png").
-			when(spy).getAbsoluteFilePath(any(String.class));
+			when(spy.imageFileUtil).getAbsoluteFilePath(any(String.class));
 		when(response.getOutputStream()).thenReturn(mock(ServletOutputStream.class));
 
 		spy.getDiffImage(0, 0, response);
@@ -392,8 +393,9 @@ public class ImageControllerTest {
 	{
 		HttpServletResponse response = mock(HttpServletResponse.class);
 		ImageController spy = spy(this.imageController);
+		spy.imageFileUtil = spy(spy.imageFileUtil);
 		doReturn("src/test/resources/images/").
-			when(spy).getAbsoluteFilePath(any(String.class));
+			when(spy.imageFileUtil).getAbsoluteFilePath(any(String.class));
 		when(response.getOutputStream()).thenReturn(mock(ServletOutputStream.class));
 
 		spy.getDiffImage(0, 0, response);

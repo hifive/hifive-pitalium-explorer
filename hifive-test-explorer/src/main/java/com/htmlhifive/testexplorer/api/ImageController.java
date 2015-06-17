@@ -58,7 +58,7 @@ public class ImageController {
 	@SuppressWarnings("unused")
 	private static Logger log = LoggerFactory.getLogger(ImageController.class);
 	
-	private ImageFileUtility imageFileUtil;
+	protected ImageFileUtility imageFileUtil;
 
 	@PostConstruct
 	public void init()
