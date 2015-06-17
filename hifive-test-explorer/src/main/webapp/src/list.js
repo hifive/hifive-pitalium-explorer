@@ -55,8 +55,6 @@
 		 * @returns {JqXHRWrapper}
 		 */
 		getTestExecutionList: function(page) {
-			this.pageStart = (page - 1) * this.pageSize;
-
 			var data = {
 				'page': page,
 				'limit': this.pageSize,
