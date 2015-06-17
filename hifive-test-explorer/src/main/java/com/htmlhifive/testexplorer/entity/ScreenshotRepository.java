@@ -21,9 +21,9 @@ public interface ScreenshotRepository extends JpaRepository<Screenshot, Integer>
 				"FROM ProcessedImage AS p " +
 				"WHERE s.id = p.screenshotId " +
 				"AND ( " +
-					"p.algorithm = 'edge;-1' " +
-					"OR p.algorithm = 'edge;0' " +
-					"OR p.algorithm = 'edge;1' )) " +
+					"p.algorithm = 'edge' " +
+					"OR p.algorithm = 'edge_0' " +
+					"OR p.algorithm = 'edge_1' )) " +
 			"ORDER BY s.id desc" /* from recent to older */
 			)
 	public List<Screenshot> findNotProcessedEdge(@Param("from") Integer from);
