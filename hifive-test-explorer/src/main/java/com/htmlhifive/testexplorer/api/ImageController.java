@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -26,6 +27,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.htmlhifive.testexplorer.cache.BackgroundImageDispatcher;
+import com.htmlhifive.testexplorer.cache.CacheTaskQueue;
 import com.htmlhifive.testexplorer.cache.ProcessedImageUtility;
 import com.htmlhifive.testexplorer.entity.ConfigRepository;
 import com.htmlhifive.testexplorer.entity.ProcessedImage;
@@ -59,12 +62,27 @@ public class ImageController {
 	private static Logger log = LoggerFactory.getLogger(ImageController.class);
 	
 	protected ImageFileUtility imageFileUtil;
+	private CacheTaskQueue cacheTaskQueue;
+	private BackgroundImageDispatcher backgroundImageDispatcher;
 
 	@PostConstruct
 	public void init()
 	{
 		Repositories repositories = new Repositories(configRepo, processedImageRepo, screenshotRepo, testExecutionRepo);
 		this.imageFileUtil = new ImageFileUtility(repositories);
+
+		this.cacheTaskQueue = new CacheTaskQueue();
+		this.backgroundImageDispatcher = new BackgroundImageDispatcher(repositories, cacheTaskQueue);
+		/* start background worker */
+		this.backgroundImageDispatcher.start();
+	}
+
+	@PreDestroy
+	public void destory() throws InterruptedException
+	{
+		this.backgroundImageDispatcher.requestStop();
+		this.backgroundImageDispatcher.interrupt();
+		this.cacheTaskQueue.interruptAndJoin();
 	}
 
 	/**

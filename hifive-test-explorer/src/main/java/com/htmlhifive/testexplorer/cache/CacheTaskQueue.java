@@ -45,6 +45,7 @@ public class CacheTaskQueue {
 	public void interruptAndJoin() throws InterruptedException
 	{
 		for (Worker worker : workers) {
+			worker.requestStop();
 			worker.interrupt();
 		}
 		for (Worker worker : workers) {
@@ -65,6 +66,7 @@ public class CacheTaskQueue {
 	
 	private class Worker extends Thread {
 		private CacheTaskQueue taskQueue;
+		private volatile boolean stop = false; 
 
 		/**
 		 * Worker constructor
@@ -75,14 +77,19 @@ public class CacheTaskQueue {
 			this.taskQueue = cacheTaskQueue;
 		}
 
+		public void requestStop()
+		{
+			this.stop = true;
+		}
+
 		@Override
 		public void run() {
 			try {
-				for (;;) {
+				while (!this.stop) {
 					PrioritizedTask task = taskQueue.TakeTask();
 					task.run();
-					if (Thread.currentThread().isInterrupted())
-						break;
+					if (Thread.interrupted())
+						return;
 				}
 			} catch (InterruptedException e) {
 				Thread.currentThread().interrupt();
