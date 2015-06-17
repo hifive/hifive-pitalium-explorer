@@ -41,12 +41,16 @@ public class CacheTaskQueue {
 	public void addTask(PrioritizedTask task) {
 		waitList.add(task);
 	}
-	
+
+	/**
+	 * Cleanup all worker threads.
+	 * 
+	 * @throws InterruptedException
+	 */
 	public void interruptAndJoin() throws InterruptedException
 	{
 		for (Worker worker : workers) {
 			worker.requestStop();
-			worker.interrupt();
 		}
 		for (Worker worker : workers) {
 			worker.join();
@@ -77,9 +81,13 @@ public class CacheTaskQueue {
 			this.taskQueue = cacheTaskQueue;
 		}
 
+		/**
+		 * Set stop flag and interrupt. The thread will stop soon
+		 */
 		public void requestStop()
 		{
 			this.stop = true;
+			this.interrupt();
 		}
 
 		@Override

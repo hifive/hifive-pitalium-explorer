@@ -23,6 +23,12 @@ public class BackgroundImageDispatcher extends Thread {
 	private final ImageFileUtility imageFileUtil;
 	private volatile boolean stop = false; 
 
+	/**
+	 * The constructor
+	 * 
+	 * @param repositories 
+	 * @param taskQueue This dispatcher will send jobs to the specified taskQueue.
+	 */
 	public BackgroundImageDispatcher(Repositories repositories, CacheTaskQueue taskQueue)
 	{
 		this.repositories = repositories;
@@ -30,9 +36,13 @@ public class BackgroundImageDispatcher extends Thread {
 		this.taskQueue = taskQueue;
 	}
 
+	/**
+	 * Set stop flag. The thread will stop soon.
+	 */
 	public void requestStop()
 	{
 		this.stop = true;
+		this.interrupt();
 	}
 
 	@Override
@@ -62,6 +72,13 @@ public class BackgroundImageDispatcher extends Thread {
 		}
 	}
 
+	/**
+	 * Create and add edge processing task.
+	 *  
+	 * @param s screenshot to be processed 
+	 * @param colorIndex the colorIndex to be processed
+	 * @param key the key for ProcessedImage class.
+	 */
 	private void addTask(Screenshot s, int colorIndex, ProcessedImageKey key)
 	{
 		taskQueue.addTask(new PrioritizedTask(0, new Runnable() {

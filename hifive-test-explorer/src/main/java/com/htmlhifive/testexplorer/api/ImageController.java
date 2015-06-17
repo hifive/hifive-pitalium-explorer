@@ -93,8 +93,8 @@ public class ImageController {
 	public void destory() throws InterruptedException
 	{
 		this.backgroundImageDispatcher.requestStop();
-		this.backgroundImageDispatcher.interrupt();
 		this.cacheTaskQueue.interruptAndJoin();
+		this.backgroundImageDispatcher.join();
 	}
 
 	/**
