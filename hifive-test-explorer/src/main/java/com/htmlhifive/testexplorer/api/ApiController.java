@@ -66,7 +66,7 @@ public class ApiController {
 		else if (pageSize == -1) {
 			pageSize = (int)Math.min(testExecutionRepo.count(), Integer.MAX_VALUE);
 		}
-		PageRequest pageRequest = new PageRequest(page - 1, pageSize, new Sort("id"));
+		PageRequest pageRequest = new PageRequest(page - 1, pageSize, new Sort(Sort.Direction.DESC, "id"));
 		Page<TestExecutionResult> list = testExecutionRepo.search(searchTestMethod, searchTestScreen, pageRequest);
 		return new ResponseEntity<Page<TestExecutionResult>>(list, HttpStatus.OK);
 	}
