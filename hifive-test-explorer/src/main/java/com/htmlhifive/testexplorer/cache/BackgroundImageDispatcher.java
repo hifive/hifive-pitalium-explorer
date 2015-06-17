@@ -1,9 +1,11 @@
 package com.htmlhifive.testexplorer.cache;
 
-import java.awt.Color;
 import java.awt.image.BufferedImage;
+import java.awt.image.LookupOp;
+import java.awt.image.ShortLookupTable;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.imageio.ImageIO;
@@ -54,14 +56,18 @@ public class BackgroundImageDispatcher extends Thread {
 			for (Screenshot s : toProcess)
 			{
 				lastIndex = Math.max(s.getId(), lastIndex);
+				ArrayList<Integer> colorIndices = new ArrayList<Integer>();
 				for (int colorIndex = -1; colorIndex <= 1; colorIndex++)
 				{
 					String algorithm = ProcessedImageUtility.getAlgorithmNameForEdge(colorIndex);
 					ProcessedImageKey key = new ProcessedImageKey(s.getId(), algorithm);
 					if (repositories.getProcessedImageRepository().exists(key))
 						continue;
-					addTask(s, colorIndex, key);
+					colorIndices.add(colorIndex);
 				}
+				if (colorIndices.isEmpty())
+					continue;
+				addTask(s, colorIndices);
 			}
 			try {
 				Thread.sleep(10000);
@@ -79,32 +85,43 @@ public class BackgroundImageDispatcher extends Thread {
 	 * @param colorIndex the colorIndex to be processed
 	 * @param key the key for ProcessedImage class.
 	 */
-	private void addTask(Screenshot s, int colorIndex, ProcessedImageKey key)
+	private void addTask(Screenshot s, ArrayList<Integer> colorIndices)
 	{
 		taskQueue.addTask(new PrioritizedTask(0, new Runnable() {
 			Screenshot s;
-			int colorIndex;
-			ProcessedImageKey key;
+			ArrayList<Integer> colorIndices;
 
-			public Runnable init(Screenshot s, int colorIndex, ProcessedImageKey key) {
+			public Runnable init(Screenshot s, ArrayList<Integer> colorIndices) {
 				this.s = s;
-				this.colorIndex = colorIndex;
-				this.key = key;
+				this.colorIndices = colorIndices;
 				return this;
+			}
+
+			public LookupOp getBlackToRedOp()
+			{
+				short[] red = new short[256];
+				short[] id = new short[256];
+				for (int i = 0; i < 256; i++) {
+					red[i] = 255;
+					id[i] = (short)i;
+				}
+				return new LookupOp(new ShortLookupTable(0, new short[][] { red, id, id, id }), null);
+			}
+
+			public LookupOp getBlackToBlueOp()
+			{
+				short[] id= new short[256];
+				short[] blue = new short[256];
+				for (int i = 0; i < 256; i++) {
+					id[i] = (short)i;
+					blue[i] = 255;
+				}
+				return new LookupOp(new ShortLookupTable(0, new short[][] { id, id, blue, id }), null);
 			}
 
 			@Override
 			public void run() {
 				EdgeDetector edgeDetector = new EdgeDetector(0.5);
-
-				switch (colorIndex) {
-				case 0:
-					edgeDetector.setForegroundColor(new Color(255, 0, 0, 255));
-					break;
-				case 1:
-					edgeDetector.setForegroundColor(new Color(0, 0, 255, 255));
-					break;
-				}
 
 				BufferedImage image;
 				try {
@@ -112,22 +129,43 @@ public class BackgroundImageDispatcher extends Thread {
 				} catch (IOException e) {
 					return;
 				}
-				BufferedImage edgeImage = edgeDetector.DetectEdge(image);
-				String path = imageFileUtil.newProcessedFilePath(key);
-				String absolutePath = imageFileUtil.getAbsoluteFilePath(path);
-				try {
-					File parentDirectory = new File(new File(absolutePath).getParent());
-					parentDirectory.mkdirs();
-					ImageIO.write(edgeImage, "png", new File(absolutePath));
-					ProcessedImage newEntry = new ProcessedImage();
-					newEntry.setScreenshotId(key.getScreenshotId());
-					newEntry.setAlgorithm(key.getAlgorithm());
-					newEntry.setFileName(path);
-					repositories.getProcessedImageRepository().saveAndFlush(newEntry);
-				} catch (IOException e) {
-					/* merely skip caching */
+				BufferedImage blackEdgeImage = edgeDetector.DetectEdge(image);
+
+				for (Integer colorIndex : colorIndices)
+				{
+					BufferedImage edgeImage;
+					LookupOp op;
+					switch (colorIndex) {
+					case 0:
+						op = getBlackToRedOp();
+						edgeImage = op.filter(blackEdgeImage, null);
+						break;
+					case 1:
+						op = getBlackToBlueOp();
+						edgeImage = op.filter(blackEdgeImage, null);
+						break;
+					default:
+						edgeImage = blackEdgeImage;
+					}
+
+					String algorithm = ProcessedImageUtility.getAlgorithmNameForEdge(colorIndex);
+					ProcessedImageKey key = new ProcessedImageKey(s.getId(), algorithm);
+					String path = imageFileUtil.newProcessedFilePath(key);
+					String absolutePath = imageFileUtil.getAbsoluteFilePath(path);
+					try {
+						File parentDirectory = new File(new File(absolutePath).getParent());
+						parentDirectory.mkdirs();
+						ImageIO.write(edgeImage, "png", new File(absolutePath));
+						ProcessedImage newEntry = new ProcessedImage();
+						newEntry.setScreenshotId(key.getScreenshotId());
+						newEntry.setAlgorithm(key.getAlgorithm());
+						newEntry.setFileName(path);
+						repositories.getProcessedImageRepository().saveAndFlush(newEntry);
+					} catch (IOException e) {
+						/* merely skip caching */
+					}
 				}
 			}
-		}.init(s, colorIndex, key)));
+		}.init(s, colorIndices)));
 	}
 }

@@ -3,7 +3,8 @@
  */
 package com.htmlhifive.testexplorer.api;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
@@ -31,9 +32,7 @@ import com.htmlhifive.testexplorer.cache.BackgroundImageDispatcher;
 import com.htmlhifive.testexplorer.cache.CacheTaskQueue;
 import com.htmlhifive.testexplorer.cache.ProcessedImageUtility;
 import com.htmlhifive.testexplorer.entity.ConfigRepository;
-import com.htmlhifive.testexplorer.entity.ProcessedImage;
 import com.htmlhifive.testexplorer.entity.ProcessedImageRepository;
-import com.htmlhifive.testexplorer.entity.ProcessedImageKey;
 import com.htmlhifive.testexplorer.entity.Repositories;
 import com.htmlhifive.testexplorer.entity.Screenshot;
 import com.htmlhifive.testexplorer.entity.ScreenshotRepository;
@@ -150,7 +149,7 @@ public class ImageController {
 				} catch (NumberFormatException nfe) { }
 			}
 
-			File cachedFile = searchProcessedImageFile(id, ProcessedImageUtility.getAlgorithmNameForEdge(colorIndex));
+			File cachedFile = imageFileUtil.searchProcessedImageFile(id, ProcessedImageUtility.getAlgorithmNameForEdge(colorIndex));
 			if (cachedFile != null)
 			{
 				sendFile(cachedFile, response);
@@ -237,24 +236,6 @@ public class ImageController {
 		}
 	}
 
-	/**
-	 * Get a File of the processed image if exists
-	 *  
-	 * @param id image id to search for
-	 * @param algorithm algorithm to search for
-	 * @return null if no such file exists, or requested file otherwise.
-	 */
-	public File searchProcessedImageFile(Integer id, String algorithm)
-	{
-		File result = null;
-		ProcessedImage p = processedImageRepo.findOne(new ProcessedImageKey(id, algorithm));
-		if (p != null)
-		{
-			result = new File(imageFileUtil.getAbsoluteFilePath(p.getFileName()));
-		}
-
-		return result;
-	}
 
 	/**
 	 * Send a file over http response

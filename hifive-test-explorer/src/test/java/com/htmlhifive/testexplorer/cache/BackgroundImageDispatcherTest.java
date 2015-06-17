@@ -65,6 +65,7 @@ public class BackgroundImageDispatcherTest {
 		ArrayList<Screenshot> notProcessed = new ArrayList<Screenshot>();
 		notProcessed.add(screenshots.get(0));
 		notProcessed.add(screenshots.get(1));
+		notProcessed.add(screenshots.get(2));
 		when(screenshotRepo.findNotProcessedEdge(any(Integer.class))).thenReturn(notProcessed);
 
 		/* test edge_1 skipping */
@@ -114,9 +115,6 @@ public class BackgroundImageDispatcherTest {
 		}.setSemaphore(sem);
 		doAnswer(answer).when(q).addTask(any(PrioritizedTask.class));
 		d.start();
-		sem.acquire();
-		sem.acquire();
-		sem.acquire();
 		sem.acquire();
 		sem.acquire();
 		d.requestStop();
