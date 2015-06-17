@@ -16,6 +16,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import com.htmlhifive.testexplorer.entity.Config;
 import com.htmlhifive.testexplorer.entity.ConfigRepository;
 import com.htmlhifive.testexplorer.entity.ProcessedImage;
+import com.htmlhifive.testexplorer.entity.ProcessedImageKey;
 import com.htmlhifive.testexplorer.entity.ProcessedImageRepository;
 import com.htmlhifive.testexplorer.entity.Repositories;
 import com.htmlhifive.testexplorer.entity.Screenshot;
@@ -161,4 +162,11 @@ public class ImageFileUtilityTest {
 		Assert.assertTrue(path.contains("test1234"));
 	}
 
+	@Test
+	public void testProcessedFilePath()
+	{
+		ImageFileUtility util = new ImageFileUtility(new Repositories(configRepo, processedImageRepo, screenshotRepo, testExecutionRepo));
+		String path = util.newProcessedFilePath(new ProcessedImageKey(123, "best"));
+		Assert.assertTrue(path.startsWith("processed-image"));
+	}
 }
