@@ -32,9 +32,12 @@ public class PrioritizedTask implements Comparable<PrioritizedTask>, Runnable
 		if (o == null)
 			return 1;
 		// higher priority is less
-		int priorityComparison = Integer.compare(o.priority, this.priority); 
-		return priorityComparison != 0 ? priorityComparison :
-			Long.compare(this.seqNum, o.seqNum);
+		int priorityComparison = Integer.compare(o.priority, this.priority);
+		if (priorityComparison != 0)
+			return priorityComparison;
+		if (this.seqNum < o.seqNum)
+			return -1;
+		return (this.seqNum > o.seqNum) ? 1 : 0;
 	}
 
 	/**

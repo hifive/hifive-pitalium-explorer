@@ -54,7 +54,7 @@ public class BackgroundImageDispatcher extends Thread {
 			for (Screenshot s : toProcess)
 			{
 				lastIndex = Math.max(s.getId(), lastIndex);
-				for (int colorIndex = -1; colorIndex <= 2; colorIndex++)
+				for (int colorIndex = -1; colorIndex <= 1; colorIndex++)
 				{
 					String algorithm = ProcessedImageUtility.getAlgorithmNameForEdge(colorIndex);
 					ProcessedImageKey key = new ProcessedImageKey(s.getId(), algorithm);
