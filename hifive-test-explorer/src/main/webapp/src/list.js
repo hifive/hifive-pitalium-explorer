@@ -121,6 +121,7 @@
 		 * @memberOf hifive.test.explorer.controller.TestResultListController
 		 */
 		__ready: function() {
+			this.collectSearchParameters();
 			this.onHashChange();
 			$(window).on('hashchange', this.own(this.onHashChange));
 		},
@@ -214,16 +215,8 @@
 			// Stop submit
 			context.event.preventDefault();
 
-			// Collect search parameters
-			var params = {};
-			$el.find('input').each(function(index) {
-				var $elem = $(this);
-				params[$elem.attr('name')] = $elem.val();
-			});
-
-			this._testResultListLogic.searchTestMethod = params['searchTestMethod'];
-			this._testResultListLogic.searchTestScreen = params['searchTestScreen'];
-			this.loadTestExecutionList(1);
+			this.collectSearchParameters($el);
+			window.location.hash = '';
 		},
 
 		/**
@@ -250,6 +243,21 @@
 			if (isNaN(pageStart)) { pageStart = 0; }
 
 			this.updatePageSize(pageSize, pageStart);
+		},
+
+		collectSearchParameters: function($el) {
+			if (typeof($el) == 'undefined') {
+				$el = this.$find('#searchTest');
+			}
+
+			var params = {};
+			$el.find('input').each(function(index) {
+				var $elem = $(this);
+				params[$elem.attr('name')] = $elem.val();
+			});
+
+			this._testResultListLogic.searchTestMethod = params['searchTestMethod'];
+			this._testResultListLogic.searchTestScreen = params['searchTestScreen'];
 		},
 
 		/**
