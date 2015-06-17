@@ -49,7 +49,7 @@ public class TestExecution implements Serializable {
 	}
 
 	public String getTimeString() {
-		SimpleDateFormat directoryFormat = new SimpleDateFormat("yyyy_MM_dd_kk_mm_ss");
+		SimpleDateFormat directoryFormat = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss");
 		return directoryFormat.format(time);
 	}
 
