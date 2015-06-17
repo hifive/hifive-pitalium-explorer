@@ -65,6 +65,11 @@ public class ImageController {
 	private CacheTaskQueue cacheTaskQueue;
 	private BackgroundImageDispatcher backgroundImageDispatcher;
 
+	/**
+	 * This method is called by spring after auto wiring.
+	 *
+	 * Do initialization here.
+	 */
 	@PostConstruct
 	public void init()
 	{
@@ -77,6 +82,13 @@ public class ImageController {
 		this.backgroundImageDispatcher.start();
 	}
 
+	/**
+	 * This method is called when the application is about to die.
+	 * 
+	 * Cleanup things.
+	 * 
+	 * @throws InterruptedException
+	 */
 	@PreDestroy
 	public void destory() throws InterruptedException
 	{
