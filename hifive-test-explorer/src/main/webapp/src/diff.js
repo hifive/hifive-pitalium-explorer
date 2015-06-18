@@ -123,6 +123,11 @@
 			this._initializeOnionHandle();
 		},
 
+		/**
+		 * Swap actual/expected images
+		 *
+		 * @memberOf hifive.test.explorer.controller.TestResultDiffController
+		 */
 		'input[name=flip-image] change': function() {
 			var imageToBeShown = this.$find('input[name=flip-image]:checked').val();
 			var $actual = this.$find('#quick-flipping .actual');
@@ -237,14 +242,29 @@
 			this.$find(selector).attr('src', hifive.test.explorer.utils.formatUrl(url, params));
 		},
 
+		/**
+		 * Hide actual mode.
+		 *
+		 * @memberOf hifive.test.explorer.controller.TestResultDiffController
+		 */
 		_hideActualMode: function() {
 			this.$find('#actual-mode').hide();
 		},
 
+		/**
+		 * Hide expected mode.
+		 *
+		 * @memberOf hifive.test.explorer.controller.TestResultDiffController
+		 */
 		_hideExpectedMode: function() {
 			this.$find('#expected-mode').hide();
 		},
 
+		/**
+		 * Initialize the swipe diff handle.
+		 *
+		 * @memberOf hifive.test.explorer.controller.TestResultDiffController
+		 */
 		_initializeSwipeHandle: function() {
 			var min = 0,max = 1000,step = 1;
 
@@ -267,6 +287,11 @@
 			$handle.on('change', inputHandler); // for IE
 		},
 
+		/**
+		 * Initialize the onion skin diff handle.
+		 *
+		 * @memberOf hifive.test.explorer.controller.TestResultDiffController
+		 */
 		_initializeOnionHandle: function() {
 			var min = 0,max = 1000,step = 1;
 

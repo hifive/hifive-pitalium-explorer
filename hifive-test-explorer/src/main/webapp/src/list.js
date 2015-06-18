@@ -245,6 +245,12 @@
 			this.updatePageSize(pageSize, pageStart);
 		},
 
+		/**
+		 * Collect search keyword parameters and save them to logic.
+		 *
+		 * @memberOf hifive.test.explorer.controller.TestResultListController
+		 * @param {jQuery} $el the search element
+		 */
 		collectSearchParameters: function($el) {
 			if (typeof($el) == 'undefined') {
 				$el = this.$find('#searchTest');
@@ -275,6 +281,12 @@
 			this.loadTestExecutionList(page);
 		},
 
+		/**
+		 * Load test execution list from server and update view.
+		 *
+		 * @memberOf hifive.test.explorer.controller.TestResultListController
+		 * @param {number} page desired page number
+		 */
 		loadTestExecutionList: function(page) {
 			var indicator = this.indicator({
 				message: 'Loading...',
