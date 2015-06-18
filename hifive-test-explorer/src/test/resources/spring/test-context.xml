@@ -16,6 +16,9 @@
 	<bean id="mockConfigRepository" class="com.htmlhifive.testexplorer.api.MockFactory">
 		<constructor-arg value="com.htmlhifive.testexplorer.entity.ConfigRepository" />
 	</bean>
+	<bean id="mockProcessedImageRepository" class="com.htmlhifive.testexplorer.api.MockFactory">
+		<constructor-arg value="com.htmlhifive.testexplorer.entity.ProcessedImageRepository" />
+	</bean>
 	<bean id="mockHttpServlet" class="org.springframework.mock.web.MockHttpServletRequest">
 	</bean>
 </beans>

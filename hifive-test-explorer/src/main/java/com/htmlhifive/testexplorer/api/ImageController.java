@@ -3,15 +3,17 @@
  */
 package com.htmlhifive.testexplorer.api;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -26,11 +28,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.htmlhifive.testexplorer.cache.BackgroundImageDispatcher;
+import com.htmlhifive.testexplorer.cache.CacheTaskQueue;
+import com.htmlhifive.testexplorer.cache.ProcessedImageUtility;
 import com.htmlhifive.testexplorer.entity.ConfigRepository;
+import com.htmlhifive.testexplorer.entity.ProcessedImageRepository;
+import com.htmlhifive.testexplorer.entity.Repositories;
 import com.htmlhifive.testexplorer.entity.Screenshot;
 import com.htmlhifive.testexplorer.entity.ScreenshotRepository;
-import com.htmlhifive.testexplorer.entity.TestExecution;
 import com.htmlhifive.testexplorer.entity.TestExecutionRepository;
+import com.htmlhifive.testexplorer.file.ImageFileUtility;
 import com.htmlhifive.testexplorer.image.EdgeDetector;
 import com.htmlhifive.testlib.image.utlity.ImageUtility;
 
@@ -44,12 +51,50 @@ public class ImageController {
 	private ScreenshotRepository screenshotRepo;
 	@Autowired
 	private TestExecutionRepository testExecutionRepo;
+	@Autowired
+	private ProcessedImageRepository processedImageRepo;
 
 	@Autowired
 	private HttpServletRequest request;
 
 	@SuppressWarnings("unused")
 	private static Logger log = LoggerFactory.getLogger(ImageController.class);
+	
+	protected ImageFileUtility imageFileUtil;
+	private CacheTaskQueue cacheTaskQueue;
+	private BackgroundImageDispatcher backgroundImageDispatcher;
+
+	/**
+	 * This method is called by spring after auto wiring.
+	 *
+	 * Do initialization here.
+	 */
+	@PostConstruct
+	public void init()
+	{
+		Repositories repositories = new Repositories(configRepo, processedImageRepo, screenshotRepo, testExecutionRepo);
+		this.imageFileUtil = new ImageFileUtility(repositories);
+
+		this.cacheTaskQueue = new CacheTaskQueue();
+		this.backgroundImageDispatcher = new BackgroundImageDispatcher(repositories, cacheTaskQueue);
+		/* start background worker */
+		this.backgroundImageDispatcher.start();
+	}
+
+	/**
+	 * This method is called when the application is about to die.
+	 * 
+	 * Cleanup things.
+	 * 
+	 * @throws InterruptedException
+	 */
+	@PreDestroy
+	public void destory() throws InterruptedException
+	{
+		this.backgroundImageDispatcher.requestStop();
+		this.cacheTaskQueue.interruptAndJoin();
+		this.backgroundImageDispatcher.join();
+	}
 
 	/**
 	 * Get the image from id.
@@ -69,7 +114,7 @@ public class ImageController {
 
 		// Send PNG image
 		try {
-			File file = getFile(screenshot);
+			File file = imageFileUtil.getFile(screenshot);
 			sendFile(file, response);
 		} catch (IOException e) {
 			response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
@@ -104,6 +149,13 @@ public class ImageController {
 				} catch (NumberFormatException nfe) { }
 			}
 
+			File cachedFile = imageFileUtil.searchProcessedImageFile(id, ProcessedImageUtility.getAlgorithmNameForEdge(colorIndex));
+			if (cachedFile != null)
+			{
+				sendFile(cachedFile, response);
+				return;
+			}
+
 			switch (colorIndex) {
 			case 0:
 				edgeDetector.setForegroundColor(new Color(255, 0, 0, 255));
@@ -113,7 +165,7 @@ public class ImageController {
 				break;
 			}
 
-			BufferedImage image = ImageIO.read(getFile(screenshot));
+			BufferedImage image = ImageIO.read(imageFileUtil.getFile(screenshot));
 			BufferedImage edgeImage = edgeDetector.DetectEdge(image);
 			sendImage(edgeImage, response);
 		} catch (IOException e) {
@@ -164,8 +216,8 @@ public class ImageController {
 		}
 
 		try {
-			File source = getFile(sourceScreenshot);
-			File target = getFile(targetScreenshot);
+			File source = imageFileUtil.getFile(sourceScreenshot);
+			File target = imageFileUtil.getFile(targetScreenshot);
 
 			// Create a partial image
 			BufferedImage actual = ImageIO.read(source);
@@ -184,40 +236,6 @@ public class ImageController {
 		}
 	}
 
-	/**
-	 * Convert relativePath from DB into absolute path 
-	 * 
-	 * @param relativePath
-	 * @return converted path
-	 */
-	public String getAbsoluteFilePath(String relativePath) {
-		File file = new File(configRepo.findOne(ConfigRepository.ABSOLUTE_PATH_KEY).getValue(),
-				relativePath);
-		return file.getPath();
-	}
-
-	/**
-	 * Get the file of a screenshot
-	 * 
-	 * @param screenshot the input screenshot
-	 * @return a file related with the input screenshot 
-	 * @throws FileNotFoundException
-	 */
-	protected File getFile(Screenshot screenshot) throws FileNotFoundException {
-		TestExecution testExecution = testExecutionRepo.findOne(screenshot.getTestExecutionId());
-		String relativePath =
-				"images" +
-				File.separatorChar +
-				testExecution.getTimeString() +
-				File.separatorChar +
-				screenshot.getTestClass() +
-				File.separatorChar +
-				screenshot.getFileName() + ".png";
-
-		File file = new File(getAbsoluteFilePath(relativePath));
-		if (!file.exists() || !file.isFile()) { throw new FileNotFoundException(file.getAbsolutePath() + " Not Found."); }
-		return file;
-	}
 
 	/**
 	 * Send a file over http response
