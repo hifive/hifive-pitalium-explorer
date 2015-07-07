@@ -1,7 +1,7 @@
-<!--Copyright (C) 2015 NS Solutions Corporation, All Rights Reserved.  -->
 <!doctype html>
 <html>
 <head>
+	<!--Copyright (C) 2015 NS Solutions Corporation, All Rights Reserved.  -->
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -21,28 +21,50 @@
 	<script src="res/lib/hifive/ejs-h5mod.js" data-h5-module="hifive:ejs"></script>
 	<script src="res/lib/hifive/h5.js" data-h5-module="hifive"></script>
 
-<!-- 	<script src="res/lib/h5devtool/h5.devtool.js"></script> -->
-
 	<script src="src/common/constant.js"></script>
 	<script src="src/common/util.js"></script>
 	<script src="src/list.js"></script>
 
-	<script type="text/ejs" id="testExectionTimeListTemplate">
-			<div class="panel-group" id="testExectionTimeAccordion" role="tablist" aria-multiselectable="true">
+	<script type="text/ejs" id="testExecutionListTemplate">
+			<div class="panel-group" id="testExecutionAccordion" role="tablist" aria-multiselectable="true">
 				[%
-					for (var i = 0, len = testExectionTimes.length; i < len; i++) {
-						var testExectionTime = testExectionTimes[i];
+					var testExecutions = testExecutionsPage.content;
+					for (var i = 0, len = testExecutions.length; i < len; i++) {
+						var testExecution = testExecutions[i].testExecution;
+						var passedCount = testExecutions[i].passedCount;
+						var totalCount = testExecutions[i].totalCount;
+						var passedPercentage = parseInt(passedCount / totalCount * 100);
 						var headerTarget = 'heading' + i;
 						var collapseTarget = 'collapse' + i;
 				%]
-				<div class="panel panel-default explorer-collapsable" data-execution-time="[%= testExectionTime.executionTime %]">
+				<div class="panel panel-default explorer-collapsable" data-test-execution-id="[%= testExecution.id %]">
 					<div class="panel-heading" role="tab" id="[%= headerTarget %]">
-						<h4 class="panel-title">
-							<a data-toggle="collapse" data-parent="#testExectionTimeAccordion" href="#[%= collapseTarget %]"
-								aria-expanded="false" aria-controls="[%= collapseTarget %]">
-								[%= testExectionTime.executionTime %]
-							</a>
-						</h4>
+						<div class="panel-title row">
+							<div class="col-xs-6">
+								<a data-toggle="collapse" data-parent="#testExecutionAccordion" href="#[%= collapseTarget %]"
+									aria-expanded="false" aria-controls="[%= collapseTarget %]">
+									[%= testExecution.timeString %]
+								</a>
+							</div>
+							<div class="col-xs-2 text-center">
+								[%= passedCount %] / [%= totalCount %]
+							</div>
+							<div class="col-xs-3">
+								<div class="progress">
+									<div class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100"
+										aria-valuenow="[%= passedPercentage %]"
+										style="width: [%= passedPercentage %]%;">
+									</div>
+								</div>
+							</div>
+							<div class="col-xs-1">
+								[% if (passedCount == totalCount) { %]
+									<img class="test-result-icon" src="res/img/checkmark.png" alt="○" aria-label="All tests passed">
+								[% } else { %]
+									<img class="test-result-icon" src="res/img/xmark.png" alt="×" aria-label="Some tests failed">
+								[% } %]
+							</div>
+						</div>
 					</div>
 					<div id="[%= collapseTarget %]" class="panel-collapse collapse" role="tabpanel"
 						aria-labelledby="[%= headerTarget %]">
@@ -53,29 +75,76 @@
 				</div>
 				[% } %]
 			</div>
+			<div class="page-bar">
+				<div>
+					<ul class="pagination">
+					[%
+						var currentPage = testExecutionsPage.number + 1;
+						var totalPages = testExecutionsPage.totalPages;
+						if (!testExecutionsPage.first) {
+							%]<li><a class="btn-page btn-first-page" href="#0" data-page="1">&lt;&lt;</a></li>[%
+						} else {
+							%]<li class="disabled"><a>&lt;&lt;</a></li>[%
+						}
+					%]
+					[%
+						var start = Math.max(1, currentPage - 5);
+						var end = Math.min(totalPages, currentPage + 5);
+						var size = testExecutionsPage.size;
+						for (var i = start; i <= end; i++) {
+							if (i != currentPage) {
+								%]<li><a class="btn-page" href="#[%= (i-1)*size %]" data-page="[%= i %]">[%= i %]</a></li>[%
+							} else {
+								%]<li class="active"><a>[%= i %]</a></li>[%
+							}
+						}
+					%]
+					[%
+						if (!testExecutionsPage.last) {
+							%]<li><a class="btn-page btn-last-page" href="#[%= (totalPages-1)*size %]" data-page="[%= totalPages %]">&gt;&gt;</a></li>[%
+						} else {
+							%]<li class="disabled"><a>&gt;&gt;</a></li>[%
+						}
+					%]
+					</ul>
+				</div>
+
+				<div class="page-info">
+				[%= testExecutionsPage.number + 1 %] / [%= testExecutionsPage.totalPages %]
+				</div>
+			</div>
 	</script>
-	<script type="text/ejs" id="testResultListTemplate">
+	<script type="text/ejs" id="screenshotListTemplate">
 		<table class="table table-striped table-hover">
 			<thead>
 				<tr>
-					<th>Test method name</th>
-					<th>ScreenShot ID</th>
+					<th>Test method</th>
+					<th>Test screen</th>
 					<th>Platform</th>
 					<th>Browser name</th>
-					<th>Test result</th>
+					<th>Comparison result</th>
 				</tr>
 			</thead>
 			<tbody>
 				[%
-					for (var i = 0; i < testResults.length; i++) {
-						var testResult = testResults[i];
+					for (var i = 0; i < screenshots.length; i++) {
+						var screenshot = screenshots[i];
 				%]
-				<tr class="explorer-test-result" data-test-result-id="[%= testResult.id %]">
-					<td>[%= testResult.testMethod %]</td>
-					<td>[%= testResult.screenShotId %]</td>
-					<td>[%= testResult.platform %]</td>
-					<td>[%= testResult.browserName %]</td>
-					<td>[%= testResult.comparisonResult ? "○" : testResult.comparisonResult == null ? "-" : "×" %]</td>
+				<tr class="explorer-test-result" data-screenshot-id="[%= screenshot.id %]">
+					<td>[%= screenshot.testMethod %]</td>
+					<td>[%= screenshot.testScreen %]</td>
+					<td>[%= screenshot.testEnvironment.platform %]</td>
+					<td>[%= screenshot.testEnvironment.browserName %]</td>
+					<td>[%
+						if (screenshot.comparisonResult === true) {
+							%]<img class="test-result-icon" src="res/img/checkmark.png" alt="○" aria-label="Passed">[%
+						}
+						else if (screenshot.comparisonResult === false) {
+							%]<img class="test-result-icon" src="res/img/xmark.png" alt="×" aria-label="Failed">[%
+						} else {
+							%]-[%
+						}
+					%]</td>
 				</tr>
 				[% } %]
 			</tbody>
@@ -87,14 +156,6 @@
 		<nav class="navbar navbar-default navbar-fixed-top">
 			<div class="container">
 				<div class="navbar-header">
-					<!--
-					<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-						<span class="sr-only">Toggle navigation</span>
-						<span class="icon-bar"></span>
-						<span class="icon-bar"></span>
-						<span class="icon-bar"></span>
-					</button>
-					 -->
 					<a class="navbar-brand" href="list.html">hifiveTestResultExplorer</a>
 				</div>
 			</div>
@@ -109,18 +170,33 @@
 			<div class="collapse" id="searchPanel">
 				<form id="searchTest" class="form-inline">
 					<div class="form-group">
-						<label for="searchCriteria">Criteria</label>
-						<input type="text" id="searchCriteria" name="criteria" class="form-control" placeholder="Criteria">
+						<label for="searchTestMethod">Test Method</label>
+						<input type="text" id="searchTestMethod" name="searchTestMethod" class="form-control" placeholder="Test method to search">
 					</div>
 					<div class="form-group">
-						<label for="search2">Search2</label>
-						<input type="text" id="search2" name="search2" class="form-control" placeholder="search2">
+						<label for="searchTestScreen">Test Screen</label>
+						<input type="text" id="searchTestScreen" name="searchTestScreen" class="form-control" placeholder="Test screen to search">
 					</div>
 					<button type="submit" class="btn btn-default">Search</button>
 				</form>
 			</div>
-			<div id="testExectionTimeList">
-				<!-- Template contents of "id="testExectionTimeList"" will be shown here -->
+
+			<div id="testExecutionList"></div>
+
+			<div class="well">
+				<div class="row">
+					<div class="col-sm-6 input-group">
+						<label class="input-group-addon" for="select-page-size">Number of items per page</label>
+						<select class="form-control" id="select-page-size">
+							<option value="5">5</option>
+							<option value="10">10</option>
+							<option value="20" selected>20</option>
+							<option value="50">50</option>
+							<option value="100">100</option>
+							<option value="-1">All</option>
+						</select>
+					</div>
+				</div>
 			</div>
 		</div>
 	</body>

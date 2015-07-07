@@ -1,5 +1,15 @@
+# Ignore binraies and build results
 /target/
 /work/
 /db/hsqldb/db/
+/db/hsqldb/images/
+/db/hsqldb/processed-images/
 /lib/
 /bin/
+/src/main/webapp/WEB-INF/classes
+/src/test/resources/processed-images/
+
+# Misc
+*.iml
+.idea
+.#webclasspath

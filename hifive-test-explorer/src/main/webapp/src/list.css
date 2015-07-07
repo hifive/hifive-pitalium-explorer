@@ -4,6 +4,29 @@
 
 @charset "utf-8";
 
-#testExectionTimeList {
+#testExecutionList {
 	margin-top: 20px;
+}
+
+.explorer-test-result {
+	cursor: pointer;
+}
+
+.explorer-test-result:hover {
+	text-decoration: underline;
+}
+
+.test-result-icon {
+	width: 17px;
+	height: 17px;
+}
+
+.page-bar {
+	display: block;
+	width: 100%;
+	text-align: center;
+}
+
+.panel-title .progress {
+	margin: 0;
 }

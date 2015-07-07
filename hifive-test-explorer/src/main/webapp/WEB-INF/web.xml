@@ -53,8 +53,12 @@
 	<!-- define a mapping from a URL path to a servlet declaration with the <servlet-mapping> element. -->
 	<servlet-mapping>
 		<servlet-name>appServlet</servlet-name>
-		<url-pattern>/*</url-pattern>
+		<url-pattern>/</url-pattern>
 	</servlet-mapping>
+
+	<welcome-file-list>
+		<welcome-file>index.html</welcome-file>
+	</welcome-file-list>
 
 	<!-- define the parameters of the Web application session. -->
 	<session-config>

@@ -8,8 +8,23 @@ import org.springframework.data.repository.query.Param;
 
 public interface ScreenshotRepository extends JpaRepository<Screenshot, Integer> {
 
-	@Query("select s from Screenshot as s, TestCaseResult as r "
-			+ "where r.executeTime = :executeTime and s.testCaseResult = r.id "
-			+ "order by s.result asc")
-	public List<Screenshot> find(@Param("executeTime") String executeTime);
+	public List<Screenshot> findByTestExecutionIdAndTestMethodContainingAndTestScreenContaining(
+			Integer testExecutionId,
+			String testMethod,
+			String testScreen);
+
+	@Query("SELECT s " +
+			"FROM Screenshot AS s " +
+			"WHERE s.id > :from " +
+			"AND 3 > (" +
+				"SELECT COUNT(*) " +
+				"FROM ProcessedImage AS p " +
+				"WHERE s.id = p.screenshotId " +
+				"AND ( " +
+					"p.algorithm = 'edge' " +
+					"OR p.algorithm = 'edge_0' " +
+					"OR p.algorithm = 'edge_1' )) " +
+			"ORDER BY s.id desc" /* from recent to older */
+			)
+	public List<Screenshot> findNotProcessedEdge(@Param("from") Integer from);
 }

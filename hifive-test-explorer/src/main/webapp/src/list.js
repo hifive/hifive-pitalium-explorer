@@ -16,72 +16,79 @@
 		__name: 'hifive.test.explorer.logic.TestResultListLogic',
 
 		/**
-		 * Gets a list of test exection time.
-		 * 
+		 * The number of items to show in one page.
+		 *
+		 * @type Number
 		 * @memberOf hifive.test.explorer.logic.TestResultListLogic
-		 * @returns {JqXHRWrapper}
 		 */
-		getTestExectionTimeList: function() {
-			return h5.ajax({
-				type: 'get',
-				dataType: 'json',
-				url: hifive.test.explorer.utils.formatUrl('api/listTestExectionTime')
-			});
-		},
+		pageSize: 20,
 
 		/**
-		 * Gets a list of test exection time which is narrowed down by parameters.
+		 * The 0-based index of the item at the top of the current page.
+		 *
+		 * @type Number
+		 * @memberOf hifive.test.explorer.logic.TestResultListLogic
+		 */
+		pageStart: 0,
+
+		/**
+		 * The search keyword for test method.
+		 *
+		 * @type String
+		 * @memberOf hifive.test.explorer.logic.TestResultListLogic
+		 */
+		searchTestMethod: "",
+
+		/**
+		 * The search keyword for test screen.
+		 *
+		 * @type String
+		 * @memberOf hifive.test.explorer.logic.TestResultListLogic
+		 */
+		searchTestScreen: "",
+
+		/**
+		 * Gets a list of test execution.
 		 * 
 		 * @memberOf hifive.test.explorer.logic.TestResultListLogic
-		 * @param {Object} params search parameters
-		 * @return {JqXHRWrapper}
+		 * @param {Number} page desired
+		 * @returns {JqXHRWrapper}
 		 */
-		getTestExectionTimeListWithParams: function(params) {
-			var data = {};
-			this._copyObjectByKey(params, data, ['criteria']);
+		getTestExecutionList: function(page) {
+			var data = {
+				'page': page,
+				'limit': this.pageSize,
+				'searchTestMethod': this.searchTestMethod,
+				'searchTestScreen': this.searchTestScreen,
+			};
 
 			return h5.ajax({
 				type: 'get',
 				dataType: 'json',
-				url: 'api/listTestExectionTime/search',
+				url: hifive.test.explorer.utils.formatUrl('api/listTestExecution'),
 				data: data
 			});
 		},
 
 		/**
-		 * Gets a list of test result details.
+		 * Gets a list of screenshots.
 		 * 
 		 * @memberOf hifive.test.explorer.logic.TestResultListLogic
-		 * @param {string} executionTime The time the test was run.
+		 * @param {string} testExecutionId The time the test was run.
 		 * @returns {JqXHRWrapper}
 		 */
-		getTestResultList: function(executionTime) {
+		getScreenshotList: function(testExecutionId) {
 			return h5.ajax({
 				type: 'get',
 				dataType: 'json',
-				url: 'api/listTestResult',
+				url: 'api/listScreenshot',
 				data: {
-					executionTime: executionTime
+					testExecutionId: testExecutionId,
+					searchTestMethod: this.searchTestMethod,
+					searchTestScreen: this.searchTestScreen,
 				}
 			});
 		},
-
-		/**
-		 * Copy values which are specified by "keys" parameter from one object to other.
-		 * 
-		 * @memberOf hifive.test.explorer.logic.TestResultListLogic
-		 * @param {Object} from The object copy from.
-		 * @param {Object} to The object copy to.
-		 * @param {Array} keys
-		 */
-		_copyObjectByKey: function(from, to, keys) {
-			for ( var index in keys) {
-				var key = keys[index];
-				if (from.hasOwnProperty(key)) {
-					to[key] = from[key];
-				}
-			}
-		}
 	};
 	h5.core.expose(testResultListLogic);
 })(jQuery);
@@ -109,30 +116,18 @@
 
 		/**
 		 * Called after the controller has been initialized.<br>
-		 * Load list of test exection time asynchronously and update views.
+		 * Load list of test execution time asynchronously and update views.
 		 * 
 		 * @memberOf hifive.test.explorer.controller.TestResultListController
 		 */
 		__ready: function() {
-			var indicator = this.indicator({
-				message: 'Loading...',
-				target: document
-			}).show();
-
-			// Load list of test exection time
-			this._testResultListLogic.getTestExectionTimeList().done(
-					this.own(function(testExectionTimeList) {
-						// Update views
-						this.view.update('#testExectionTimeList', 'testExectionTimeListTemplate', {
-							testExectionTimes: testExectionTimeList
-						});
-					})).always(function() {
-				indicator.hide();
-			});
+			this.collectSearchParameters();
+			this.onHashChange();
+			$(window).on('hashchange', this.own(this.onHashChange));
 		},
 
 		/**
-		 * Called when a label of test execution time has been clicked.<br>
+		 * Called when a label of test execution has been clicked.<br>
 		 * Load list of test results of selected item asynchronously, and update views.
 		 * 
 		 * @memberOf hifive.test.explorer.controller.TestResultListController
@@ -146,7 +141,7 @@
 			if ($panelBody.hasClass('hifive.test.explorer-load'))
 				return;
 
-			var executionTime = $el.data('executionTime');
+			var testExecutionId = $el.data('testExecutionId');
 
 			$panelBody.addClass('hifive.test.explorer-load');
 
@@ -156,11 +151,11 @@
 				target: document
 			}).show();
 
-			this._testResultListLogic.getTestResultList(executionTime).done(
-					this.own(function(testResultList) {
+			this._testResultListLogic.getScreenshotList(testExecutionId).done(
+					this.own(function(screenshotList) {
 						// Update views
-						this.view.update($panelBody, 'testResultListTemplate', {
-							testResults: testResultList
+						this.view.update($panelBody, 'screenshotListTemplate', {
+							screenshots: screenshotList
 						});
 					})).always(function() {
 				indicator.hide();
@@ -176,7 +171,7 @@
 		 * @param {jQuery} $el the event target element
 		 */
 		'.explorer-test-result click': function(context, $el) {
-			var id = $el.data('testResultId');
+			var id = $el.data('screenshotId');
 			var url = hifive.test.explorer.utils.formatUrl('diff.html', {
 				id: id
 			});
@@ -220,32 +215,94 @@
 			// Stop submit
 			context.event.preventDefault();
 
-			// Collect search parameters
+			this.collectSearchParameters($el);
+			window.location.hash = '';
+		},
+
+		/**
+		 * Called when the page size select value has been changed. Updates view.
+		 *
+		 * @memberOf hifive.test.explorer.controller.TestResultListController
+		 * @param {Object} context the event context
+		 * @param {jQuery} $el the event target element
+		 */
+		'#select-page-size change': function(context, $el) {
+			var pageSize = $el.val();
+			var pageStart = this._testResultListLogic.pageStart;
+			this.updatePageSize(pageSize, pageStart);
+		},
+
+		/**
+		 * Called when the page link has been clicked. Update view.
+		 *
+		 * @memberOf hifive.test.explorer.controller.TestResultListController
+		 */
+		onHashChange: function(){
+			var pageSize = $("#select-page-size").val();
+			var pageStart = Math.max(0, parseInt(window.location.hash.substr(1)));
+			if (isNaN(pageStart)) { pageStart = 0; }
+
+			this.updatePageSize(pageSize, pageStart);
+		},
+
+		/**
+		 * Collect search keyword parameters and save them to logic.
+		 *
+		 * @memberOf hifive.test.explorer.controller.TestResultListController
+		 * @param {jQuery} $el the search element
+		 */
+		collectSearchParameters: function($el) {
+			if (typeof($el) == 'undefined') {
+				$el = this.$find('#searchTest');
+			}
+
 			var params = {};
 			$el.find('input').each(function(index) {
 				var $elem = $(this);
 				params[$elem.attr('name')] = $elem.val();
 			});
 
-			// Show indicator
+			this._testResultListLogic.searchTestMethod = params['searchTestMethod'];
+			this._testResultListLogic.searchTestScreen = params['searchTestScreen'];
+		},
+
+		/**
+		 * Set pageSize and pageStart, and update view.
+		 *
+		 * @memberOf hifive.test.explorer.controller.TestResultListController
+		 * @param {number} pageSize new page size
+		 * @param {number} pageStart new page start
+		 */
+		updatePageSize: function(pageSize, pageStart) {
+			// update pagination parameters
+			this._testResultListLogic.pageStart = pageStart;
+			this._testResultListLogic.pageSize = pageSize;
+			var page = 1 + Math.floor(pageStart / pageSize);
+			this.loadTestExecutionList(page);
+		},
+
+		/**
+		 * Load test execution list from server and update view.
+		 *
+		 * @memberOf hifive.test.explorer.controller.TestResultListController
+		 * @param {number} page desired page number
+		 */
+		loadTestExecutionList: function(page) {
 			var indicator = this.indicator({
 				message: 'Loading...',
 				target: document
 			}).show();
 
-			// Reset views
-			this.$find('#testExectionTimeList').empty();
-
-			// Search test results
-			this._testResultListLogic.getTestExectionTimeListWithParams(params).done(
-					this.own(function(testExectionTimeList) {
-						this.view.update('#testExectionTimeList', 'testExectionTimeList', {
-							testExectionTimes: testExectionTimeList
-						});
-					})).always(function() {
+			// Load list of test execution
+			this._testResultListLogic.getTestExecutionList(page).done(this.own(function(response) {
+				// Update views
+				this.view.update('#testExecutionList', 'testExecutionListTemplate', {
+					testExecutionsPage: response
+				});
+			})).always(function() {
 				indicator.hide();
 			});
-		}
+		},
 	};
 	h5.core.expose(testResultListController);
 })(jQuery);
