@@ -1,3 +1,6 @@
+/*
+ * Copyright (C) 2015 NS Solutions Corporation, All Rights Reserved.
+ */
 (function() {
 	var apiController = {
 		__name: 'com.htmlhifive.testresultexplorer.apiController',

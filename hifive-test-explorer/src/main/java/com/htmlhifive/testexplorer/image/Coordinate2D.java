@@ -1,3 +1,6 @@
+/*
+ * Copyright (C) 2015 NS Solutions Corporation, All Rights Reserved.
+ */
 package com.htmlhifive.testexplorer.image;
 
 public class Coordinate2D<T> {
