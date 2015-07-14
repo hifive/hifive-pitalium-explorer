@@ -12,6 +12,8 @@
 	<context:property-placeholder
 		location="classpath:appConf/*.properties" />
 
+	<util:properties id="apiConf" location="classpath:appConf/api-conf.properties"/>
+
 	<!-- Settings to access to the database. -->
 	<import resource="database.xml" />
 

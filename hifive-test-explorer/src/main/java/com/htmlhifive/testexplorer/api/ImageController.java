@@ -31,6 +31,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.htmlhifive.testexplorer.cache.BackgroundImageDispatcher;
 import com.htmlhifive.testexplorer.cache.CacheTaskQueue;
 import com.htmlhifive.testexplorer.cache.ProcessedImageUtility;
+import com.htmlhifive.testexplorer.conf.ApplicationConfig;
 import com.htmlhifive.testexplorer.entity.ConfigRepository;
 import com.htmlhifive.testexplorer.entity.ProcessedImageRepository;
 import com.htmlhifive.testexplorer.entity.Repositories;
@@ -44,7 +45,8 @@ import com.htmlhifive.testlib.image.utlity.ImageUtility;
 @Controller
 @RequestMapping("/image")
 public class ImageController {
-
+	@Autowired
+	private ApplicationConfig config;
 	@Autowired
 	private ConfigRepository configRepo;
 	@Autowired
@@ -70,15 +72,16 @@ public class ImageController {
 	 * Do initialization here.
 	 */
 	@PostConstruct
-	public void init()
-	{
+	public void init() {
 		Repositories repositories = new Repositories(configRepo, processedImageRepo, screenshotRepo, testExecutionRepo);
 		this.imageFileUtil = new ImageFileUtility(repositories);
-
-		this.cacheTaskQueue = new CacheTaskQueue();
-		this.backgroundImageDispatcher = new BackgroundImageDispatcher(repositories, cacheTaskQueue);
-		/* start background worker */
-		this.backgroundImageDispatcher.start();
+	
+		if (config.isDiffImageCacheOn()) {
+			this.cacheTaskQueue = new CacheTaskQueue();
+			this.backgroundImageDispatcher = new BackgroundImageDispatcher(repositories, cacheTaskQueue);
+			/* start background worker */
+			this.backgroundImageDispatcher.start();
+		}
 	}
 
 	/**
@@ -91,9 +94,11 @@ public class ImageController {
 	@PreDestroy
 	public void destory() throws InterruptedException
 	{
-		this.backgroundImageDispatcher.requestStop();
-		this.cacheTaskQueue.interruptAndJoin();
-		this.backgroundImageDispatcher.join();
+		if (config.isDiffImageCacheOn()) {
+			this.backgroundImageDispatcher.requestStop();
+			this.cacheTaskQueue.interruptAndJoin();
+			this.backgroundImageDispatcher.join();
+		}
 	}
 
 	/**
