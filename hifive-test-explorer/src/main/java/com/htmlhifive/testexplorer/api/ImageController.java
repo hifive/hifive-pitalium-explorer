@@ -40,7 +40,8 @@ import com.htmlhifive.testexplorer.entity.ScreenshotRepository;
 import com.htmlhifive.testexplorer.entity.TestExecutionRepository;
 import com.htmlhifive.testexplorer.file.ImageFileUtility;
 import com.htmlhifive.testexplorer.image.EdgeDetector;
-import com.htmlhifive.testlib.image.utlity.ImageUtility;
+import com.htmlhifive.testlib.image.model.DiffPoints;
+import com.htmlhifive.testlib.image.util.ImageUtils;
 
 @Controller
 @RequestMapping("/image")
@@ -229,11 +230,11 @@ public class ImageController {
 			BufferedImage expected = ImageIO.read(target);
 
 			// Compare.
-			List<Point> diffPoints = ImageUtility.compareImages(expected, null, actual, null, null, null);
-			if (diffPoints.isEmpty()) {
+			DiffPoints diffPoints = ImageUtils.compare(expected, null, actual, null, null);
+			if (!diffPoints.isFailed()) {
 				sendFile(source, response);
 			} else {
-				BufferedImage marked = ImageUtility.getMarkedImage(actual, diffPoints);
+				BufferedImage marked = ImageUtils.getMarkedImage(actual, diffPoints);
 				sendImage(marked, response);
 			}
 		} catch (IOException e) {
