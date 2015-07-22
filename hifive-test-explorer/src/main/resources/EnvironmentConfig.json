@@ -1,0 +1,7 @@
+{
+	"execMode": "SET_EXPECTED",
+	"hubHost": "localhost",
+	"maxThreadExecuteTime": 3600,
+	"capabilitiesFilePath": "capabilities.json",
+	"persister": "com.htmlhifive.testexplorer.io.ExplorerDBPersister"
+}
