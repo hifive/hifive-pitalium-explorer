@@ -14,12 +14,46 @@ public interface ExplorerPersister extends Persister {
 
 	int defaultPageSize = 20;
 
+	/**
+	 * TestExecutionのリストを取得する。
+	 * 
+	 * 引数のメソッド名、スクリーンショットを含む（like検索）Screenshotを持つ TestExecutionのリストを取得する。
+	 * 
+	 * @param searchTestMethod メソッド名
+	 * @param searchTestScreen スクリーンショット
+	 * @param page 表示ページ番号
+	 * @param pageSize 1ページあたりの表示数
+	 * @return TestExecutionのリスト
+	 */
 	Page<TestExecutionResult> findTestExecution(String searchTestMethod, String searchTestScreen, int page, int pageSize);
 
+	/**
+	 * Screenshotのリストを取得する。
+	 * 
+	 * 引数のメソッド名、スクリーンショットを含む（like検索）Screenshotのリストを取得する。
+	 * 
+	 * @param testExecutionId テスト実行ID
+	 * @param searchTestMethod メソッド名
+	 * @param searchTestScreen スクリーンショット
+	 * @return Screenshotのリスト
+	 */
 	List<Screenshot> findScreenshot(Integer testExecutionId, String searchTestMethod, String searchTestScreen);
 	
+	/**
+	 * Screenshotを取得する。
+	 * 
+	 * @param screenshotid スクリーンショットID
+	 * @return Screenshot
+	 */
 	Screenshot getScreenshot(Integer screenshotid);
 
+	/**
+	 * 画像ファイルを取得する。
+	 * 
+	 * @param id スクリーンショットID
+	 * @return 画像ファイル
+	 * @throws IOException
+	 */
 	File getImage(Integer id) throws IOException;
 
 	File searchProcessedImageFile(Integer screenshotId, String algorithm);
