@@ -1,3 +1,6 @@
+/*
+ * Copyright (C) 2015 NS Solutions Corporation, All Rights Reserved.
+ */
 package com.htmlhifive.testexplorer.service;
 
 import java.awt.Color;
@@ -18,7 +21,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import com.htmlhifive.testexplorer.cache.ProcessedImageUtility;
 import com.htmlhifive.testexplorer.conf.ApplicationConfig;
 import com.htmlhifive.testexplorer.entity.ConfigRepository;
 import com.htmlhifive.testexplorer.entity.ProcessedImageRepository;
