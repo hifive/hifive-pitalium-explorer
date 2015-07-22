@@ -74,14 +74,6 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 			pageSize = (int) Math.min(size, Integer.MAX_VALUE);
 		}
 
-		// TODO このタイミングで反転しない方が良いかも。
-		// 最新から並ぶようにソートする。
-		File[] tempFiles = collection.toArray(new File[size]);
-		File[] files = new File[size];
-		for (int i = 0; i <size; i++) {
-			files[size - i - 1] = tempFiles[i];
-		}
-
 		testExecutiontMap = new HashMap<>();
 		screenshotMap = new HashMap<>();
 		screenshotListMap = new HashMap<>();
@@ -92,6 +84,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 		Map<ScreenshotResult, Screenshot> workScreenshotMap = new HashMap<>();
 		
 		int screenshotId = 0;
+		File[] files = collection.toArray(new File[size]);
 		for (int i = 0, len = files.length; i < len; i++) {
 			PersistMetadata metadata = new PersistMetadata(
 					files[i].getParentFile().getParentFile().getName(), 
@@ -169,6 +162,14 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 			}
 		}
 
+		// 最新から並ぶようにソートする。
+		List<TestExecution> tempTestExecutionList = new ArrayList<>();
+		for (int i = size - 1; i >= 0 ; i--) {
+			tempTestExecutionList.add(testExecutionList.get(i));
+		}
+		testExecutionList = tempTestExecutionList;
+
+		// 表示ページ番号、ページ表示数に合わせてリストを作成する。
 		List<TestExecutionResult> resultList = new ArrayList<TestExecutionResult>();
 		for (int i = (page - 1) * pageSize; i < Math.min(page * pageSize, size); i++) {
 			TestExecution execution = testExecutionList.get(i);
@@ -185,7 +186,6 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 			TestExecutionResult testExecutionResult = new TestExecutionResult(
 					execution, Long.valueOf(passedCount), Long.valueOf(totalCount));
 			resultList.add(testExecutionResult);
-
 		}
 
 		PageRequest pageable = new PageRequest(page - 1, pageSize);
