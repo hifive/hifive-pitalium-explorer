@@ -3,5 +3,5 @@
 	"hubHost": "localhost",
 	"maxThreadExecuteTime": 3600,
 	"capabilitiesFilePath": "capabilities.json",
-	"persister": "com.htmlhifive.testexplorer.io.ExplorerDBPersister"
+	"persister": "com.htmlhifive.testexplorer.io.ExplorerFilePersister"
 }

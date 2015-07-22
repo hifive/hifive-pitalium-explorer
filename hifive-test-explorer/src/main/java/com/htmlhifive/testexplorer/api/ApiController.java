@@ -5,14 +5,10 @@ package com.htmlhifive.testexplorer.api;
 
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
+import javax.annotation.PostConstruct;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -22,26 +18,20 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.htmlhifive.testexplorer.entity.Screenshot;
-import com.htmlhifive.testexplorer.entity.ScreenshotRepository;
-import com.htmlhifive.testexplorer.entity.TestExecutionRepository;
 import com.htmlhifive.testexplorer.response.TestExecutionResult;
+import com.htmlhifive.testexplorer.service.ExplorerService;
 
 @Controller
 @RequestMapping("/api")
 public class ApiController {
 
 	@Autowired
-	private TestExecutionRepository testExecutionRepo;
-	@Autowired
-	private ScreenshotRepository screenshotRepo;
-
-	@Autowired
-	private HttpServletRequest request;
-
-	@SuppressWarnings("unused")
-	private static Logger log = LoggerFactory.getLogger(ApiController.class);
+	private ExplorerService service;
 	
-	private static final int defaultPageSize = 20;
+	@PostConstruct
+	public void init() {
+		service.init();
+	}
 
 	/**
 	 * Gets list of the test execution.
@@ -60,14 +50,7 @@ public class ApiController {
 			@RequestParam(value = "limit", defaultValue = "0") int pageSize,
 			@RequestParam(defaultValue = "") String searchTestMethod,
 			@RequestParam(defaultValue = "") String searchTestScreen) {
-		if (pageSize == 0) {
-			pageSize = defaultPageSize;
-		}
-		else if (pageSize == -1) {
-			pageSize = (int)Math.min(testExecutionRepo.count(), Integer.MAX_VALUE);
-		}
-		PageRequest pageRequest = new PageRequest(page - 1, pageSize, new Sort(Sort.Direction.DESC, "id"));
-		Page<TestExecutionResult> list = testExecutionRepo.search(searchTestMethod, searchTestScreen, pageRequest);
+		Page<TestExecutionResult> list = service.findTestExecution(searchTestMethod, searchTestScreen, page, pageSize);
 		return new ResponseEntity<Page<TestExecutionResult>>(list, HttpStatus.OK);
 	}
 
@@ -83,8 +66,7 @@ public class ApiController {
 			@RequestParam Integer testExecutionId,
 			@RequestParam(defaultValue = "") String searchTestMethod,
 			@RequestParam(defaultValue = "") String searchTestScreen) {
-		List<Screenshot> list = screenshotRepo.findByTestExecutionIdAndTestMethodContainingAndTestScreenContaining(
-				testExecutionId, searchTestMethod, searchTestScreen);
+		List<Screenshot> list = service.findScreenshot(testExecutionId, searchTestMethod, searchTestScreen);
 		return new ResponseEntity<List<Screenshot>>(list, HttpStatus.OK);
 	}
 
@@ -97,7 +79,7 @@ public class ApiController {
 	@RequestMapping(value = "/getScreenshot", method = RequestMethod.GET, produces = "application/json;charset=utf-8")
 	@ResponseBody
 	public ResponseEntity<Screenshot> getDetail(@RequestParam Integer id) {
-		Screenshot item = screenshotRepo.findOne(id);
+		Screenshot item = service.getScreenshot(id);
 		return new ResponseEntity<Screenshot>(item, HttpStatus.OK);
 	}
 
