@@ -18,7 +18,7 @@ public interface TestExecutionRepository extends JpaRepository<TestExecution, In
 			"SUM(CASE WHEN s.comparisonResult = TRUE THEN 1 ELSE 0 END), " +
 			"COUNT(s.id) " +
 			") FROM TestExecution AS te, Screenshot AS s " +
-			"WHERE te.id = s.testExecutionId " +
+			"WHERE te.id = s.testExecution " +
 			"AND s.testMethod LIKE %:testMethod% " +
 			"AND s.testScreen LIKE %:testScreen% " +
 			"GROUP BY te.id ")

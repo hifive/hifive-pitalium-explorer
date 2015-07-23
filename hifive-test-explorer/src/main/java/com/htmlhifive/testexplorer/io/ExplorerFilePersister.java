@@ -41,7 +41,6 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 
 	private static Logger log = LoggerFactory.getLogger(ExplorerFilePersister.class);
 
-	private Map<Integer, TestExecution> testExecutiontMap;
 	private Map<Integer, Screenshot> screenshotMap;
 	private Map<Integer, List<Screenshot>> screenshotListMap;
 	
@@ -77,7 +76,6 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 			pageSize = (int) Math.min(size, Integer.MAX_VALUE);
 		}
 
-		testExecutiontMap = new HashMap<>();
 		screenshotMap = new HashMap<>();
 		screenshotListMap = new HashMap<>();
 		// 後続のページング処理用
@@ -99,7 +97,6 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 			DateTime dateTime = DateTimeFormat.forPattern("yyyy_MM_dd_HH_mm_ss")
 					.parseDateTime(testResult.getResultId());
 			testExecution.setTime(new Timestamp(dateTime.getMillis()));
-			testExecutiontMap.put(Integer.valueOf(i), testExecution);
 			testExecutionList.add(testExecution);
 
 			List<Screenshot> screenshotList = new ArrayList<>();
@@ -119,7 +116,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 				
 				screenshot.setFileName(getScreenshotImageFileName(metadata));
 				screenshot.setTestClass(screenshotResult.getTestClass());
-				screenshot.setTestExecutionId(Integer.valueOf(i));
+				screenshot.setTestExecution(testExecution);
 				screenshot.setTestMethod(screenshotResult.getTestMethod());
 				screenshot.setTestScreen(screenshotResult.getScreenshotId());
 				
@@ -215,7 +212,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 			return null;
 		}
 
-		TestExecution execution = testExecutiontMap.get(screenshot.getTestExecutionId());
+		TestExecution execution = screenshot.getTestExecution();
 		TestEnvironment env = screenshot.getTestEnvironment();
 		Map<String, String> capabilities = new HashMap<>();
 		capabilities.put("browserName", env.getBrowserName());

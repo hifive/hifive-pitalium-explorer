@@ -42,7 +42,7 @@ public class ImageFileUtility {
 	 * @throws FileNotFoundException
 	 */
 	public File getFile(Screenshot screenshot) throws FileNotFoundException {
-		TestExecution testExecution = repositories.getTestExecutionRepository().findOne(screenshot.getTestExecutionId());
+		TestExecution testExecution = screenshot.getTestExecution();
 		String relativePath =
 				testExecution.getTimeString() +
 				File.separatorChar +

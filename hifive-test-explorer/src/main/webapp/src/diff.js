@@ -4,7 +4,7 @@
 (function($) {
 	/**
 	 * This class is a &qout;logic&quot; for the test result comparison page.
-	 *
+	 * 
 	 * @class
 	 * @memberOf hifive.test.explorer.logic
 	 * @name TestResultDiffLogic
@@ -16,8 +16,8 @@
 		__name: 'hifive.test.explorer.logic.TestResultDiffLogic',
 
 		/**
-		 *
 		 * Get details of the screenshot.
+		 * 
 		 * @memberOf hifive.test.explorer.logic.TestResultDiffLogic
 		 * @param {string} id the id of the screenshot
 		 * @returns {JqXHRWrapper}
@@ -38,7 +38,7 @@
 (function($) {
 	/**
 	 * This class is a controller for the test result comparison page.
-	 *
+	 * 
 	 * @class
 	 * @memberOf hifive.test.explorer.controller
 	 * @name TestResultDiffController
@@ -51,7 +51,7 @@
 
 		/**
 		 * The &quot;Logic&quot; class
-		 *
+		 * 
 		 * @type Logic
 		 * @memberOf hifive.test.explorer.controller.TestResultDiffController
 		 */
@@ -60,7 +60,7 @@
 		/**
 		 * Called after the controller has been initialized.<br>
 		 * Get the id of the right screenshot, and update views.
-		 *
+		 * 
 		 * @memberOf hifive.test.explorer.controller.TestResultDiffController
 		 */
 		__ready: function() {
@@ -75,6 +75,10 @@
 
 			// Get screenshot details
 			this._testResultDiffLogic.getScreenshot(id).done(this.own(function(screenshot) {
+				this.view.update('#detail', 'testResultListTemplate', {
+					testResult: screenshot
+				});
+
 				// Expected mode
 				if (screenshot.expectedScreenshot == null) {
 					this._setActualImageSrc(false, {
@@ -125,7 +129,7 @@
 
 		/**
 		 * Swap actual/expected images
-		 *
+		 * 
 		 * @memberOf hifive.test.explorer.controller.TestResultDiffController
 		 */
 		'input[name=flip-image] change': function() {
@@ -139,7 +143,7 @@
 
 		/**
 		 * Show actual image.
-		 *
+		 * 
 		 * @memberOf hifive.test.explorer.controller.TestResultDiffController
 		 * @param {Boolean} withMarker whether or not to display the image with markers.
 		 * @param {Object} params extra paramters
@@ -150,7 +154,7 @@
 
 		/**
 		 * Show expected image.
-		 *
+		 * 
 		 * @memberOf hifive.test.explorer.controller.TestResultDiffController
 		 * @param {Boolean} withMarker whether or not to display the image with markers.
 		 * @param {Object} params extra paramters
@@ -167,71 +171,92 @@
 		 */
 		_initEdgeOverlapping: function(expectedId, actualId) {
 			// Initialize <canvas>
-			var expected = new Image(), actual = new Image();
+			var expected = new Image(),actual = new Image();
 
-			var d1 = $.Deferred(), d2 = $.Deferred();
+			var d1 = $.Deferred(),d2 = $.Deferred();
 			expected.onload = d1.resolve;
 			actual.onload = d2.resolve;
 
 			var format = hifive.test.explorer.utils.formatUrl;
-			expected.src = format('image/getProcessed', { id: expectedId, algorithm: 'edge', colorIndex: 1 });
-			actual.src = format('image/getProcessed', { id: actualId, algorithm: 'edge', colorIndex: 0 });
+			expected.src = format('image/getProcessed', {
+				id: expectedId,
+				algorithm: 'edge',
+				colorIndex: 1
+			});
+			actual.src = format('image/getProcessed', {
+				id: actualId,
+				algorithm: 'edge',
+				colorIndex: 0
+			});
 
-			$.when.apply($, [d1.promise(), d2.promise()]).done(function() {
-				var canvas = $('#edge-overlapping canvas')[0];
-				var native_width  = canvas.width  = expected.width;
-				var native_height = canvas.height = expected.height;
+			$.when.apply($, [d1.promise(), d2.promise()]).done(
+					function() {
+						var canvas = $('#edge-overlapping canvas')[0];
+						var native_width = canvas.width = expected.width;
+						var native_height = canvas.height = expected.height;
 
-				var context = canvas.getContext('2d');
-				context.globalCompositeOperation = 'multiply';
-				if (context.globalCompositeOperation == 'multiply') {
-					context.drawImage(expected, 0, 0);
-					context.drawImage(actual, 0, 0);
-					initImageMagnifier();
-				} else {
-					// IE workaround
-					var actualBlack = new Image();
-					actualBlack.onload = function() {
-						context.drawImage(expected, 0, 0);
-						context.globalCompositeOperation = 'source-atop';
-						context.drawImage(actualBlack, 0, 0);
-						context.globalCompositeOperation = 'destination-over';
-						context.drawImage(actual, 0, 0);
-						initImageMagnifier();
-					}
-					actualBlack.src = format('image/getProcessed', { id: actualId, algorithm: 'edge', colorIndex: 2 });
-				}
-
-				function initImageMagnifier() {
-					// Image magnifier
-					$('.large').css('background-image', 'url('+canvas.toDataURL('image/png')+')');
-					$('#edge-overlapping .image-overlay').mousemove(function(e) {
-						var magnify_offset = $(this).offset();
-						var mx = e.pageX - magnify_offset.left;
-						var my = e.pageY - magnify_offset.top;
-
-						if (mx < $(this).width() && my < $(this).height() && mx > 0 && my > 0) {
-							$('.large').fadeIn(100);
+						var context = canvas.getContext('2d');
+						context.globalCompositeOperation = 'multiply';
+						if (context.globalCompositeOperation == 'multiply') {
+							context.drawImage(expected, 0, 0);
+							context.drawImage(actual, 0, 0);
+							initImageMagnifier();
 						} else {
-							$('.large').fadeOut(100);
-						} if ($('.large').is(':visible')) {
-							var rx = Math.round(mx/$('.small').width()*native_width - $('.large').width()/2)*-1;
-							var ry = Math.round(my/$('.small').height()*native_height - $('.large').height()/2)*-1;
-
-							$('.large').css({
-								left: mx - $('.large').width()/2,
-								top: my - $('.large').height()/2,
-								backgroundPosition: rx + 'px ' + ry + 'px'
+							// IE workaround
+							var actualBlack = new Image();
+							actualBlack.onload = function() {
+								context.drawImage(expected, 0, 0);
+								context.globalCompositeOperation = 'source-atop';
+								context.drawImage(actualBlack, 0, 0);
+								context.globalCompositeOperation = 'destination-over';
+								context.drawImage(actual, 0, 0);
+								initImageMagnifier();
+							}
+							actualBlack.src = format('image/getProcessed', {
+								id: actualId,
+								algorithm: 'edge',
+								colorIndex: 2
 							});
 						}
+
+						function initImageMagnifier() {
+							// Image magnifier
+							$('.large').css('background-image',
+									'url(' + canvas.toDataURL('image/png') + ')');
+							$('#edge-overlapping .image-overlay').mousemove(
+									function(e) {
+										var magnify_offset = $(this).offset();
+										var mx = e.pageX - magnify_offset.left;
+										var my = e.pageY - magnify_offset.top;
+
+										if (mx < $(this).width() && my < $(this).height() && mx > 0
+												&& my > 0) {
+											$('.large').fadeIn(100);
+										} else {
+											$('.large').fadeOut(100);
+										}
+										if ($('.large').is(':visible')) {
+											var rx = Math.round(mx / $('.small').width()
+													* native_width - $('.large').width() / 2)
+													* -1;
+											var ry = Math.round(my / $('.small').height()
+													* native_height - $('.large').height() / 2)
+													* -1;
+
+											$('.large').css({
+												left: mx - $('.large').width() / 2,
+												top: my - $('.large').height() / 2,
+												backgroundPosition: rx + 'px ' + ry + 'px'
+											});
+										}
+									});
+						}
 					});
-				}
-			});
 		},
 
 		/**
 		 * Show image.
-		 *
+		 * 
 		 * @memberOf hifive.test.explorer.controller.TestResultDiffController
 		 * @param {String} selector jQuery selector expression which determines the image node
 		 * @param {Boolean} withMarker whether or not to display the image with markers.
@@ -244,7 +269,7 @@
 
 		/**
 		 * Hide actual mode.
-		 *
+		 * 
 		 * @memberOf hifive.test.explorer.controller.TestResultDiffController
 		 */
 		_hideActualMode: function() {
@@ -253,7 +278,7 @@
 
 		/**
 		 * Hide expected mode.
-		 *
+		 * 
 		 * @memberOf hifive.test.explorer.controller.TestResultDiffController
 		 */
 		_hideExpectedMode: function() {
@@ -262,7 +287,7 @@
 
 		/**
 		 * Initialize the swipe diff handle.
-		 *
+		 * 
 		 * @memberOf hifive.test.explorer.controller.TestResultDiffController
 		 */
 		_initializeSwipeHandle: function() {
@@ -289,7 +314,7 @@
 
 		/**
 		 * Initialize the onion skin diff handle.
-		 *
+		 * 
 		 * @memberOf hifive.test.explorer.controller.TestResultDiffController
 		 */
 		_initializeOnionHandle: function() {

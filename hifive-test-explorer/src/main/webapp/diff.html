@@ -1,7 +1,7 @@
+<!--Copyright (C) 2015 NS Solutions Corporation, All Rights Reserved.  -->
 <!doctype html>
 <html>
 <head>
-	<!--Copyright (C) 2015 NS Solutions Corporation, All Rights Reserved.  -->
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -24,6 +24,33 @@
 	<script src="src/common/constant.js"></script>
 	<script src="src/common/util.js"></script>
 	<script src="src/diff.js"></script>
+
+	<script type="text/ejs" id="testResultListTemplate">
+		<table class="table table-striped table-hover">
+			<thead>
+				<tr>
+					<th>Execution time</th>
+					<th>Test class name</th>
+					<th>Test method name</th>
+					<th>Screenshot ID</th>
+					<th>Platform</th>
+					<th>Browser name</th>
+					<th>Test result</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr class="explorer-test-result" data-test-result-id="[%= testResult.id %]">
+					<td>[%= testResult.testExecution.timeString %]</td>
+					<td>[%= testResult.testClass %]</td>
+					<td>[%= testResult.testMethod %]</td>
+					<td>[%= testResult.testScreen %]</td>
+					<td>[%= testResult.testEnvironment.platform %]</td>
+					<td>[%= testResult.testEnvironment.browserName %]</td>
+					<td>[%= testResult.comparisonResult ? "○" : testResult.comparisonResult == null ? "-" : "×" %]</td>
+				</tr>
+			</tbody>
+		</table>
+	</script>
 	</head>
 	<body>
 		<!-- Navigation -->
@@ -37,6 +64,22 @@
 		<!-- Navigation -->
 
 		<div class="container">
+			<div class="panel-group" id="accordion">
+			  <div class="panel panel-default">
+			    <div class="panel-heading">
+			      <h4 class="panel-title">
+			        <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="false">
+			          Result Information
+			        </a>
+			      </h4>
+			    </div>
+			    <div id="collapseOne" class="panel-collapse collapse">
+			      <div class="panel-body">
+			      	<div id="detail"></div>
+			      </div>
+			    </div>
+			  </div>
+			 </div>
 
 			<div id="expected-mode" class="row">
 				<div class="col-xs-12 image-diff actual">
@@ -120,7 +163,6 @@
 							</div>
 						</div>
 					</div>
-
 				</div>
 			</div>
 		</div>
