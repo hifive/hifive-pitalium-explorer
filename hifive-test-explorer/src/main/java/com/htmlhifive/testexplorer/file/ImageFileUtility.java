@@ -44,8 +44,6 @@ public class ImageFileUtility {
 	public File getFile(Screenshot screenshot) throws FileNotFoundException {
 		TestExecution testExecution = repositories.getTestExecutionRepository().findOne(screenshot.getTestExecutionId());
 		String relativePath =
-				"images" +
-				File.separatorChar +
 				testExecution.getTimeString() +
 				File.separatorChar +
 				screenshot.getTestClass() +
