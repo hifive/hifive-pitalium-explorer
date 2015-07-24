@@ -118,6 +118,7 @@
 		<table class="table table-striped table-hover">
 			<thead>
 				<tr>
+					<th>Test class</th>
 					<th>Test method</th>
 					<th>Test screen</th>
 					<th>Platform</th>
@@ -131,6 +132,7 @@
 						var screenshot = screenshots[i];
 				%]
 				<tr class="explorer-test-result" data-screenshot-id="[%= screenshot.id %]">
+					<td>[%= screenshot.testClass %]</td>
 					<td>[%= screenshot.testMethod %]</td>
 					<td>[%= screenshot.testScreen %]</td>
 					<td>[%= screenshot.testEnvironment.platform %]</td>
