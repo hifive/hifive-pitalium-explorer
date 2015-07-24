@@ -147,12 +147,12 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 			// TestExecution.id をキーとして格納する。
 			List<Screenshot> list = screenshotListMap.get(testExecution.getId());
 			if (list == null) {
-				screenshotListMap.put(testExecution.getId(), screenshotList);
-			} else {
-				list.addAll(screenshotList);
+				list = new ArrayList<>();
+				screenshotListMap.put(testExecution.getId(), list);
 			}
+			list.addAll(screenshotList);
 			// 実行日時をキーとして格納する。
-			workScreenshotListMap.put(testExecution.getTimeString(), screenshotList);
+			workScreenshotListMap.put(testExecution.getTimeString(), list);
 		}
 		
 		// Screenshot同士の関連付けを行う。
