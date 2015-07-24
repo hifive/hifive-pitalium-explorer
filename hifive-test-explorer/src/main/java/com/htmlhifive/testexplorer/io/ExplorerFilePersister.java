@@ -68,14 +68,6 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 		Collection<File> collection = 
 				FileUtils.listFiles(root, filter, TrueFileFilter.INSTANCE);
 
-		int size = collection.size();
-		
-		if (pageSize == 0) {
-			pageSize = defaultPageSize;
-		} else if (pageSize == -1) {
-			pageSize = (int) Math.min(size, Integer.MAX_VALUE);
-		}
-
 		screenshotMap = new HashMap<>();
 		screenshotListMap = new HashMap<>();
 		// 後続のページング処理用
@@ -84,21 +76,38 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 		Map<String, List<Screenshot>> workScreenshotListMap = new HashMap<>();
 		Map<ScreenshotResult, Screenshot> workScreenshotMap = new HashMap<>();
 		
+		int executionId = 0;
 		int screenshotId = 0;
-		File[] files = collection.toArray(new File[size]);
+		
+		File[] files = collection.toArray(new File[collection.size()]);
 		for (int i = 0, len = files.length; i < len; i++) {
-			PersistMetadata metadata = new PersistMetadata(
-					files[i].getParentFile().getParentFile().getName(), 
-					files[i].getParentFile().getName());
-			TestResult testResult = super.loadTestResult(metadata);
-
+			System.out.println(files[i].getAbsolutePath());
+			
+			String executionDate = files[i].getParentFile().getParentFile().getName();
 			TestExecution testExecution = new TestExecution();
-			testExecution.setId(Integer.valueOf(i));
+			testExecution.setId(executionId);
 			DateTime dateTime = DateTimeFormat.forPattern("yyyy_MM_dd_HH_mm_ss")
-					.parseDateTime(testResult.getResultId());
+					.parseDateTime(executionDate);
 			testExecution.setTime(new Timestamp(dateTime.getMillis()));
-			testExecutionList.add(testExecution);
+			
+			// 重複チェック
+			boolean exists = false;
+			for (TestExecution exec : testExecutionList) {
+				if (StringUtils.equals(exec.getTimeString(), testExecution.getTimeString())) {
+					exists = true;
+					testExecution = exec;
+					break;
+				}
+			}
+			if (!exists) {
+				testExecutionList.add(testExecution);
+				executionId++;
+			}
 
+			PersistMetadata metadata = new PersistMetadata(
+					executionDate, files[i].getParentFile().getName());
+			TestResult testResult = super.loadTestResult(metadata);
+			
 			List<Screenshot> screenshotList = new ArrayList<>();
 			for (ScreenshotResult screenshotResult : testResult.getScreenshotResults()) {
 				Screenshot screenshot = new Screenshot();
@@ -138,9 +147,14 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 				workScreenshotMap.put(screenshotResult, screenshot);
 			}
 			// TestExecution.id をキーとして格納する。
-			screenshotListMap.put(Integer.valueOf(i), screenshotList);
+			List<Screenshot> list = screenshotListMap.get(testExecution.getId());
+			if (list == null) {
+				screenshotListMap.put(testExecution.getId(), screenshotList);
+			} else {
+				list.addAll(screenshotList);
+			}
 			// 実行日時をキーとして格納する。
-			workScreenshotListMap.put(files[i].getParentFile().getParentFile().getName(), screenshotList);
+			workScreenshotListMap.put(testExecution.getTimeString(), screenshotList);
 		}
 		
 		// Screenshot同士の関連付けを行う。
@@ -162,12 +176,21 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 			}
 		}
 
+		int size = testExecutionList.size();
+		
 		// 最新から並ぶようにソートする。
 		List<TestExecution> tempTestExecutionList = new ArrayList<>();
 		for (int i = size - 1; i >= 0 ; i--) {
 			tempTestExecutionList.add(testExecutionList.get(i));
 		}
 		testExecutionList = tempTestExecutionList;
+
+		
+		if (pageSize == 0) {
+			pageSize = defaultPageSize;
+		} else if (pageSize == -1) {
+			pageSize = (int) Math.min(size, Integer.MAX_VALUE);
+		}
 
 		// 表示ページ番号、ページ表示数に合わせてリストを作成する。
 		List<TestExecutionResult> resultList = new ArrayList<TestExecutionResult>();
@@ -189,7 +212,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 		}
 
 		PageRequest pageable = new PageRequest(page - 1, pageSize);
-		return new PageImpl<TestExecutionResult>(resultList, pageable, collection.size());
+		return new PageImpl<TestExecutionResult>(resultList, pageable, size);
 	}
 
 	@Override
