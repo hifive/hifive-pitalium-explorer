@@ -81,8 +81,6 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 		
 		File[] files = collection.toArray(new File[collection.size()]);
 		for (int i = 0, len = files.length; i < len; i++) {
-			System.out.println(files[i].getAbsolutePath());
-			
 			String executionDate = files[i].getParentFile().getParentFile().getName();
 			TestExecution testExecution = new TestExecution();
 			testExecution.setId(executionId);
