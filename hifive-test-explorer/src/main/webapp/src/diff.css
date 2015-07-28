@@ -60,6 +60,10 @@ body {
 	background-color: gray;
 }
 
+#quick-flipping .image-diff.image-label {
+	  cursor: pointer;
+}
+
 #edge-overlapping .large {
 	width: 175px;
 	height: 175px;
