@@ -120,20 +120,34 @@
 					</div>
 
 					<div class="tab-pane active" id="two-up">
+ 						<div class="row label-row">
+							<div class="col-xs-6 image-diff image-label expected">
+								<div class="image-label">EXPECTED</div>
+							</div>
+							<div class="col-xs-6 image-diff image-label actual">
+								<div class="image-label">ACTUAL</div>
+							</div>
+ 						</div>
 						<div class="row">
 							<div class="col-xs-6 image-diff expected">
-								<div class="image-label">EXPECTED</div>
 								<img>
 							</div>
 							<div class="col-xs-6 image-diff actual">
-								<div class="image-label">ACTUAL</div>
 								<img>
 							</div>
 						</div>
 					</div>
 
 					<div class="tab-pane" id="swipe">
-						<input type="range" id="swipe-handle">
+						<div class="handle row label-row">
+							<div>
+								<span class="expected legend">EXPECTED</span>
+								<span class="actual legend">ACTUAL</span>
+							</div>
+							<div>
+								<input type="range" id="swipe-handle">
+							</div>
+						</div>
 						<div class="row">
 							<div class="col-xs-12 image-diff image-overlay">
 								<div class="expected">
@@ -148,7 +162,15 @@
 					</div>
 
 					<div class="tab-pane" id="onion-skin">
-						<input type="range" id="onion-handle">
+						<div class="handle row label-row">
+							<div>
+								<span class="expected legend">EXPECTED</span>
+								<span class="actual legend">ACTUAL</span>
+							</div>
+							<div>
+								<input type="range" id="onion-handle">
+							</div>
+						</div>
 						<div class="row">
 							<div class="col-xs-12 image-diff image-overlay">
 								<div class="expected">
@@ -162,6 +184,12 @@
 					</div>
 
 					<div class="tab-pane" id="edge-overlapping">
+						<div class="row label-row">
+							<div>
+								<span class="expected legend">EXPECTED</span>
+								<span class="actual legend">ACTUAL</span>
+							</div>
+						</div>
 						<div class="row">
 							<div class="col-xs-12 image-diff image-overlay">
 								<div class="large"></div>

@@ -287,13 +287,13 @@
 			var min = 0,max = 1000,step = 1;
 
 			var $handle = this.$find('#swipe-handle');
-			var $actual = this.$find('#swipe .actual');
-			var $actualImg = this.$find('#swipe .actual > img');
+			var $actual = this.$find('#swipe .expected');
+			var $actualImg = this.$find('#swipe .expected > img');
 
 			$handle.attr('min', min);
 			$handle.attr('max', max);
 			$handle.attr('step', step);
-			$handle.val(min);
+			$handle.val(max);
 
 			var inputHandler = function() {
 				var val = $handle.val();
@@ -303,6 +303,8 @@
 			};
 			$handle.on('input', inputHandler);
 			$handle.on('change', inputHandler); // for IE
+
+			inputHandler();
 		},
 
 		/**
@@ -314,7 +316,7 @@
 			var min = 0,max = 1000,step = 1;
 
 			var $handle = this.$find('#onion-handle');
-			var $actual = this.$find('#onion-skin .actual');
+			var $actual = this.$find('#onion-skin .image-diff .expected');
 
 			$handle.attr('min', min);
 			$handle.attr('max', max);
@@ -324,10 +326,12 @@
 			var inputHandler = function() {
 				var val = $handle.val();
 				var ratio = (val - min) / (max - min);
-				$actual.css('opacity', ratio);
+				$actual.css('opacity', 1 - ratio);
 			};
 			$handle.on('input', inputHandler);
 			$handle.on('change', inputHandler); // for IE
+
+			inputHandler();
 		},
 	};
 
