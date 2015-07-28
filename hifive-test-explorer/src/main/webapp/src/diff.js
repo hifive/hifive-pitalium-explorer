@@ -123,12 +123,11 @@
 		},
 
 		'#quick-flipping .image-diff click': function(context, $el) {
+			var $actual = this.$find('#quick-flipping .image-overlay .expected');
 			if ($el.hasClass('expected')) {
-				this.$find('#quick-flipping .image-overlay .expected').show();
-				this.$find('#quick-flipping .image-overlay .actual').hide();
+				$actual.show();
 			} else {
-				this.$find('#quick-flipping .image-overlay .expected').hide();
-				this.$find('#quick-flipping .image-overlay .actual').show();
+				$actual.hide();
 			}
 			$el.css('opacity', 1);
 			$el.siblings().css('opacity', 0.2);
