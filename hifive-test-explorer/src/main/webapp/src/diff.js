@@ -79,8 +79,9 @@
 					testResult: screenshot
 				});
 
+				var expectedScreenshot = screenshot.expectedScreenshot;
 				// Expected mode
-				if (screenshot.expectedScreenshot == null) {
+				if (expectedScreenshot == null) {
 					this._setActualImageSrc(false, {
 						id: id
 					});
@@ -88,15 +89,6 @@
 					return;
 				}
 				this._hideExpectedMode();
-				var expectedScreenshot = screenshot.expectedScreenshot;
-
-				// Test not executed
-				if (screenshot.comparisonResult == null) {
-					this._setExpectedImageSrc(false, {
-						id: expectedScreenshot.id
-					});
-					return;
-				}
 
 				if (screenshot.comparisonResult) {
 					// Test succeeded
@@ -125,20 +117,21 @@
 
 			this._initializeSwipeHandle();
 			this._initializeOnionHandle();
+
+			this.$find('#quick-flipping .image-diff.expected').css('opacity', 0.2);
+			this.$find('#quick-flipping .image-overlay .expected').hide();
 		},
 
-		/**
-		 * Swap actual/expected images
-		 * 
-		 * @memberOf hifive.test.explorer.controller.TestResultDiffController
-		 */
-		'input[name=flip-image] change': function() {
-			var imageToBeShown = this.$find('input[name=flip-image]:checked').val();
-			var $actual = this.$find('#quick-flipping .actual');
-			if (imageToBeShown === 'actual')
-				$actual.show();
-			else
-				$actual.hide();
+		'#quick-flipping .image-diff click': function(context, $el) {
+			if ($el.hasClass('expected')) {
+				this.$find('#quick-flipping .image-overlay .expected').show();
+				this.$find('#quick-flipping .image-overlay .actual').hide();
+			} else {
+				this.$find('#quick-flipping .image-overlay .expected').hide();
+				this.$find('#quick-flipping .image-overlay .actual').show();
+			}
+			$el.css('opacity', 1);
+			$el.siblings().css('opacity', 0.2);
 		},
 
 		/**
