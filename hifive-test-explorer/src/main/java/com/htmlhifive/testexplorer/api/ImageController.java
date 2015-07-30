@@ -63,10 +63,12 @@ public class ImageController {
 	 * Get the image from id.
 	 *
 	 * @param screenshotId screenshot id
+	 * @param targetId id of the target area to be used for image comparison
 	 * @param response HttpServletResponse
 	 */
 	@RequestMapping(value = "/get", method = RequestMethod.GET)
-	public void getImage(@RequestParam Integer screenshotId, HttpServletResponse response) {
+	public void getImage(@RequestParam Integer screenshotId, @RequestParam Integer targetId, 
+			HttpServletResponse response) {
 		service.getImage(screenshotId, response);
 	}
 
@@ -74,10 +76,12 @@ public class ImageController {
 	 * Get edge detection result of an image.
 	 *
 	 * @param screenshotId id of screenshot to be processed by edge detector.
+	 * @param targetId id of the target area to be used for image comparison
 	 * @param allparams all parameters received by API
 	 * @param response HttpServletResponse
 	 */
-	public void getEdgeImage(Integer screenshotId, Map<String, String> allparams, HttpServletResponse response) {
+	public void getEdgeImage(Integer screenshotId, Integer targetId, Map<String, String> allparams, 
+			HttpServletResponse response) {
 		service.getEdgeImage(screenshotId, allparams, response);
 	}
 
@@ -85,13 +89,15 @@ public class ImageController {
 	 * Get processed image.
 	 * 
 	 * @param screenshotId id of an image to be processed  
+	 * @param targetId id of the target area to be used for image comparison
 	 * @param algorithm currently only "edge" is supported
 	 * @param allparams received all parameters
 	 * @param response HttpServletResponse
 	 */
 	@RequestMapping(value = "/getProcessed", method = RequestMethod.GET)
-	public void getProcessed(@RequestParam Integer screenshotId, @RequestParam String algorithm,
-			@RequestParam Map<String, String> allparams, HttpServletResponse response) {
+	public void getProcessed(@RequestParam Integer screenshotId, @RequestParam Integer targetId, 
+			@RequestParam String algorithm, @RequestParam Map<String, String> allparams, 
+			HttpServletResponse response) {
 		service.getProcessed(screenshotId, algorithm, allparams, response);
 	}
 
@@ -100,11 +106,13 @@ public class ImageController {
 	 *
 	 * @param sourceSceenshotId comparison source image id
 	 * @param targetScreenshotId comparison target image id
+	 * @param targetId id of the target area to be used for image comparison
 	 * @param response HttpServletResponse
 	 */
 	@RequestMapping(value = "/getDiff", method = RequestMethod.GET)
 	public void getDiffImage(@RequestParam Integer sourceSceenshotId, 
-			@RequestParam Integer targetScreenshotId, HttpServletResponse response) {
+			@RequestParam Integer targetScreenshotId, @RequestParam Integer targetId, 
+			HttpServletResponse response) {
 		service.getDiffImage(sourceSceenshotId, targetScreenshotId, response);
 	}
 }

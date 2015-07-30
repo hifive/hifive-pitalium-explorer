@@ -132,14 +132,15 @@
 			this._setImage(val);
 		},
 
-		_setImage: function(incluedId) {
-			var id = this._screenshot.id;
+		_setImage: function(targetId) {
+			var screenshotId = this._screenshot.id;
 
 			var expectedScreenshot = this._screenshot.expectedScreenshot;
 			// Expected mode
 			if (expectedScreenshot == null) {
 				this._setActualImageSrc(false, {
-					screenshotId: id
+					screenshotId: screenshotId,
+					targetId: targetId
 				});
 				this._hideActualMode();
 				return;
@@ -149,26 +150,30 @@
 			if (this._screenshot.comparisonResult) {
 				// Test succeeded
 				this._setActualImageSrc(false, {
-					screenshotId: id
+					screenshotId: screenshotId,
+					targetId: targetId
 				});
 
 				this._setExpectedImageSrc(false, {
-					screenshotId: expectedScreenshot.id
+					screenshotId: expectedScreenshot.id,
+					targetId: targetId
 				});
 			} else {
 				// Test failed
 				this._setActualImageSrc(true, {
-					sourceSceenshotId: id,
-					targetScreenshotId: expectedScreenshot.id
+					sourceSceenshotId: screenshotId,
+					targetScreenshotId: expectedScreenshot.id,
+					targetId: targetId
 				});
 
 				this._setExpectedImageSrc(true, {
 					sourceSceenshotId: expectedScreenshot.id,
-					targetScreenshotId: id
+					targetScreenshotId: screenshotId,
+					targetId: targetId
 				});
 			}
 
-			this._initEdgeOverlapping(expectedScreenshot.id, id);
+			this._initEdgeOverlapping(expectedScreenshot.id, screenshotId, targetId);
 		},
 
 		'#quick-flipping .image-diff click': function(context, $el) {
@@ -209,8 +214,9 @@
 		 * @memberOf hifive.test.explorer.controller.TestResultDiffController
 		 * @param {Number} expectedId ID of expected image
 		 * @param {Number} actualId ID of actual image
+		 * @param {Number} targetId ID the target area to be used for image comparison
 		 */
-		_initEdgeOverlapping: function(expectedId, actualId) {
+		_initEdgeOverlapping: function(expectedId, actualId, targetId) {
 			// Initialize <canvas>
 			var expected = new Image(),actual = new Image();
 
@@ -221,11 +227,13 @@
 			var format = hifive.test.explorer.utils.formatUrl;
 			expected.src = format('image/getProcessed', {
 				screenshotId: expectedId,
+				targetId: targetId,
 				algorithm: 'edge',
 				colorIndex: 1
 			});
 			actual.src = format('image/getProcessed', {
 				screenshotId: actualId,
+				targetId: targetId,
 				algorithm: 'edge',
 				colorIndex: 0
 			});
