@@ -62,48 +62,49 @@ public class ImageController {
 	/**
 	 * Get the image from id.
 	 *
-	 * @param id screenshot id
+	 * @param screenshotId screenshot id
 	 * @param response HttpServletResponse
 	 */
 	@RequestMapping(value = "/get", method = RequestMethod.GET)
-	public void getImage(@RequestParam Integer id, HttpServletResponse response) {
-		service.getImage(id, response);
+	public void getImage(@RequestParam Integer screenshotId, HttpServletResponse response) {
+		service.getImage(screenshotId, response);
 	}
 
 	/**
 	 * Get edge detection result of an image.
 	 *
-	 * @param id id of screenshot to be processed by edge detector.
+	 * @param screenshotId id of screenshot to be processed by edge detector.
 	 * @param allparams all parameters received by API
 	 * @param response HttpServletResponse
 	 */
-	public void getEdgeImage(Integer id, Map<String, String> allparams, HttpServletResponse response) {
-		service.getEdgeImage(id, allparams, response);
+	public void getEdgeImage(Integer screenshotId, Map<String, String> allparams, HttpServletResponse response) {
+		service.getEdgeImage(screenshotId, allparams, response);
 	}
 
 	/**
 	 * Get processed image.
 	 * 
-	 * @param id id of an image to be processed  
+	 * @param screenshotId id of an image to be processed  
 	 * @param algorithm currently only "edge" is supported
 	 * @param allparams received all parameters
 	 * @param response HttpServletResponse
 	 */
 	@RequestMapping(value = "/getProcessed", method = RequestMethod.GET)
-	public void getProcessed(@RequestParam Integer id, @RequestParam String algorithm,
+	public void getProcessed(@RequestParam Integer screenshotId, @RequestParam String algorithm,
 			@RequestParam Map<String, String> allparams, HttpServletResponse response) {
-		service.getProcessed(id, algorithm, allparams, response);
+		service.getProcessed(screenshotId, algorithm, allparams, response);
 	}
 
 	/**
 	 * Get the diff image with a marker of comparison result. If there is no difference, return normal image.
 	 *
-	 * @param sourceId comparison source image id
-	 * @param targetId comparison target image id
+	 * @param sourceSceenshotId comparison source image id
+	 * @param targetScreenshotId comparison target image id
 	 * @param response HttpServletResponse
 	 */
 	@RequestMapping(value = "/getDiff", method = RequestMethod.GET)
-	public void getDiffImage(@RequestParam Integer sourceId, @RequestParam Integer targetId, HttpServletResponse response) {
-		service.getDiffImage(sourceId, targetId, response);
+	public void getDiffImage(@RequestParam Integer sourceSceenshotId, 
+			@RequestParam Integer targetScreenshotId, HttpServletResponse response) {
+		service.getDiffImage(sourceSceenshotId, targetScreenshotId, response);
 	}
 }

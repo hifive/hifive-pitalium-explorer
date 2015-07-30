@@ -139,7 +139,7 @@
 			// Expected mode
 			if (expectedScreenshot == null) {
 				this._setActualImageSrc(false, {
-					id: id
+					screenshotId: id
 				});
 				this._hideActualMode();
 				return;
@@ -149,22 +149,22 @@
 			if (this._screenshot.comparisonResult) {
 				// Test succeeded
 				this._setActualImageSrc(false, {
-					id: id
+					screenshotId: id
 				});
 
 				this._setExpectedImageSrc(false, {
-					id: expectedScreenshot.id
+					screenshotId: expectedScreenshot.id
 				});
 			} else {
 				// Test failed
 				this._setActualImageSrc(true, {
-					sourceId: id,
-					targetId: expectedScreenshot.id
+					sourceSceenshotId: id,
+					targetScreenshotId: expectedScreenshot.id
 				});
 
 				this._setExpectedImageSrc(true, {
-					sourceId: expectedScreenshot.id,
-					targetId: id
+					sourceSceenshotId: expectedScreenshot.id,
+					targetScreenshotId: id
 				});
 			}
 
@@ -220,12 +220,12 @@
 
 			var format = hifive.test.explorer.utils.formatUrl;
 			expected.src = format('image/getProcessed', {
-				id: expectedId,
+				screenshotId: expectedId,
 				algorithm: 'edge',
 				colorIndex: 1
 			});
 			actual.src = format('image/getProcessed', {
-				id: actualId,
+				screenshotId: actualId,
 				algorithm: 'edge',
 				colorIndex: 0
 			});
