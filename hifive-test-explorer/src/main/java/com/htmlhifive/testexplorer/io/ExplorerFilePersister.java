@@ -25,15 +25,18 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 
+import com.htmlhifive.testexplorer.entity.Area;
 import com.htmlhifive.testexplorer.entity.Screenshot;
+import com.htmlhifive.testexplorer.entity.Target;
 import com.htmlhifive.testexplorer.entity.TestEnvironment;
 import com.htmlhifive.testexplorer.entity.TestExecution;
 import com.htmlhifive.testexplorer.response.TestExecutionResult;
 import com.htmlhifive.testlib.core.config.FilePersisterConfig;
 import com.htmlhifive.testlib.core.io.FilePersister;
 import com.htmlhifive.testlib.core.io.PersistMetadata;
-import com.htmlhifive.testlib.core.model.ExecResult;
+import com.htmlhifive.testlib.core.model.ScreenAreaResult;
 import com.htmlhifive.testlib.core.model.ScreenshotResult;
+import com.htmlhifive.testlib.core.model.TargetResult;
 import com.htmlhifive.testlib.core.model.TestResult;
 import com.htmlhifive.testlib.core.selenium.MrtCapabilities;
 
@@ -78,6 +81,8 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 		
 		int executionId = 0;
 		int screenshotId = 0;
+		int targetId = 0;
+		int areaId = 0;
 		
 		File[] files = collection.toArray(new File[collection.size()]);
 		for (int i = 0, len = files.length; i < len; i++) {
@@ -97,6 +102,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 					break;
 				}
 			}
+
 			if (!exists) {
 				testExecutionList.add(testExecution);
 				executionId++;
@@ -108,36 +114,40 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 			
 			List<Screenshot> screenshotList = new ArrayList<>();
 			for (ScreenshotResult screenshotResult : testResult.getScreenshotResults()) {
-				Screenshot screenshot = new Screenshot();
-				screenshot.setId(screenshotId);
-				Boolean comparisonResult = null;
-				if (screenshotResult.getResult() != null) {
-					comparisonResult = 
-							screenshotResult.getResult() == ExecResult.SUCCESS ? Boolean.TRUE : Boolean.FALSE;
-				}
-				screenshot.setComparisonResult(comparisonResult);
-
-				metadata = new PersistMetadata(screenshotResult.getExpectedId(), 
-						screenshotResult.getTestClass(), screenshotResult.getTestMethod(), 
-						screenshotResult.getScreenshotId(), new MrtCapabilities(screenshotResult.getCapabilities()));
-				
-				screenshot.setFileName(getScreenshotImageFileName(metadata));
-				screenshot.setTestClass(screenshotResult.getTestClass());
+				Screenshot screenshot = createScreenshot(screenshotId, screenshotResult);
 				screenshot.setTestExecution(testExecution);
-				screenshot.setTestMethod(screenshotResult.getTestMethod());
-				screenshot.setTestScreen(screenshotResult.getScreenshotId());
 				
+				// Capability
 				Map<String, ?> capabilities = screenshotResult.getCapabilities();
-				TestEnvironment testEnvironment = new TestEnvironment();
-				testEnvironment.setBrowserName((String)capabilities.get("browserName"));
-				testEnvironment.setBrowserVersion((String)capabilities.get("version"));
-				testEnvironment.setDeviceName((String)capabilities.get("deviceName"));
-				testEnvironment.setId(null);
-				testEnvironment.setLabel(null);
-				testEnvironment.setPlatform((String)capabilities.get("platform"));
-				testEnvironment.setPlatformVersion((String)capabilities.get("platformVersion"));
+				TestEnvironment testEnvironment = createTestEnvironment(capabilities);
 				screenshot.setTestEnvironment(testEnvironment);
 
+				// Target
+				List<TargetResult> targetResultList = screenshotResult.getTargetResults();
+				List<Target> targetList = new ArrayList<>();
+				for (TargetResult targetResult : targetResultList) {
+					Target target = createTarget(targetId, screenshotId, targetResult, screenshotResult);
+					targetList.add(target);
+
+					// 比較対象の情報
+					ScreenAreaResult screenAreaResult = targetResult.getTarget();
+					Area area = createArea(areaId, targetId, screenAreaResult, false);
+					areaId++;
+					target.setArea(area);
+
+					// 比較除外対象の情報
+					List<ScreenAreaResult> screenAreaResultList = targetResult.getExcludes();
+					List<Area> exculdeAreaList = new ArrayList<>();
+					for (ScreenAreaResult excludeScreenAreaResult : screenAreaResultList) {
+						Area excludeArea = createArea(areaId, targetId, excludeScreenAreaResult, true);
+						exculdeAreaList.add(excludeArea);
+						areaId++;
+					}
+					target.setExcludeAreas(exculdeAreaList);
+					targetId++;
+				}
+				screenshot.setTargets(targetList);
+				
 				screenshotMap.put(screenshotId, screenshot);
 				screenshotList.add(screenshot);
 				screenshotId++;
@@ -213,6 +223,64 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 		return new PageImpl<TestExecutionResult>(resultList, pageable, size);
 	}
 
+	private Screenshot createScreenshot(Integer screenshotId, ScreenshotResult screenshotResult) {
+		Screenshot screenshot = new Screenshot();
+		screenshot.setId(screenshotId);
+		screenshot.setComparisonResult(screenshotResult.getResult() != null ? screenshotResult.getResult().isSuccess() : null);
+		screenshot.setTestClass(screenshotResult.getTestClass());
+		screenshot.setTestMethod(screenshotResult.getTestMethod());
+		screenshot.setTestScreen(screenshotResult.getScreenshotId());
+
+		PersistMetadata screenshotMetadata = new PersistMetadata(screenshotResult.getExpectedId(), 
+				screenshotResult.getTestClass(), screenshotResult.getTestMethod(), 
+				screenshotResult.getScreenshotId(), new MrtCapabilities(screenshotResult.getCapabilities()));
+		screenshot.setFileName(getScreenshotImageFileName(screenshotMetadata));
+		return screenshot;
+	}
+	
+	private TestEnvironment createTestEnvironment(Map<String, ?> capabilities) {
+		TestEnvironment testEnvironment = new TestEnvironment();
+		testEnvironment.setBrowserName((String)capabilities.get("browserName"));
+		testEnvironment.setBrowserVersion((String)capabilities.get("version"));
+		testEnvironment.setDeviceName((String)capabilities.get("deviceName"));
+		testEnvironment.setId(null);
+		testEnvironment.setLabel(null);
+		testEnvironment.setPlatform((String)capabilities.get("platform"));
+		testEnvironment.setPlatformVersion((String)capabilities.get("platformVersion"));
+		return testEnvironment;
+	}
+
+	private Target createTarget(Integer targetId, Integer screenshotId, TargetResult targetResult, ScreenshotResult screenshotResult) {
+		Target target = new Target();
+		target.setTargetId(targetId);
+		target.setScreenshotId(screenshotId);
+		target.setComparisonResult(targetResult.getResult() != null ? targetResult.getResult().isSuccess() : null);
+
+		// 比較対象の情報
+		ScreenAreaResult screenAreaResult = targetResult.getTarget();
+
+		PersistMetadata targetMetadata = new PersistMetadata(screenshotResult.getExpectedId(), 
+				screenshotResult.getTestClass(), screenshotResult.getTestMethod(), 
+				screenshotResult.getScreenshotId(), screenAreaResult.getSelector(),
+				screenAreaResult.getRectangle() ,new MrtCapabilities(screenshotResult.getCapabilities()));
+		target.setFileName(getScreenshotImageFileName(targetMetadata));
+		return target;
+	}
+	
+	private Area createArea(Integer areaId, Integer targetId, ScreenAreaResult screenAreaResult, boolean excluded) {
+		Area area = new Area();
+		area.setAreaId(areaId);
+		area.setTargetId(targetId);
+		area.setSelectorType(screenAreaResult.getSelector().getType().name());
+		area.setSelectorValue(screenAreaResult.getSelector().getValue());
+		area.setX(screenAreaResult.getRectangle().getX());
+		area.setY(screenAreaResult.getRectangle().getY());
+		area.setWidth(screenAreaResult.getRectangle().getWidth());
+		area.setHeight(screenAreaResult.getRectangle().getHeight());
+		area.setExcluded(excluded);
+		return area;
+	}
+	
 	@Override
 	public List<Screenshot> findScreenshot(Integer testExecutionId, String searchTestMethod, 
 			String searchTestScreen) {
