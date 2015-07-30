@@ -5,7 +5,8 @@
 
 DROP TABLE Config;
 DROP TABLE ProcessedImage;
-DROP TABLE ScreenshotDifference;
+DROP TABLE Area;
+DROP TABLE Target;
 DROP TABLE Screenshot;
 DROP TABLE TestEnvironment;
 DROP TABLE TestExecution;
@@ -14,6 +15,8 @@ DROP TABLE TestExecution;
 
 \p ******* DROP SEQUENCE START *******
 
+DROP SEQUENCE Seq_Target;
+DROP SEQUENCE Seq_Area;
 DROP SEQUENCE Seq_Screenshot;
 DROP SEQUENCE Seq_TestEnvironment;
 DROP SEQUENCE Seq_TestExecution;
@@ -27,6 +30,8 @@ DROP SEQUENCE Seq_TestExecution;
 CREATE SEQUENCE Seq_TestExecution AS INTEGER START WITH 1;
 CREATE SEQUENCE Seq_TestEnvironment AS INTEGER START WITH 1;
 CREATE SEQUENCE Seq_Screenshot AS INTEGER START WITH 1;
+CREATE SEQUENCE Seq_Target AS INTEGER START WITH 1;
+CREATE SEQUENCE Seq_Area AS INTEGER START WITH 1;
 
 \p ******* CREATE SEQUENCE END *******
 
@@ -72,12 +77,27 @@ CREATE TABLE Screenshot (
 	FOREIGN KEY (testEnvironmentId) REFERENCES TestEnvironment (id)
 );
 
-CREATE TABLE ScreenshotDifference (
-	screenshotId INTEGER NOT NULL,
-	type VARCHAR(100) NOT NULL,
-	data VARCHAR(100) NOT NULL,
-	PRIMARY KEY (screenshotId, type),
+CREATE TABLE Target (
+	targetId int NOT NULL,
+	screenshotId int NOT NULL,
+	fileName VARCHAR(260) NOT NULL,
+	comparisonResult boolean,
+	PRIMARY KEY (targetId),
 	FOREIGN KEY (screenshotId) REFERENCES Screenshot (id)
+);
+
+CREATE TABLE Area (
+	areaId int NOT NULL,
+	targetId int NOT NULL,
+	selectorValue varchar(20) NOT NULL,
+	selectorType varchar(20) NOT NULL,
+	x decimal(5,1) NOT NULL,
+	y decimal(5,1) NOT NULL,
+	width decimal(5,1) NOT NULL,
+	height decimal(5,1) NOT NULL,
+	excluded boolean NOT NULL,
+	PRIMARY KEY (areaId),
+	FOREIGN KEY (targetId) REFERENCES Target (targetId)
 );
 
 CREATE TABLE ProcessedImage (
