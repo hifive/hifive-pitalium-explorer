@@ -96,14 +96,14 @@ public class ExplorerService implements Serializable {
 		return persister.findScreenshot(testExecutionId, searchTestMethod, searchTestScreen);
 	}
 	
-	public Screenshot getScreenshot(Integer screenshotid) {
-		return persister.getScreenshot(screenshotid);
+	public Screenshot getScreenshot(Integer screenshotId) {
+		return persister.getScreenshot(screenshotId);
 	}
 
-	public void getImage(Integer id, HttpServletResponse response) {
+	public void getImage(Integer screenshotId, Integer targetId, HttpServletResponse response) {
 		File file;
 		try {
-			file = persister.getImage(id);
+			file = persister.getImage(screenshotId);
 			if (file == null) {
 				response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
 				return;
@@ -114,7 +114,8 @@ public class ExplorerService implements Serializable {
 		}
 	}
 
-	public void getEdgeImage(Integer id, Map<String, String> allparams, HttpServletResponse response) {
+	public void getEdgeImage(Integer screenshotId, Integer targetId, Map<String, String> allparams, 
+			HttpServletResponse response) {
 		int colorIndex = -1;
 		if (allparams.containsKey("colorIndex")) {
 			try {
@@ -136,7 +137,7 @@ public class ExplorerService implements Serializable {
 //		}
 
 		try {
-			File imageFile = persister.getImage(id);
+			File imageFile = persister.getImage(screenshotId);
 
 			if (imageFile == null) {
 				response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
@@ -165,10 +166,11 @@ public class ExplorerService implements Serializable {
 		}
 	}
 
-	public void getProcessed(Integer id, String algorithm, Map<String, String> allparams, HttpServletResponse response) {
+	public void getProcessed(Integer screenshotId, Integer targetId, String algorithm, 
+			Map<String, String> allparams, HttpServletResponse response) {
 		switch(algorithm) {
 		case "edge":
-			getEdgeImage(id, allparams, response);
+			getEdgeImage(screenshotId, targetId, allparams, response);
 			break;
 		default:
 			response.setStatus(HttpStatus.BAD_REQUEST.value());
@@ -176,14 +178,15 @@ public class ExplorerService implements Serializable {
 		}
 	}
 
-	public void getDiffImage(Integer sourceId, Integer targetId, HttpServletResponse response) {
+	public void getDiffImage(Integer sourceScreenshotId, Integer targetScreenshotId, 
+			Integer targetId, HttpServletResponse response) {
 		try {
-			DiffPoints diffPoints = compare(sourceId, targetId);
+			DiffPoints diffPoints = compare(sourceScreenshotId, targetScreenshotId);
 			if (diffPoints == null) {
 				response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
 				return;
 			}
-			File sourceFile = persister.getImage(sourceId);
+			File sourceFile = persister.getImage(sourceScreenshotId);
 			if (!diffPoints.isFailed()) {
 				sendFile(sourceFile, response);
 			} else {
@@ -195,9 +198,9 @@ public class ExplorerService implements Serializable {
 		}
 	}
 
-	private DiffPoints compare(Integer sourceId, Integer targetId) throws IOException {
-		File sourceFile = persister.getImage(sourceId);
-		File targetFile = persister.getImage(targetId);
+	private DiffPoints compare(Integer sourceScreenshotId, Integer targetScreenshotId) throws IOException {
+		File sourceFile = persister.getImage(sourceScreenshotId);
+		File targetFile = persister.getImage(targetScreenshotId);
 		if (sourceFile == null || targetFile == null) {
 			return null;
 		}

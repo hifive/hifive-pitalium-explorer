@@ -69,7 +69,7 @@ public class ImageController {
 	@RequestMapping(value = "/get", method = RequestMethod.GET)
 	public void getImage(@RequestParam Integer screenshotId, @RequestParam Integer targetId, 
 			HttpServletResponse response) {
-		service.getImage(screenshotId, response);
+		service.getImage(screenshotId, targetId, response);
 	}
 
 	/**
@@ -82,7 +82,7 @@ public class ImageController {
 	 */
 	public void getEdgeImage(Integer screenshotId, Integer targetId, Map<String, String> allparams, 
 			HttpServletResponse response) {
-		service.getEdgeImage(screenshotId, allparams, response);
+		service.getEdgeImage(screenshotId, targetId, allparams, response);
 	}
 
 	/**
@@ -98,7 +98,7 @@ public class ImageController {
 	public void getProcessed(@RequestParam Integer screenshotId, @RequestParam Integer targetId, 
 			@RequestParam String algorithm, @RequestParam Map<String, String> allparams, 
 			HttpServletResponse response) {
-		service.getProcessed(screenshotId, algorithm, allparams, response);
+		service.getProcessed(screenshotId, targetId, algorithm, allparams, response);
 	}
 
 	/**
@@ -113,6 +113,6 @@ public class ImageController {
 	public void getDiffImage(@RequestParam Integer sourceSceenshotId, 
 			@RequestParam Integer targetScreenshotId, @RequestParam Integer targetId, 
 			HttpServletResponse response) {
-		service.getDiffImage(sourceSceenshotId, targetScreenshotId, response);
+		service.getDiffImage(sourceSceenshotId, targetScreenshotId, targetId, response);
 	}
 }
