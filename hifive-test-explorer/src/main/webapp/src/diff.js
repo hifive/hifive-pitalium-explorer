@@ -83,13 +83,6 @@
 					testResult: screenshot
 				});
 			}));
-
-			this._initializeSwipeHandle();
-			this._initializeOnionHandle();
-
-			this.$find('#quick-flipping .image-diff.expected').css('opacity', 0.2);
-			this.$find('#quick-flipping .image-overlay .expected').hide();
-
 		},
 
 		/**
@@ -174,6 +167,12 @@
 			}
 
 			this._initEdgeOverlapping(expectedScreenshot.id, screenshotId, targetId);
+
+			this._initializeSwipeHandle();
+			this._initializeOnionHandle();
+
+			this.$find('#quick-flipping .image-diff.expected').css('opacity', 0.2);
+			this.$find('#quick-flipping .image-overlay .expected').hide();
 		},
 
 		'#quick-flipping .image-diff click': function(context, $el) {
@@ -260,7 +259,7 @@
 								context.globalCompositeOperation = 'destination-over';
 								context.drawImage(actual, 0, 0);
 								initImageMagnifier();
-							}
+							};
 							actualBlack.src = format('image/getProcessed', {
 								id: actualId,
 								algorithm: 'edge',
