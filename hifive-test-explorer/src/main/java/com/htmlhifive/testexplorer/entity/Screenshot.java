@@ -4,6 +4,7 @@
 package com.htmlhifive.testexplorer.entity;
 
 import java.io.Serializable;
+import java.util.List;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -12,6 +13,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
+import javax.persistence.Transient;
 
 @Entity
 public class Screenshot implements Serializable {
@@ -45,6 +47,9 @@ public class Screenshot implements Serializable {
 	@JoinColumn(name="testEnvironmentId", nullable=false, updatable=false)
 	private TestEnvironment testEnvironment;
 
+	@Transient
+	private List<Target> targets;
+	
 	public Integer getId() {
 		return id;
 	}
@@ -115,6 +120,14 @@ public class Screenshot implements Serializable {
 
 	public void setTestEnvironment(TestEnvironment testEnvironment) {
 		this.testEnvironment = testEnvironment;
+	}
+
+	public List<Target> getTargets() {
+		return targets;
+	}
+
+	public void setTargets(List<Target> targets) {
+		this.targets = targets;
 	}
 
 }
