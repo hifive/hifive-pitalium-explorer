@@ -57,6 +57,8 @@
 		 */
 		_testResultDiffLogic: hifive.test.explorer.logic.TestResultDiffLogic,
 
+		_screenshot: {},
+
 		/**
 		 * Called after the controller has been initialized.<br>
 		 * Get the id of the right screenshot, and update views.
@@ -75,44 +77,11 @@
 
 			// Get screenshot details
 			this._testResultDiffLogic.getScreenshot(id).done(this.own(function(screenshot) {
+				this._screenshot = screenshot;
+				this._initializeImageSelector(screenshot.targets);
 				this.view.update('#detail', 'testResultListTemplate', {
 					testResult: screenshot
 				});
-
-				var expectedScreenshot = screenshot.expectedScreenshot;
-				// Expected mode
-				if (expectedScreenshot == null) {
-					this._setActualImageSrc(false, {
-						id: id
-					});
-					this._hideActualMode();
-					return;
-				}
-				this._hideExpectedMode();
-
-				if (screenshot.comparisonResult) {
-					// Test succeeded
-					this._setActualImageSrc(false, {
-						id: id
-					});
-
-					this._setExpectedImageSrc(false, {
-						id: expectedScreenshot.id
-					});
-				} else {
-					// Test failed
-					this._setActualImageSrc(true, {
-						sourceId: id,
-						targetId: expectedScreenshot.id
-					});
-
-					this._setExpectedImageSrc(true, {
-						sourceId: expectedScreenshot.id,
-						targetId: id
-					});
-				}
-
-				this._initEdgeOverlapping(expectedScreenshot.id, id);
 			}));
 
 			this._initializeSwipeHandle();
@@ -120,6 +89,86 @@
 
 			this.$find('#quick-flipping .image-diff.expected').css('opacity', 0.2);
 			this.$find('#quick-flipping .image-overlay .expected').hide();
+
+		},
+
+		/**
+		 * Initialize the drop down of image selection.
+		 * 
+		 * @memberOf hifiveTestExplorer.controller.TestResultDiffController
+		 * @param {Array} includes the selectors for the test area inclusion.
+		 */
+		_initializeImageSelector: function(targets) {
+			// Generate select options
+			var imageSelector = this.$find('#imageSelector');
+			if (targets != null && targets.length > 0) {
+				var html = '';
+				for ( var key in targets) {
+					var target = targets[key];
+					html += '<option value="' + target.targetId + '">SelectorType : '
+							+ target.area.selectorType + ', SelectorValue : '
+							+ target.area.selectorValue + '</option>';
+				}
+
+				imageSelector.prop('disabled', false);
+				imageSelector.append(html);
+			}
+
+			// Fire change event and show images.
+			imageSelector.change();
+		},
+
+
+		/**
+		 * Called when the selection of the drop down changed.<br>
+		 * Update images.
+		 * 
+		 * @memberOf hifiveTestExplorer.controller.TestResultDiffController
+		 * @param {Object} context the event context
+		 * @param {jQuery} $el the event target element
+		 */
+		'#imageSelector change': function(context, $el) {
+			var val = $el.val();
+			this._setImage(val);
+		},
+
+		_setImage: function(incluedId) {
+			var id = this._screenshot.id;
+
+			var expectedScreenshot = this._screenshot.expectedScreenshot;
+			// Expected mode
+			if (expectedScreenshot == null) {
+				this._setActualImageSrc(false, {
+					id: id
+				});
+				this._hideActualMode();
+				return;
+			}
+			this._hideExpectedMode();
+
+			if (this._screenshot.comparisonResult) {
+				// Test succeeded
+				this._setActualImageSrc(false, {
+					id: id
+				});
+
+				this._setExpectedImageSrc(false, {
+					id: expectedScreenshot.id
+				});
+			} else {
+				// Test failed
+				this._setActualImageSrc(true, {
+					sourceId: id,
+					targetId: expectedScreenshot.id
+				});
+
+				this._setExpectedImageSrc(true, {
+					sourceId: expectedScreenshot.id,
+					targetId: id
+				});
+			}
+
+			this._initEdgeOverlapping(expectedScreenshot.id, id);
 		},
 
 		'#quick-flipping .image-diff click': function(context, $el) {
