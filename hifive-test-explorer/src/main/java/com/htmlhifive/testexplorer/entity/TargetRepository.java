@@ -18,4 +18,11 @@ public interface TargetRepository extends JpaRepository<Target, Integer> {
 			+ "order by t.targetId")
 	public List<Target> find(@Param("screenshotId") Integer screenshotId);
 
+
+	@Query("select "
+			+ "new com.htmlhifive.testexplorer.entity.Target (t, a) "
+			+ "from Target as t, Area as a "
+			+ "where t.targetId = a.targetId and t.targetId = :targetId and a.excluded = false")
+	public Target get(@Param("targetId") Integer targetId);
+
 }

@@ -7,13 +7,18 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
+import com.htmlhifive.testexplorer.entity.Area;
+import com.htmlhifive.testexplorer.entity.Config;
+import com.htmlhifive.testexplorer.entity.ConfigRepository;
 import com.htmlhifive.testexplorer.entity.ProcessedImage;
 import com.htmlhifive.testexplorer.entity.ProcessedImageKey;
 import com.htmlhifive.testexplorer.entity.ProcessedImageRepository;
+import com.htmlhifive.testexplorer.entity.Repositories;
 import com.htmlhifive.testexplorer.entity.Screenshot;
 import com.htmlhifive.testexplorer.entity.ScreenshotRepository;
 import com.htmlhifive.testexplorer.entity.Target;
@@ -28,13 +33,7 @@ public class ExplorerDBPersister extends DBPersister implements ExplorerPersiste
 	private ScreenshotRepository screenshotRepo;
 	private TargetRepository targetRepo;
 	private ProcessedImageRepository processedImageRepo;
-
-	// FIXME 使わないように何とかしたい。
-	private ImageFileUtility imageFileUtil;
-
-	public void setImageFileUtility(ImageFileUtility utility) {
-		imageFileUtil = utility;
-	}
+	private ConfigRepository configRepo;
 
 	public void setTestExecutionRepository(TestExecutionRepository repository) {
 		testExecutionRepo = repository;
@@ -50,6 +49,10 @@ public class ExplorerDBPersister extends DBPersister implements ExplorerPersiste
 
 	public void setProcessedImageRepository(ProcessedImageRepository repository) {
 		processedImageRepo = repository;
+	}
+
+	public void setConfigRepository(ConfigRepository repository) {
+		configRepo = repository;
 	}
 	
 	@Override
@@ -83,24 +86,55 @@ public class ExplorerDBPersister extends DBPersister implements ExplorerPersiste
 	}
 
 	@Override
-	public File getImage(Integer id) throws IOException {
-		Screenshot screenshot = getScreenshot(id);
+	public File getImage(Integer screenshotId, Integer targetId) throws IOException {
+		Screenshot screenshot = getScreenshot(screenshotId);
 
 		if (screenshot == null) {
 			return null;
 		}
 
+		Target target = null;
+		for (Target t : screenshot.getTargets()) {
+			if (t.getTargetId().intValue() == targetId.intValue()) {
+				target = t;
+				break;
+			}
+		}
+		
+		// FIXME データの持ち方を再検討する必要があるかも。
+		// targetIdはシーケンシャルにふっているため、
+		// 引数でわたってきたtargetIdと期待値となる画像のScreenshotクラスから取得したTargetクラスのIDは一致しない。
+		// そのために以下の処理を必要とする。
+		if (target == null) {
+			Area area = targetRepo.get(targetId).getArea();
+			for (Target t : screenshot.getTargets()) {
+				if (StringUtils.equals(t.getArea().getSelectorType(), area.getSelectorType()) && 
+						StringUtils.equals(t.getArea().getSelectorValue(), area.getSelectorValue())) {
+					target = t;
+					break;
+				}
+			}
+		}
+
+		Config config = configRepo.findOne(ConfigRepository.ABSOLUTE_PATH_KEY);
+		String child = screenshot.getTestExecution().getTimeString() 
+				+ File.separatorChar + screenshot.getTestClass() 
+				+ File.separatorChar + target.getFileName();
+		File image = new File(config.getValue(), child);
+
 		// Send PNG image
-		return imageFileUtil.getFile(screenshot);
+		return image;
 	}
 
 	@Override
 	public File searchProcessedImageFile(Integer screenshotId, String algorithm) {
 		File result = null;
 		ProcessedImage p = processedImageRepo.findOne(new ProcessedImageKey(screenshotId, algorithm));
-		if (p != null)
-		{
-			result = new File(imageFileUtil.getAbsoluteFilePath(p.getFileName()));
+		if (p != null) {
+			// FIXME 直したい
+			result = new File(new ImageFileUtility(
+					new Repositories(configRepo, processedImageRepo, screenshotRepo, testExecutionRepo))
+				.getAbsoluteFilePath(p.getFileName()));
 		}
 		return result;
 	}

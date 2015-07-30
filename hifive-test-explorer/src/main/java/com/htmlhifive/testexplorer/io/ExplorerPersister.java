@@ -53,11 +53,12 @@ public interface ExplorerPersister extends Persister {
 	/**
 	 * 画像ファイルを取得する。
 	 * 
-	 * @param id スクリーンショットID
+	 * @param screenshotId スクリーンショットID
+	 * @param targetId 比較対象のID
 	 * @return 画像ファイル
 	 * @throws IOException
 	 */
-	File getImage(Integer id) throws IOException;
+	File getImage(Integer screenshotId, Integer targetId) throws IOException;
 
 	File searchProcessedImageFile(Integer screenshotId, String algorithm);
 	

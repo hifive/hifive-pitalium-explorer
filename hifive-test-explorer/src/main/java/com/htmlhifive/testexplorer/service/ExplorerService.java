@@ -29,7 +29,6 @@ import com.htmlhifive.testexplorer.entity.Screenshot;
 import com.htmlhifive.testexplorer.entity.ScreenshotRepository;
 import com.htmlhifive.testexplorer.entity.TargetRepository;
 import com.htmlhifive.testexplorer.entity.TestExecutionRepository;
-import com.htmlhifive.testexplorer.file.ImageFileUtility;
 import com.htmlhifive.testexplorer.image.EdgeDetector;
 import com.htmlhifive.testexplorer.io.ExplorerDBPersister;
 import com.htmlhifive.testexplorer.io.ExplorerPersister;
@@ -68,9 +67,7 @@ public class ExplorerService implements Serializable {
 			((ExplorerDBPersister)persister).setScreenshotRepository(screenshotRepo);
 			((ExplorerDBPersister)persister).setTargetRepository(targetRepo);
 			((ExplorerDBPersister)persister).setProcessedImageRepository(processedImageRepo);
-			// FIXME 直したい
-			Repositories repositories = new Repositories(configRepo, processedImageRepo, screenshotRepo, testExecutionRepo);
-			((ExplorerDBPersister)persister).setImageFileUtility(new ImageFileUtility(repositories));
+			((ExplorerDBPersister)persister).setConfigRepository(configRepo);
 		}
 	}
 
@@ -103,7 +100,7 @@ public class ExplorerService implements Serializable {
 	public void getImage(Integer screenshotId, Integer targetId, HttpServletResponse response) {
 		File file;
 		try {
-			file = persister.getImage(screenshotId);
+			file = persister.getImage(screenshotId, targetId);
 			if (file == null) {
 				response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
 				return;
@@ -137,7 +134,7 @@ public class ExplorerService implements Serializable {
 //		}
 
 		try {
-			File imageFile = persister.getImage(screenshotId);
+			File imageFile = persister.getImage(screenshotId, targetId);
 
 			if (imageFile == null) {
 				response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
@@ -181,12 +178,12 @@ public class ExplorerService implements Serializable {
 	public void getDiffImage(Integer sourceScreenshotId, Integer targetScreenshotId, 
 			Integer targetId, HttpServletResponse response) {
 		try {
-			DiffPoints diffPoints = compare(sourceScreenshotId, targetScreenshotId);
+			DiffPoints diffPoints = compare(sourceScreenshotId, targetScreenshotId, targetId);
 			if (diffPoints == null) {
 				response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
 				return;
 			}
-			File sourceFile = persister.getImage(sourceScreenshotId);
+			File sourceFile = persister.getImage(sourceScreenshotId, targetId);
 			if (!diffPoints.isFailed()) {
 				sendFile(sourceFile, response);
 			} else {
@@ -198,9 +195,10 @@ public class ExplorerService implements Serializable {
 		}
 	}
 
-	private DiffPoints compare(Integer sourceScreenshotId, Integer targetScreenshotId) throws IOException {
-		File sourceFile = persister.getImage(sourceScreenshotId);
-		File targetFile = persister.getImage(targetScreenshotId);
+	private DiffPoints compare(Integer sourceScreenshotId, Integer targetScreenshotId, 
+			Integer targetId) throws IOException {
+		File sourceFile = persister.getImage(sourceScreenshotId, targetId);
+		File targetFile = persister.getImage(targetScreenshotId, targetId);
 		if (sourceFile == null || targetFile == null) {
 			return null;
 		}

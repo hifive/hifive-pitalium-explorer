@@ -46,6 +46,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 
 	private Map<Integer, Screenshot> screenshotMap;
 	private Map<Integer, List<Screenshot>> screenshotListMap;
+	private Map<Integer, Target> targetMap;
 	
 	public ExplorerFilePersister() {
 		// FIXME 独自のConfigに差し替える必要があるかも
@@ -73,6 +74,8 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 
 		screenshotMap = new HashMap<>();
 		screenshotListMap = new HashMap<>();
+		targetMap = new HashMap<>();
+
 		// 後続のページング処理用
 		List<TestExecution> testExecutionList = new ArrayList<>();
 		// Screenshotの関連を貼るための処理用
@@ -144,6 +147,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 						areaId++;
 					}
 					target.setExcludeAreas(exculdeAreaList);
+					targetMap.put(targetId, target);
 					targetId++;
 				}
 				screenshot.setTargets(targetList);
@@ -294,27 +298,44 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 	}
 
 	@Override
-	public File getImage(Integer id) throws IOException {
-		Screenshot screenshot = getScreenshot(id);
+	public File getImage(Integer screenshotId, Integer targetId) throws IOException {
+		Screenshot screenshot = getScreenshot(screenshotId);
 
 		if (screenshot == null) {
 			return null;
 		}
 
-		TestExecution execution = screenshot.getTestExecution();
-		TestEnvironment env = screenshot.getTestEnvironment();
-		Map<String, String> capabilities = new HashMap<>();
-		capabilities.put("browserName", env.getBrowserName());
-		capabilities.put("version", env.getBrowserVersion());
-		capabilities.put("deviceName", env.getDeviceName());
-		capabilities.put("platform", env.getPlatform());
-		capabilities.put("platformVersion", env.getPlatformVersion());
+		Target target = null;
+		for (Target t : screenshot.getTargets()) {
+			if (t.getTargetId().intValue() == targetId.intValue()) {
+				target = t;
+				break;
+			}
+		}
+		
+		// FIXME データの持ち方を再検討する必要があるかも。
+		// targetIdはシーケンシャルにふっているため、
+		// 引数でわたってきたtargetIdと期待値となる画像のScreenshotクラスから取得したTargetクラスのIDは一致しない。
+		// そのために以下の処理を必要とする。
+		if (target == null) {
+			Area area = targetMap.get(targetId).getArea();
+			for (Target t : screenshot.getTargets()) {
+				if (StringUtils.equals(t.getArea().getSelectorType(), area.getSelectorType()) && 
+						StringUtils.equals(t.getArea().getSelectorValue(), area.getSelectorValue())) {
+					target = t;
+					break;
+				}
+			}
+		}
 
-		PersistMetadata metadata = new PersistMetadata(execution.getTimeString(), 
-				screenshot.getTestClass(), screenshot.getTestMethod(), 
-				screenshot.getTestScreen(), new MrtCapabilities(capabilities));
+		// FIXME MetaDataを使用する方法にするか？
+		String child = screenshot.getTestExecution().getTimeString() 
+				+ File.separatorChar + screenshot.getTestClass() 
+				+ File.separatorChar + target.getFileName();
+		File image = new File(super.getResultDirectoryFile(), child);
+
 		// Send PNG image
-		return super.getScreenshotImageFile(metadata);
+		return image;
 	}
 
 	@Override
