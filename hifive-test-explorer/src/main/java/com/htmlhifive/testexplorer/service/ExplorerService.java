@@ -27,6 +27,7 @@ import com.htmlhifive.testexplorer.entity.ProcessedImageRepository;
 import com.htmlhifive.testexplorer.entity.Repositories;
 import com.htmlhifive.testexplorer.entity.Screenshot;
 import com.htmlhifive.testexplorer.entity.ScreenshotRepository;
+import com.htmlhifive.testexplorer.entity.TargetRepository;
 import com.htmlhifive.testexplorer.entity.TestExecutionRepository;
 import com.htmlhifive.testexplorer.file.ImageFileUtility;
 import com.htmlhifive.testexplorer.image.EdgeDetector;
@@ -50,6 +51,8 @@ public class ExplorerService implements Serializable {
 	@Autowired
 	private ScreenshotRepository screenshotRepo;
 	@Autowired
+	private TargetRepository targetRepo;
+	@Autowired
 	private ConfigRepository configRepo;
 	@Autowired
 	private ProcessedImageRepository processedImageRepo;
@@ -63,6 +66,7 @@ public class ExplorerService implements Serializable {
 		if (persister instanceof ExplorerDBPersister) {
 			((ExplorerDBPersister)persister).setTestExecutionRepository(testExecutionRepo);
 			((ExplorerDBPersister)persister).setScreenshotRepository(screenshotRepo);
+			((ExplorerDBPersister)persister).setTargetRepository(targetRepo);
 			((ExplorerDBPersister)persister).setProcessedImageRepository(processedImageRepo);
 			// FIXME 直したい
 			Repositories repositories = new Repositories(configRepo, processedImageRepo, screenshotRepo, testExecutionRepo);

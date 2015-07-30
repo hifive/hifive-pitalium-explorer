@@ -16,6 +16,8 @@ import com.htmlhifive.testexplorer.entity.ProcessedImageKey;
 import com.htmlhifive.testexplorer.entity.ProcessedImageRepository;
 import com.htmlhifive.testexplorer.entity.Screenshot;
 import com.htmlhifive.testexplorer.entity.ScreenshotRepository;
+import com.htmlhifive.testexplorer.entity.Target;
+import com.htmlhifive.testexplorer.entity.TargetRepository;
 import com.htmlhifive.testexplorer.entity.TestExecutionRepository;
 import com.htmlhifive.testexplorer.file.ImageFileUtility;
 import com.htmlhifive.testexplorer.response.TestExecutionResult;
@@ -24,6 +26,7 @@ public class ExplorerDBPersister extends DBPersister implements ExplorerPersiste
 
 	private TestExecutionRepository testExecutionRepo;
 	private ScreenshotRepository screenshotRepo;
+	private TargetRepository targetRepo;
 	private ProcessedImageRepository processedImageRepo;
 
 	// FIXME 使わないように何とかしたい。
@@ -39,6 +42,10 @@ public class ExplorerDBPersister extends DBPersister implements ExplorerPersiste
 	
 	public void setScreenshotRepository(ScreenshotRepository repository) {
 		screenshotRepo = repository;
+	}
+
+	public void setTargetRepository(TargetRepository repository) {
+		targetRepo = repository;
 	}
 
 	public void setProcessedImageRepository(ProcessedImageRepository repository) {
@@ -69,7 +76,10 @@ public class ExplorerDBPersister extends DBPersister implements ExplorerPersiste
 
 	@Override
 	public Screenshot getScreenshot(Integer screenshotId) {
-		return screenshotRepo.findOne(screenshotId);
+		Screenshot screenshot = screenshotRepo.findOne(screenshotId);
+		List<Target> targetList = targetRepo.find(screenshotId);
+		screenshot.setTargets(targetList);
+		return screenshot;
 	}
 
 	@Override
