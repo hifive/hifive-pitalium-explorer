@@ -73,13 +73,13 @@ public class ApiController {
 	/**
 	 * Gets the screenshot from screenshot id.
 	 *
-	 * @param id screenshot id
+	 * @param screenshotId screenshot id
 	 * @return screenshot
 	 */
 	@RequestMapping(value = "/getScreenshot", method = RequestMethod.GET, produces = "application/json;charset=utf-8")
 	@ResponseBody
-	public ResponseEntity<Screenshot> getDetail(@RequestParam Integer id) {
-		Screenshot item = service.getScreenshot(id);
+	public ResponseEntity<Screenshot> getDetail(@RequestParam Integer screenshotId) {
+		Screenshot item = service.getScreenshot(screenshotId);
 		return new ResponseEntity<Screenshot>(item, HttpStatus.OK);
 	}
 

@@ -27,7 +27,7 @@
 				type: 'get',
 				url: 'api/getScreenshot',
 				data: {
-					id: id
+					screenshotId: id
 				}
 			});
 		}
