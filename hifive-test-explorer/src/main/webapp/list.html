@@ -123,6 +123,7 @@
 					<th>Test screen</th>
 					<th>Platform</th>
 					<th>Browser name</th>
+					<th>Browser Version</th>
 					<th>Comparison result</th>
 				</tr>
 			</thead>
@@ -137,6 +138,7 @@
 					<td>[%= screenshot.testScreen %]</td>
 					<td>[%= screenshot.testEnvironment.platform %]</td>
 					<td>[%= screenshot.testEnvironment.browserName %]</td>
+					<td>[%= screenshot.testEnvironment.browserVersion %]</td>
 					<td>[%
 						if (screenshot.comparisonResult === true) {
 							%]<img class="test-result-icon" src="res/img/checkmark.png" alt="○" aria-label="Passed">[%

@@ -35,6 +35,7 @@
 					<th>Test screen</th>
 					<th>Platform</th>
 					<th>Browser name</th>
+					<th>Browser Version</th>
 					<th>Comparison result</th>
 				</tr>
 			</thead>
@@ -46,6 +47,7 @@
 					<td>[%= testResult.testScreen %]</td>
 					<td>[%= testResult.testEnvironment.platform %]</td>
 					<td>[%= testResult.testEnvironment.browserName %]</td>
+					<td>[%= testResult.testEnvironment.browserVersion %]</td>
 					<td>[%= testResult.comparisonResult ? "○" : testResult.comparisonResult == null ? "-" : "×" %]</td>
 				</tr>
 			</tbody>
