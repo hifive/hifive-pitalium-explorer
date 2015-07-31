@@ -30,6 +30,8 @@ public class Area implements Serializable {
 
 	private String selectorValue;
 
+	private Integer selectorIndex;
+	
 	private double x;
 
 	private double y;
@@ -70,6 +72,14 @@ public class Area implements Serializable {
 
 	public void setSelectorValue(String selectorValue) {
 		this.selectorValue = selectorValue;
+	}
+
+	public Integer getSelectorIndex() {
+		return selectorIndex;
+	}
+
+	public void setSelectorIndex(Integer selectorIndex) {
+		this.selectorIndex = selectorIndex;
 	}
 
 	public double getX() {
