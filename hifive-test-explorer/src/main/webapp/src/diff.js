@@ -98,9 +98,9 @@
 				var html = '';
 				for ( var key in targets) {
 					var target = targets[key];
-					html += '<option value="' + target.targetId + '">SelectorType : '
-							+ target.area.selectorType + ', SelectorValue : '
-							+ target.area.selectorValue + '</option>';
+					html += '<option value="' + target.targetId + '">' + target.area.selectorType
+							+ '_' + target.area.selectorValue + '_[' + target.area.selectorIndex
+							+ ']</option>';
 				}
 
 				imageSelector.prop('disabled', false);
