@@ -298,7 +298,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 	}
 
 	@Override
-	public File getImage(Integer screenshotId, Integer targetId) throws IOException {
+	public Target getTarget(Integer screenshotId, Integer targetId) {
 		Screenshot screenshot = getScreenshot(screenshotId);
 
 		if (screenshot == null) {
@@ -327,8 +327,21 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 				}
 			}
 		}
+		return target;
+	}
+
+	@Override
+	public File getImage(Integer screenshotId, Integer targetId) throws IOException {
+		Screenshot screenshot = getScreenshot(screenshotId);
+
+		if (screenshot == null) {
+			return null;
+		}
+
+		Target target = getTarget(screenshotId, targetId);
 
 		// FIXME MetaDataを使用する方法にするか？
+		// その場合、
 		String child = screenshot.getTestExecution().getTimeString() 
 				+ File.separatorChar + screenshot.getTestClass() 
 				+ File.separatorChar + target.getFileName();

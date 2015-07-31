@@ -10,6 +10,7 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 
 import com.htmlhifive.testexplorer.entity.Screenshot;
+import com.htmlhifive.testexplorer.entity.Target;
 import com.htmlhifive.testexplorer.response.TestExecutionResult;
 import com.htmlhifive.testlib.core.io.Persister;
 
@@ -49,6 +50,15 @@ public interface ExplorerPersister extends Persister {
 	 * @return Screenshot
 	 */
 	Screenshot getScreenshot(Integer screenshotid);
+
+	/**
+	 * Targetを取得する。
+	 * 
+	 * @param screenshotId スクリーンショットID
+	 * @param targetId 比較対象のID
+	 * @return Target
+	 */
+	Target getTarget(Integer screenshotId, Integer targetId);
 
 	/**
 	 * 画像ファイルを取得する。

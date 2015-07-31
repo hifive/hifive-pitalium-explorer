@@ -5,6 +5,7 @@ package com.htmlhifive.testexplorer.io;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -13,6 +14,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
 import com.htmlhifive.testexplorer.entity.Area;
+import com.htmlhifive.testexplorer.entity.AreaRepository;
 import com.htmlhifive.testexplorer.entity.Config;
 import com.htmlhifive.testexplorer.entity.ConfigRepository;
 import com.htmlhifive.testexplorer.entity.ProcessedImage;
@@ -32,6 +34,7 @@ public class ExplorerDBPersister extends DBPersister implements ExplorerPersiste
 	private TestExecutionRepository testExecutionRepo;
 	private ScreenshotRepository screenshotRepo;
 	private TargetRepository targetRepo;
+	private AreaRepository areaRepo;
 	private ProcessedImageRepository processedImageRepo;
 	private ConfigRepository configRepo;
 
@@ -45,6 +48,10 @@ public class ExplorerDBPersister extends DBPersister implements ExplorerPersiste
 
 	public void setTargetRepository(TargetRepository repository) {
 		targetRepo = repository;
+	}
+
+	public void setAreaRepository(AreaRepository repository) {
+		areaRepo = repository;
 	}
 
 	public void setProcessedImageRepository(ProcessedImageRepository repository) {
@@ -80,13 +87,28 @@ public class ExplorerDBPersister extends DBPersister implements ExplorerPersiste
 	@Override
 	public Screenshot getScreenshot(Integer screenshotId) {
 		Screenshot screenshot = screenshotRepo.findOne(screenshotId);
-		List<Target> targetList = targetRepo.find(screenshotId);
+		List<Target> targetList = targetRepo.findByScreenshotId(screenshotId);
 		screenshot.setTargets(targetList);
+
+		for (Target target : targetList) {
+			List<Area> areaList = areaRepo.findByTargetId(target.getTargetId());
+			
+			List<Area> excludeAreaList = new ArrayList<>();
+			for (Area area : areaList) {
+				if (!area.isExcluded()) {
+					target.setArea(area);
+				} else {
+					excludeAreaList.add(area);
+				}
+			}
+			target.setExcludeAreas(excludeAreaList);
+		}
+		
 		return screenshot;
 	}
 
 	@Override
-	public File getImage(Integer screenshotId, Integer targetId) throws IOException {
+	public Target getTarget(Integer screenshotId, Integer targetId) {
 		Screenshot screenshot = getScreenshot(screenshotId);
 
 		if (screenshot == null) {
@@ -106,7 +128,7 @@ public class ExplorerDBPersister extends DBPersister implements ExplorerPersiste
 		// 引数でわたってきたtargetIdと期待値となる画像のScreenshotクラスから取得したTargetクラスのIDは一致しない。
 		// そのために以下の処理を必要とする。
 		if (target == null) {
-			Area area = targetRepo.get(targetId).getArea();
+			Area area = areaRepo.getByTargetIdAndExcluded(targetId, Boolean.FALSE);
 			for (Target t : screenshot.getTargets()) {
 				if (StringUtils.equals(t.getArea().getSelectorType(), area.getSelectorType()) && 
 						StringUtils.equals(t.getArea().getSelectorValue(), area.getSelectorValue())) {
@@ -115,6 +137,18 @@ public class ExplorerDBPersister extends DBPersister implements ExplorerPersiste
 				}
 			}
 		}
+		return target;
+	}
+
+	@Override
+	public File getImage(Integer screenshotId, Integer targetId) throws IOException {
+		Screenshot screenshot = getScreenshot(screenshotId);
+
+		if (screenshot == null) {
+			return null;
+		}
+
+		Target target = getTarget(screenshotId, targetId);
 
 		Config config = configRepo.findOne(ConfigRepository.ABSOLUTE_PATH_KEY);
 		String child = screenshot.getTestExecution().getTimeString() 
