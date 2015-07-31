@@ -4,11 +4,16 @@
 package com.htmlhifive.testexplorer.service;
 
 import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -22,11 +27,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.htmlhifive.testexplorer.conf.ApplicationConfig;
+import com.htmlhifive.testexplorer.entity.Area;
+import com.htmlhifive.testexplorer.entity.AreaRepository;
 import com.htmlhifive.testexplorer.entity.ConfigRepository;
 import com.htmlhifive.testexplorer.entity.ProcessedImageRepository;
 import com.htmlhifive.testexplorer.entity.Repositories;
 import com.htmlhifive.testexplorer.entity.Screenshot;
 import com.htmlhifive.testexplorer.entity.ScreenshotRepository;
+import com.htmlhifive.testexplorer.entity.Target;
 import com.htmlhifive.testexplorer.entity.TargetRepository;
 import com.htmlhifive.testexplorer.entity.TestExecutionRepository;
 import com.htmlhifive.testexplorer.image.EdgeDetector;
@@ -42,7 +50,7 @@ public class ExplorerService implements Serializable {
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = -1786687526955533525L;
+	private static final long serialVersionUID = -7097257097122078409L;
 	@Autowired
 	private ApplicationConfig config;
 	@Autowired
@@ -51,6 +59,8 @@ public class ExplorerService implements Serializable {
 	private ScreenshotRepository screenshotRepo;
 	@Autowired
 	private TargetRepository targetRepo;
+	@Autowired
+	private AreaRepository areaRepo;
 	@Autowired
 	private ConfigRepository configRepo;
 	@Autowired
@@ -66,6 +76,7 @@ public class ExplorerService implements Serializable {
 			((ExplorerDBPersister)persister).setTestExecutionRepository(testExecutionRepo);
 			((ExplorerDBPersister)persister).setScreenshotRepository(screenshotRepo);
 			((ExplorerDBPersister)persister).setTargetRepository(targetRepo);
+			((ExplorerDBPersister)persister).setAreaRepository(areaRepo);
 			((ExplorerDBPersister)persister).setProcessedImageRepository(processedImageRepo);
 			((ExplorerDBPersister)persister).setConfigRepository(configRepo);
 		}
@@ -105,7 +116,17 @@ public class ExplorerService implements Serializable {
 				response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
 				return;
 			}
-			sendFile(file, response);
+
+			Target target = persister.getTarget(screenshotId, targetId);
+			if (target.getExcludeAreas().isEmpty()) {
+				sendFile(file, response);
+			} else {
+				BufferedImage image = ImageIO.read(file);
+				List<Rectangle> excludeRectangleList = createExcludRectangleList(target);
+				// permeabilize
+				fillRect(image, excludeRectangleList, new Color(0, 0, 0, 150));
+				sendImage(image, response);
+			}
 		} catch (IOException e1) {
 			response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
 		}
@@ -184,15 +205,59 @@ public class ExplorerService implements Serializable {
 				return;
 			}
 			File sourceFile = persister.getImage(sourceScreenshotId, targetId);
-			if (!diffPoints.isFailed()) {
-				sendFile(sourceFile, response);
+			Target target = persister.getTarget(sourceScreenshotId, targetId);
+			if (target.getExcludeAreas().isEmpty()) {
+				if (!diffPoints.isFailed()) {
+					sendFile(sourceFile, response);
+				} else {
+					BufferedImage marked = getMarkedImage(sourceFile, diffPoints);
+					sendImage(marked, response);
+				}
 			} else {
-				BufferedImage marked = getMarkedImage(sourceFile, diffPoints);
-				sendImage(marked, response);
+				BufferedImage image = ImageIO.read(sourceFile);
+				List<Rectangle> excludeRectangleList = createExcludRectangleList(target);
+				// permeabilize
+				fillRect(image, excludeRectangleList, new Color(0, 0, 0, 150));
+
+				if (!diffPoints.isFailed()) {
+					sendImage(image, response);
+				} else {
+					BufferedImage marked = getMarkedImage(image, diffPoints);
+					sendImage(marked, response);
+				}
 			}
+
+			
 		} catch (IOException e) {
 			response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
 		}
+	}
+
+	private List<Rectangle> createExcludRectangleList(Target target) {
+		Area area = target.getArea();
+		List<Rectangle> excludeList = new ArrayList<>();
+		for (Area excludeArea : target.getExcludeAreas()) {
+			// Get the relative coordinates from the starting position of the actualArea.
+			// Based on the obtained relative coordinates, to create a rectangle.
+			Rectangle rectangle = new Rectangle((int) excludeArea.getX() - (int) area.getX(),
+					(int) excludeArea.getY() - (int) area.getY(), (int) excludeArea.getWidth(),
+					(int) excludeArea.getHeight());
+			excludeList.add(rectangle);
+		}
+		return excludeList;
+	}
+	
+	private void fillRect(BufferedImage image, List<Rectangle> rectangleList, Color color) {
+		Graphics graphics = image.getGraphics();
+		graphics.setColor(color);
+
+		// Fills the specified rectangle.
+		for (Rectangle rect : rectangleList) {
+			Point loc = rect.getLocation();
+			Dimension size = rect.getSize();
+			graphics.fillRect(loc.x, loc.y, size.width, size.height);
+		}
+		graphics.dispose();
 	}
 
 	private DiffPoints compare(Integer sourceScreenshotId, Integer targetScreenshotId, 
@@ -207,13 +272,24 @@ public class ExplorerService implements Serializable {
 		BufferedImage actual = ImageIO.read(sourceFile);
 		BufferedImage expected = ImageIO.read(targetFile);
 
+		Target target = persister.getTarget(sourceScreenshotId, targetId);
+		if (!target.getExcludeAreas().isEmpty()) {
+			List<Rectangle> excludeRectangleList = createExcludRectangleList(target);
+			fillRect(actual, excludeRectangleList, Color.BLACK);
+			fillRect(expected, excludeRectangleList, Color.BLACK);
+		}
+		
 		// Compare.
 		return ImageUtils.compare(expected, null, actual, null, null);
 	}
 
 	private BufferedImage getMarkedImage(File image, DiffPoints diffPoints) throws IOException {
 		BufferedImage bufferedImage = ImageIO.read(image);
-		return ImageUtils.getMarkedImage(bufferedImage, diffPoints);
+		return getMarkedImage(bufferedImage, diffPoints);
+	}
+
+	private BufferedImage getMarkedImage(BufferedImage image, DiffPoints diffPoints) throws IOException {
+		return ImageUtils.getMarkedImage(image, diffPoints);
 	}
 
 	/**
