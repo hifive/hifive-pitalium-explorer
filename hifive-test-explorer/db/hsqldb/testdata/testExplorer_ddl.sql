@@ -91,6 +91,7 @@ CREATE TABLE Area (
 	targetId int NOT NULL,
 	selectorValue varchar(20) NOT NULL,
 	selectorType varchar(20) NOT NULL,
+	selectorIndex int,
 	x decimal(5,1) NOT NULL,
 	y decimal(5,1) NOT NULL,
 	width decimal(5,1) NOT NULL,
