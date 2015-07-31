@@ -277,6 +277,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 		area.setTargetId(targetId);
 		area.setSelectorType(screenAreaResult.getSelector().getType().name());
 		area.setSelectorValue(screenAreaResult.getSelector().getValue());
+		area.setSelectorIndex(screenAreaResult.getSelector().getIndex());
 		area.setX(screenAreaResult.getRectangle().getX());
 		area.setY(screenAreaResult.getRectangle().getY());
 		area.setWidth(screenAreaResult.getRectangle().getWidth());
