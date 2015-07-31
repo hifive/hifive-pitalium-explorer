@@ -41,14 +41,6 @@ public class Target implements Serializable {
 	public Target() {
 	}
 	
-	public Target(Target target, Area area) {
-		targetId = target.getTargetId();
-		screenshotId = target.getScreenshotId();
-		fileName = target.getFileName();
-		comparisonResult = target.getComparisonResult();
-		this.area = area;
-	}
-
 	public Integer getTargetId() {
 		return targetId;
 	}
