@@ -34,11 +34,14 @@ import com.htmlhifive.testexplorer.response.TestExecutionResult;
 import com.htmlhifive.testlib.core.config.FilePersisterConfig;
 import com.htmlhifive.testlib.core.io.FilePersister;
 import com.htmlhifive.testlib.core.io.PersistMetadata;
+import com.htmlhifive.testlib.core.model.IndexDomSelector;
 import com.htmlhifive.testlib.core.model.ScreenAreaResult;
 import com.htmlhifive.testlib.core.model.ScreenshotResult;
+import com.htmlhifive.testlib.core.model.SelectorType;
 import com.htmlhifive.testlib.core.model.TargetResult;
 import com.htmlhifive.testlib.core.model.TestResult;
 import com.htmlhifive.testlib.core.selenium.MrtCapabilities;
+import com.htmlhifive.testlib.image.model.RectangleArea;
 
 public class ExplorerFilePersister extends FilePersister implements ExplorerPersister {
 
@@ -340,16 +343,25 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 		}
 
 		Target target = getTarget(screenshotId, targetId);
+		Area area = target.getArea();
+		IndexDomSelector selector = 
+				new IndexDomSelector(SelectorType.valueOf(area.getSelectorType()), 
+						area.getSelectorValue(), area.getSelectorIndex());
+		RectangleArea rectangleArea = 
+				new RectangleArea(area.getX(), area.getY(), area.getWidth(), area.getHeight());
+		Map<String, String> map = new HashMap<>();
+		TestEnvironment env = screenshot.getTestEnvironment();
+		map.put("browserName", env.getBrowserName());
+		map.put("version", env.getBrowserVersion());
+		map.put("deviceName", env.getDeviceName());
+		map.put("platform", env.getPlatform());
+		map.put("platformVersion", env.getPlatformVersion());
 
-		// FIXME MetaDataを使用する方法にするか？
-		// その場合、
-		String child = screenshot.getTestExecution().getTimeString() 
-				+ File.separatorChar + screenshot.getTestClass() 
-				+ File.separatorChar + target.getFileName();
-		File image = new File(super.getResultDirectoryFile(), child);
-
+		PersistMetadata metadata = new PersistMetadata(screenshot.getTestExecution().getTimeString(), 
+				screenshot.getTestClass(), screenshot.getTestMethod(), 
+				screenshot.getTestScreen(), selector, rectangleArea, new MrtCapabilities(map));
 		// Send PNG image
-		return image;
+		return super.getScreenshotImageFile(metadata);
 	}
 
 	@Override
