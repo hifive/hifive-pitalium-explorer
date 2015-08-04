@@ -123,7 +123,6 @@ public class ExplorerDBPersister extends DBPersister implements ExplorerPersiste
 			}
 		}
 		
-		// FIXME データの持ち方を再検討する必要があるかも。
 		// targetIdはシーケンシャルにふっているため、
 		// 引数でわたってきたtargetIdと期待値となる画像のScreenshotクラスから取得したTargetクラスのIDは一致しない。
 		// そのために以下の処理を必要とする。
@@ -131,7 +130,8 @@ public class ExplorerDBPersister extends DBPersister implements ExplorerPersiste
 			Area area = areaRepo.getByTargetIdAndExcluded(targetId, Boolean.FALSE);
 			for (Target t : screenshot.getTargets()) {
 				if (StringUtils.equals(t.getArea().getSelectorType(), area.getSelectorType()) && 
-						StringUtils.equals(t.getArea().getSelectorValue(), area.getSelectorValue())) {
+						StringUtils.equals(t.getArea().getSelectorValue(), area.getSelectorValue()) &&
+						t.getArea().getSelectorIndex() == area.getSelectorIndex()) {
 					target = t;
 					break;
 				}
