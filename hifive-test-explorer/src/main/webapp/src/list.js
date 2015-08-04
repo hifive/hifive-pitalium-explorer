@@ -17,7 +17,7 @@
 
 		/**
 		 * The number of items to show in one page.
-		 *
+		 * 
 		 * @type Number
 		 * @memberOf hifive.test.explorer.logic.TestResultListLogic
 		 */
@@ -25,7 +25,7 @@
 
 		/**
 		 * The 0-based index of the item at the top of the current page.
-		 *
+		 * 
 		 * @type Number
 		 * @memberOf hifive.test.explorer.logic.TestResultListLogic
 		 */
@@ -33,7 +33,7 @@
 
 		/**
 		 * The search keyword for test method.
-		 *
+		 * 
 		 * @type String
 		 * @memberOf hifive.test.explorer.logic.TestResultListLogic
 		 */
@@ -41,7 +41,7 @@
 
 		/**
 		 * The search keyword for test screen.
-		 *
+		 * 
 		 * @type String
 		 * @memberOf hifive.test.explorer.logic.TestResultListLogic
 		 */
@@ -176,7 +176,7 @@
 				id: id
 			});
 
-			location.href = url;
+			window.open(url, '_diff');
 		},
 
 		/**
@@ -221,7 +221,7 @@
 
 		/**
 		 * Called when the page size select value has been changed. Updates view.
-		 *
+		 * 
 		 * @memberOf hifive.test.explorer.controller.TestResultListController
 		 * @param {Object} context the event context
 		 * @param {jQuery} $el the event target element
@@ -234,25 +234,27 @@
 
 		/**
 		 * Called when the page link has been clicked. Update view.
-		 *
+		 * 
 		 * @memberOf hifive.test.explorer.controller.TestResultListController
 		 */
-		onHashChange: function(){
+		onHashChange: function() {
 			var pageSize = $("#select-page-size").val();
 			var pageStart = Math.max(0, parseInt(window.location.hash.substr(1)));
-			if (isNaN(pageStart)) { pageStart = 0; }
+			if (isNaN(pageStart)) {
+				pageStart = 0;
+			}
 
 			this.updatePageSize(pageSize, pageStart);
 		},
 
 		/**
 		 * Collect search keyword parameters and save them to logic.
-		 *
+		 * 
 		 * @memberOf hifive.test.explorer.controller.TestResultListController
 		 * @param {jQuery} $el the search element
 		 */
 		collectSearchParameters: function($el) {
-			if (typeof($el) == 'undefined') {
+			if (typeof ($el) == 'undefined') {
 				$el = this.$find('#searchTest');
 			}
 
@@ -268,7 +270,7 @@
 
 		/**
 		 * Set pageSize and pageStart, and update view.
-		 *
+		 * 
 		 * @memberOf hifive.test.explorer.controller.TestResultListController
 		 * @param {number} pageSize new page size
 		 * @param {number} pageStart new page start
@@ -283,7 +285,7 @@
 
 		/**
 		 * Load test execution list from server and update view.
-		 *
+		 * 
 		 * @memberOf hifive.test.explorer.controller.TestResultListController
 		 * @param {number} page desired page number
 		 */
@@ -307,5 +309,6 @@
 	h5.core.expose(testResultListController);
 })(jQuery);
 $(function() {
-	h5.core.controller('body>div.container', hifive.test.explorer.controller.TestResultListController);
+	h5.core.controller('body>div.container',
+			hifive.test.explorer.controller.TestResultListController);
 });
