@@ -11,6 +11,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
@@ -64,7 +65,6 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 	@Override
 	public Page<TestExecutionResult> findTestExecution(String searchTestMethod, 
 			String searchTestScreen, int page, int pageSize) {
-		// TODO:検索には未対応
 		File root = super.getResultDirectoryFile();
 		if (!root.exists() || !root.isDirectory()) {
 			log.error("Directory(" + root.getAbsolutePath() + ") Not Found.");
@@ -191,15 +191,20 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 			}
 		}
 
-		int size = testExecutionList.size();
-		
-		// 最新から並ぶようにソートする。
+		// 検索条件に一致するtestExecution.Idを取得する。
+		List<Integer> extractExecutionIdList = extractTestExecutionId(searchTestMethod, searchTestScreen);
+
+		// 検索条件に一致したTestExecutionのみに絞り込み、かつ最新から並ぶようにソートする。
 		List<TestExecution> tempTestExecutionList = new ArrayList<>();
-		for (int i = size - 1; i >= 0 ; i--) {
-			tempTestExecutionList.add(testExecutionList.get(i));
+		for (int i = testExecutionList.size() - 1; i >= 0 ; i--) {
+			TestExecution testExecution = testExecutionList.get(i);
+			if (extractExecutionIdList.contains(testExecution.getId())) {
+				tempTestExecutionList.add(testExecution);
+			}
 		}
 		testExecutionList = tempTestExecutionList;
 
+		int size = testExecutionList.size();
 		
 		if (pageSize == 0) {
 			pageSize = defaultPageSize;
@@ -211,7 +216,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 		List<TestExecutionResult> resultList = new ArrayList<TestExecutionResult>();
 		for (int i = (page - 1) * pageSize; i < Math.min(page * pageSize, size); i++) {
 			TestExecution execution = testExecutionList.get(i);
-			List<Screenshot> list = screenshotListMap.get(execution.getId());
+			List<Screenshot> list = findScreenshot(execution.getId(), searchTestMethod, searchTestScreen);
 
 			int passedCount = 0;
 			int totalCount = 0;
@@ -288,12 +293,60 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 		area.setExcluded(excluded);
 		return area;
 	}
+
+	private List<Integer> extractTestExecutionId(String searchTestMethod, String searchTestScreen) {
+		boolean existsSearchTestMethod = searchTestMethod != null && !searchTestMethod.trim().isEmpty(); 
+		boolean existsSearchTestScreen = searchTestScreen != null && !searchTestScreen.trim().isEmpty(); 
+
+		List<Integer> extractExecutionIdList = new ArrayList<>();
+		for (Entry<Integer, List<Screenshot>> entry : screenshotListMap.entrySet()) {
+			List<Screenshot> screenshotList = entry.getValue();
+			for (Screenshot screenshot : screenshotList) {
+				if (existsSearchTestScreen) {
+					if (!screenshot.getTestScreen().contains(searchTestScreen)) {
+						continue;
+					}
+				}
+				if (existsSearchTestMethod) {
+					if (!screenshot.getTestMethod().contains(searchTestMethod)) {
+						continue;
+					}
+				}
+				extractExecutionIdList.add(entry.getKey());
+				break;
+			}
+		}
+		return extractExecutionIdList;
+	}
 	
 	@Override
 	public List<Screenshot> findScreenshot(Integer testExecutionId, String searchTestMethod, 
 			String searchTestScreen) {
-		return screenshotListMap != null ? 
-				screenshotListMap.get(testExecutionId) : new ArrayList<Screenshot>(); 
+		if (screenshotListMap == null) {
+			return new ArrayList<Screenshot>();
+		}
+		
+		List<Screenshot> screenshotList = screenshotListMap.get(testExecutionId);
+
+		// 検索条件に一致するScreenshotを抽出する
+		boolean existsSearchTestMethod = searchTestMethod != null && !searchTestMethod.trim().isEmpty(); 
+		boolean existsSearchTestScreen = searchTestScreen != null && !searchTestScreen.trim().isEmpty(); 
+
+		List<Screenshot> extractScreenshotList = new ArrayList<>();
+		for (Screenshot screenshot : screenshotList) {
+			if (existsSearchTestScreen) {
+				if (!screenshot.getTestScreen().contains(searchTestScreen)) {
+					continue;
+				}
+			}
+			if (existsSearchTestMethod) {
+				if (!screenshot.getTestMethod().contains(searchTestMethod)) {
+					continue;
+				}
+			}
+			extractScreenshotList.add(screenshot);
+		}
+		return extractScreenshotList;
 	}
 
 	@Override
