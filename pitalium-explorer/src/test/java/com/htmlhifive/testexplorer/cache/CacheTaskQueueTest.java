@@ -9,6 +9,9 @@ import java.util.concurrent.TimeUnit;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.htmlhifive.pitalium.explorer.cache.CacheTaskQueue;
+import com.htmlhifive.pitalium.explorer.cache.PrioritizedTask;
+
 public class CacheTaskQueueTest {
 	@Test
 	public void TestCreation() throws InterruptedException

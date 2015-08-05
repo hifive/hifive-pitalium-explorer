@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2015 NS Solutions Corporation, All Rights Reserved.
  */
-package com.htmlhifive.testexplorer.cache;
+package com.htmlhifive.pitalium.explorer.cache;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.LookupOp;
@@ -13,12 +13,12 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 
-import com.htmlhifive.testexplorer.entity.ProcessedImage;
-import com.htmlhifive.testexplorer.entity.ProcessedImageKey;
-import com.htmlhifive.testexplorer.entity.Repositories;
-import com.htmlhifive.testexplorer.entity.Screenshot;
-import com.htmlhifive.testexplorer.file.ImageFileUtility;
-import com.htmlhifive.testexplorer.image.EdgeDetector;
+import com.htmlhifive.pitalium.explorer.entity.ProcessedImage;
+import com.htmlhifive.pitalium.explorer.entity.ProcessedImageKey;
+import com.htmlhifive.pitalium.explorer.entity.Repositories;
+import com.htmlhifive.pitalium.explorer.entity.Screenshot;
+import com.htmlhifive.pitalium.explorer.file.ImageFileUtility;
+import com.htmlhifive.pitalium.explorer.image.EdgeDetector;
 
 public class BackgroundImageDispatcher extends Thread {
 	private CacheTaskQueue taskQueue;

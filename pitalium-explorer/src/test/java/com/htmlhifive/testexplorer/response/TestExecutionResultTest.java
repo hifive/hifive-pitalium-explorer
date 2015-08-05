@@ -6,7 +6,8 @@ package com.htmlhifive.testexplorer.response;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.htmlhifive.testexplorer.entity.TestExecution;
+import com.htmlhifive.pitalium.explorer.entity.TestExecution;
+import com.htmlhifive.pitalium.explorer.response.TestExecutionResult;
 
 public class TestExecutionResultTest {
 	@Test

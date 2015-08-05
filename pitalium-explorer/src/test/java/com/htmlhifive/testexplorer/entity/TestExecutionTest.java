@@ -10,6 +10,8 @@ import java.util.HashSet;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.htmlhifive.pitalium.explorer.entity.TestExecution;
+
 public class TestExecutionTest {
 	@Test
 	public void testGetterSetter() throws ClassNotFoundException, IOException

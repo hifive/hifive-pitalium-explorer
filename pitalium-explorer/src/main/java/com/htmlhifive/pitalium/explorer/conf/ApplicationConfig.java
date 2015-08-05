@@ -1,11 +1,12 @@
 /*
  * Copyright (C) 2015 NS Solutions Corporation, All Rights Reserved.
  */
-package com.htmlhifive.testexplorer.conf;
+package com.htmlhifive.pitalium.explorer.conf;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
+
 
 @Configuration()
 public class ApplicationConfig {

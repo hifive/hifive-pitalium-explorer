@@ -3,10 +3,12 @@
  */
 package com.htmlhifive.testexplorer.cache;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
 
 import org.junit.Assert;
 import org.junit.Test;
+
+import com.htmlhifive.pitalium.explorer.cache.PrioritizedTask;
 
 public class PrioritizedTaskTest {
 	@Test

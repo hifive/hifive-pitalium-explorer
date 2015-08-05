@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2015 NS Solutions Corporation, All Rights Reserved.
  */
-package com.htmlhifive.testexplorer.io;
+package com.htmlhifive.pitalium.explorer.io;
 
 import java.awt.image.BufferedImage;
 import java.io.InputStream;

@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2015 NS Solutions Corporation, All Rights Reserved.
  */
-package com.htmlhifive.testexplorer.api;
+package com.htmlhifive.pitalium.explorer.api;
 
 import java.util.Map;
 
@@ -15,9 +15,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.htmlhifive.testexplorer.cache.BackgroundImageDispatcher;
-import com.htmlhifive.testexplorer.cache.CacheTaskQueue;
-import com.htmlhifive.testexplorer.service.ExplorerService;
+import com.htmlhifive.pitalium.explorer.cache.BackgroundImageDispatcher;
+import com.htmlhifive.pitalium.explorer.cache.CacheTaskQueue;
+import com.htmlhifive.pitalium.explorer.service.ExplorerService;
 
 @Controller
 @RequestMapping("/image")

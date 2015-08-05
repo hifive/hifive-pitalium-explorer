@@ -8,6 +8,10 @@ import java.io.IOException;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.htmlhifive.pitalium.explorer.entity.Screenshot;
+import com.htmlhifive.pitalium.explorer.entity.TestEnvironment;
+import com.htmlhifive.pitalium.explorer.entity.TestExecution;
+
 public class ScreenshotTest {
 	@Test
 	public void testGetterSetter() throws ClassNotFoundException, IOException

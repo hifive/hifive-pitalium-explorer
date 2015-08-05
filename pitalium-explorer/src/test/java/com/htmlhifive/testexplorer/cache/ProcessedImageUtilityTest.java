@@ -5,6 +5,8 @@ package com.htmlhifive.testexplorer.cache;
 
 import org.junit.Test;
 
+import com.htmlhifive.pitalium.explorer.cache.ProcessedImageUtility;
+
 public class ProcessedImageUtilityTest {
 	@Test
 	public void testGetAlgorithmName()

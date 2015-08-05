@@ -4,8 +4,11 @@
 package com.htmlhifive.testexplorer.entity;
 
 import java.io.IOException;
+
 import org.junit.Assert;
 import org.junit.Test;
+
+import com.htmlhifive.pitalium.explorer.entity.Config;
 
 public class ConfigTest {
 	@Test

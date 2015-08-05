@@ -1,10 +1,12 @@
 /*
  * Copyright (C) 2015 NS Solutions Corporation, All Rights Reserved.
  */
-package com.htmlhifive.testexplorer.image;
+package com.htmlhifive.pitalium.explorer.image;
 
-import java.awt.*;
-import java.awt.image.*;
+import java.awt.Color;
+import java.awt.image.BufferedImage;
+import java.awt.image.ConvolveOp;
+import java.awt.image.DataBufferInt;
 import java.util.Arrays;
 import java.util.Stack;
 

@@ -5,6 +5,8 @@ package com.htmlhifive.testexplorer.image;
 
 import org.junit.Test;
 
+import com.htmlhifive.pitalium.explorer.image.ConvolveOpGenerator;
+
 public class ConvolveOpGeneratorTest {
 	@Test
 	public void TestConstruction()

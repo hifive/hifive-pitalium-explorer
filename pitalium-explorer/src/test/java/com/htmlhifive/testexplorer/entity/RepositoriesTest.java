@@ -4,12 +4,16 @@
 package com.htmlhifive.testexplorer.entity;
 
 import org.junit.Assert;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import com.htmlhifive.pitalium.explorer.entity.ConfigRepository;
+import com.htmlhifive.pitalium.explorer.entity.ProcessedImageRepository;
+import com.htmlhifive.pitalium.explorer.entity.ScreenshotRepository;
+import com.htmlhifive.pitalium.explorer.entity.TestExecutionRepository;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("/spring/test-context.xml")

@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2015 NS Solutions Corporation, All Rights Reserved.
  */
-package com.htmlhifive.testexplorer.io;
+package com.htmlhifive.pitalium.explorer.io;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,21 +13,21 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
-import com.htmlhifive.testexplorer.entity.Area;
-import com.htmlhifive.testexplorer.entity.AreaRepository;
-import com.htmlhifive.testexplorer.entity.Config;
-import com.htmlhifive.testexplorer.entity.ConfigRepository;
-import com.htmlhifive.testexplorer.entity.ProcessedImage;
-import com.htmlhifive.testexplorer.entity.ProcessedImageKey;
-import com.htmlhifive.testexplorer.entity.ProcessedImageRepository;
-import com.htmlhifive.testexplorer.entity.Repositories;
-import com.htmlhifive.testexplorer.entity.Screenshot;
-import com.htmlhifive.testexplorer.entity.ScreenshotRepository;
-import com.htmlhifive.testexplorer.entity.Target;
-import com.htmlhifive.testexplorer.entity.TargetRepository;
-import com.htmlhifive.testexplorer.entity.TestExecutionRepository;
-import com.htmlhifive.testexplorer.file.ImageFileUtility;
-import com.htmlhifive.testexplorer.response.TestExecutionResult;
+import com.htmlhifive.pitalium.explorer.entity.Area;
+import com.htmlhifive.pitalium.explorer.entity.AreaRepository;
+import com.htmlhifive.pitalium.explorer.entity.Config;
+import com.htmlhifive.pitalium.explorer.entity.ConfigRepository;
+import com.htmlhifive.pitalium.explorer.entity.ProcessedImage;
+import com.htmlhifive.pitalium.explorer.entity.ProcessedImageKey;
+import com.htmlhifive.pitalium.explorer.entity.ProcessedImageRepository;
+import com.htmlhifive.pitalium.explorer.entity.Repositories;
+import com.htmlhifive.pitalium.explorer.entity.Screenshot;
+import com.htmlhifive.pitalium.explorer.entity.ScreenshotRepository;
+import com.htmlhifive.pitalium.explorer.entity.Target;
+import com.htmlhifive.pitalium.explorer.entity.TargetRepository;
+import com.htmlhifive.pitalium.explorer.entity.TestExecutionRepository;
+import com.htmlhifive.pitalium.explorer.file.ImageFileUtility;
+import com.htmlhifive.pitalium.explorer.response.TestExecutionResult;
 
 public class ExplorerDBPersister extends DBPersister implements ExplorerPersister {
 

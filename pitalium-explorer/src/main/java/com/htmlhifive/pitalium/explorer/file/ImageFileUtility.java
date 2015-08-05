@@ -1,17 +1,17 @@
 /*
  * Copyright (C) 2015 NS Solutions Corporation, All Rights Reserved.
  */
-package com.htmlhifive.testexplorer.file;
+package com.htmlhifive.pitalium.explorer.file;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 
-import com.htmlhifive.testexplorer.entity.ConfigRepository;
-import com.htmlhifive.testexplorer.entity.ProcessedImage;
-import com.htmlhifive.testexplorer.entity.ProcessedImageKey;
-import com.htmlhifive.testexplorer.entity.Repositories;
-import com.htmlhifive.testexplorer.entity.Screenshot;
-import com.htmlhifive.testexplorer.entity.TestExecution;
+import com.htmlhifive.pitalium.explorer.entity.ConfigRepository;
+import com.htmlhifive.pitalium.explorer.entity.ProcessedImage;
+import com.htmlhifive.pitalium.explorer.entity.ProcessedImageKey;
+import com.htmlhifive.pitalium.explorer.entity.Repositories;
+import com.htmlhifive.pitalium.explorer.entity.Screenshot;
+import com.htmlhifive.pitalium.explorer.entity.TestExecution;
 
 public class ImageFileUtility {
 	private final Repositories repositories;

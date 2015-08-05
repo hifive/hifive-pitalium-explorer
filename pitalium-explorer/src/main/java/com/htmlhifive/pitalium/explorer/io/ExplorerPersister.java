@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2015 NS Solutions Corporation, All Rights Reserved.
  */
-package com.htmlhifive.testexplorer.io;
+package com.htmlhifive.pitalium.explorer.io;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,9 +10,9 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 
 import com.htmlhifive.pitalium.core.io.Persister;
-import com.htmlhifive.testexplorer.entity.Screenshot;
-import com.htmlhifive.testexplorer.entity.Target;
-import com.htmlhifive.testexplorer.response.TestExecutionResult;
+import com.htmlhifive.pitalium.explorer.entity.Screenshot;
+import com.htmlhifive.pitalium.explorer.entity.Target;
+import com.htmlhifive.pitalium.explorer.response.TestExecutionResult;
 
 public interface ExplorerPersister extends Persister {
 

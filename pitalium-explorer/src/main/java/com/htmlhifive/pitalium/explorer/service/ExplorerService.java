@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2015 NS Solutions Corporation, All Rights Reserved.
  */
-package com.htmlhifive.testexplorer.service;
+package com.htmlhifive.pitalium.explorer.service;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -27,23 +27,23 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.htmlhifive.pitalium.core.result.TestResultManager;
+import com.htmlhifive.pitalium.explorer.conf.ApplicationConfig;
+import com.htmlhifive.pitalium.explorer.entity.Area;
+import com.htmlhifive.pitalium.explorer.entity.AreaRepository;
+import com.htmlhifive.pitalium.explorer.entity.ConfigRepository;
+import com.htmlhifive.pitalium.explorer.entity.ProcessedImageRepository;
+import com.htmlhifive.pitalium.explorer.entity.Repositories;
+import com.htmlhifive.pitalium.explorer.entity.Screenshot;
+import com.htmlhifive.pitalium.explorer.entity.ScreenshotRepository;
+import com.htmlhifive.pitalium.explorer.entity.Target;
+import com.htmlhifive.pitalium.explorer.entity.TargetRepository;
+import com.htmlhifive.pitalium.explorer.entity.TestExecutionRepository;
+import com.htmlhifive.pitalium.explorer.image.EdgeDetector;
+import com.htmlhifive.pitalium.explorer.io.ExplorerDBPersister;
+import com.htmlhifive.pitalium.explorer.io.ExplorerPersister;
+import com.htmlhifive.pitalium.explorer.response.TestExecutionResult;
 import com.htmlhifive.pitalium.image.model.DiffPoints;
 import com.htmlhifive.pitalium.image.util.ImageUtils;
-import com.htmlhifive.testexplorer.conf.ApplicationConfig;
-import com.htmlhifive.testexplorer.entity.Area;
-import com.htmlhifive.testexplorer.entity.AreaRepository;
-import com.htmlhifive.testexplorer.entity.ConfigRepository;
-import com.htmlhifive.testexplorer.entity.ProcessedImageRepository;
-import com.htmlhifive.testexplorer.entity.Repositories;
-import com.htmlhifive.testexplorer.entity.Screenshot;
-import com.htmlhifive.testexplorer.entity.ScreenshotRepository;
-import com.htmlhifive.testexplorer.entity.Target;
-import com.htmlhifive.testexplorer.entity.TargetRepository;
-import com.htmlhifive.testexplorer.entity.TestExecutionRepository;
-import com.htmlhifive.testexplorer.image.EdgeDetector;
-import com.htmlhifive.testexplorer.io.ExplorerDBPersister;
-import com.htmlhifive.testexplorer.io.ExplorerPersister;
-import com.htmlhifive.testexplorer.response.TestExecutionResult;
 
 @Service
 public class ExplorerService implements Serializable {

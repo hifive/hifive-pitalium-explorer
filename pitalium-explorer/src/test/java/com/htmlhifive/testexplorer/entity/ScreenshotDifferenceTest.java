@@ -8,6 +8,9 @@ import java.io.IOException;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.htmlhifive.pitalium.explorer.entity.Screenshot;
+import com.htmlhifive.pitalium.explorer.entity.ScreenshotDifference;
+
 public class ScreenshotDifferenceTest {
 	@Test
 	public void testGetterSetter() throws ClassNotFoundException, IOException

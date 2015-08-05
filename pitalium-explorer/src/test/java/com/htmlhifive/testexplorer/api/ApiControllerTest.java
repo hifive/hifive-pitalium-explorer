@@ -3,14 +3,17 @@
  */
 package com.htmlhifive.testexplorer.api;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -29,18 +32,18 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import com.htmlhifive.testexplorer.entity.Config;
-import com.htmlhifive.testexplorer.entity.ConfigRepository;
-import com.htmlhifive.testexplorer.entity.ProcessedImage;
-import com.htmlhifive.testexplorer.entity.ProcessedImageRepository;
-import com.htmlhifive.testexplorer.entity.Repositories;
+import com.htmlhifive.pitalium.explorer.api.ApiController;
+import com.htmlhifive.pitalium.explorer.entity.Config;
+import com.htmlhifive.pitalium.explorer.entity.ConfigRepository;
+import com.htmlhifive.pitalium.explorer.entity.ProcessedImage;
+import com.htmlhifive.pitalium.explorer.entity.ProcessedImageRepository;
+import com.htmlhifive.pitalium.explorer.entity.Screenshot;
+import com.htmlhifive.pitalium.explorer.entity.ScreenshotRepository;
+import com.htmlhifive.pitalium.explorer.entity.TestEnvironment;
+import com.htmlhifive.pitalium.explorer.entity.TestExecution;
+import com.htmlhifive.pitalium.explorer.entity.TestExecutionRepository;
+import com.htmlhifive.pitalium.explorer.response.TestExecutionResult;
 import com.htmlhifive.testexplorer.entity.RepositoryMockCreator;
-import com.htmlhifive.testexplorer.entity.Screenshot;
-import com.htmlhifive.testexplorer.entity.ScreenshotRepository;
-import com.htmlhifive.testexplorer.entity.TestEnvironment;
-import com.htmlhifive.testexplorer.entity.TestExecution;
-import com.htmlhifive.testexplorer.entity.TestExecutionRepository;
-import com.htmlhifive.testexplorer.response.TestExecutionResult;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("/spring/test-context.xml")

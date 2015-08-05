@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2015 NS Solutions Corporation, All Rights Reserved.
  */
-package com.htmlhifive.testexplorer.entity;
+package com.htmlhifive.pitalium.explorer.entity;
 
 import java.io.Serializable;
 import java.util.List;

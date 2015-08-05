@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2015 NS Solutions Corporation, All Rights Reserved.
  */
-package com.htmlhifive.testexplorer.io;
+package com.htmlhifive.pitalium.explorer.io;
 
 import java.io.File;
 import java.io.IOException;
@@ -36,13 +36,13 @@ import com.htmlhifive.pitalium.core.model.SelectorType;
 import com.htmlhifive.pitalium.core.model.TargetResult;
 import com.htmlhifive.pitalium.core.model.TestResult;
 import com.htmlhifive.pitalium.core.selenium.PtlCapabilities;
+import com.htmlhifive.pitalium.explorer.entity.Area;
+import com.htmlhifive.pitalium.explorer.entity.Screenshot;
+import com.htmlhifive.pitalium.explorer.entity.Target;
+import com.htmlhifive.pitalium.explorer.entity.TestEnvironment;
+import com.htmlhifive.pitalium.explorer.entity.TestExecution;
+import com.htmlhifive.pitalium.explorer.response.TestExecutionResult;
 import com.htmlhifive.pitalium.image.model.RectangleArea;
-import com.htmlhifive.testexplorer.entity.Area;
-import com.htmlhifive.testexplorer.entity.Screenshot;
-import com.htmlhifive.testexplorer.entity.Target;
-import com.htmlhifive.testexplorer.entity.TestEnvironment;
-import com.htmlhifive.testexplorer.entity.TestExecution;
-import com.htmlhifive.testexplorer.response.TestExecutionResult;
 
 public class ExplorerFilePersister extends FilePersister implements ExplorerPersister {
 

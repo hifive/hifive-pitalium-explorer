@@ -8,6 +8,8 @@ import java.io.IOException;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.htmlhifive.pitalium.explorer.entity.ProcessedImageKey;
+
 public class ProcessedImageKeyTest {
 	@Test
 	public void testGetterSetter() throws ClassNotFoundException, IOException

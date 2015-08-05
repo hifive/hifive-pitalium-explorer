@@ -1,9 +1,9 @@
 /*
  * Copyright (C) 2015 NS Solutions Corporation, All Rights Reserved.
  */
-package com.htmlhifive.testexplorer.response;
+package com.htmlhifive.pitalium.explorer.response;
 
-import com.htmlhifive.testexplorer.entity.TestExecution;
+import com.htmlhifive.pitalium.explorer.entity.TestExecution;
 
 public class TestExecutionResult {
 
