@@ -50,15 +50,6 @@ Let's **hifive**!
 
 [url-list]: http://localhost:8080/pitalium-explorer/list.html
 
-### About Web APIs
-You can see the list of this application's APIs from
-[http://localhost:8080/pitalium-explorer/spec/api.html][url-api]
-
-By clicking the buttons labeled "Get a sample result" in that page, you can see
-the example data.
-
-[url-api]: http://localhost:8080/pitalium-explorer/spec/api.html
-
 ### How to generate API Documents (JSDoc)
 1.  Download jsdoc3
     - Download [jsdoc](https://github.com/jsdoc3/jsdoc)
