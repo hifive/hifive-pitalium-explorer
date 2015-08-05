@@ -82,6 +82,7 @@
 				this.view.update('#detail', 'testResultListTemplate', {
 					testResult: screenshot
 				});
+				this._changeTitle();
 			}));
 
 			this._initializeSwipeHandle();
@@ -89,6 +90,17 @@
 
 			this.$find('#quick-flipping .image-diff.expected').css('opacity', 0.2);
 			this.$find('#quick-flipping .image-overlay .expected').hide();
+		},
+
+		_changeTitle: function() {
+			var title = $('title').text();
+			if (this._screenshot.comparisonResult == null) {
+				// ignore
+			} else if (this._screenshot.comparisonResult) {
+				$('title').text('○ ' + title);
+			} else {
+				$('title').text('× ' + title);
+			}
 		},
 
 		/**
@@ -106,7 +118,6 @@
 			// Fire change event and show images.
 			imageSelector.change();
 		},
-
 
 		/**
 		 * Called when the selection of the drop down changed.<br>
