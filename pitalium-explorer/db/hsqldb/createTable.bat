@@ -1,1 +1,1 @@
-executeSQL.bat testdata/testExplorer_ddl.sql
+executeSQL.bat testdata/pitaliumExplorer_ddl.sql

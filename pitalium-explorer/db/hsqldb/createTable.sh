@@ -1,1 +1,1 @@
-./executeSQL.sh "testdata/testExplorer_ddl.sql"
+./executeSQL.sh "testdata/pitaliumExplorer_ddl.sql"
