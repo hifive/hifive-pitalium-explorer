@@ -99,7 +99,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 			testExecution.setId(executionId);
 			DateTime dateTime = DateTimeFormat.forPattern("yyyy_MM_dd_HH_mm_ss").parseDateTime(executionDate);
 			testExecution.setTime(new Timestamp(dateTime.getMillis()));
-			testExecution.setExecResult(testResult.getResult());
+			testExecution.setExecResult(testResult.getResult().toString());
 
 			// 重複チェック
 			boolean exists = false;

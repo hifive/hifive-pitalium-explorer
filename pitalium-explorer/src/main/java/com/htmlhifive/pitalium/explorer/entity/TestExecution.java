@@ -29,7 +29,7 @@ public class TestExecution implements Serializable {
 
 	private Timestamp time;
 
-	private ExecResult execResult;
+	private String execResult;
 
 	public Integer getId() {
 		return id;
@@ -60,11 +60,11 @@ public class TestExecution implements Serializable {
 		return directoryFormat.format(time);
 	}
 
-	public ExecResult getExecResult() {
+	public String getExecResult() {
 		return execResult;
 	}
 
-	public void setExecResult(ExecResult execResult) {
+	public void setExecResult(String execResult) {
 		this.execResult = execResult;
 	}
 
