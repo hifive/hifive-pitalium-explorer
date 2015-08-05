@@ -13,7 +13,7 @@
 		<conf name="test" visibility="private"/>
 	</configurations>
 	<publications>
-		<artifact name="hifive-test-explorer" type="war" conf="default"/>
+		<artifact name="pitalium-explorer" type="war" conf="default"/>
 	</publications>
 	<dependencies>
 		<dependency org="org.slf4j" name="slf4j-api" rev="1.7.10" conf="default,test->default(*)" />
