@@ -5,6 +5,6 @@
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd">
 
 	<!-- Scans within the base package of the application for @Controller to configure as beans -->
-	<context:component-scan base-package="com.htmlhifive.testexplorer" />
+	<context:component-scan base-package="com.htmlhifive.pitalium.explorer" />
 
 </beans>

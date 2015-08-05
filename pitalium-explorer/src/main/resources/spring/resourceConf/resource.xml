@@ -7,7 +7,7 @@
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd">
 
 	<!-- Scans within the base package of the application for JpaRepository classs to configure as beans -->
-	<jpa:repositories base-package="com.htmlhifive.testexplorer.entity"
+	<jpa:repositories base-package="com.htmlhifive.pitalium.explorer.entity"
 		transaction-manager-ref="transactionManager"/>
 
 </beans>
