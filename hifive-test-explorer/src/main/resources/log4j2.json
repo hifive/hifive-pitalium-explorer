@@ -11,7 +11,7 @@
       },
       "File": {
         "name": "File",
-        "fileName" : "./logs/resourceFrameworkTest.log",
+        "fileName" : "./logs/pitalium-explorer.log",
 		"Append" : "true",
         "PatternLayout": {
           "pattern": "%d{yy/MM/dd HH:mm:ss.SSS} %-5p: [R:%.5X{reqId} S:%.5X{sessionId}] [%X{userId}] %X{messageId} %m%n%ex"
