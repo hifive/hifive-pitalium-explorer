@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2015 NS Solutions Corporation, All Rights Reserved.
  */
-package com.htmlhifive.testexplorer.api;
+package com.htmlhifive.pitalium-explorer.api;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doReturn;
@@ -36,7 +36,7 @@ import com.htmlhifive.pitalium.explorer.entity.ScreenshotRepository;
 import com.htmlhifive.pitalium.explorer.entity.TestEnvironment;
 import com.htmlhifive.pitalium.explorer.entity.TestExecution;
 import com.htmlhifive.pitalium.explorer.entity.TestExecutionRepository;
-import com.htmlhifive.testexplorer.entity.RepositoryMockCreator;
+import com.htmlhifive.pitalium-explorer.entity.RepositoryMockCreator;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("/spring/test-context.xml")
