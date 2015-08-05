@@ -98,21 +98,11 @@
 		 * @param {Array} includes the selectors for the test area inclusion.
 		 */
 		_initializeImageSelector: function(targets) {
+			this.view.update('#selector', 'imageSelectorTemplate', {
+				targets: targets
+			});
 			// Generate select options
 			var imageSelector = this.$find('#imageSelector');
-			if (targets != null && targets.length > 0) {
-				var html = '';
-				for ( var key in targets) {
-					var target = targets[key];
-					html += '<option value="' + target.targetId + '">' + target.area.selectorType
-							+ '_' + target.area.selectorValue + '_[' + target.area.selectorIndex
-							+ ']</option>';
-				}
-
-				imageSelector.prop('disabled', false);
-				imageSelector.append(html);
-			}
-
 			// Fire change event and show images.
 			imageSelector.change();
 		},
