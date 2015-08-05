@@ -6,18 +6,18 @@
 		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.2.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd">
 
-	<context:component-scan base-package="com.htmlhifive.testexplorer.api"/>
-	<bean id="mockTestExecutionRepository" class="com.htmlhifive.testexplorer.api.MockFactory">
-		<constructor-arg value="com.htmlhifive.testexplorer.entity.TestExecutionRepository" />
+	<context:component-scan base-package="com.htmlhifive.pitalium.explorer.api"/>
+	<bean id="mockTestExecutionRepository" class="com.htmlhifive.pitalium.explorer.api.MockFactory">
+		<constructor-arg value="com.htmlhifive.pitalium.explorer.entity.TestExecutionRepository" />
 	</bean>
-	<bean id="mockScreenshotRepository" class="com.htmlhifive.testexplorer.api.MockFactory">
-		<constructor-arg value="com.htmlhifive.testexplorer.entity.ScreenshotRepository" />
+	<bean id="mockScreenshotRepository" class="com.htmlhifive.pitalium.explorer.api.MockFactory">
+		<constructor-arg value="com.htmlhifive.pitalium.explorer.entity.ScreenshotRepository" />
 	</bean>
-	<bean id="mockConfigRepository" class="com.htmlhifive.testexplorer.api.MockFactory">
-		<constructor-arg value="com.htmlhifive.testexplorer.entity.ConfigRepository" />
+	<bean id="mockConfigRepository" class="com.htmlhifive.pitalium.explorer.api.MockFactory">
+		<constructor-arg value="com.htmlhifive.pitalium.explorer.entity.ConfigRepository" />
 	</bean>
-	<bean id="mockProcessedImageRepository" class="com.htmlhifive.testexplorer.api.MockFactory">
-		<constructor-arg value="com.htmlhifive.testexplorer.entity.ProcessedImageRepository" />
+	<bean id="mockProcessedImageRepository" class="com.htmlhifive.pitalium.explorer.api.MockFactory">
+		<constructor-arg value="com.htmlhifive.pitalium.explorer.entity.ProcessedImageRepository" />
 	</bean>
 	<bean id="mockHttpServlet" class="org.springframework.mock.web.MockHttpServletRequest">
 	</bean>
