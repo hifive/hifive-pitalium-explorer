@@ -29,6 +29,7 @@ import org.springframework.data.domain.PageRequest;
 import com.htmlhifive.pitalium.core.config.FilePersisterConfig;
 import com.htmlhifive.pitalium.core.io.FilePersister;
 import com.htmlhifive.pitalium.core.io.PersistMetadata;
+import com.htmlhifive.pitalium.core.model.ExecResult;
 import com.htmlhifive.pitalium.core.model.IndexDomSelector;
 import com.htmlhifive.pitalium.core.model.ScreenAreaResult;
 import com.htmlhifive.pitalium.core.model.ScreenshotResult;
@@ -99,7 +100,11 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 			testExecution.setId(executionId);
 			DateTime dateTime = DateTimeFormat.forPattern("yyyy_MM_dd_HH_mm_ss").parseDateTime(executionDate);
 			testExecution.setTime(new Timestamp(dateTime.getMillis()));
-			testExecution.setExecResult(testResult.getResult().toString());
+
+			ExecResult result = testResult.getResult();
+			if (result != null) {
+				testExecution.setExecResult(testResult.getResult().toString());
+			}
 
 			// 重複チェック
 			boolean exists = false;
