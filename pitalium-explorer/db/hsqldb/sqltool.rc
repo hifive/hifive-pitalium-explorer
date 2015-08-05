@@ -1,4 +1,4 @@
-urlid testexplorer
-url jdbc:hsqldb:hsql://localhost/db/testexplorer
+urlid pitalium-explorer
+url jdbc:hsqldb:hsql://localhost/db/pitalium-explorer
 username sa
 password
