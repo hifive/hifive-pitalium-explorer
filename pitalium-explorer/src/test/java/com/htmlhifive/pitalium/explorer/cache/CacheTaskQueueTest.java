@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2015 NS Solutions Corporation, All Rights Reserved.
  */
-package com.htmlhifive.pitalium-explorer.cache;
+package com.htmlhifive.pitalium.explorer.cache;
 
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;

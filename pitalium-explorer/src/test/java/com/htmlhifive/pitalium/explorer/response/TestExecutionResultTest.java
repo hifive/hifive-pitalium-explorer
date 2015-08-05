@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2015 NS Solutions Corporation, All Rights Reserved.
  */
-package com.htmlhifive.pitalium-explorer.response;
+package com.htmlhifive.pitalium.explorer.response;
 
 import org.junit.Assert;
 import org.junit.Test;

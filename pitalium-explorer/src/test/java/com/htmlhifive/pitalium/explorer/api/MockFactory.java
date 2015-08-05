@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2015 NS Solutions Corporation, All Rights Reserved.
  */
-package com.htmlhifive.pitalium-explorer.api;
+package com.htmlhifive.pitalium.explorer.api;
 
 import org.mockito.Mockito;
 import org.springframework.beans.factory.FactoryBean;

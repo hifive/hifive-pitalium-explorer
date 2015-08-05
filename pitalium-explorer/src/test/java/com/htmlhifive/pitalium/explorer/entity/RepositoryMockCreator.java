@@ -1,23 +1,13 @@
 /*
  * Copyright (C) 2015 NS Solutions Corporation, All Rights Reserved.
  */
-package com.htmlhifive.pitalium-explorer.entity;
+package com.htmlhifive.pitalium.explorer.entity;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
-
-import com.htmlhifive.pitalium.explorer.entity.Config;
-import com.htmlhifive.pitalium.explorer.entity.ConfigRepository;
-import com.htmlhifive.pitalium.explorer.entity.ProcessedImage;
-import com.htmlhifive.pitalium.explorer.entity.ProcessedImageRepository;
-import com.htmlhifive.pitalium.explorer.entity.Screenshot;
-import com.htmlhifive.pitalium.explorer.entity.ScreenshotRepository;
-import com.htmlhifive.pitalium.explorer.entity.TestEnvironment;
-import com.htmlhifive.pitalium.explorer.entity.TestExecution;
-import com.htmlhifive.pitalium.explorer.entity.TestExecutionRepository;
 
 public class RepositoryMockCreator {
 	private TestExecutionRepository testExecutionRepo;

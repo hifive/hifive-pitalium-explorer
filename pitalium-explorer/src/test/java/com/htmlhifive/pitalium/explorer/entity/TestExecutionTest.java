@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2015 NS Solutions Corporation, All Rights Reserved.
  */
-package com.htmlhifive.pitalium-explorer.entity;
+package com.htmlhifive.pitalium.explorer.entity;
 
 import java.io.IOException;
 import java.sql.Timestamp;
