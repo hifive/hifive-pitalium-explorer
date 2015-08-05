@@ -15,11 +15,17 @@
 			<arguments>
 			</arguments>
 		</buildCommand>
+		<buildCommand>
+			<name>com.htmlhifive.tools.jslint.H5JSLintPlugin.jslintbuilder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
 	</buildSpec>
 	<natures>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 		<nature>com.sysdeo.eclipse.tomcat.tomcatnature</nature>
 		<nature>org.eclipse.wst.jsdt.core.jsNature</nature>
 		<nature>org.apache.ivyde.eclipse.ivynature</nature>
+		<nature>com.htmlhifive.tools.jslint.H5JSLintPlugin.JSLintPluginNature</nature>
 	</natures>
 </projectDescription>

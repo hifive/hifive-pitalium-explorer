@@ -1,3 +1,4 @@
+/*global h5, hifive, window, document */
 /*
  * Copyright (C) 2015 NS Solutions Corporation, All Rights Reserved.
  */
@@ -44,7 +45,7 @@
 				'page': page,
 				'limit': pageSize,
 				'searchTestMethod': this.searchTestMethod,
-				'searchTestScreen': this.searchTestScreen,
+				'searchTestScreen': this.searchTestScreen
 			};
 
 			return h5.ajax({
@@ -70,10 +71,10 @@
 				data: {
 					testExecutionId: testExecutionId,
 					searchTestMethod: this.searchTestMethod,
-					searchTestScreen: this.searchTestScreen,
+					searchTestScreen: this.searchTestScreen
 				}
 			});
-		},
+		}
 	};
 	h5.core.expose(testResultListLogic);
 })(jQuery);
@@ -139,8 +140,9 @@
 			var $panelBody = $el.find('.panel-body');
 
 			// Check the loaded flag and do nothing if exists.
-			if ($panelBody.hasClass('hifive.pitalium.explorer-load'))
+			if ($panelBody.hasClass('hifive.pitalium.explorer-load')) {
 				return;
+			}
 
 			var testExecutionId = $el.data('testExecutionId');
 
@@ -268,8 +270,8 @@
 				params[$elem.attr('name')] = $elem.val();
 			});
 
-			this._testResultListLogic.searchTestMethod = params['searchTestMethod'];
-			this._testResultListLogic.searchTestScreen = params['searchTestScreen'];
+			this._testResultListLogic.searchTestMethod = params.searchTestMethod;
+			this._testResultListLogic.searchTestScreen = params.searchTestScreen;
 		},
 
 		/**
@@ -304,7 +306,7 @@
 					})).always(function() {
 				indicator.hide();
 			});
-		},
+		}
 	};
 	h5.core.expose(testResultListController);
 })(jQuery);

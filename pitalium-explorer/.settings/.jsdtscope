@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry excluding="src/main/webapp/res/lib/**/*|src/main/webapp/supplement/**/*" kind="src" path="">
+	<classpathentry including="src/main/webapp/src/**" kind="src" path="">
 		<attributes>
 			<attribute name="provider" value="org.eclipse.wst.jsdt.web.core.internal.project.ModuleSourcePathProvider"/>
 		</attributes>
