@@ -1,8 +1,8 @@
-Hifive Test Explorer
+Pitalium Explorer
 ========
-This is the Test Result Explorer tool which supports `hifive-test-library`. You
+This is the Test Result Explorer tool which supports `Pitalium`. You
 can easily access your test results and understand what is wrong, if these tests
-are written with hifive-test-library.
+are written with Pitalium.
 
 This product is licensed under the [Apache License, Version 2.0][license].
 Our developer site is located at [htmlhifive.com][].
@@ -11,11 +11,11 @@ Let's **hifive**!
 
 [license]: http://www.apache.org/licenses/LICENSE-2.0
 [htmlhifive.com]: http://www.htmlhifive.com
+<!--
+![screenshot 1](https://hifive-snu.github.io/pitalium-explorer/img0.png)
 
-![screenshot 1](https://hifive-snu.github.io/hifive-test-explorer/img0.png)
-
-![screenshot 2](https://hifive-snu.github.io/hifive-test-explorer/img1.png)
-
+![screenshot 2](https://hifive-snu.github.io/pitalium-explorer/img1.png)
+-->
 ### Prerequisite
 * [Eclipse IDE for Java EE (Luna SR2)][ide]
 * [Tomcat 7][tomcat]
@@ -38,34 +38,34 @@ Let's **hifive**!
     choose `Run As` → `ivy_build.xml`.
 
 2.  Initialize and start database. Change current directory to
-    `hifive-test-explorer/db/hsql` and run `./init.sh` or `init.bat`.
+    `pitalium-explorer/db/hsql` and run `./init.sh` or `init.bat`.
     And then, run `./start.sh` or `start.bat`.
 
-3.  Update Tomcat context definition. Right-click `hifive-test-explorer`
+3.  Update Tomcat context definition. Right-click `pitalium-explorer`
     project and choose `Tomcat project` → `Update context definition`.
 
 4.  Start Tomcat.
 
-5.  Go [http://localhost:8080/hifive-test-explorer/list.html][url-list]
+5.  Go [http://localhost:8080/pitalium-explorer/list.html][url-list]
 
-[url-list]: http://localhost:8080/hifive-test-explorer/list.html
+[url-list]: http://localhost:8080/pitalium-explorer/list.html
 
 ### About Web APIs
 You can see the list of this application's APIs from
-[http://localhost:8080/hifive-test-explorer/spec/api.html][url-api]
+[http://localhost:8080/pitalium-explorer/spec/api.html][url-api]
 
 By clicking the buttons labeled "Get a sample result" in that page, you can see
 the example data.
 
-[url-api]: http://localhost:8080/hifive-test-explorer/spec/api.html
+[url-api]: http://localhost:8080/pitalium-explorer/spec/api.html
 
 ### How to generate API Documents (JSDoc)
 1.  Download jsdoc3
     - Download [jsdoc](https://github.com/jsdoc3/jsdoc)
-    - Download all fils from Tag to `hifive-test-explorer/jsTool/jsdoc/bin`. Let
+    - Download all fils from Tag to `pitalium-explorer/jsTool/jsdoc/bin`. Let
       `jsdoc.bat` be in the `bin` folder.
 2.  Generate
-    - Right-click `hifive-test-explorer/jsTool/jsdoc/jsdoc.bat` and select open
+    - Right-click `pitalium-explorer/jsTool/jsdoc/jsdoc.bat` and select open
       in the command prompt.
     - Run `jsdoc.bat`.
-    - JSDocs are generated in `hifive-test-explorer/doc/jsdoc`.
+    - JSDocs are generated in `pitalium-explorer/doc/jsdoc`.
