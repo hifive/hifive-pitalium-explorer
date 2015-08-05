@@ -26,23 +26,23 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 
+import com.htmlhifive.pitalium.core.config.FilePersisterConfig;
+import com.htmlhifive.pitalium.core.io.FilePersister;
+import com.htmlhifive.pitalium.core.io.PersistMetadata;
+import com.htmlhifive.pitalium.core.model.IndexDomSelector;
+import com.htmlhifive.pitalium.core.model.ScreenAreaResult;
+import com.htmlhifive.pitalium.core.model.ScreenshotResult;
+import com.htmlhifive.pitalium.core.model.SelectorType;
+import com.htmlhifive.pitalium.core.model.TargetResult;
+import com.htmlhifive.pitalium.core.model.TestResult;
+import com.htmlhifive.pitalium.core.selenium.PtlCapabilities;
+import com.htmlhifive.pitalium.image.model.RectangleArea;
 import com.htmlhifive.testexplorer.entity.Area;
 import com.htmlhifive.testexplorer.entity.Screenshot;
 import com.htmlhifive.testexplorer.entity.Target;
 import com.htmlhifive.testexplorer.entity.TestEnvironment;
 import com.htmlhifive.testexplorer.entity.TestExecution;
 import com.htmlhifive.testexplorer.response.TestExecutionResult;
-import com.htmlhifive.testlib.core.config.FilePersisterConfig;
-import com.htmlhifive.testlib.core.io.FilePersister;
-import com.htmlhifive.testlib.core.io.PersistMetadata;
-import com.htmlhifive.testlib.core.model.IndexDomSelector;
-import com.htmlhifive.testlib.core.model.ScreenAreaResult;
-import com.htmlhifive.testlib.core.model.ScreenshotResult;
-import com.htmlhifive.testlib.core.model.SelectorType;
-import com.htmlhifive.testlib.core.model.TargetResult;
-import com.htmlhifive.testlib.core.model.TestResult;
-import com.htmlhifive.testlib.core.selenium.MrtCapabilities;
-import com.htmlhifive.testlib.image.model.RectangleArea;
 
 public class ExplorerFilePersister extends FilePersister implements ExplorerPersister {
 
@@ -245,7 +245,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 
 		PersistMetadata screenshotMetadata = new PersistMetadata(screenshotResult.getExpectedId(),
 				screenshotResult.getTestClass(), screenshotResult.getTestMethod(), screenshotResult.getScreenshotId(),
-				new MrtCapabilities(screenshotResult.getCapabilities()));
+				new PtlCapabilities(screenshotResult.getCapabilities()));
 		screenshot.setFileName(getScreenshotImageFileName(screenshotMetadata));
 		return screenshot;
 	}
@@ -274,7 +274,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 
 		PersistMetadata targetMetadata = new PersistMetadata(screenshotResult.getExpectedId(),
 				screenshotResult.getTestClass(), screenshotResult.getTestMethod(), screenshotResult.getScreenshotId(),
-				screenAreaResult.getSelector(), screenAreaResult.getRectangle(), new MrtCapabilities(
+				screenAreaResult.getSelector(), screenAreaResult.getRectangle(), new PtlCapabilities(
 						screenshotResult.getCapabilities()));
 		target.setFileName(getScreenshotImageFileName(targetMetadata));
 		return target;
@@ -410,7 +410,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 
 		PersistMetadata metadata = new PersistMetadata(screenshot.getTestExecution().getTimeString(),
 				screenshot.getTestClass(), screenshot.getTestMethod(), screenshot.getTestScreen(), selector,
-				rectangleArea, new MrtCapabilities(map));
+				rectangleArea, new PtlCapabilities(map));
 		// Send PNG image
 		return super.getScreenshotImageFile(metadata);
 	}

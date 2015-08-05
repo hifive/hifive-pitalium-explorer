@@ -24,7 +24,6 @@
         <webClassPathEntry>/hifive-test-explorer/lib/hibernate-core-4.3.8.Final.jar</webClassPathEntry>
         <webClassPathEntry>/hifive-test-explorer/lib/hibernate-entitymanager-4.3.8.Final.jar</webClassPathEntry>
         <webClassPathEntry>/hifive-test-explorer/lib/hibernate-jpa-2.1-api-1.0.0.Final.jar</webClassPathEntry>
-        <webClassPathEntry>/hifive-test-explorer/lib/hifive-test-library-1.0.0.jar</webClassPathEntry>
         <webClassPathEntry>/hifive-test-explorer/lib/hsqldb-2.3.2.jar</webClassPathEntry>
         <webClassPathEntry>/hifive-test-explorer/lib/jackson-annotations-2.5.0.jar</webClassPathEntry>
         <webClassPathEntry>/hifive-test-explorer/lib/jackson-core-2.5.1.jar</webClassPathEntry>
@@ -38,6 +37,7 @@
         <webClassPathEntry>/hifive-test-explorer/lib/log4j-api-2.2.jar</webClassPathEntry>
         <webClassPathEntry>/hifive-test-explorer/lib/log4j-core-2.2.jar</webClassPathEntry>
         <webClassPathEntry>/hifive-test-explorer/lib/log4j-slf4j-impl-2.2.jar</webClassPathEntry>
+        <webClassPathEntry>/hifive-test-explorer/lib/pitalium-1.0.0.jar</webClassPathEntry>
         <webClassPathEntry>/hifive-test-explorer/lib/selenium-api-2.46.0.jar</webClassPathEntry>
         <webClassPathEntry>/hifive-test-explorer/lib/slf4j-api-1.7.10.jar</webClassPathEntry>
         <webClassPathEntry>/hifive-test-explorer/lib/slf4j-ext-1.7.10.jar</webClassPathEntry>
