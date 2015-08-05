@@ -82,6 +82,7 @@
 				this.view.update('#detail', 'testResultListTemplate', {
 					testResult: screenshot
 				});
+				this._changeTitle();
 			}));
 
 			this._initializeSwipeHandle();
@@ -91,6 +92,17 @@
 			this.$find('#quick-flipping .image-overlay .expected').hide();
 		},
 
+		_changeTitle: function() {
+			var title = $('title').text();
+			if (this._screenshot.comparisonResult == null) {
+				// ignore
+			} else if (this._screenshot.comparisonResult) {
+				$('title').text('○ ' + title);
+			} else {
+				$('title').text('× ' + title);
+			}
+		},
+
 		/**
 		 * Initialize the drop down of image selection.
 		 * 
@@ -98,25 +110,14 @@
 		 * @param {Array} includes the selectors for the test area inclusion.
 		 */
 		_initializeImageSelector: function(targets) {
+			this.view.update('#selector', 'imageSelectorTemplate', {
+				targets: targets
+			});
 			// Generate select options
 			var imageSelector = this.$find('#imageSelector');
-			if (targets != null && targets.length > 0) {
-				var html = '';
-				for ( var key in targets) {
-					var target = targets[key];
-					html += '<option value="' + target.targetId + '">' + target.area.selectorType
-							+ '_' + target.area.selectorValue + '_[' + target.area.selectorIndex
-							+ ']</option>';
-				}
-
-				imageSelector.prop('disabled', false);
-				imageSelector.append(html);
-			}
-
 			// Fire change event and show images.
 			imageSelector.change();
 		},
-
 
 		/**
 		 * Called when the selection of the drop down changed.<br>
