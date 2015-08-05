@@ -18,13 +18,13 @@ import com.htmlhifive.pitalium.explorer.entity.ConfigRepository;
 import com.htmlhifive.pitalium.explorer.entity.ProcessedImage;
 import com.htmlhifive.pitalium.explorer.entity.ProcessedImageKey;
 import com.htmlhifive.pitalium.explorer.entity.ProcessedImageRepository;
+import com.htmlhifive.pitalium.explorer.entity.Repositories;
+import com.htmlhifive.pitalium.explorer.entity.RepositoryMockCreator;
 import com.htmlhifive.pitalium.explorer.entity.Screenshot;
 import com.htmlhifive.pitalium.explorer.entity.ScreenshotRepository;
 import com.htmlhifive.pitalium.explorer.entity.TestEnvironment;
 import com.htmlhifive.pitalium.explorer.entity.TestExecution;
 import com.htmlhifive.pitalium.explorer.entity.TestExecutionRepository;
-import com.htmlhifive.pitalium.explorer.file.ImageFileUtility;
-import com.htmlhifive.pitalium.explorer.entity.RepositoryMockCreator;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("/spring/test-context.xml")
@@ -34,7 +34,7 @@ public class ImageFileUtilityTest {
 
 	@Autowired
 	private ScreenshotRepository screenshotRepo;
-	
+
 	@Autowired
 	private ConfigRepository configRepo;
 
@@ -50,9 +50,9 @@ public class ImageFileUtilityTest {
 	 * Initialize some mock objects for testing. This method is called before each test method.
 	 */
 	@Before
-	public void initializeDefaultMockObjects()
-	{
-		RepositoryMockCreator r = new RepositoryMockCreator(new Repositories(configRepo, processedImageRepo, screenshotRepo, testExecutionRepo)); 
+	public void initializeDefaultMockObjects() {
+		RepositoryMockCreator r = new RepositoryMockCreator(new Repositories(configRepo, processedImageRepo,
+				screenshotRepo, testExecutionRepo));
 		configs = r.getConfigs();
 		screenshots = r.getScreenshots();
 		new ArrayList<ProcessedImage>();
@@ -60,19 +60,18 @@ public class ImageFileUtilityTest {
 		testEnvironments = r.getTestEnvironments();
 	}
 
-
 	@Test
-	public void testGetAbsoluteFilePath()
-	{
-		ImageFileUtility util = new ImageFileUtility(new Repositories(configRepo, processedImageRepo, screenshotRepo, testExecutionRepo));
+	public void testGetAbsoluteFilePath() {
+		ImageFileUtility util = new ImageFileUtility(new Repositories(configRepo, processedImageRepo, screenshotRepo,
+				testExecutionRepo));
 		String path = util.getAbsoluteFilePath("test.png");
 		Assert.assertTrue(path.endsWith("test.png"));
 	}
 
 	@Test
-	public void testProcessedFilePath()
-	{
-		ImageFileUtility util = new ImageFileUtility(new Repositories(configRepo, processedImageRepo, screenshotRepo, testExecutionRepo));
+	public void testProcessedFilePath() {
+		ImageFileUtility util = new ImageFileUtility(new Repositories(configRepo, processedImageRepo, screenshotRepo,
+				testExecutionRepo));
 		String path = util.newProcessedFilePath(new ProcessedImageKey(123, "best"));
 		Assert.assertTrue(path.startsWith("processed-image"));
 	}
