@@ -16,22 +16,6 @@
 		__name: 'hifive.test.explorer.logic.TestResultListLogic',
 
 		/**
-		 * The number of items to show in one page.
-		 * 
-		 * @type Number
-		 * @memberOf hifive.test.explorer.logic.TestResultListLogic
-		 */
-		pageSize: 20,
-
-		/**
-		 * The 0-based index of the item at the top of the current page.
-		 * 
-		 * @type Number
-		 * @memberOf hifive.test.explorer.logic.TestResultListLogic
-		 */
-		pageStart: 0,
-
-		/**
 		 * The search keyword for test method.
 		 * 
 		 * @type String
@@ -52,12 +36,13 @@
 		 * 
 		 * @memberOf hifive.test.explorer.logic.TestResultListLogic
 		 * @param {Number} page desired
+		 * @param {number} pageSize new page size
 		 * @returns {JqXHRWrapper}
 		 */
-		getTestExecutionList: function(page) {
+		getTestExecutionList: function(page, pageSize) {
 			var data = {
 				'page': page,
-				'limit': this.pageSize,
+				'limit': pageSize,
 				'searchTestMethod': this.searchTestMethod,
 				'searchTestScreen': this.searchTestScreen,
 			};
@@ -113,6 +98,22 @@
 		 * @memberOf hifive.test.explorer.controller.TestResultListController
 		 */
 		_testResultListLogic: hifive.test.explorer.logic.TestResultListLogic,
+
+		/**
+		 * The number of items to show in one page.
+		 * 
+		 * @type Number
+		 * @memberOf hifive.test.explorer.controller.TestResultListController
+		 */
+		_pageSize: 20,
+
+		/**
+		 * The 0-based index of the item at the top of the current page.
+		 * 
+		 * @type Number
+		 * @memberOf hifive.test.explorer.controller.TestResultListController
+		 */
+		_pageStart: 0,
 
 		/**
 		 * Called after the controller has been initialized.<br>
@@ -216,7 +217,11 @@
 			context.event.preventDefault();
 
 			this.collectSearchParameters($el);
-			window.location.hash = '';
+			if (window.location.hash) {
+				window.location.hash = '';
+			} else {
+				this.updatePage();
+			}
 		},
 
 		/**
@@ -227,9 +232,8 @@
 		 * @param {jQuery} $el the event target element
 		 */
 		'#select-page-size change': function(context, $el) {
-			var pageSize = $el.val();
-			var pageStart = this._testResultListLogic.pageStart;
-			this.updatePageSize(pageSize, pageStart);
+			this._pageSize = $el.val();
+			this.updatePage();
 		},
 
 		/**
@@ -238,13 +242,13 @@
 		 * @memberOf hifive.test.explorer.controller.TestResultListController
 		 */
 		onHashChange: function() {
-			var pageSize = $("#select-page-size").val();
 			var pageStart = Math.max(0, parseInt(window.location.hash.substr(1)));
 			if (isNaN(pageStart)) {
 				pageStart = 0;
 			}
+			this._pageStart = pageStart;
 
-			this.updatePageSize(pageSize, pageStart);
+			this.updatePage();
 		},
 
 		/**
@@ -272,14 +276,9 @@
 		 * Set pageSize and pageStart, and update view.
 		 * 
 		 * @memberOf hifive.test.explorer.controller.TestResultListController
-		 * @param {number} pageSize new page size
-		 * @param {number} pageStart new page start
 		 */
-		updatePageSize: function(pageSize, pageStart) {
-			// update pagination parameters
-			this._testResultListLogic.pageStart = pageStart;
-			this._testResultListLogic.pageSize = pageSize;
-			var page = 1 + Math.floor(pageStart / pageSize);
+		updatePage: function() {
+			var page = 1 + Math.floor(this._pageStart / this._pageSize);
 			this.loadTestExecutionList(page);
 		},
 
@@ -296,12 +295,13 @@
 			}).show();
 
 			// Load list of test execution
-			this._testResultListLogic.getTestExecutionList(page).done(this.own(function(response) {
-				// Update views
-				this.view.update('#testExecutionList', 'testExecutionListTemplate', {
-					testExecutionsPage: response
-				});
-			})).always(function() {
+			this._testResultListLogic.getTestExecutionList(page, this._pageSize).done(
+					this.own(function(response) {
+						// Update views
+						this.view.update('#testExecutionList', 'testExecutionListTemplate', {
+							testExecutionsPage: response
+						});
+					})).always(function() {
 				indicator.hide();
 			});
 		},
