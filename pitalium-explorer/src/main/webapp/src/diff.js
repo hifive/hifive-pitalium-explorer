@@ -6,19 +6,19 @@
 	 * This class is a &qout;logic&quot; for the test result comparison page.
 	 * 
 	 * @class
-	 * @memberOf hifive.test.explorer.logic
+	 * @memberOf hifive.pitalium.explorer.logic
 	 * @name TestResultDiffLogic
 	 */
 	var testResultDiffLogic = {
 		/**
-		 * @memberOf hifive.test.explorer.logic.TestResultDiffLogic
+		 * @memberOf hifive.pitalium.explorer.logic.TestResultDiffLogic
 		 */
-		__name: 'hifive.test.explorer.logic.TestResultDiffLogic',
+		__name: 'hifive.pitalium.explorer.logic.TestResultDiffLogic',
 
 		/**
 		 * Get details of the screenshot.
 		 * 
-		 * @memberOf hifive.test.explorer.logic.TestResultDiffLogic
+		 * @memberOf hifive.pitalium.explorer.logic.TestResultDiffLogic
 		 * @param {string} id the id of the screenshot
 		 * @returns {JqXHRWrapper}
 		 */
@@ -40,22 +40,22 @@
 	 * This class is a controller for the test result comparison page.
 	 * 
 	 * @class
-	 * @memberOf hifive.test.explorer.controller
+	 * @memberOf hifive.pitalium.explorer.controller
 	 * @name TestResultDiffController
 	 */
 	var testResultDiffController = {
 		/**
-		 * @memberOf hifive.test.explorer.controller.TestResultDiffController
+		 * @memberOf hifive.pitalium.explorer.controller.TestResultDiffController
 		 */
-		__name: 'hifive.test.explorer.controller.TestResultDiffController',
+		__name: 'hifive.pitalium.explorer.controller.TestResultDiffController',
 
 		/**
 		 * The &quot;Logic&quot; class
 		 * 
 		 * @type Logic
-		 * @memberOf hifive.test.explorer.controller.TestResultDiffController
+		 * @memberOf hifive.pitalium.explorer.controller.TestResultDiffController
 		 */
-		_testResultDiffLogic: hifive.test.explorer.logic.TestResultDiffLogic,
+		_testResultDiffLogic: hifive.pitalium.explorer.logic.TestResultDiffLogic,
 
 		_screenshot: {},
 
@@ -63,11 +63,11 @@
 		 * Called after the controller has been initialized.<br>
 		 * Get the id of the right screenshot, and update views.
 		 * 
-		 * @memberOf hifive.test.explorer.controller.TestResultDiffController
+		 * @memberOf hifive.pitalium.explorer.controller.TestResultDiffController
 		 */
 		__ready: function() {
 			// Get the id of the test result from url query parameters.
-			var queryParams = hifive.test.explorer.utils.getParameters();
+			var queryParams = hifive.pitalium.explorer.utils.getParameters();
 			if (!queryParams.hasOwnProperty('id')) {
 				alert('ID not found');
 				return;
@@ -190,7 +190,7 @@
 		/**
 		 * Show actual image.
 		 * 
-		 * @memberOf hifive.test.explorer.controller.TestResultDiffController
+		 * @memberOf hifive.pitalium.explorer.controller.TestResultDiffController
 		 * @param {Boolean} withMarker whether or not to display the image with markers.
 		 * @param {Object} params extra paramters
 		 */
@@ -201,7 +201,7 @@
 		/**
 		 * Show expected image.
 		 * 
-		 * @memberOf hifive.test.explorer.controller.TestResultDiffController
+		 * @memberOf hifive.pitalium.explorer.controller.TestResultDiffController
 		 * @param {Boolean} withMarker whether or not to display the image with markers.
 		 * @param {Object} params extra paramters
 		 */
@@ -211,7 +211,7 @@
 
 
 		/**
-		 * @memberOf hifive.test.explorer.controller.TestResultDiffController
+		 * @memberOf hifive.pitalium.explorer.controller.TestResultDiffController
 		 * @param {Number} expectedId ID of expected image
 		 * @param {Number} actualId ID of actual image
 		 * @param {Number} targetId ID the target area to be used for image comparison
@@ -224,7 +224,7 @@
 			expected.onload = d1.resolve;
 			actual.onload = d2.resolve;
 
-			var format = hifive.test.explorer.utils.formatUrl;
+			var format = hifive.pitalium.explorer.utils.formatUrl;
 			expected.src = format('image/getProcessed', {
 				screenshotId: expectedId,
 				targetId: targetId,
@@ -307,20 +307,20 @@
 		/**
 		 * Show image.
 		 * 
-		 * @memberOf hifive.test.explorer.controller.TestResultDiffController
+		 * @memberOf hifive.pitalium.explorer.controller.TestResultDiffController
 		 * @param {String} selector jQuery selector expression which determines the image node
 		 * @param {Boolean} withMarker whether or not to display the image with markers.
 		 * @param {Object} params extra paramters
 		 */
 		_setImageSrc: function(selector, withMarker, params) {
 			var url = withMarker ? 'image/getDiff' : 'image/get';
-			this.$find(selector).attr('src', hifive.test.explorer.utils.formatUrl(url, params));
+			this.$find(selector).attr('src', hifive.pitalium.explorer.utils.formatUrl(url, params));
 		},
 
 		/**
 		 * Hide actual mode.
 		 * 
-		 * @memberOf hifive.test.explorer.controller.TestResultDiffController
+		 * @memberOf hifive.pitalium.explorer.controller.TestResultDiffController
 		 */
 		_hideActualMode: function() {
 			this.$find('#actual-mode').hide();
@@ -329,7 +329,7 @@
 		/**
 		 * Hide expected mode.
 		 * 
-		 * @memberOf hifive.test.explorer.controller.TestResultDiffController
+		 * @memberOf hifive.pitalium.explorer.controller.TestResultDiffController
 		 */
 		_hideExpectedMode: function() {
 			this.$find('#expected-mode').hide();
@@ -338,7 +338,7 @@
 		/**
 		 * Initialize the swipe diff handle.
 		 * 
-		 * @memberOf hifive.test.explorer.controller.TestResultDiffController
+		 * @memberOf hifive.pitalium.explorer.controller.TestResultDiffController
 		 */
 		_initializeSwipeHandle: function() {
 			var min = 0,max = 1000,step = 1;
@@ -367,7 +367,7 @@
 		/**
 		 * Initialize the onion skin diff handle.
 		 * 
-		 * @memberOf hifive.test.explorer.controller.TestResultDiffController
+		 * @memberOf hifive.pitalium.explorer.controller.TestResultDiffController
 		 */
 		_initializeOnionHandle: function() {
 			var min = 0,max = 1000,step = 1;
@@ -396,5 +396,5 @@
 })(jQuery);
 $(function() {
 	h5.core.controller('body>div.container',
-			hifive.test.explorer.controller.TestResultDiffController);
+			hifive.pitalium.explorer.controller.TestResultDiffController);
 });

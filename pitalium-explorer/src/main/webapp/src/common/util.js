@@ -3,15 +3,15 @@
  */
 (function() {
 	/**
-	 * @namespace hifive.test.explorer.utils
+	 * @namespace hifive.pitalium.explorer.utils
 	 */
 
-	h5.u.obj.expose('hifive.test.explorer.utils', {
+	h5.u.obj.expose('hifive.pitalium.explorer.utils', {
 		/**
 		 * Get page query parameters as a key-value object.
 		 * 
 		 * @returns {Object} key-value pair object which contains page query parameters
-		 * @memberOf hifive.test.explorer.utils
+		 * @memberOf hifive.pitalium.explorer.utils
 		 */
 		getParameters: function() {
 			var ret = {};
@@ -40,7 +40,7 @@
 		 * 
 		 * @function
 		 * @name formatUrl
-		 * @memberOf hifive.test.explorer.utils
+		 * @memberOf hifive.pitalium.explorer.utils
 		 * @param {String} baseUrl base URL
 		 * @param {Object} params query parameters
 		 * @returns {String} new concatenated URL
