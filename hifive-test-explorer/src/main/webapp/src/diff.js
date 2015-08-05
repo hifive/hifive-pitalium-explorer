@@ -261,7 +261,8 @@
 								initImageMagnifier();
 							};
 							actualBlack.src = format('image/getProcessed', {
-								id: actualId,
+								screenshotId: actualId,
+								targetId: targetId,
 								algorithm: 'edge',
 								colorIndex: 2
 							});
