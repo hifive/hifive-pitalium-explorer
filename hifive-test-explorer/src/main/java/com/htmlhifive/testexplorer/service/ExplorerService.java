@@ -26,6 +26,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import com.htmlhifive.pitalium.core.result.TestResultManager;
+import com.htmlhifive.pitalium.image.model.DiffPoints;
+import com.htmlhifive.pitalium.image.util.ImageUtils;
 import com.htmlhifive.testexplorer.conf.ApplicationConfig;
 import com.htmlhifive.testexplorer.entity.Area;
 import com.htmlhifive.testexplorer.entity.AreaRepository;
@@ -41,9 +44,6 @@ import com.htmlhifive.testexplorer.image.EdgeDetector;
 import com.htmlhifive.testexplorer.io.ExplorerDBPersister;
 import com.htmlhifive.testexplorer.io.ExplorerPersister;
 import com.htmlhifive.testexplorer.response.TestExecutionResult;
-import com.htmlhifive.testlib.core.result.TestResultManager;
-import com.htmlhifive.testlib.image.model.DiffPoints;
-import com.htmlhifive.testlib.image.util.ImageUtils;
 
 @Service
 public class ExplorerService implements Serializable {

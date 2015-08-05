@@ -9,11 +9,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.htmlhifive.testlib.core.io.PersistMetadata;
-import com.htmlhifive.testlib.core.io.Persister;
-import com.htmlhifive.testlib.core.io.ResourceUnavailableException;
-import com.htmlhifive.testlib.core.model.TargetResult;
-import com.htmlhifive.testlib.core.model.TestResult;
+import com.htmlhifive.pitalium.core.io.PersistMetadata;
+import com.htmlhifive.pitalium.core.io.Persister;
+import com.htmlhifive.pitalium.core.io.ResourceUnavailableException;
+import com.htmlhifive.pitalium.core.model.TargetResult;
+import com.htmlhifive.pitalium.core.model.TestResult;
 
 public class DBPersister implements Persister {
 

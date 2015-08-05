@@ -13,7 +13,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 
-import com.htmlhifive.testlib.core.model.ExecResult;
+import com.htmlhifive.pitalium.core.model.ExecResult;
 
 @Entity
 public class TestExecution implements Serializable {

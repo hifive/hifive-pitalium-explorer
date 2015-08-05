@@ -9,10 +9,10 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 
+import com.htmlhifive.pitalium.core.io.Persister;
 import com.htmlhifive.testexplorer.entity.Screenshot;
 import com.htmlhifive.testexplorer.entity.Target;
 import com.htmlhifive.testexplorer.response.TestExecutionResult;
-import com.htmlhifive.testlib.core.io.Persister;
 
 public interface ExplorerPersister extends Persister {
 
