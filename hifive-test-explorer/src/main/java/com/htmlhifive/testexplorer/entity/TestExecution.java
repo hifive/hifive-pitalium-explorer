@@ -13,19 +13,23 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 
+import com.htmlhifive.testlib.core.model.ExecResult;
+
 @Entity
 public class TestExecution implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	@SequenceGenerator(name="TestExecution_generator", sequenceName="Seq_TestExecution", allocationSize=1)
-	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="TestExecution_generator")
+	@SequenceGenerator(name = "TestExecution_generator", sequenceName = "Seq_TestExecution", allocationSize = 1)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "TestExecution_generator")
 	@Id
 	private Integer id;
 
 	private String label;
 
 	private Timestamp time;
+
+	private ExecResult execResult;
 
 	public Integer getId() {
 		return id;
@@ -56,6 +60,14 @@ public class TestExecution implements Serializable {
 		return directoryFormat.format(time);
 	}
 
+	public ExecResult getExecResult() {
+		return execResult;
+	}
+
+	public void setExecResult(ExecResult execResult) {
+		this.execResult = execResult;
+	}
+
 	@Override
 	public int hashCode() {
 		return this.id;
@@ -67,7 +79,7 @@ public class TestExecution implements Serializable {
 			return false;
 		if (obj == this)
 			return true;
-		TestExecution other = (TestExecution)obj;
+		TestExecution other = (TestExecution) obj;
 		return this.id == other.id;
 	}
 }
