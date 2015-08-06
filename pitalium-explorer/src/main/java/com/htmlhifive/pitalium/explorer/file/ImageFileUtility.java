@@ -7,7 +7,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 
 import com.htmlhifive.pitalium.explorer.entity.ConfigRepository;
-import com.htmlhifive.pitalium.explorer.entity.ProcessedImage;
 import com.htmlhifive.pitalium.explorer.entity.ProcessedImageKey;
 import com.htmlhifive.pitalium.explorer.entity.Repositories;
 import com.htmlhifive.pitalium.explorer.entity.Screenshot;
@@ -54,22 +53,5 @@ public class ImageFileUtility {
 	public String newProcessedFilePath(ProcessedImageKey key) {
 		String idDirectory = new File("processed-images", key.getScreenshotId().toString()).getPath();
 		return new File(idDirectory, key.getAlgorithm() + ".png").getPath();
-	}
-
-	/**
-	 * Get a File of the processed image if exists
-	 * 
-	 * @param id image id to search for
-	 * @param algorithm algorithm to search for
-	 * @return null if no such file exists, or requested file otherwise.
-	 */
-	public File searchProcessedImageFile(Integer id, String algorithm) {
-		File result = null;
-		ProcessedImage p = repositories.getProcessedImageRepository().findOne(new ProcessedImageKey(id, algorithm));
-		if (p != null) {
-			result = new File(getAbsoluteFilePath(p.getFileName()));
-		}
-
-		return result;
 	}
 }
