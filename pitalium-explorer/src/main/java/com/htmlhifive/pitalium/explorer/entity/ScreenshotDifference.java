@@ -17,7 +17,7 @@ public class ScreenshotDifference implements Serializable {
 
 	@Id
 	@ManyToOne
-	@JoinColumn(name="screenshotId", nullable=false, updatable=false)
+	@JoinColumn(name = "screenshotId", nullable = false, updatable = false)
 	private Screenshot screenshot;
 
 	@Id

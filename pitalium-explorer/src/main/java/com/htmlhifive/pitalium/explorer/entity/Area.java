@@ -19,8 +19,8 @@ public class Area implements Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	@SequenceGenerator(name="Area_generator", sequenceName="Seq_Area", allocationSize=1)
-	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="Area_generator")
+	@SequenceGenerator(name = "Area_generator", sequenceName = "Seq_Area", allocationSize = 1)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "Area_generator")
 	@Id
 	private Integer areaId;
 
@@ -31,7 +31,7 @@ public class Area implements Serializable {
 	private String selectorValue;
 
 	private Integer selectorIndex;
-	
+
 	private double x;
 
 	private double y;

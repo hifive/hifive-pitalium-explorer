@@ -20,13 +20,13 @@ public class Screenshot implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	@SequenceGenerator(name="Screenshot_generator", sequenceName="Seq_Screenshot", allocationSize=1)
-	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="Screenshot_generator")
+	@SequenceGenerator(name = "Screenshot_generator", sequenceName = "Seq_Screenshot", allocationSize = 1)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "Screenshot_generator")
 	@Id
 	private Integer id;
 
 	@ManyToOne
-	@JoinColumn(name="expectedId", nullable=true, updatable=false)
+	@JoinColumn(name = "expectedId", nullable = true, updatable = false)
 	private Screenshot expectedScreenshot;
 
 	private String fileName;
@@ -40,16 +40,16 @@ public class Screenshot implements Serializable {
 	private String testScreen;
 
 	@ManyToOne
-	@JoinColumn(name="testExecutionId", nullable=false, updatable=false)
+	@JoinColumn(name = "testExecutionId", nullable = false, updatable = false)
 	private TestExecution testExecution;
 
 	@ManyToOne
-	@JoinColumn(name="testEnvironmentId", nullable=false, updatable=false)
+	@JoinColumn(name = "testEnvironmentId", nullable = false, updatable = false)
 	private TestEnvironment testEnvironment;
 
 	@Transient
 	private List<Target> targets;
-	
+
 	public Integer getId() {
 		return id;
 	}

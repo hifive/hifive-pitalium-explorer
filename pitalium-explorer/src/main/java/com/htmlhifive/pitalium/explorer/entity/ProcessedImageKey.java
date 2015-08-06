@@ -7,7 +7,6 @@ import java.io.Serializable;
 
 import javax.persistence.Id;
 
-
 public class ProcessedImageKey implements Serializable {
 	/**
 	 * serial id
@@ -22,12 +21,10 @@ public class ProcessedImageKey implements Serializable {
 	/**
 	 * Constructors
 	 */
-	public ProcessedImageKey()
-	{
+	public ProcessedImageKey() {
 	}
 
-	public ProcessedImageKey(Integer screenshotId, String algorithm)
-	{
+	public ProcessedImageKey(Integer screenshotId, String algorithm) {
 		this.screenshotId = screenshotId;
 		this.algorithm = algorithm;
 	}
@@ -38,18 +35,21 @@ public class ProcessedImageKey implements Serializable {
 	public Integer getScreenshotId() {
 		return screenshotId;
 	}
+
 	/**
 	 * @param screenshotId the screenshotId to set
 	 */
 	public void setScreenshotId(Integer screenshotId) {
 		this.screenshotId = screenshotId;
 	}
+
 	/**
 	 * @return the algorithm
 	 */
 	public String getAlgorithm() {
 		return algorithm;
 	}
+
 	/**
 	 * @param algorithm the algorithm to set
 	 */

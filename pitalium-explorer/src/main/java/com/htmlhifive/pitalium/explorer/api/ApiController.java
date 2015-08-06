@@ -27,17 +27,15 @@ public class ApiController {
 
 	@Autowired
 	private ExplorerService service;
-	
+
 	@PostConstruct
 	public void init() {
 		service.init();
 	}
 
 	/**
-	 * Gets list of the test execution.
-	 * 
-	 * If pageSize equals to zero, the default page size is used.
-	 * If pageSize equals to -1, the entire list is returned.
+	 * Gets list of the test execution. If pageSize equals to zero, the default page size is used. If pageSize equals to
+	 * -1, the entire list is returned.
 	 * 
 	 * @param page Which page to show.
 	 * @param pageSize Page size.
@@ -45,8 +43,7 @@ public class ApiController {
 	 */
 	@RequestMapping(value = "/listTestExecution", method = RequestMethod.GET, produces = "application/json;charset=utf-8")
 	@ResponseBody
-	public ResponseEntity<Page<TestExecutionResult>> listTestExecution(
-			@RequestParam(defaultValue = "1") int page,
+	public ResponseEntity<Page<TestExecutionResult>> listTestExecution(@RequestParam(defaultValue = "1") int page,
 			@RequestParam(value = "limit", defaultValue = "0") int pageSize,
 			@RequestParam(defaultValue = "") String searchTestMethod,
 			@RequestParam(defaultValue = "") String searchTestScreen) {
@@ -62,8 +59,7 @@ public class ApiController {
 	 */
 	@RequestMapping(value = "/listScreenshot", method = RequestMethod.GET, produces = "application/json;charset=utf-8")
 	@ResponseBody
-	public ResponseEntity<List<Screenshot>> listScreenshot(
-			@RequestParam Integer testExecutionId,
+	public ResponseEntity<List<Screenshot>> listScreenshot(@RequestParam Integer testExecutionId,
 			@RequestParam(defaultValue = "") String searchTestMethod,
 			@RequestParam(defaultValue = "") String searchTestScreen) {
 		List<Screenshot> list = service.findScreenshot(testExecutionId, searchTestMethod, searchTestScreen);

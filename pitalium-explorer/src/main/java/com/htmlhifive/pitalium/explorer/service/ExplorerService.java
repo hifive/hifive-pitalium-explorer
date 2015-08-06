@@ -67,18 +67,18 @@ public class ExplorerService implements Serializable {
 	private ProcessedImageRepository processedImageRepo;
 
 	private ExplorerPersister persister;
-	
+
 	public void init() {
 		TestResultManager manager = TestResultManager.getInstance();
-		persister = (ExplorerPersister)manager.getPersister();
+		persister = (ExplorerPersister) manager.getPersister();
 
 		if (persister instanceof ExplorerDBPersister) {
-			((ExplorerDBPersister)persister).setTestExecutionRepository(testExecutionRepo);
-			((ExplorerDBPersister)persister).setScreenshotRepository(screenshotRepo);
-			((ExplorerDBPersister)persister).setTargetRepository(targetRepo);
-			((ExplorerDBPersister)persister).setAreaRepository(areaRepo);
-			((ExplorerDBPersister)persister).setProcessedImageRepository(processedImageRepo);
-			((ExplorerDBPersister)persister).setConfigRepository(configRepo);
+			((ExplorerDBPersister) persister).setTestExecutionRepository(testExecutionRepo);
+			((ExplorerDBPersister) persister).setScreenshotRepository(screenshotRepo);
+			((ExplorerDBPersister) persister).setTargetRepository(targetRepo);
+			((ExplorerDBPersister) persister).setAreaRepository(areaRepo);
+			((ExplorerDBPersister) persister).setProcessedImageRepository(processedImageRepo);
+			((ExplorerDBPersister) persister).setConfigRepository(configRepo);
 		}
 	}
 
@@ -86,24 +86,26 @@ public class ExplorerService implements Serializable {
 	public Repositories getRepositories() {
 		return new Repositories(configRepo, processedImageRepo, screenshotRepo, testExecutionRepo);
 	}
+
 	// ------------------------------------------------------------
 
 	public ApplicationConfig getApplicationConfig() {
 		return config;
 	}
-	
+
 	public ExplorerPersister getExplorerPersister() {
 		return persister;
 	}
-	
-	public Page<TestExecutionResult> findTestExecution(String searchTestMethod, String searchTestScreen, int page, int pageSize) {
+
+	public Page<TestExecutionResult> findTestExecution(String searchTestMethod, String searchTestScreen, int page,
+			int pageSize) {
 		return persister.findTestExecution(searchTestMethod, searchTestScreen, page, pageSize);
 	}
 
 	public List<Screenshot> findScreenshot(Integer testExecutionId, String searchTestMethod, String searchTestScreen) {
 		return persister.findScreenshot(testExecutionId, searchTestMethod, searchTestScreen);
 	}
-	
+
 	public Screenshot getScreenshot(Integer screenshotId) {
 		return persister.getScreenshot(screenshotId);
 	}
@@ -132,7 +134,7 @@ public class ExplorerService implements Serializable {
 		}
 	}
 
-	public void getEdgeImage(Integer screenshotId, Integer targetId, Map<String, String> allparams, 
+	public void getEdgeImage(Integer screenshotId, Integer targetId, Map<String, String> allparams,
 			HttpServletResponse response) {
 		int colorIndex = -1;
 		if (allparams.containsKey("colorIndex")) {
@@ -144,15 +146,15 @@ public class ExplorerService implements Serializable {
 		}
 
 		// FIXME キャッシュ対応後に復活させる
-//		File cachedFile = persister.searchProcessedImageFile(id, ProcessedImageUtility.getAlgorithmNameForEdge(colorIndex));
-//		if (cachedFile != null) {
-//			try {
-//				sendFile(cachedFile, response);
-//			} catch (IOException e1) {
-//				response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
-//			}
-//			return;
-//		}
+		//		File cachedFile = persister.searchProcessedImageFile(id, ProcessedImageUtility.getAlgorithmNameForEdge(colorIndex));
+		//		if (cachedFile != null) {
+		//			try {
+		//				sendFile(cachedFile, response);
+		//			} catch (IOException e1) {
+		//				response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+		//			}
+		//			return;
+		//		}
 
 		try {
 			File imageFile = persister.getImage(screenshotId, targetId);
@@ -163,14 +165,14 @@ public class ExplorerService implements Serializable {
 			}
 
 			EdgeDetector edgeDetector = new EdgeDetector(0.5);
-			
+
 			switch (colorIndex) {
-			case 0:
-				edgeDetector.setForegroundColor(new Color(255, 0, 0, 255));
-				break;
-			case 1:
-				edgeDetector.setForegroundColor(new Color(0, 0, 255, 255));
-				break;
+				case 0:
+					edgeDetector.setForegroundColor(new Color(255, 0, 0, 255));
+					break;
+				case 1:
+					edgeDetector.setForegroundColor(new Color(0, 0, 255, 255));
+					break;
 			}
 
 			BufferedImage image = edgeDetector.DetectEdge(ImageIO.read(imageFile));
@@ -184,20 +186,20 @@ public class ExplorerService implements Serializable {
 		}
 	}
 
-	public void getProcessed(Integer screenshotId, Integer targetId, String algorithm, 
-			Map<String, String> allparams, HttpServletResponse response) {
-		switch(algorithm) {
-		case "edge":
-			getEdgeImage(screenshotId, targetId, allparams, response);
-			break;
-		default:
-			response.setStatus(HttpStatus.BAD_REQUEST.value());
-			break;
+	public void getProcessed(Integer screenshotId, Integer targetId, String algorithm, Map<String, String> allparams,
+			HttpServletResponse response) {
+		switch (algorithm) {
+			case "edge":
+				getEdgeImage(screenshotId, targetId, allparams, response);
+				break;
+			default:
+				response.setStatus(HttpStatus.BAD_REQUEST.value());
+				break;
 		}
 	}
 
-	public void getDiffImage(Integer sourceScreenshotId, Integer targetScreenshotId, 
-			Integer targetId, HttpServletResponse response) {
+	public void getDiffImage(Integer sourceScreenshotId, Integer targetScreenshotId, Integer targetId,
+			HttpServletResponse response) {
 		try {
 			DiffPoints diffPoints = compare(sourceScreenshotId, targetScreenshotId, targetId);
 			if (diffPoints == null) {
@@ -227,7 +229,6 @@ public class ExplorerService implements Serializable {
 				}
 			}
 
-			
 		} catch (IOException e) {
 			response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
 		}
@@ -239,14 +240,13 @@ public class ExplorerService implements Serializable {
 		for (Area excludeArea : target.getExcludeAreas()) {
 			// Get the relative coordinates from the starting position of the actualArea.
 			// Based on the obtained relative coordinates, to create a rectangle.
-			Rectangle rectangle = new Rectangle((int) excludeArea.getX() - (int) area.getX(),
-					(int) excludeArea.getY() - (int) area.getY(), (int) excludeArea.getWidth(),
-					(int) excludeArea.getHeight());
+			Rectangle rectangle = new Rectangle((int) excludeArea.getX() - (int) area.getX(), (int) excludeArea.getY()
+					- (int) area.getY(), (int) excludeArea.getWidth(), (int) excludeArea.getHeight());
 			excludeList.add(rectangle);
 		}
 		return excludeList;
 	}
-	
+
 	private void fillRect(BufferedImage image, List<Rectangle> rectangleList, Color color) {
 		Graphics graphics = image.getGraphics();
 		graphics.setColor(color);
@@ -260,8 +260,8 @@ public class ExplorerService implements Serializable {
 		graphics.dispose();
 	}
 
-	private DiffPoints compare(Integer sourceScreenshotId, Integer targetScreenshotId, 
-			Integer targetId) throws IOException {
+	private DiffPoints compare(Integer sourceScreenshotId, Integer targetScreenshotId, Integer targetId)
+			throws IOException {
 		File sourceFile = persister.getImage(sourceScreenshotId, targetId);
 		File targetFile = persister.getImage(targetScreenshotId, targetId);
 		if (sourceFile == null || targetFile == null) {
@@ -278,7 +278,7 @@ public class ExplorerService implements Serializable {
 			fillRect(actual, excludeRectangleList, Color.BLACK);
 			fillRect(expected, excludeRectangleList, Color.BLACK);
 		}
-		
+
 		// Compare.
 		return ImageUtils.compare(expected, null, actual, null, null);
 	}

@@ -16,8 +16,8 @@ public class TestEnvironment implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	@SequenceGenerator(name="TestEnvironment_generator", sequenceName="Seq_TestEnvironment", allocationSize=1)
-	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="TestEnvironment_generator")
+	@SequenceGenerator(name = "TestEnvironment_generator", sequenceName = "Seq_TestEnvironment", allocationSize = 1)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "TestEnvironment_generator")
 	@Id
 	private Integer id;
 

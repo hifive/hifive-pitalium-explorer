@@ -22,7 +22,7 @@ public class ProcessedImage implements Serializable {
 	private String algorithm;
 
 	private String fileName;
-	
+
 	public Integer getScreenshotId() {
 		return screenshotId;
 	}

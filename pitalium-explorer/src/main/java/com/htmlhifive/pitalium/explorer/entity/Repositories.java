@@ -15,16 +15,13 @@ public class Repositories {
 	/**
 	 * Constructor. Must provide all repositories to create.
 	 *
-	 * @param configRepository configRepository 
+	 * @param configRepository configRepository
 	 * @param processedImageRepository processedImageRepository
 	 * @param screenshotRepository screenshotRepository
 	 * @param testExecutionRepository testExecutionRepository
 	 */
-	public Repositories(ConfigRepository configRepository,
-		ProcessedImageRepository processedImageRepository,
-		ScreenshotRepository screenshotRepository,
-		TestExecutionRepository testExecutionRepository)
-	{
+	public Repositories(ConfigRepository configRepository, ProcessedImageRepository processedImageRepository,
+			ScreenshotRepository screenshotRepository, TestExecutionRepository testExecutionRepository) {
 		this.configRepository = configRepository;
 		this.processedImageRepository = processedImageRepository;
 		this.screenshotRepository = screenshotRepository;

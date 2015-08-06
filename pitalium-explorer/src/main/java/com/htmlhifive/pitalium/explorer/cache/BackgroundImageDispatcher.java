@@ -24,18 +24,17 @@ public class BackgroundImageDispatcher extends Thread {
 	private CacheTaskQueue taskQueue;
 
 	private Repositories repositories;
-	
+
 	private final ImageFileUtility imageFileUtil;
-	private volatile boolean stop = false; 
+	private volatile boolean stop = false;
 
 	/**
 	 * The constructor
 	 * 
-	 * @param repositories 
+	 * @param repositories
 	 * @param taskQueue This dispatcher will send jobs to the specified taskQueue.
 	 */
-	public BackgroundImageDispatcher(Repositories repositories, CacheTaskQueue taskQueue)
-	{
+	public BackgroundImageDispatcher(Repositories repositories, CacheTaskQueue taskQueue) {
 		this.repositories = repositories;
 		this.imageFileUtil = new ImageFileUtility(repositories);
 		this.taskQueue = taskQueue;
@@ -44,8 +43,7 @@ public class BackgroundImageDispatcher extends Thread {
 	/**
 	 * Set stop flag. The thread will stop soon.
 	 */
-	public void requestStop()
-	{
+	public void requestStop() {
 		this.stop = true;
 		this.interrupt();
 	}
@@ -53,15 +51,12 @@ public class BackgroundImageDispatcher extends Thread {
 	@Override
 	public void run() {
 		Integer lastIndex = -1;
-		while(!this.stop)
-		{
+		while (!this.stop) {
 			List<Screenshot> toProcess = repositories.getScreenshotRepository().findNotProcessedEdge(lastIndex);
-			for (Screenshot s : toProcess)
-			{
+			for (Screenshot s : toProcess) {
 				lastIndex = Math.max(s.getId(), lastIndex);
 				ArrayList<Integer> colorIndices = new ArrayList<Integer>();
-				for (int colorIndex = -1; colorIndex <= 1; colorIndex++)
-				{
+				for (int colorIndex = -1; colorIndex <= 1; colorIndex++) {
 					String algorithm = ProcessedImageUtility.getAlgorithmNameForEdge(colorIndex);
 					ProcessedImageKey key = new ProcessedImageKey(s.getId(), algorithm);
 					if (repositories.getProcessedImageRepository().exists(key))
@@ -83,13 +78,12 @@ public class BackgroundImageDispatcher extends Thread {
 
 	/**
 	 * Create and add edge processing task.
-	 *  
-	 * @param s screenshot to be processed 
+	 * 
+	 * @param s screenshot to be processed
 	 * @param colorIndex the colorIndex to be processed
 	 * @param key the key for ProcessedImage class.
 	 */
-	private void addTask(Screenshot s, ArrayList<Integer> colorIndices)
-	{
+	private void addTask(Screenshot s, ArrayList<Integer> colorIndices) {
 		taskQueue.addTask(new PrioritizedTask(0, new Runnable() {
 			Screenshot s;
 			ArrayList<Integer> colorIndices;
@@ -100,23 +94,21 @@ public class BackgroundImageDispatcher extends Thread {
 				return this;
 			}
 
-			public LookupOp getBlackToRedOp()
-			{
+			public LookupOp getBlackToRedOp() {
 				short[] red = new short[256];
 				short[] id = new short[256];
 				for (int i = 0; i < 256; i++) {
 					red[i] = 255;
-					id[i] = (short)i;
+					id[i] = (short) i;
 				}
 				return new LookupOp(new ShortLookupTable(0, new short[][] { red, id, id, id }), null);
 			}
 
-			public LookupOp getBlackToBlueOp()
-			{
-				short[] id= new short[256];
+			public LookupOp getBlackToBlueOp() {
+				short[] id = new short[256];
 				short[] blue = new short[256];
 				for (int i = 0; i < 256; i++) {
-					id[i] = (short)i;
+					id[i] = (short) i;
 					blue[i] = 255;
 				}
 				return new LookupOp(new ShortLookupTable(0, new short[][] { id, id, blue, id }), null);
@@ -134,21 +126,20 @@ public class BackgroundImageDispatcher extends Thread {
 				}
 				BufferedImage blackEdgeImage = edgeDetector.DetectEdge(image);
 
-				for (Integer colorIndex : colorIndices)
-				{
+				for (Integer colorIndex : colorIndices) {
 					BufferedImage edgeImage;
 					LookupOp op;
 					switch (colorIndex) {
-					case 0:
-						op = getBlackToRedOp();
-						edgeImage = op.filter(blackEdgeImage, null);
-						break;
-					case 1:
-						op = getBlackToBlueOp();
-						edgeImage = op.filter(blackEdgeImage, null);
-						break;
-					default:
-						edgeImage = blackEdgeImage;
+						case 0:
+							op = getBlackToRedOp();
+							edgeImage = op.filter(blackEdgeImage, null);
+							break;
+						case 1:
+							op = getBlackToBlueOp();
+							edgeImage = op.filter(blackEdgeImage, null);
+							break;
+						default:
+							edgeImage = blackEdgeImage;
 					}
 
 					String algorithm = ProcessedImageUtility.getAlgorithmNameForEdge(colorIndex);

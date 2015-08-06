@@ -15,15 +15,13 @@ import com.htmlhifive.pitalium.explorer.entity.TestExecution;
 
 public class ImageFileUtility {
 	private final Repositories repositories;
-	
-	public ImageFileUtility(Repositories repositories)
-	{
+
+	public ImageFileUtility(Repositories repositories) {
 		this.repositories = repositories;
 	}
-	
 
 	/**
-	 * Convert relativePath from DB into absolute path 
+	 * Convert relativePath from DB into absolute path
 	 * 
 	 * @param relativePath
 	 * @return converted path
@@ -38,23 +36,20 @@ public class ImageFileUtility {
 	 * Get the file of a screenshot
 	 * 
 	 * @param screenshot the input screenshot
-	 * @return a file related with the input screenshot 
+	 * @return a file related with the input screenshot
 	 * @throws FileNotFoundException
 	 */
 	public File getFile(Screenshot screenshot) throws FileNotFoundException {
 		TestExecution testExecution = screenshot.getTestExecution();
-		String relativePath =
-				testExecution.getTimeString() +
-				File.separatorChar +
-				screenshot.getTestClass() +
-				File.separatorChar +
-				screenshot.getFileName() + ".png";
+		String relativePath = testExecution.getTimeString() + File.separatorChar + screenshot.getTestClass()
+				+ File.separatorChar + screenshot.getFileName() + ".png";
 
 		File file = new File(getAbsoluteFilePath(relativePath));
-		if (!file.exists() || !file.isFile()) { throw new FileNotFoundException(file.getAbsolutePath() + " Not Found."); }
+		if (!file.exists() || !file.isFile()) {
+			throw new FileNotFoundException(file.getAbsolutePath() + " Not Found.");
+		}
 		return file;
 	}
-
 
 	public String newProcessedFilePath(ProcessedImageKey key) {
 		String idDirectory = new File("processed-images", key.getScreenshotId().toString()).getPath();
@@ -63,17 +58,15 @@ public class ImageFileUtility {
 
 	/**
 	 * Get a File of the processed image if exists
-	 *  
+	 * 
 	 * @param id image id to search for
 	 * @param algorithm algorithm to search for
 	 * @return null if no such file exists, or requested file otherwise.
 	 */
-	public File searchProcessedImageFile(Integer id, String algorithm)
-	{
+	public File searchProcessedImageFile(Integer id, String algorithm) {
 		File result = null;
 		ProcessedImage p = repositories.getProcessedImageRepository().findOne(new ProcessedImageKey(id, algorithm));
-		if (p != null)
-		{
+		if (p != null) {
 			result = new File(getAbsoluteFilePath(p.getFileName()));
 		}
 

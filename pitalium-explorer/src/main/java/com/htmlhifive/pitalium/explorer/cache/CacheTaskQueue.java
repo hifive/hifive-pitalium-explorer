@@ -50,8 +50,7 @@ public class CacheTaskQueue {
 	 * 
 	 * @throws InterruptedException
 	 */
-	public void interruptAndJoin() throws InterruptedException
-	{
+	public void interruptAndJoin() throws InterruptedException {
 		for (Worker worker : workers) {
 			worker.requestStop();
 		}
@@ -70,10 +69,10 @@ public class CacheTaskQueue {
 	private PrioritizedTask TakeTask() throws InterruptedException {
 		return waitList.take();
 	}
-	
+
 	private class Worker extends Thread {
 		private CacheTaskQueue taskQueue;
-		private volatile boolean stop = false; 
+		private volatile boolean stop = false;
 
 		/**
 		 * Worker constructor
@@ -87,8 +86,7 @@ public class CacheTaskQueue {
 		/**
 		 * Set stop flag and interrupt. The thread will stop soon
 		 */
-		public void requestStop()
-		{
+		public void requestStop() {
 			this.stop = true;
 			this.interrupt();
 		}

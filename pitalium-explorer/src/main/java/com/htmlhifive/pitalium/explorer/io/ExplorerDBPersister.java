@@ -41,7 +41,7 @@ public class ExplorerDBPersister extends DBPersister implements ExplorerPersiste
 	public void setTestExecutionRepository(TestExecutionRepository repository) {
 		testExecutionRepo = repository;
 	}
-	
+
 	public void setScreenshotRepository(ScreenshotRepository repository) {
 		screenshotRepo = repository;
 	}
@@ -61,27 +61,25 @@ public class ExplorerDBPersister extends DBPersister implements ExplorerPersiste
 	public void setConfigRepository(ConfigRepository repository) {
 		configRepo = repository;
 	}
-	
+
 	@Override
-	public Page<TestExecutionResult> findTestExecution(String searchTestMethod, 
-			String searchTestScreen, int page, int pageSize) {
+	public Page<TestExecutionResult> findTestExecution(String searchTestMethod, String searchTestScreen, int page,
+			int pageSize) {
 		if (pageSize == 0) {
 			pageSize = defaultPageSize;
 		} else if (pageSize == -1) {
 			// TODO 検索条件が入っていないからバグかなぁ?
 			long count = testExecutionRepo.count();
-			pageSize = (int)Math.min(count, Integer.MAX_VALUE);
+			pageSize = (int) Math.min(count, Integer.MAX_VALUE);
 		}
-		PageRequest pageRequest = new PageRequest(
-				page - 1, pageSize, new Sort(Sort.Direction.DESC, "id"));
+		PageRequest pageRequest = new PageRequest(page - 1, pageSize, new Sort(Sort.Direction.DESC, "id"));
 		return testExecutionRepo.search(searchTestMethod, searchTestScreen, pageRequest);
 	}
 
 	@Override
-	public List<Screenshot> findScreenshot(Integer testExecutionId, String searchTestMethod, 
-			String searchTestScreen) {
-		return screenshotRepo.findByTestExecutionIdAndTestMethodContainingAndTestScreenContaining(
-				testExecutionId, searchTestMethod, searchTestScreen);
+	public List<Screenshot> findScreenshot(Integer testExecutionId, String searchTestMethod, String searchTestScreen) {
+		return screenshotRepo.findByTestExecutionIdAndTestMethodContainingAndTestScreenContaining(testExecutionId,
+				searchTestMethod, searchTestScreen);
 	}
 
 	@Override
@@ -92,7 +90,7 @@ public class ExplorerDBPersister extends DBPersister implements ExplorerPersiste
 
 		for (Target target : targetList) {
 			List<Area> areaList = areaRepo.findByTargetId(target.getTargetId());
-			
+
 			List<Area> excludeAreaList = new ArrayList<>();
 			for (Area area : areaList) {
 				if (!area.isExcluded()) {
@@ -103,7 +101,7 @@ public class ExplorerDBPersister extends DBPersister implements ExplorerPersiste
 			}
 			target.setExcludeAreas(excludeAreaList);
 		}
-		
+
 		return screenshot;
 	}
 
@@ -122,16 +120,16 @@ public class ExplorerDBPersister extends DBPersister implements ExplorerPersiste
 				break;
 			}
 		}
-		
+
 		// targetIdはシーケンシャルにふっているため、
 		// 引数でわたってきたtargetIdと期待値となる画像のScreenshotクラスから取得したTargetクラスのIDは一致しない。
 		// そのために以下の処理を必要とする。
 		if (target == null) {
 			Area area = areaRepo.getByTargetIdAndExcluded(targetId, Boolean.FALSE);
 			for (Target t : screenshot.getTargets()) {
-				if (StringUtils.equals(t.getArea().getSelectorType(), area.getSelectorType()) && 
-						StringUtils.equals(t.getArea().getSelectorValue(), area.getSelectorValue()) &&
-						t.getArea().getSelectorIndex() == area.getSelectorIndex()) {
+				if (StringUtils.equals(t.getArea().getSelectorType(), area.getSelectorType())
+						&& StringUtils.equals(t.getArea().getSelectorValue(), area.getSelectorValue())
+						&& t.getArea().getSelectorIndex() == area.getSelectorIndex()) {
 					target = t;
 					break;
 				}
@@ -151,8 +149,7 @@ public class ExplorerDBPersister extends DBPersister implements ExplorerPersiste
 		Target target = getTarget(screenshotId, targetId);
 
 		Config config = configRepo.findOne(ConfigRepository.ABSOLUTE_PATH_KEY);
-		String child = screenshot.getTestExecution().getTimeString() 
-				+ File.separatorChar + screenshot.getTestClass() 
+		String child = screenshot.getTestExecution().getTimeString() + File.separatorChar + screenshot.getTestClass()
 				+ File.separatorChar + target.getFileName();
 		File image = new File(config.getValue(), child);
 
@@ -166,9 +163,8 @@ public class ExplorerDBPersister extends DBPersister implements ExplorerPersiste
 		ProcessedImage p = processedImageRepo.findOne(new ProcessedImageKey(screenshotId, algorithm));
 		if (p != null) {
 			// FIXME 直したい
-			result = new File(new ImageFileUtility(
-					new Repositories(configRepo, processedImageRepo, screenshotRepo, testExecutionRepo))
-				.getAbsoluteFilePath(p.getFileName()));
+			result = new File(new ImageFileUtility(new Repositories(configRepo, processedImageRepo, screenshotRepo,
+					testExecutionRepo)).getAbsoluteFilePath(p.getFileName()));
 		}
 		return result;
 	}

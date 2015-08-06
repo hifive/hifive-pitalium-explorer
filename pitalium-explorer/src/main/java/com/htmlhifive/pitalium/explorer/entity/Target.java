@@ -21,26 +21,26 @@ public class Target implements Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	@SequenceGenerator(name="Target_generator", sequenceName="Seq_Target", allocationSize=1)
-	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="Target_generator")
+	@SequenceGenerator(name = "Target_generator", sequenceName = "Seq_Target", allocationSize = 1)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "Target_generator")
 	@Id
 	private Integer targetId;
 
 	private Integer screenshotId;
 
 	private String fileName;
-	
+
 	private Boolean comparisonResult;
 
 	@Transient
 	private Area area;
-	
+
 	@Transient
 	private List<Area> excludeAreas;
 
 	public Target() {
 	}
-	
+
 	public Integer getTargetId() {
 		return targetId;
 	}
