@@ -5,6 +5,8 @@ package com.htmlhifive.pitalium.explorer.entity;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -22,4 +24,18 @@ public interface ScreenshotRepository extends JpaRepository<Screenshot, Integer>
 																									 */
 	)
 	public List<Screenshot> findNotProcessedEdge(@Param("from") Integer from);
+
+	public Page<Screenshot> findByTestExecutionAndTestEnvironment(@Param("testExecutionId") Integer testExecutionId, 
+			@Param("testEnvironmentId") Integer testEnvironmentId, Pageable page);
+
+	public long countByTestExecutionAndTestEnvironment(@Param("testExecutionId") Integer testExecutionId, 
+			@Param("testEnvironmentId") Integer testEnvironmentId);
+
+	@Query("select distinct new com.htmlhifive.pitalium.explorer.entity.TestExecutionAndEnvironment( "
+			+ "exe.id as exeId, exe.time, env.id as envId, env.platform, env.platformVersion, env.deviceName, "
+			+ "env.browserName, env.browserVersion ) from Screenshot as s, TestExecution as exe, TestEnvironment as env "
+			+ "where s.testExecution = exe.id and s.testEnvironment = env.id "
+			+ "order by exeId asc, envId asc")
+	public Page<TestExecutionAndEnvironment> findTestExecutionAndEnvironment(Pageable page);
+
 }

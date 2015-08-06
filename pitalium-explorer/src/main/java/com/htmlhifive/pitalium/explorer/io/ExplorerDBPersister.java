@@ -26,6 +26,7 @@ import com.htmlhifive.pitalium.explorer.entity.ScreenshotRepository;
 import com.htmlhifive.pitalium.explorer.entity.Target;
 import com.htmlhifive.pitalium.explorer.entity.TargetRepository;
 import com.htmlhifive.pitalium.explorer.entity.TestExecutionRepository;
+import com.htmlhifive.pitalium.explorer.entity.TestExecutionAndEnvironment;
 import com.htmlhifive.pitalium.explorer.file.FileUtility;
 import com.htmlhifive.pitalium.explorer.response.TestExecutionResult;
 
@@ -155,6 +156,26 @@ public class ExplorerDBPersister extends DBPersister implements ExplorerPersiste
 
 		// Send PNG image
 		return image;
+	}
+
+	@Override
+	public Page<Screenshot> findScreenshot(Integer testExecutionId, Integer testEnviromentId, 
+			int page, int pageSize) {
+		if (pageSize == 0) {
+			pageSize = defaultPageSize;
+		} else if (pageSize == -1) {
+			// TODO 検索条件が入っていないからバグかなぁ?
+			long count = screenshotRepo.countByTestExecutionAndTestEnvironment(testExecutionId, testEnviromentId);
+			pageSize = (int) Math.min(count, Integer.MAX_VALUE);
+		}
+		PageRequest pageRequest = new PageRequest(page - 1, pageSize, new Sort(Sort.Direction.DESC, "id"));
+		return screenshotRepo.findByTestExecutionAndTestEnvironment(testExecutionId, testEnviromentId, pageRequest);
+	}
+
+	@Override
+	public Page<TestExecutionAndEnvironment> findTestExecutionAndEnviroment(int page, int pageSize) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	@Override

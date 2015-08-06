@@ -42,6 +42,7 @@ import com.htmlhifive.pitalium.explorer.entity.Screenshot;
 import com.htmlhifive.pitalium.explorer.entity.Target;
 import com.htmlhifive.pitalium.explorer.entity.TestEnvironment;
 import com.htmlhifive.pitalium.explorer.entity.TestExecution;
+import com.htmlhifive.pitalium.explorer.entity.TestExecutionAndEnvironment;
 import com.htmlhifive.pitalium.explorer.response.TestExecutionResult;
 import com.htmlhifive.pitalium.image.model.RectangleArea;
 
@@ -418,6 +419,57 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 				rectangleArea, new PtlCapabilities(map));
 		// Send PNG image
 		return super.getScreenshotImageFile(metadata);
+	}
+
+	@Override
+	public Page<Screenshot> findScreenshot(Integer testExecutionId, Integer testEnviromentId,
+			int page, int pageSize) {
+		if (screenshotListMap == null) {
+			return new PageImpl<Screenshot>(new ArrayList<Screenshot>());
+		}
+
+		List<Screenshot> screenshotList = screenshotListMap.get(testExecutionId);
+
+		List<Screenshot> extractScreenshotList = new ArrayList<>();
+		for (Screenshot screenshot : screenshotList) {
+			if (screenshot.getTestEnvironment().getId() == testEnviromentId) {
+				extractScreenshotList.add(screenshot);
+			}
+		}
+		PageRequest pageable = new PageRequest(page - 1, pageSize);
+		return new PageImpl<Screenshot>(extractScreenshotList, pageable, extractScreenshotList.size());
+	}
+
+	@Override
+	public Page<TestExecutionAndEnvironment> findTestExecutionAndEnviroment(int page, int pageSize) {
+		if (screenshotListMap == null) {
+			return new PageImpl<TestExecutionAndEnvironment>(new ArrayList<TestExecutionAndEnvironment>());
+		}
+
+		List<TestExecutionAndEnvironment> extractList = new ArrayList<>();
+		for (Entry<Integer, List<Screenshot>> entry : screenshotListMap.entrySet()) {
+			for (Screenshot screenshot : entry.getValue()) {
+				TestExecutionAndEnvironment testEE = new TestExecutionAndEnvironment();
+
+				TestExecution testExec = screenshot.getTestExecution();
+				testEE.setExecutionId(testExec.getId());
+				testEE.setExecutionTime(testExec.getTimeString());
+
+				TestEnvironment testEnv = screenshot.getTestEnvironment();
+				testEE.setEnviromentId(testEnv.getId());
+				testEE.setBrowserName(testEnv.getBrowserName());
+				testEE.setBrowserVersion(testEnv.getBrowserVersion());
+				testEE.setPlatform(testEnv.getPlatform());
+				testEE.setPlatformVersion(testEnv.getPlatformVersion());
+				testEE.setDeviceName(testEnv.getDeviceName());
+
+				if (!extractList.contains(testEE)) {
+					extractList.add(testEE);
+				}
+			}
+		}
+		PageRequest pageable = new PageRequest(page - 1, pageSize);
+		return new PageImpl<TestExecutionAndEnvironment>(extractList, pageable, extractList.size());
 	}
 
 	@Override

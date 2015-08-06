@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page;
 import com.htmlhifive.pitalium.core.io.Persister;
 import com.htmlhifive.pitalium.explorer.entity.Screenshot;
 import com.htmlhifive.pitalium.explorer.entity.Target;
+import com.htmlhifive.pitalium.explorer.entity.TestExecutionAndEnvironment;
 import com.htmlhifive.pitalium.explorer.response.TestExecutionResult;
 
 public interface ExplorerPersister extends Persister {
@@ -66,6 +67,26 @@ public interface ExplorerPersister extends Persister {
 	 */
 	File getImage(Integer screenshotId, Integer targetId) throws IOException;
 
+	/**
+	 * Screenshotのリストを取得する。 引数のテスト実行ID、テスト環境IDと一致するScreenshotのリストを取得する。
+	 * 
+	 * @param testExecutionId テスト実行ID
+	 * @param testEnviromentId テスト環境ID
+	 * @param page 表示ページ番号
+	 * @param pageSize 1ページあたりの表示数
+	 * @return Screenshotのリスト
+	 */
+	Page<Screenshot> findScreenshot(Integer testExecutionId, Integer testEnviromentId, int page, int pageSize);
+	
+	/**
+	 * TestExecutionAndEnviromentのリストを取得する。
+	 * 
+	 * @param page 表示ページ番号
+	 * @param pageSize 1ページあたりの表示数
+	 * @return TestExecutionAndEnviromentのリスト
+	 */
+	Page<TestExecutionAndEnvironment> findTestExecutionAndEnviroment(int page, int pageSize);
+	
 	File searchProcessedImageFile(Integer screenshotId, String algorithm);
 
 	List<Screenshot> findNotProcessedEdge();
