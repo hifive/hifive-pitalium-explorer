@@ -71,12 +71,12 @@ public interface ExplorerPersister extends Persister {
 	 * Screenshotのリストを取得する。 引数のテスト実行ID、テスト環境IDと一致するScreenshotのリストを取得する。
 	 * 
 	 * @param testExecutionId テスト実行ID
-	 * @param testEnviromentId テスト環境ID
+	 * @param testEnvironmentId テスト環境ID
 	 * @param page 表示ページ番号
 	 * @param pageSize 1ページあたりの表示数
 	 * @return Screenshotのリスト
 	 */
-	Page<Screenshot> findScreenshot(Integer testExecutionId, Integer testEnviromentId, int page, int pageSize);
+	Page<Screenshot> findScreenshot(Integer testExecutionId, Integer testEnvironmentId, int page, int pageSize);
 	
 	/**
 	 * TestExecutionAndEnviromentのリストを取得する。

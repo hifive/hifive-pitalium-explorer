@@ -422,7 +422,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 	}
 
 	@Override
-	public Page<Screenshot> findScreenshot(Integer testExecutionId, Integer testEnviromentId,
+	public Page<Screenshot> findScreenshot(Integer testExecutionId, Integer testEnvironmentId,
 			int page, int pageSize) {
 		if (screenshotListMap == null) {
 			return new PageImpl<Screenshot>(new ArrayList<Screenshot>());
@@ -432,7 +432,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 
 		List<Screenshot> extractScreenshotList = new ArrayList<>();
 		for (Screenshot screenshot : screenshotList) {
-			if (screenshot.getTestEnvironment().getId() == testEnviromentId) {
+			if (screenshot.getTestEnvironment().getId() == testEnvironmentId) {
 				extractScreenshotList.add(screenshot);
 			}
 		}

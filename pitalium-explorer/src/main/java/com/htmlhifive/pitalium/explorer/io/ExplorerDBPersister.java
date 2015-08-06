@@ -159,17 +159,17 @@ public class ExplorerDBPersister extends DBPersister implements ExplorerPersiste
 	}
 
 	@Override
-	public Page<Screenshot> findScreenshot(Integer testExecutionId, Integer testEnviromentId, 
+	public Page<Screenshot> findScreenshot(Integer testExecutionId, Integer testEnvironmentId, 
 			int page, int pageSize) {
 		if (pageSize == 0) {
 			pageSize = defaultPageSize;
 		} else if (pageSize == -1) {
 			// TODO 検索条件が入っていないからバグかなぁ?
-			long count = screenshotRepo.countByTestExecutionAndTestEnvironment(testExecutionId, testEnviromentId);
+			long count = screenshotRepo.countByTestExecutionAndTestEnvironment(testExecutionId, testEnvironmentId);
 			pageSize = (int) Math.min(count, Integer.MAX_VALUE);
 		}
 		PageRequest pageRequest = new PageRequest(page - 1, pageSize, new Sort(Sort.Direction.DESC, "id"));
-		return screenshotRepo.findByTestExecutionAndTestEnvironment(testExecutionId, testEnviromentId, pageRequest);
+		return screenshotRepo.findByTestExecutionAndTestEnvironment(testExecutionId, testEnvironmentId, pageRequest);
 	}
 
 	@Override
