@@ -1,0 +1,4 @@
+urlid pitalium-explorer
+url jdbc:hsqldb:hsql://localhost/db/pitalium-explorer
+username sa
+password

@@ -1,0 +1,1 @@
+executeSQL.bat testdata/pitaliumExplorer_ddl.sql

@@ -1,4 +1,0 @@
-urlid testexplorer
-url jdbc:hsqldb:hsql://localhost/db/testexplorer
-username sa
-password

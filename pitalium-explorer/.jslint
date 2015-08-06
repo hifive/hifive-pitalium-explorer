@@ -1,0 +1,8 @@
+#
+#Wed Aug 05 22:01:33 JST 2015
+hi5.tool.jslint.lib.external.list=
+hi5.tool.jslint.option=/pitalium-explorer/config/jshint_config.xml
+hi5.tool.jslint.use.other.project=false
+hi5.tool.jslint.other.project=
+hi5.tool.jslint.jslint=/pitalium-explorer/config/jshint.js
+hi5.tool.jslint.lib.internal.list=

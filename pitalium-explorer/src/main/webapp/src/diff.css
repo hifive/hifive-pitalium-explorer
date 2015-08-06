@@ -1,0 +1,154 @@
+/*
+ * Copyright (C) 2015 NS Solutions Corporation, All Rights Reserved.
+ */
+
+@charset "utf-8";
+
+body {
+	overflow-x: hidden;
+}
+
+.row {
+	overflow-x: hidden;
+	overflow-y: scroll;
+	max-height: 700px;
+}
+
+.legend {
+	vertical-align: top;
+}
+
+.legend.expected {
+	color: blue;
+	vertical-align: top;
+}
+
+.legend.actual {
+	color: red;
+}
+
+.label-row {
+	height: 45px;
+	position: relative;
+	overflow-y: hidden;
+	padding-right: 17px;
+
+}
+
+.handle .actual {
+	float: right;
+}
+
+.image-diff {
+	padding-left: 0;
+	padding-right: 0;
+}
+
+.image-diff img {
+	width: 100%;
+}
+
+.label-row > .image-label {
+	font-size: 14pt;
+	color: #ffffff;
+	text-align: center;
+	margin: 18px 0 0;
+}
+
+.expected img {
+	border: 1px solid blue;
+}
+
+.actual img {
+	border: 1px solid red;
+}
+
+.expected .image-label {
+	background: #0000ff;
+}
+
+.actual .image-label {
+	background: #ff0000;
+}
+
+.image-overlay {
+	position: relative;
+}
+
+.image-overlay .expected {
+	position: absolute;
+	overflow: hidden;
+	width: 100%;
+	left: 0;
+	top: 0;
+}
+
+.image-overlay .swipe-bar {
+	position: absolute;
+	left: 0;
+	top: 0;
+	bottom: 0;
+	width: 1px;
+	background-color: gray;
+}
+
+#quick-flipping .image-diff.image-label {
+	  cursor: pointer;
+}
+
+#edge-overlapping .large {
+	width: 175px;
+	height: 175px;
+	position: absolute;
+	border-radius: 100%;
+
+	background-color: white;
+	background-repeat: no-repeat;
+
+	box-shadow:
+		0 0 0 7px rgba(255, 255, 255, 0.85),
+		0 0 7px 7px rgba(0, 0, 0, 0.25),
+		inset 0 0 40px 2px rgba(0, 0, 0, 0.25);
+
+	display: none;
+}
+
+#edge-overlapping canvas {
+	max-width: 100%;
+}
+
+#edge-overlapping .label-row > div {
+	position: absolute;
+  top: 50%;
+  margin: -0.5em 0 0;
+}
+
+#edge-overlapping .legend {
+	display: inline-table;
+	text-align: center;
+	margin: 0px 10px 0 0;
+}
+
+#edge-overlapping .legend:after {
+	content: '';
+	display: table-cell;
+	width: 70px;
+	background: -webkit-linear-gradient(transparent 50%, currentColor 50%, currentColor -webkit-calc(50% + 1px), transparent -webkit-calc(50% + 1px));
+	background: -webkit-gradient(linear, left top, left bottom, from(transparent), color-stop(50%, currentColor), color-stop(currentColor calc(50% + 1px)), to(transparent calc(50% + 1px)));
+	background: linear-gradient(transparent 50%, currentColor 50%, currentColor calc(50% + 1px), transparent calc(50% + 1px));
+}
+#edge-overlapping .legend:after {
+	border-left: 1em solid transparent;
+}
+
+#edge-overlapping .image-diff {
+	border: 1px solid rgb(216, 216, 216);
+}
+
+.image-selector-row {
+	height:45px;
+}
+
+.image-selector {
+	width: auto
+}

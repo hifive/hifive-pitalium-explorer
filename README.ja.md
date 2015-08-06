@@ -1,8 +1,8 @@
-Hifive Test Explorer
+Pitalium Explorer
 ========
-This is the Test Result Explorer tool which supports hifive-test-library. You
+This is the Test Result Explorer tool which supports Pitalium. You
 can easily access your test results and understand what is wrong, if these tests
-are written with hifive-test-library.
+are written with Pitalium.
 
 This product is licensed under the [Apache License, Version 2.0][license].
 Our developer site is located at [htmlhifive.com][].
@@ -34,7 +34,7 @@ Let's **hifive**!
     `Run As` → `ivy_build.xml` で実行します。
 
 2.  データベースを初期化して起動します。カレントディレクトリーを
-    `hifive-test-explorer/db/hsql`に変わって`./init.sh`や`init.bat`を実行します。
+    `pitalium-explorer/db/hsql`に変わって`./init.sh`や`init.bat`を実行します。
     その後に`./start.sh`や`start.bat`を実行します。
 
 3.  Tomcatのコンテキスト定義を更新します。プロジェクトを選択し、右クリックし、
@@ -44,18 +44,9 @@ Let's **hifive**!
 
 5.  下記にアクセスできることを確認してください。
 
-    [http://localhost:8080/hifive-test-explorer/list.html][url-list]
+    [http://localhost:8080/pitalium-explorer/list.html][url-list]
 
-[url-list]: http://localhost:8080/hifive-test-explorer/list.html
-
-### About Web APIs
-You can see the list of this application's APIs from
-[http://localhost:8080/hifive-test-explorer/spec/api.html][url-api]
-
-By clicking the buttons labeled "Get a sample result" in that page, you can see
-the example data.
-
-[url-api]: http://localhost:8080/hifive-test-explorer/spec/api.html
+[url-list]: http://localhost:8080/pitalium-explorer/list.html
 
 ### APIドキュメント（JSDocドキュメント）の生成方法
 1.  jsdoc3をダウンロード
