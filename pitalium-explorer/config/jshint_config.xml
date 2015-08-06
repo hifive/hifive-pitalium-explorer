@@ -1,0 +1,354 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<jsCheckOption>
+    <option key="browser" type="java.lang.Boolean" engine="jshint">
+        <state>false</state>
+        <description>標準ブラウザでの実行を想定(documentやwindow等、のグローバル変数が事前に定義されているか.)</description>
+        <detail></detail>
+    </option>
+    <option key="jquery" type="java.lang.Boolean" engine="jshint">
+        <state>true</state>
+        <description>jQueryでの実行を想定(jQueryのグローバル変数が事前に定義されているか.)</description>
+        <detail></detail>
+    </option>
+    <option key="couch" type="java.lang.Boolean" engine="jshint">
+        <state>false</state>
+        <description>CouchDBでの実行を想定(CouchDBのグローバル変数が事前に定義されているか.)</description>
+        <detail></detail>
+    </option>
+    <option key="es5" type="java.lang.Boolean" engine="jshint">
+        <state>false</state>
+        <description>es5での実行を想定(es5の文法を使用してもよいか.)</description>
+        <detail></detail>
+    </option>
+    <option key="devel" type="java.lang.Boolean" engine="jshint">
+        <state>false</state>
+        <description>alert、confirm、console、Debug、opera、promptを使用してもよいか</description>
+        <detail></detail>
+    </option>
+    <option key="node" type="java.lang.Boolean" engine="jshint">
+        <state>false</state>
+        <description>node.jsでの実行を想定(node.jsのグローバル変数が事前に定義されているか.)</description>
+        <detail></detail>
+    </option>
+    <option key="rhino" type="java.lang.Boolean" engine="jshint">
+        <state>false</state>
+        <description>Rhinoでの実行を想定(Rhinoのグローバル変数が事前に定義されているか.)</description>
+        <detail></detail>
+    </option>
+    <option key="prototypejs" type="java.lang.Boolean" engine="jshint">
+        <state>false</state>
+        <description>prototype.jsでの実行を想定(prototype.jsのグローバル変数が事前に定義されているか.)</description>
+        <detail></detail>
+    </option>
+    <option key="mootools" type="java.lang.Boolean" engine="jshint">
+        <state>false</state>
+        <description>mootoolsでの実行を想定(mootoolsのグローバル変数が事前に定義されているか.)</description>
+        <detail></detail>
+    </option>
+    <option key="asi" type="java.lang.Boolean" engine="jshint">
+        <state>false</state>
+        <description>セミコロンの未挿入を許容.</description>
+        <detail></detail>
+    </option>
+    <option key="bitwise" type="java.lang.Boolean" engine="jshint">
+        <state>true</state>
+        <description>ビット演算子の使用を禁止.</description>
+        <detail></detail>
+    </option>
+    <option key="boss" type="java.lang.Boolean" engine="jshint">
+        <state>false</state>
+        <description>構造化要素の中身の割り当てを許容.</description>
+        <detail></detail>
+    </option>
+    <option key="curly" type="java.lang.Boolean" engine="jshint">
+        <state>true</state>
+        <description>構造化要素内の中括弧未使用を禁止.</description>
+        <detail></detail>
+    </option>
+    <option key="debug" type="java.lang.Boolean" engine="jshint">
+        <state>false</state>
+        <description>debuggerキーワードを許容.</description>
+        <detail></detail>
+    </option>
+    <option key="eqeqeq" type="java.lang.Boolean" engine="jshint">
+        <state>false</state>
+        <description>===か!==以外の比較を禁止.</description>
+        <detail></detail>
+    </option>
+    <option key="eqnull" type="java.lang.Boolean" engine="jshint">
+        <state>true</state>
+        <description>== null を許容.</description>
+        <detail></detail>
+    </option>
+    <option key="evil" type="java.lang.Boolean" engine="jshint">
+        <state>false</state>
+        <description>eval関数を許容.</description>
+        <detail></detail>
+    </option>
+    <option key="forin" type="java.lang.Boolean" engine="jshint">
+        <state>true</state>
+        <description>hasOwnPropertyメソッドでチェックを行っていない場合のfor inを禁止.</description>
+        <detail></detail>
+    </option>
+    <option key="immed" type="java.lang.Boolean" engine="jshint">
+        <state>true</state>
+        <description>括弧で括られた範囲の、即時実行を要求する.</description>
+        <detail></detail>
+    </option>
+    <option key="laxbreak" type="java.lang.Boolean" engine="jshint">
+        <state>true</state>
+        <description>改行をチェックしない.</description>
+        <detail></detail>
+    </option>
+    <option key="newcap" type="java.lang.Boolean" engine="jshint">
+        <state>true</state>
+        <description>コンストラクタ名の最初の文字の大文字チェック.</description>
+        <detail>(注意)JSHINTは、コンストラクタの定義の所で名前のチェックをしていない。
+ newでコンストラクタを呼ぶ所で名前をチェックしているので、小文字だった場合は
+ その行を指摘される。</detail>
+    </option>
+    <option key="noarg" type="java.lang.Boolean" engine="jshint">
+        <state>true</state>
+        <description>arguments.caller と　arguments.calleeの使用を禁止.</description>
+        <detail></detail>
+    </option>
+    <option key="noempty" type="java.lang.Boolean" engine="jshint">
+        <state>true</state>
+        <description>空ブロックの禁止.</description>
+        <detail></detail>
+    </option>
+    <option key="nonew" type="java.lang.Boolean" engine="jshint">
+        <state>true</state>
+        <description>副作用のあるコンストラクタの使用を禁止.</description>
+        <detail></detail>
+    </option>
+    <option key="nomen" type="java.lang.Boolean" engine="jshint">
+        <state>false</state>
+        <description>名前の先頭または末尾のアンダーバーを禁止.</description>
+        <detail></detail>
+    </option>
+    <option key="onevar" type="java.lang.Boolean" engine="jshint">
+        <state>false</state>
+        <description>1つの関数で2つ以上のvarステートメントの使用を禁止.</description>
+        <detail></detail>
+    </option>
+    <option key="passfail" type="java.lang.Boolean" engine="jshint">
+        <state>false</state>
+        <description>1個目のエラーでチェックをを止める.</description>
+        <detail></detail>
+    </option>
+    <option key="plusplus" type="java.lang.Boolean" engine="jshint">
+        <state>false</state>
+        <description> インクリメント(++)・デクリメント(--)を使用を禁止.</description>
+        <detail></detail>
+    </option>
+    <option key="regexp" type="java.lang.Boolean" engine="jshint">
+        <state>false</state>
+        <description>正規表現の . (任意の1文字)と [^...] (指定した文字以外)の使用禁止</description>
+        <detail></detail>
+    </option>
+    <option key="undef" type="java.lang.Boolean" engine="jshint">
+        <state>true</state>
+        <description>変数または関数の宣言があるかをチェックする</description>
+        <detail></detail>
+    </option>
+    <option key="sub" type="java.lang.Boolean" engine="jshint">
+        <state>false</state>
+        <description>オブジェクトのプロパティへのアクセスは、ドットではなくて括弧記法を許容.</description>
+        <detail>ドット演算子(dot notation): sample.aaa
+ 括弧記法(subscript notation): sample['aaa']</detail>
+    </option>
+    <option key="strict" type="java.lang.Boolean" engine="jshint">
+        <state>false</state>
+        <description>'use strict' の未使用を禁止.</description>
+        <detail></detail>
+    </option>
+    <option key="white" type="java.lang.Boolean" engine="jshint">
+        <state>false</state>
+        <description>いい加減な空白をチェック.</description>
+        <detail></detail>
+    </option>
+    <option key="maxerr" type="java.lang.Integer" engine="jshint">
+        <state>true</state>
+        <value>1000</value>
+        <description>許容するエラーの最大数(指定なし：50個)</description>
+        <detail></detail>
+    </option>
+    <option key="'continue'" type="java.lang.Boolean" engine="jslint">
+        <state>false</state>
+        <description>continueを使用してもよいか</description>
+        <detail></detail>
+    </option>
+    <option key="unparam" type="java.lang.Boolean" engine="jslint">
+        <state>false</state>
+        <description>未使用の変数があってもよいか</description>
+        <detail></detail>
+    </option>
+    <option key="cap" type="java.lang.Boolean" engine="jslint">
+        <state>false</state>
+        <description>HTMLタグが大文字で書かれているか</description>
+        <detail></detail>
+    </option>
+    <option key="browser" type="java.lang.Boolean" engine="jslint">
+        <state>false</state>
+        <description>標準ブラウザでの実行を想定(documentやwindow等、のグローバル変数が事前に定義されているか.)</description>
+        <detail></detail>
+    </option>
+    <option key="eqeq" type="java.lang.Boolean" engine="jslint">
+        <state>false</state>
+        <description>抽象比較( == または != )を使用してもよいか</description>
+        <detail></detail>
+    </option>
+    <option key="properties" type="java.lang.Boolean" engine="jslint">
+        <state>false</state>
+        <description>/*properties*/コメントを利用して全プロパティのスペルミスをチェックするか</description>
+        <detail></detail>
+    </option>
+    <option key="safe" type="java.lang.Boolean" engine="jslint">
+        <state>false</state>
+        <description>ADsafeルールのうち、ウィジェット向けのルール以外を有効にするか</description>
+        <detail></detail>
+    </option>
+    <option key="regexp" type="java.lang.Boolean" engine="jslint">
+        <state>false</state>
+        <description>正規表現の . (任意の1文字)と [^...] (指定した文字以外)の使用禁止</description>
+        <detail></detail>
+    </option>
+    <option key="devel" type="java.lang.Boolean" engine="jslint">
+        <state>false</state>
+        <description>alert、confirm、console、Debug、opera、promptを使用してもよいか</description>
+        <detail></detail>
+    </option>
+    <option key="bitwise" type="java.lang.Boolean" engine="jslint">
+        <state>false</state>
+        <description>ビット演算子の仕様を禁止.</description>
+        <detail></detail>
+    </option>
+    <option key="css" type="java.lang.Boolean" engine="jslint">
+        <state>false</state>
+        <description>CSSの1行目に @charset 'UTF-8' が無くてもよいか</description>
+        <detail></detail>
+    </option>
+    <option key="on" type="java.lang.Boolean" engine="jslint">
+        <state>false</state>
+        <description>HTMLでイベントハンドラーの登録をしてもよいか</description>
+        <detail></detail>
+    </option>
+    <option key="fragment" type="java.lang.Boolean" engine="jslint">
+        <state>false</state>
+        <description>HTMLでフラグメント識別子の使用してもよいか</description>
+        <detail></detail>
+    </option>
+    <option key="vars" type="java.lang.Boolean" engine="jslint">
+        <state>false</state>
+        <description>1つのfunction内にvarステートメントが2つ以上あってもよいか</description>
+        <detail></detail>
+    </option>
+    <option key="adsafe" type="java.lang.Boolean" engine="jslint">
+        <state>false</state>
+        <description>ADsafe のルールを適用するか</description>
+        <detail></detail>
+    </option>
+    <option key="sloppy" type="java.lang.Boolean" engine="jslint">
+        <state>false</state>
+        <description>'use strict' が無くてもよいか</description>
+        <detail></detail>
+    </option>
+    <option key="nomen" type="java.lang.Boolean" engine="jslint">
+        <state>false</state>
+        <description>名前の先頭または末尾のアンダーバーを禁止.</description>
+        <detail></detail>
+    </option>
+    <option key="plusplus" type="java.lang.Boolean" engine="jslint">
+        <state>false</state>
+        <description> インクリメント(++)・デクリメント(--)を使用を禁止.</description>
+        <detail></detail>
+    </option>
+    <option key="newcap" type="java.lang.Boolean" engine="jslint">
+        <state>false</state>
+        <description>コンストラクタ名の最初の文字の大文字チェック.</description>
+        <detail>(注意)JSHINTは、コンストラクタの定義の所で名前のチェックをしていない。
+ newでコンストラクタを呼ぶ所で名前をチェックしているので、小文字だった場合は
+ その行を指摘される。</detail>
+    </option>
+    <option key="indent" type="java.lang.Integer" engine="jslint">
+        <state>false</state>
+        <description>インデント幅が指定した幅になっているか(0の場合はチェックを行わない)</description>
+        <detail></detail>
+    </option>
+    <option key="sub" type="java.lang.Boolean" engine="jslint">
+        <state>false</state>
+        <description>オブジェクトのプロパティへのアクセスは、ドットではなくて括弧記法を許容.</description>
+        <detail></detail>
+    </option>
+    <option key="windows" type="java.lang.Boolean" engine="jslint">
+        <state>false</state>
+        <description>Windows固有のグローバル変数・関数があらかじめ定義されていると仮定するか</description>
+        <detail></detail>
+    </option>
+    <option key="passfail" type="java.lang.Boolean" engine="jslint">
+        <state>false</state>
+        <description>1個目のエラーでチェックをを止める.</description>
+        <detail></detail>
+    </option>
+    <option key="white" type="java.lang.Boolean" engine="jslint">
+        <state>false</state>
+        <description>いい加減な空白をチェック.</description>
+        <detail></detail>
+    </option>
+    <option key="node" type="java.lang.Boolean" engine="jslint">
+        <state>false</state>
+        <description>node.jsでの実行を想定(node.jsのグローバル変数が事前に定義されているか.)</description>
+        <detail></detail>
+    </option>
+    <option key="forin" type="java.lang.Boolean" engine="jslint">
+        <state>false</state>
+        <description>プロパティを持っていない場合のfor inを禁止.</description>
+        <detail></detail>
+    </option>
+    <option key="rhino" type="java.lang.Boolean" engine="jslint">
+        <state>false</state>
+        <description>Rhinoでの実行を想定(Rhinoのグローバル変数が事前に定義されているか.)</description>
+        <detail></detail>
+    </option>
+    <option key="maxerr" type="java.lang.Integer" engine="jslint">
+        <state>false</state>
+        <description>許容するエラーの最大数(指定なし：50個)</description>
+        <detail></detail>
+    </option>
+    <option key="maxlen" type="java.lang.Integer" engine="jslint">
+        <state>false</state>
+        <description>許容するソースコード行数(指定なし：全行)</description>
+        <detail></detail>
+    </option>
+    <option key="confusion" type="java.lang.Boolean" engine="jslint">
+        <state>false</state>
+        <description>ある変数の型が途中で変わってもいいか</description>
+        <detail></detail>
+    </option>
+    <option key="es5" type="java.lang.Boolean" engine="jslint">
+        <state>false</state>
+        <description>es5での実行を想定(es5の文法を使用してもよいか.)</description>
+        <detail></detail>
+    </option>
+    <option key="undef" type="java.lang.Boolean" engine="jslint">
+        <state>false</state>
+        <description>変数または関数の宣言があるかをチェックする</description>
+        <detail></detail>
+    </option>
+    <option key="debug" type="java.lang.Boolean" engine="jslint">
+        <state>false</state>
+        <description>debuggerキーワードを許容.</description>
+        <detail></detail>
+    </option>
+    <option key="evil" type="java.lang.Boolean" engine="jslint">
+        <state>false</state>
+        <description>eval関数を許容.</description>
+        <detail></detail>
+    </option>
+    <option key="widget" type="java.lang.Boolean" engine="jslint">
+        <state>false</state>
+        <description>Yahoo Widget環境で提供されているグローバル変数・関数があらかじめ定義されていると仮定するか</description>
+        <detail></detail>
+    </option>
+</jsCheckOption>
