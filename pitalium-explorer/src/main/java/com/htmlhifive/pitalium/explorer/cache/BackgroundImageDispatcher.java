@@ -17,7 +17,7 @@ import com.htmlhifive.pitalium.explorer.entity.ProcessedImage;
 import com.htmlhifive.pitalium.explorer.entity.ProcessedImageKey;
 import com.htmlhifive.pitalium.explorer.entity.Repositories;
 import com.htmlhifive.pitalium.explorer.entity.Screenshot;
-import com.htmlhifive.pitalium.explorer.file.ImageFileUtility;
+import com.htmlhifive.pitalium.explorer.file.FileUtility;
 import com.htmlhifive.pitalium.explorer.image.EdgeDetector;
 
 public class BackgroundImageDispatcher extends Thread {
@@ -25,7 +25,7 @@ public class BackgroundImageDispatcher extends Thread {
 
 	private Repositories repositories;
 
-	private final ImageFileUtility imageFileUtil;
+	private final FileUtility imageFileUtil;
 	private volatile boolean stop = false;
 
 	/**
@@ -36,7 +36,7 @@ public class BackgroundImageDispatcher extends Thread {
 	 */
 	public BackgroundImageDispatcher(Repositories repositories, CacheTaskQueue taskQueue) {
 		this.repositories = repositories;
-		this.imageFileUtil = new ImageFileUtility(repositories);
+		this.imageFileUtil = new FileUtility(repositories);
 		this.taskQueue = taskQueue;
 	}
 

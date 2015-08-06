@@ -26,7 +26,7 @@ import com.htmlhifive.pitalium.explorer.entity.ScreenshotRepository;
 import com.htmlhifive.pitalium.explorer.entity.Target;
 import com.htmlhifive.pitalium.explorer.entity.TargetRepository;
 import com.htmlhifive.pitalium.explorer.entity.TestExecutionRepository;
-import com.htmlhifive.pitalium.explorer.file.ImageFileUtility;
+import com.htmlhifive.pitalium.explorer.file.FileUtility;
 import com.htmlhifive.pitalium.explorer.response.TestExecutionResult;
 
 public class ExplorerDBPersister extends DBPersister implements ExplorerPersister {
@@ -163,7 +163,7 @@ public class ExplorerDBPersister extends DBPersister implements ExplorerPersiste
 		ProcessedImage p = processedImageRepo.findOne(new ProcessedImageKey(screenshotId, algorithm));
 		if (p != null) {
 			// FIXME 直したい
-			result = new File(new ImageFileUtility(new Repositories(configRepo, processedImageRepo, screenshotRepo,
+			result = new File(new FileUtility(new Repositories(configRepo, processedImageRepo, screenshotRepo,
 					testExecutionRepo)).getAbsoluteFilePath(p.getFileName()));
 		}
 		return result;

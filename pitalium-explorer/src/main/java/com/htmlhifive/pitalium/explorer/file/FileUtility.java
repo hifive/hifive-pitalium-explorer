@@ -12,10 +12,10 @@ import com.htmlhifive.pitalium.explorer.entity.Repositories;
 import com.htmlhifive.pitalium.explorer.entity.Screenshot;
 import com.htmlhifive.pitalium.explorer.entity.TestExecution;
 
-public class ImageFileUtility {
+public class FileUtility {
 	private final Repositories repositories;
 
-	public ImageFileUtility(Repositories repositories) {
+	public FileUtility(Repositories repositories) {
 		this.repositories = repositories;
 	}
 
