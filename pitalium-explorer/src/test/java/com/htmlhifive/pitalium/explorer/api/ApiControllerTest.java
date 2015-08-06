@@ -3,11 +3,8 @@
  */
 package com.htmlhifive.pitalium.explorer.api;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -56,7 +53,7 @@ public class ApiControllerTest {
 
 	@Autowired
 	private ScreenshotRepository screenshotRepo;
-	
+
 	@Autowired
 	private ConfigRepository configRepo;
 
@@ -72,19 +69,18 @@ public class ApiControllerTest {
 	 * Initialize some mock objects for testing. This method is called before each test method.
 	 */
 	@Before
-	public void initializeDefaultMockObjects()
-	{
-		RepositoryMockCreator r = new RepositoryMockCreator(new Repositories(configRepo, processedImageRepo, screenshotRepo, testExecutionRepo)); 
+	public void initializeDefaultMockObjects() {
+		RepositoryMockCreator r = new RepositoryMockCreator(new Repositories(configRepo, processedImageRepo,
+				screenshotRepo, testExecutionRepo));
 		configs = r.getConfigs();
 		screenshots = r.getScreenshots();
 		new ArrayList<ProcessedImage>();
 		testExecutions = r.getTestExecutions();
 		testEnvironments = r.getTestEnvironments();
 	}
-	
+
 	@SuppressWarnings("unchecked")
-	private ArrayList<TestExecution> getTestExecutionMockClone() throws IOException, ClassNotFoundException
-	{
+	private ArrayList<TestExecution> getTestExecutionMockClone() throws IOException, ClassNotFoundException {
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		{
 			ObjectOutputStream oos = new ObjectOutputStream(bos);
@@ -94,12 +90,11 @@ public class ApiControllerTest {
 		bos.close();
 		byte[] byteData = bos.toByteArray();
 		ByteArrayInputStream bais = new ByteArrayInputStream(byteData);
-		return (ArrayList<TestExecution>)new ObjectInputStream(bais).readObject();
+		return (ArrayList<TestExecution>) new ObjectInputStream(bais).readObject();
 	}
 
 	@Test
-	public void testListTestExecution() throws ClassNotFoundException, IOException
-	{
+	public void testListTestExecution() throws ClassNotFoundException, IOException {
 		List<TestExecution> cloned = getTestExecutionMockClone();
 		List<TestExecutionResult> converted = new ArrayList<TestExecutionResult>();
 
@@ -114,19 +109,17 @@ public class ApiControllerTest {
 		ResponseEntity<Page<TestExecutionResult>> response = this.apiController.listTestExecution(1, 0, "", "");
 		Assert.assertEquals(200, response.getStatusCode().value());
 		List<TestExecutionResult> responseBody = response.getBody().getContent();
-		for (int i = 0; i < responseBody.size(); i++)
-		{
-			Assert.assertEquals(testExecutions.get(i).getId().intValue(),
-					responseBody.get(i).getTestExecution().getId().intValue());
-			Assert.assertEquals(testExecutions.get(i).getTimeString(),
-					responseBody.get(i).getTestExecution().getTimeString());
+		for (int i = 0; i < responseBody.size(); i++) {
+			Assert.assertEquals(testExecutions.get(i).getId().intValue(), responseBody.get(i).getTestExecution()
+					.getId().intValue());
+			Assert.assertEquals(testExecutions.get(i).getTimeString(), responseBody.get(i).getTestExecution()
+					.getTimeString());
 		}
 		verify(testExecutionRepo).search(eq(""), eq(""), any(Pageable.class));
 	}
 
 	@Test
-	public void testListTestExecutionWithPageSize() throws ClassNotFoundException, IOException
-	{
+	public void testListTestExecutionWithPageSize() throws ClassNotFoundException, IOException {
 		List<TestExecution> cloned = getTestExecutionMockClone();
 		List<TestExecutionResult> converted = new ArrayList<TestExecutionResult>();
 
@@ -137,24 +130,22 @@ public class ApiControllerTest {
 		Page<TestExecutionResult> page = new PageImpl<TestExecutionResult>(converted);
 		reset(testExecutionRepo);
 		when(testExecutionRepo.search(eq(""), eq(""), any(Pageable.class))).thenReturn(page);
-		when(testExecutionRepo.count()).thenReturn((long)converted.size());
+		when(testExecutionRepo.count()).thenReturn((long) converted.size());
 
 		ResponseEntity<Page<TestExecutionResult>> response = this.apiController.listTestExecution(1, 20, "", "");
 		Assert.assertEquals(200, response.getStatusCode().value());
 		List<TestExecutionResult> responseBody = response.getBody().getContent();
-		for (int i = 0; i < responseBody.size(); i++)
-		{
-			Assert.assertEquals(testExecutions.get(i).getId().intValue(),
-					responseBody.get(i).getTestExecution().getId().intValue());
-			Assert.assertEquals(testExecutions.get(i).getTimeString(),
-					responseBody.get(i).getTestExecution().getTimeString());
+		for (int i = 0; i < responseBody.size(); i++) {
+			Assert.assertEquals(testExecutions.get(i).getId().intValue(), responseBody.get(i).getTestExecution()
+					.getId().intValue());
+			Assert.assertEquals(testExecutions.get(i).getTimeString(), responseBody.get(i).getTestExecution()
+					.getTimeString());
 		}
 		verify(testExecutionRepo).search(eq(""), eq(""), any(Pageable.class));
 	}
 
 	@Test
-	public void testListTestExecutionWithPageSizeUnlimited() throws ClassNotFoundException, IOException
-	{
+	public void testListTestExecutionWithPageSizeUnlimited() throws ClassNotFoundException, IOException {
 		List<TestExecution> cloned = getTestExecutionMockClone();
 		List<TestExecutionResult> converted = new ArrayList<TestExecutionResult>();
 
@@ -165,31 +156,27 @@ public class ApiControllerTest {
 		Page<TestExecutionResult> page = new PageImpl<TestExecutionResult>(converted);
 		reset(testExecutionRepo);
 		when(testExecutionRepo.search(eq(""), eq(""), any(Pageable.class))).thenReturn(page);
-		when(testExecutionRepo.count()).thenReturn((long)converted.size());
+		when(testExecutionRepo.count()).thenReturn((long) converted.size());
 
 		ResponseEntity<Page<TestExecutionResult>> response = this.apiController.listTestExecution(1, -1, "", "");
 		Assert.assertEquals(200, response.getStatusCode().value());
 		List<TestExecutionResult> responseBody = response.getBody().getContent();
-		for (int i = 0; i < responseBody.size(); i++)
-		{
-			Assert.assertEquals(testExecutions.get(i).getId().intValue(),
-					responseBody.get(i).getTestExecution().getId().intValue());
-			Assert.assertEquals(testExecutions.get(i).getTimeString(),
-					responseBody.get(i).getTestExecution().getTimeString());
+		for (int i = 0; i < responseBody.size(); i++) {
+			Assert.assertEquals(testExecutions.get(i).getId().intValue(), responseBody.get(i).getTestExecution()
+					.getId().intValue());
+			Assert.assertEquals(testExecutions.get(i).getTimeString(), responseBody.get(i).getTestExecution()
+					.getTimeString());
 		}
 		verify(testExecutionRepo).search(eq(""), eq(""), any(Pageable.class));
 	}
 
 	@Test
-	public void testSearch() throws ClassNotFoundException, IOException
-	{
+	public void testSearch() throws ClassNotFoundException, IOException {
 		HashSet<Integer> expectedIds = new HashSet<Integer>();
-		for (int i = 0; i < screenshots.size(); i++)
-		{
-			if (screenshots.get(i).getTestMethod().contains("thod1") &&
-				screenshots.get(i).getTestScreen().contains("screen1"))
-			{
-				expectedIds.add(screenshots.get(i).getTestExecutionId());
+		for (int i = 0; i < screenshots.size(); i++) {
+			if (screenshots.get(i).getTestMethod().contains("thod1")
+					&& screenshots.get(i).getTestScreen().contains("screen1")) {
+				expectedIds.add(screenshots.get(i).getTestExecution().getId());
 			}
 		}
 
@@ -197,8 +184,7 @@ public class ApiControllerTest {
 		List<TestExecutionResult> converted = new ArrayList<TestExecutionResult>();
 
 		for (TestExecution te : cloned) {
-			if (expectedIds.contains(te.getId()))
-			{
+			if (expectedIds.contains(te.getId())) {
 				converted.add(new TestExecutionResult(te, 0l, 1l));
 			}
 		}
@@ -206,9 +192,10 @@ public class ApiControllerTest {
 		Page<TestExecutionResult> page = new PageImpl<TestExecutionResult>(converted);
 		reset(testExecutionRepo);
 		when(testExecutionRepo.search(eq("thod1"), eq("screen1"), any(Pageable.class))).thenReturn(page);
-		when(testExecutionRepo.count()).thenReturn((long)converted.size());
+		when(testExecutionRepo.count()).thenReturn((long) converted.size());
 
-		ResponseEntity<Page<TestExecutionResult>> response = this.apiController.listTestExecution(1, 20, "thod1", "screen1");
+		ResponseEntity<Page<TestExecutionResult>> response = this.apiController.listTestExecution(1, 20, "thod1",
+				"screen1");
 		Assert.assertEquals(200, response.getStatusCode().value());
 		List<TestExecutionResult> responseBody = response.getBody().getContent();
 
@@ -216,7 +203,7 @@ public class ApiControllerTest {
 		for (int i = 0; i < responseBody.size(); i++) {
 			realIds.add(responseBody.get(i).getTestExecution().getId());
 		}
-		
+
 		Integer[] expectedList = expectedIds.toArray(new Integer[expectedIds.size()]);
 		Integer[] realList = realIds.toArray(new Integer[realIds.size()]);
 		Assert.assertEquals(expectedIds.size(), realIds.size());
@@ -228,49 +215,44 @@ public class ApiControllerTest {
 	}
 
 	@Test
-	public void testListScreenshot()
-	{
+	public void testListScreenshot() {
 		Map<Integer, ArrayList<Screenshot>> mapTE2S = new HashMap<Integer, ArrayList<Screenshot>>();
-		for (Screenshot sc : screenshots)
-		{
-			Integer tid = sc.getTestExecutionId(); 
-			if (!mapTE2S.containsKey(tid))
-			{
+		for (Screenshot sc : screenshots) {
+			Integer tid = sc.getTestExecution().getId();
+			if (!mapTE2S.containsKey(tid)) {
 				mapTE2S.put(tid, new ArrayList<Screenshot>());
 			}
-			mapTE2S.get(tid).add(sc); 
+			mapTE2S.get(tid).add(sc);
 		}
-		for (Map.Entry<Integer, ArrayList<Screenshot>> entry : mapTE2S.entrySet())
-		{
-			when(screenshotRepo.findByTestExecutionIdAndTestMethodContainingAndTestScreenContaining(eq(entry.getKey().intValue()), eq(""), eq(""))).thenReturn(entry.getValue());
+		for (Map.Entry<Integer, ArrayList<Screenshot>> entry : mapTE2S.entrySet()) {
+			when(
+					screenshotRepo.findByTestExecutionIdAndTestMethodContainingAndTestScreenContaining(eq(entry
+							.getKey().intValue()), eq(""), eq(""))).thenReturn(entry.getValue());
 		}
 
-		for (Map.Entry<Integer, ArrayList<Screenshot>> entry : mapTE2S.entrySet())
-		{
-			int testExecuteId = entry.getKey().intValue();  
+		for (Map.Entry<Integer, ArrayList<Screenshot>> entry : mapTE2S.entrySet()) {
+			int testExecuteId = entry.getKey().intValue();
 			ResponseEntity<List<Screenshot>> response = this.apiController.listScreenshot(testExecuteId, "", "");
-			Assert.assertEquals(200,  response.getStatusCode().value());
-			verify(screenshotRepo).findByTestExecutionIdAndTestMethodContainingAndTestScreenContaining(eq(testExecuteId), eq(""), eq(""));
+			Assert.assertEquals(200, response.getStatusCode().value());
+			verify(screenshotRepo).findByTestExecutionIdAndTestMethodContainingAndTestScreenContaining(
+					eq(testExecuteId), eq(""), eq(""));
 		}
 	}
 
 	@Test
-	public void testGetDetail()
-	{
-		for (int i = 0; i < screenshots.size(); i++)
-		{
+	public void testGetDetail() {
+		for (int i = 0; i < screenshots.size(); i++) {
 			int id = screenshots.get(i).getId().intValue();
 			when(screenshotRepo.findOne(i)).thenReturn(screenshots.get(i));
 			ResponseEntity<Screenshot> response = this.apiController.getDetail(id);
-			Assert.assertEquals(200,  response.getStatusCode().value());
+			Assert.assertEquals(200, response.getStatusCode().value());
 			Assert.assertEquals(id, response.getBody().getId().intValue());
 			verify(screenshotRepo).findOne(id);
 		}
 	}
 
 	@Test
-	public void testGetDetailFail()
-	{
+	public void testGetDetailFail() {
 		ResponseEntity<Screenshot> response = this.apiController.getDetail(-1);
 		Assert.assertEquals(null, response.getBody());
 	}
