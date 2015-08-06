@@ -1,8 +1,0 @@
-#
-#Wed Aug 05 19:18:04 JST 2015
-hi5.tool.jslint.lib.external.list=
-hi5.tool.jslint.option=/hifive-test-explorer/config/jshint_config.xml
-hi5.tool.jslint.use.other.project=false
-hi5.tool.jslint.other.project=
-hi5.tool.jslint.jslint=/hifive-test-explorer/config/jshint.js
-hi5.tool.jslint.lib.internal.list=
