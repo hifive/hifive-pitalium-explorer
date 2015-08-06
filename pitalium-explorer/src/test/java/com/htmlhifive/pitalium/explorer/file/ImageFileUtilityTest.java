@@ -62,7 +62,7 @@ public class ImageFileUtilityTest {
 
 	@Test
 	public void testGetAbsoluteFilePath() {
-		ImageFileUtility util = new ImageFileUtility(new Repositories(configRepo, processedImageRepo, screenshotRepo,
+		FileUtility util = new FileUtility(new Repositories(configRepo, processedImageRepo, screenshotRepo,
 				testExecutionRepo));
 		String path = util.getAbsoluteFilePath("test.png");
 		Assert.assertTrue(path.endsWith("test.png"));
@@ -70,7 +70,7 @@ public class ImageFileUtilityTest {
 
 	@Test
 	public void testProcessedFilePath() {
-		ImageFileUtility util = new ImageFileUtility(new Repositories(configRepo, processedImageRepo, screenshotRepo,
+		FileUtility util = new FileUtility(new Repositories(configRepo, processedImageRepo, screenshotRepo,
 				testExecutionRepo));
 		String path = util.newProcessedFilePath(new ProcessedImageKey(123, "best"));
 		Assert.assertTrue(path.startsWith("processed-image"));
