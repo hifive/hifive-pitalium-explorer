@@ -25,17 +25,17 @@ public interface ScreenshotRepository extends JpaRepository<Screenshot, Integer>
 	)
 	public List<Screenshot> findNotProcessedEdge(@Param("from") Integer from);
 
-	public Page<Screenshot> findByTestExecutionAndTestEnvironment(@Param("testExecutionId") Integer testExecutionId, 
+	public Page<Screenshot> findByTestExecutionIdAndTestEnvironmentId(@Param("testExecutionId") Integer testExecutionId, 
 			@Param("testEnvironmentId") Integer testEnvironmentId, Pageable page);
 
-	public long countByTestExecutionAndTestEnvironment(@Param("testExecutionId") Integer testExecutionId, 
+	public long countByTestExecutionIdAndTestEnvironmentId(@Param("testExecutionId") Integer testExecutionId, 
 			@Param("testEnvironmentId") Integer testEnvironmentId);
 
 	@Query("select distinct new com.htmlhifive.pitalium.explorer.entity.TestExecutionAndEnvironment( "
-			+ "exe.id as exeId, exe.time, env.id as envId, env.platform, env.platformVersion, env.deviceName, "
+			+ "exe.id, exe.time, env.id, env.platform, env.platformVersion, env.deviceName, "
 			+ "env.browserName, env.browserVersion ) from Screenshot as s, TestExecution as exe, TestEnvironment as env "
 			+ "where s.testExecution = exe.id and s.testEnvironment = env.id "
-			+ "order by exeId asc, envId asc")
+			+ "order by exe.id asc, env.id asc")
 	public Page<TestExecutionAndEnvironment> findTestExecutionAndEnvironment(Pageable page);
 
 }
