@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.htmlhifive.pitalium.explorer.entity.Screenshot;
+import com.htmlhifive.pitalium.explorer.entity.TestExecutionAndEnvironment;
 import com.htmlhifive.pitalium.explorer.response.TestExecutionResult;
 import com.htmlhifive.pitalium.explorer.service.ExplorerService;
 
@@ -77,6 +78,45 @@ public class ApiController {
 	public ResponseEntity<Screenshot> getDetail(@RequestParam Integer screenshotId) {
 		Screenshot item = service.getScreenshot(screenshotId);
 		return new ResponseEntity<Screenshot>(item, HttpStatus.OK);
+	}
+
+	/**
+	 * Gets list of the screenshots which is narrowed down by a test execution id and test environment id.
+	 * If pageSize equals to zero, the default page size is used. If pageSize equals to
+	 * -1, the entire list is returned.
+	 * 
+	 * @param testExecutionId test execution id
+	 * @param testEnviromentId test environment id
+	 * @param page Which page to show.
+	 * @param pageSize Page size.
+	 * @return Page of test execution
+	 */
+	@RequestMapping(value = "/listScreenshot", method = RequestMethod.GET, produces = "application/json;charset=utf-8")
+	@ResponseBody
+	public ResponseEntity<Page<Screenshot>> listScreenshot(@RequestParam Integer testExecutionId,
+			@RequestParam Integer testEnvironmentId,
+			@RequestParam(defaultValue = "1") int page,
+			@RequestParam(value = "limit", defaultValue = "-1") int pageSize) {
+		Page<Screenshot> screenshotPage = service.findScreenshot(testExecutionId, testEnvironmentId, page, pageSize);
+		return new ResponseEntity<Page<Screenshot>>(screenshotPage, HttpStatus.OK);
+	}
+
+	/**
+	 * Gets list of the TestExecutionAndEnvironment.
+	 * If pageSize equals to zero, the default page size is used. If pageSize equals to
+	 * -1, the entire list is returned.
+	 * 
+	 * @param page Which page to show.
+	 * @param pageSize Page size.
+	 * @return Page of test execution and environment
+	 */
+	@RequestMapping(value = "/listCompositeTestExecution", method = RequestMethod.GET, produces = "application/json;charset=utf-8")
+	@ResponseBody
+	public ResponseEntity<Page<TestExecutionAndEnvironment>> listCompositeTestExecution(
+			@RequestParam(defaultValue = "1") int page,
+			@RequestParam(value = "limit", defaultValue = "-1") int pageSize) {
+		Page<TestExecutionAndEnvironment> testPage = service.findTestExecutionAndEnviroment(page, pageSize);
+		return new ResponseEntity<Page<TestExecutionAndEnvironment>>(testPage, HttpStatus.OK);
 	}
 
 }
