@@ -164,8 +164,7 @@ public class ExplorerDBPersister extends DBPersister implements ExplorerPersiste
 		if (pageSize == 0) {
 			pageSize = defaultPageSize;
 		} else if (pageSize == -1) {
-			long count = screenshotRepo.countByTestExecutionIdAndTestEnvironmentId(testExecutionId, testEnvironmentId);
-			pageSize = (int) Math.min(count, Integer.MAX_VALUE);
+			pageSize = Integer.MAX_VALUE;
 		}
 		PageRequest pageRequest = new PageRequest(page - 1, pageSize, new Sort(Sort.Direction.DESC, "id"));
 		return screenshotRepo.findByTestExecutionIdAndTestEnvironmentId(testExecutionId, testEnvironmentId, pageRequest);
@@ -176,9 +175,7 @@ public class ExplorerDBPersister extends DBPersister implements ExplorerPersiste
 		if (pageSize == 0) {
 			pageSize = defaultPageSize;
 		} else if (pageSize == -1) {
-			// TODO 未実装
-			long count = 0;
-			pageSize = (int) Math.min(count, Integer.MAX_VALUE);
+			pageSize = Integer.MAX_VALUE;
 		}
 		PageRequest pageRequest = new PageRequest(page - 1, pageSize);
 		return screenshotRepo.findTestExecutionAndEnvironment(pageRequest);
