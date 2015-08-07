@@ -37,6 +37,7 @@ import com.htmlhifive.pitalium.explorer.entity.Screenshot;
 import com.htmlhifive.pitalium.explorer.entity.ScreenshotRepository;
 import com.htmlhifive.pitalium.explorer.entity.Target;
 import com.htmlhifive.pitalium.explorer.entity.TargetRepository;
+import com.htmlhifive.pitalium.explorer.entity.TestExecutionAndEnvironment;
 import com.htmlhifive.pitalium.explorer.entity.TestExecutionRepository;
 import com.htmlhifive.pitalium.explorer.image.EdgeDetector;
 import com.htmlhifive.pitalium.explorer.io.ExplorerDBPersister;
@@ -317,4 +318,14 @@ public class ExplorerService implements Serializable {
 		response.flushBuffer();
 		ImageIO.write(image, "png", response.getOutputStream());
 	}
+	
+	public Page<Screenshot> findScreenshot(Integer testExecutionId, Integer testEnvironmentId, 
+			int page, int pageSize) {
+		return persister.findScreenshot(testExecutionId, testEnvironmentId, page, pageSize);
+	}
+	
+	public Page<TestExecutionAndEnvironment> findTestExecutionAndEnviroment(int page, int pageSize) {
+		return persister.findTestExecutionAndEnviroment(page, pageSize);
+	}
+
 }
