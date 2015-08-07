@@ -57,9 +57,9 @@ public class ApiController {
 	 * @param executionId test execution id
 	 * @return list of screenshots
 	 */
-	@RequestMapping(value = "/listScreenshot", method = RequestMethod.GET, produces = "application/json;charset=utf-8")
+	@RequestMapping(value = "/listCompositeScreenshot", method = RequestMethod.GET, produces = "application/json;charset=utf-8")
 	@ResponseBody
-	public ResponseEntity<List<Screenshot>> listScreenshot(@RequestParam Integer testExecutionId,
+	public ResponseEntity<List<Screenshot>> listCompositeScreenshot(@RequestParam Integer testExecutionId,
 			@RequestParam(defaultValue = "") String searchTestMethod,
 			@RequestParam(defaultValue = "") String searchTestScreen) {
 		List<Screenshot> list = service.findScreenshot(testExecutionId, searchTestMethod, searchTestScreen);

@@ -232,7 +232,7 @@ public class ApiControllerTest {
 
 		for (Map.Entry<Integer, ArrayList<Screenshot>> entry : mapTE2S.entrySet()) {
 			int testExecuteId = entry.getKey().intValue();
-			ResponseEntity<List<Screenshot>> response = this.apiController.listScreenshot(testExecuteId, "", "");
+			ResponseEntity<List<Screenshot>> response = this.apiController.listCompositeScreenshot(testExecuteId, "", "");
 			Assert.assertEquals(200, response.getStatusCode().value());
 			verify(screenshotRepo).findByTestExecutionIdAndTestMethodContainingAndTestScreenContaining(
 					eq(testExecuteId), eq(""), eq(""));

@@ -67,7 +67,7 @@
 			return h5.ajax({
 				type: 'get',
 				dataType: 'json',
-				url: 'api/listScreenshot',
+				url: 'api/listCompositeScreenshot',
 				data: {
 					testExecutionId: testExecutionId,
 					searchTestMethod: this.searchTestMethod,
