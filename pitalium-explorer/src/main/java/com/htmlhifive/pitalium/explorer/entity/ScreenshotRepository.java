@@ -32,7 +32,7 @@ public interface ScreenshotRepository extends JpaRepository<Screenshot, Integer>
 			+ "exe.id, exe.time, env.id, env.platform, env.platformVersion, env.deviceName, "
 			+ "env.browserName, env.browserVersion ) from Screenshot as s, TestExecution as exe, TestEnvironment as env "
 			+ "where s.testExecution = exe.id and s.testEnvironment = env.id "
-			+ "order by exe.id asc, env.id asc")
+			+ "order by exe.time desc, env.id asc")
 	public Page<TestExecutionAndEnvironment> findTestExecutionAndEnvironment(Pageable page);
 
 }
