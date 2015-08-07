@@ -86,10 +86,13 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 		Map<String, List<Screenshot>> workScreenshotListMap = new HashMap<>();
 		Map<ScreenshotResult, Screenshot> workScreenshotMap = new HashMap<>();
 
+		List<TestEnvironment> workEnvList = new ArrayList<>();
+		
 		int executionId = 0;
 		int screenshotId = 0;
 		int targetId = 0;
 		int areaId = 0;
+		int environmentId = 0;
 
 		File[] files = collection.toArray(new File[collection.size()]);
 		for (int i = 0, len = files.length; i < len; i++) {
@@ -130,6 +133,15 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 				// Capability
 				Map<String, ?> capabilities = screenshotResult.getCapabilities();
 				TestEnvironment testEnvironment = createTestEnvironment(capabilities);
+				// リストの何番目に一致するデータがあるか探す。
+				int index = indexOf(workEnvList, testEnvironment);
+				if (index == -1) {
+					workEnvList.add(testEnvironment);
+					testEnvironment.setId(environmentId);
+					environmentId++;
+				} else {
+					testEnvironment = workEnvList.get(index);
+				}
 				screenshot.setTestEnvironment(testEnvironment);
 
 				// Target
@@ -268,6 +280,21 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 		return testEnvironment;
 	}
 
+	private int indexOf(List<TestEnvironment> environmentList, TestEnvironment environment) {
+		// idの値を除いて一致するデータを探す。
+		for (int i = 0, size = environmentList.size(); i < size; i++) {
+			TestEnvironment env = environmentList.get(i);
+			if (StringUtils.equals(env.getPlatform(), environment.getPlatform()) 
+					&& StringUtils.equals(env.getPlatformVersion(), environment.getPlatformVersion())
+					&& StringUtils.equals(env.getDeviceName(), environment.getDeviceName())
+					&& StringUtils.equals(env.getBrowserName(), environment.getBrowserName())
+					&& StringUtils.equals(env.getBrowserVersion(), environment.getBrowserVersion())) {
+				return i;
+			}
+		}
+		return -1;
+	}
+	
 	private Target createTarget(Integer targetId, Integer screenshotId, TargetResult targetResult,
 			ScreenshotResult screenshotResult) {
 		Target target = new Target();
