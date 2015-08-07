@@ -28,9 +28,6 @@ public interface ScreenshotRepository extends JpaRepository<Screenshot, Integer>
 	public Page<Screenshot> findByTestExecutionIdAndTestEnvironmentId(@Param("testExecutionId") Integer testExecutionId, 
 			@Param("testEnvironmentId") Integer testEnvironmentId, Pageable page);
 
-	public long countByTestExecutionIdAndTestEnvironmentId(@Param("testExecutionId") Integer testExecutionId, 
-			@Param("testEnvironmentId") Integer testEnvironmentId);
-
 	@Query("select distinct new com.htmlhifive.pitalium.explorer.entity.TestExecutionAndEnvironment( "
 			+ "exe.id, exe.time, env.id, env.platform, env.platformVersion, env.deviceName, "
 			+ "env.browserName, env.browserVersion ) from Screenshot as s, TestExecution as exe, TestEnvironment as env "
