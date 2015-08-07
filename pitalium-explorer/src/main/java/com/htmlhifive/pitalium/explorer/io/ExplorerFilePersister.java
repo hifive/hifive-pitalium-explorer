@@ -464,13 +464,22 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 			}
 		}
 
+		int size = extractScreenshotList.size();
+
 		if (pageSize == 0) {
 			pageSize = defaultPageSize;
 		} else if (pageSize == -1) {
 			pageSize = Integer.MAX_VALUE;
 		}
+
+		// 表示ページ番号、ページ表示数に合わせてリストを作成する。
+		List<Screenshot> resultList = new ArrayList<>();
+		for (int i = (page - 1) * pageSize; i < Math.min(page * pageSize, size); i++) {
+			resultList.add(extractScreenshotList.get(i));
+		}
+		
 		PageRequest pageable = new PageRequest(page - 1, pageSize);
-		return new PageImpl<Screenshot>(extractScreenshotList, pageable, extractScreenshotList.size());
+		return new PageImpl<Screenshot>(resultList, pageable, size);
 	}
 
 	@Override
@@ -502,13 +511,22 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 			}
 		}
 
+		int size = extractList.size();
+
 		if (pageSize == 0) {
 			pageSize = defaultPageSize;
 		} else if (pageSize == -1) {
 			pageSize = Integer.MAX_VALUE;
 		}
+
+		// 表示ページ番号、ページ表示数に合わせてリストを作成する。
+		List<TestExecutionAndEnvironment> resultList = new ArrayList<>();
+		for (int i = (page - 1) * pageSize; i < Math.min(page * pageSize, size); i++) {
+			resultList.add(extractList.get(i));
+		}
+		
 		PageRequest pageable = new PageRequest(page - 1, pageSize);
-		return new PageImpl<TestExecutionAndEnvironment>(extractList, pageable, extractList.size());
+		return new PageImpl<TestExecutionAndEnvironment>(resultList, pageable, size);
 	}
 
 	@Override
