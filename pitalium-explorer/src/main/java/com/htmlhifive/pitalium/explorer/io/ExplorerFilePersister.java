@@ -436,6 +436,12 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 				extractScreenshotList.add(screenshot);
 			}
 		}
+
+		if (pageSize == 0) {
+			pageSize = defaultPageSize;
+		} else if (pageSize == -1) {
+			pageSize = Integer.MAX_VALUE;
+		}
 		PageRequest pageable = new PageRequest(page - 1, pageSize);
 		return new PageImpl<Screenshot>(extractScreenshotList, pageable, extractScreenshotList.size());
 	}
@@ -467,6 +473,12 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 					extractList.add(testEE);
 				}
 			}
+		}
+
+		if (pageSize == 0) {
+			pageSize = defaultPageSize;
+		} else if (pageSize == -1) {
+			pageSize = Integer.MAX_VALUE;
 		}
 		PageRequest pageable = new PageRequest(page - 1, pageSize);
 		return new PageImpl<TestExecutionAndEnvironment>(extractList, pageable, extractList.size());
