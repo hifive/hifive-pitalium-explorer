@@ -136,9 +136,9 @@
 		_setImage: function(targetId) {
 			var screenshotId = this._screenshot.id;
 
-			var expectedScreenshot = this._screenshot.expectedScreenshot;
+			var expectedScreenshotId = this._screenshot.expectedScreenshotId;
 			// Expected mode
-			if (expectedScreenshot == null) {
+			if (expectedScreenshotId == null) {
 				this._setActualImageSrc(false, {
 					screenshotId: screenshotId,
 					targetId: targetId
@@ -156,25 +156,25 @@
 				});
 
 				this._setExpectedImageSrc(false, {
-					screenshotId: expectedScreenshot.id,
+					screenshotId: expectedScreenshotId,
 					targetId: targetId
 				});
 			} else {
 				// Test failed
 				this._setActualImageSrc(true, {
 					sourceSceenshotId: screenshotId,
-					targetScreenshotId: expectedScreenshot.id,
+					targetScreenshotId: expectedScreenshotId,
 					targetId: targetId
 				});
 
 				this._setExpectedImageSrc(true, {
-					sourceSceenshotId: expectedScreenshot.id,
+					sourceSceenshotId: expectedScreenshotId,
 					targetScreenshotId: screenshotId,
 					targetId: targetId
 				});
 			}
 
-			this._initEdgeOverlapping(expectedScreenshot.id, screenshotId, targetId);
+			this._initEdgeOverlapping(expectedScreenshotId, screenshotId, targetId);
 		},
 
 		'#quick-flipping .image-diff click': function(context, $el) {

@@ -6,6 +6,7 @@ package com.htmlhifive.pitalium.explorer.entity;
 import java.io.Serializable;
 import java.util.List;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -25,9 +26,8 @@ public class Screenshot implements Serializable {
 	@Id
 	private Integer id;
 
-	@ManyToOne
-	@JoinColumn(name = "expectedId", nullable = true, updatable = false)
-	private Screenshot expectedScreenshot;
+	@Column(name = "expectedId")
+	private Integer expectedScreenshotId;
 
 	private String fileName;
 
@@ -58,12 +58,12 @@ public class Screenshot implements Serializable {
 		this.id = id;
 	}
 
-	public Screenshot getExpectedScreenshot() {
-		return expectedScreenshot;
+	public Integer getExpectedScreenshotId() {
+		return expectedScreenshotId;
 	}
 
-	public void setExpectedScreenshot(Screenshot expectedScreenshot) {
-		this.expectedScreenshot = expectedScreenshot;
+	public void setExpectedScreenshotId(Integer expectedScreenshotId) {
+		this.expectedScreenshotId = expectedScreenshotId;
 	}
 
 	public String getFileName() {

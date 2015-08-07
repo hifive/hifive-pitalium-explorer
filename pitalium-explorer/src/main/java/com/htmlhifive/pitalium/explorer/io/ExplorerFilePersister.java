@@ -201,7 +201,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 			for (Screenshot expectedScreenshot : screenshotList) {
 				if (StringUtils.equals(expectedScreenshot.getTestClass(), screenshot.getTestClass())
 						&& StringUtils.equals(expectedScreenshot.getFileName(), screenshot.getFileName())) {
-					screenshot.setExpectedScreenshot(expectedScreenshot);
+					screenshot.setExpectedScreenshotId(expectedScreenshot.getId());
 					break;
 				}
 			}

@@ -22,7 +22,7 @@ public class ScreenshotTest {
 		TestExecution texe = new TestExecution();
 
 		s.setId(7357);
-		s.setExpectedScreenshot(s2);
+		s.setExpectedScreenshotId(s2.getId());
 		s.setFileName("TEST FILE NAME");
 		s.setComparisonResult(true);
 		s.setTestClass("TEST CLASS");
@@ -32,7 +32,7 @@ public class ScreenshotTest {
 		s.setTestEnvironment(tenv);
 
 		Assert.assertEquals(7357, s.getId().intValue());
-		Assert.assertEquals(s2, s.getExpectedScreenshot());
+		Assert.assertEquals(s2.getId(), s.getExpectedScreenshotId());
 		Assert.assertEquals("TEST FILE NAME", s.getFileName());
 		Assert.assertEquals(true, s.getComparisonResult());
 		Assert.assertEquals("TEST CLASS", s.getTestClass());
