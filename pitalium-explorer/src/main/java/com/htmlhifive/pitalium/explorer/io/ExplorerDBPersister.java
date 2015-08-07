@@ -166,7 +166,8 @@ public class ExplorerDBPersister extends DBPersister implements ExplorerPersiste
 		} else if (pageSize == -1) {
 			pageSize = Integer.MAX_VALUE;
 		}
-		PageRequest pageRequest = new PageRequest(page - 1, pageSize, new Sort(Sort.Direction.DESC, "id"));
+		PageRequest pageRequest = 
+				new PageRequest(page - 1, pageSize, new Sort(Sort.Direction.ASC, "testClass", "testMethod", "testScreen"));
 		return screenshotRepo.findByTestExecutionIdAndTestEnvironmentId(testExecutionId, testEnvironmentId, pageRequest);
 	}
 
