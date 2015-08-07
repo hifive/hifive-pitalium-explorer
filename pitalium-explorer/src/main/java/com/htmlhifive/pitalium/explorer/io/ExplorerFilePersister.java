@@ -511,6 +511,14 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 			}
 		}
 
+		// 実行日時の降順にソート
+		List<TestExecutionAndEnvironment> tempTestExecutionAndEnvironmentList = new ArrayList<>();
+		for (int i = extractList.size() - 1; i >= 0; i--) {
+			TestExecutionAndEnvironment testEE = extractList.get(i);
+			tempTestExecutionAndEnvironmentList.add(testEE);
+		}
+		extractList = tempTestExecutionAndEnvironmentList;
+
 		int size = extractList.size();
 
 		if (pageSize == 0) {
