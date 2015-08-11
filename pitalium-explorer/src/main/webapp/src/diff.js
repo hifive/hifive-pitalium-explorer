@@ -227,20 +227,7 @@
 			this.view.update('#detail', 'testResultListTemplate', {
 				testResult: screenshot
 			});
-			this._changeTitle();
-
 			return h5.async.when(this._imageLoadPromises);
-		},
-
-		_changeTitle: function() {
-			var title = $('title').text();
-			if (this._screenshot.comparisonResult == null) {
-				// ignore
-			} else if (this._screenshot.comparisonResult) {
-				$('title').text('○ ' + title);
-			} else {
-				$('title').text('× ' + title);
-			}
 		},
 
 		/**
@@ -567,6 +554,9 @@
 
 		_testResultDiffController: hifive.pitalium.explorer.controller.TestResultDiffController,
 
+		/** original title */
+		_orgTitle: null,
+
 		__meta: {
 			_screenshotListController: {
 				rootElement: '#list'
@@ -594,6 +584,8 @@
 
 			// Get screenshot detailsT
 			this._testResultDiffLogic.getScreenshot(id).done(this.own(function(screenshot) {
+				this._changeTitle(screenshot.comparisonResult);
+
 				var diffPromise = this._testResultDiffController.showResult(screenshot);
 				var listPromise = this._screenshotListController.showList(screenshot);
 
@@ -605,6 +597,21 @@
 			var height = this.rootElement.scrollHeight;
 			$(this.rootElement).height(height);
 			this._dividedboxController.refresh();
+		},
+
+		_changeTitle: function(comparisonResult) {
+			if (this._orgTitle == null) {
+				this._$title = $('title');
+				this._orgTitle = this._$title.text();
+			}
+
+			if (comparisonResult == null) {
+				this._$title.text(this._orgTitle);
+			} else if (comparisonResult) {
+				this._$title.text('○ ' + this._orgTitle);
+			} else {
+				this._$title.text('× ' + this._orgTitle);
+			}
 		},
 
 		'#list selectScreenshot': function(context, $el) {
