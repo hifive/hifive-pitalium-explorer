@@ -87,7 +87,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 		Map<ScreenshotResult, Screenshot> workScreenshotMap = new HashMap<>();
 
 		List<TestEnvironment> workEnvList = new ArrayList<>();
-		
+
 		int executionId = 0;
 		int screenshotId = 0;
 		int targetId = 0;
@@ -255,6 +255,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 	private Screenshot createScreenshot(Integer screenshotId, ScreenshotResult screenshotResult) {
 		Screenshot screenshot = new Screenshot();
 		screenshot.setId(screenshotId);
+		screenshot.setScreenshotName(screenshotResult.getScreenshotId());
 		screenshot.setComparisonResult(screenshotResult.getResult() != null ? screenshotResult.getResult().isSuccess()
 				: null);
 		screenshot.setTestClass(screenshotResult.getTestClass());
@@ -284,7 +285,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 		// idの値を除いて一致するデータを探す。
 		for (int i = 0, size = environmentList.size(); i < size; i++) {
 			TestEnvironment env = environmentList.get(i);
-			if (StringUtils.equals(env.getPlatform(), environment.getPlatform()) 
+			if (StringUtils.equals(env.getPlatform(), environment.getPlatform())
 					&& StringUtils.equals(env.getPlatformVersion(), environment.getPlatformVersion())
 					&& StringUtils.equals(env.getDeviceName(), environment.getDeviceName())
 					&& StringUtils.equals(env.getBrowserName(), environment.getBrowserName())
@@ -294,7 +295,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 		}
 		return -1;
 	}
-	
+
 	private Target createTarget(Integer targetId, Integer screenshotId, TargetResult targetResult,
 			ScreenshotResult screenshotResult) {
 		Target target = new Target();
@@ -449,8 +450,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 	}
 
 	@Override
-	public Page<Screenshot> findScreenshot(Integer testExecutionId, Integer testEnvironmentId,
-			int page, int pageSize) {
+	public Page<Screenshot> findScreenshot(Integer testExecutionId, Integer testEnvironmentId, int page, int pageSize) {
 		if (screenshotListMap == null) {
 			return new PageImpl<Screenshot>(new ArrayList<Screenshot>());
 		}
@@ -477,7 +477,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 		for (int i = (page - 1) * pageSize; i < Math.min(page * pageSize, size); i++) {
 			resultList.add(extractScreenshotList.get(i));
 		}
-		
+
 		PageRequest pageable = new PageRequest(page - 1, pageSize);
 		return new PageImpl<Screenshot>(resultList, pageable, size);
 	}
@@ -532,7 +532,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 		for (int i = (page - 1) * pageSize; i < Math.min(page * pageSize, size); i++) {
 			resultList.add(extractList.get(i));
 		}
-		
+
 		PageRequest pageable = new PageRequest(page - 1, pageSize);
 		return new PageImpl<TestExecutionAndEnvironment>(resultList, pageable, size);
 	}

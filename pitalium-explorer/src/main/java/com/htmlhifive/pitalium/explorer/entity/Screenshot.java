@@ -26,6 +26,8 @@ public class Screenshot implements Serializable {
 	@Id
 	private Integer id;
 
+	private String screenshotName;
+
 	@Column(name = "expectedId")
 	private Integer expectedScreenshotId;
 
@@ -56,6 +58,14 @@ public class Screenshot implements Serializable {
 
 	public void setId(Integer id) {
 		this.id = id;
+	}
+
+	public String getScreenshotName() {
+		return screenshotName;
+	}
+
+	public void setScreenshotName(String screenshotName) {
+		this.screenshotName = screenshotName;
 	}
 
 	public Integer getExpectedScreenshotId() {
