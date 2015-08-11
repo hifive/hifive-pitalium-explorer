@@ -775,13 +775,13 @@
 				}
 			}
 
-			var prevWH = $groupPrev[outerW_H]() + move;
+			var prevWH = $groupPrev[w_h]() + move;
 			if (prevWH < 0) {
 				prevWH = 0;
-				move = -$groupPrev[outerW_H]();
+				move = -$groupPrev[w_h]();
 			}
 
-			var nextWH = $groupNext[outerW_H]() - move;
+			var nextWH = $groupNext[w_h]() - move;
 			if (nextWH < 0) {
 				nextWH = 0;
 			}
