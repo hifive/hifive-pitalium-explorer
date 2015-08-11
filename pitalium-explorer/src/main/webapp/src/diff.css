@@ -8,10 +8,38 @@ body {
 	overflow-x: hidden;
 }
 
+#list {
+	width: 15%;
+}
+
+#main {
+	width: 80%;
+	height: auto;
+}
+
+.box {
+	border: 2px gray solid;
+	border-radius: 10px;
+	background-color: white;
+	padding: 5px;
+}
+
+/* DividedBox */
+.dividedBox .dividerHandler {
+	display: none !important;
+}
+
+.dividedBox>.divider {
+	background-color: #E2E2E2;
+}
+
 .row {
 	overflow-x: hidden;
 	overflow-y: scroll;
 	max-height: 700px;
+}
+.tab-pane > .row {
+	margin: 0px;
 }
 
 .legend {

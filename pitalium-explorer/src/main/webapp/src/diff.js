@@ -31,6 +31,54 @@
 					screenshotId: id
 				}
 			});
+		},
+
+		/**
+		 * Get screenshots of the current execution and environment.
+		 * 
+		 * @memberOf hifive.pitalium.explorer.logic.TestResultDiffLogic
+		 * @param {string} id the id of the screenshot
+		 * @returns {JqXHRWrapper}
+		 */
+		listScreenshot: function(executionId, environmentId) {
+			var dfd = this.deferred();
+
+			h5.ajax('api/listScreenshot', {
+				data: {
+					testExecutionId: executionId,
+					testEnvironmentId: environmentId
+				},
+				type: 'GET',
+				dataType: 'json'
+			}).done(this.own(function(response) {
+				var screenshots = response.content;
+				var map = this._convertToTreeMap(screenshots);
+				dfd.resolve(map);
+			}));
+			return dfd.promise();
+		},
+
+		_convertToTreeMap: function(screenshotArray) {
+			var retMap = {};
+			for (var i = 0, len = screenshotArray.length; i < len; i++) {
+				var s = screenshotArray[i];
+				var testClass = s.testClass;
+				var testClassObj = retMap[testClass];
+				if (!testClassObj) {
+					testClassObj = {};
+					retMap[testClass] = testClassObj;
+				}
+
+				var testMethod = s.testMethod;
+				var screenshotsOfMethod = testClassObj[testMethod];
+				if (!screenshotsOfMethod) {
+					screenshotsOfMethod = [];
+					testClassObj[testMethod] = screenshotsOfMethod;
+				}
+
+				screenshotsOfMethod.push(s);
+			}
+			return retMap;
 		}
 	};
 
@@ -38,7 +86,97 @@
 })(jQuery);
 (function($) {
 	/**
-	 * This class is a controller for the test result comparison page.
+	 * This class is a controller for the list of screeenshots.
+	 * 
+	 * @class
+	 * @memberOf hifive.pitalium.explorer.controller
+	 * @name ScreenshotListController
+	 */
+	var screenshotListController = {
+		__name: 'hifive.pitalium.explorer.controller.ScreenshotListController',
+
+		/**
+		 * The &quot;Logic&quot; class
+		 * 
+		 * @type Logic
+		 * @memberOf hifive.pitalium.explorer.controller.ScreenshotListController
+		 */
+		_testResultDiffLogic: hifive.pitalium.explorer.logic.TestResultDiffLogic,
+
+		/**
+		 * Show the list of screenshots.
+		 * 
+		 * @memberOf hifive.pitalium.explorer.controller.ScreenshotListController
+		 */
+		showList: function(screenshot) {
+			return this._testResultDiffLogic.listScreenshot(screenshot.testExecution.id,
+					screenshot.testEnvironment.id).done(this.own(function(screenshotMap) {
+				this._showList(screenshotMap);
+			}));
+		},
+
+		_showList: function(screenshotMap) {
+			var treeData = [];
+			for ( var testClass in screenshotMap) {
+				var children = [];
+				var testMethodMap = screenshotMap[testClass];
+				for ( var testMethod in testMethodMap) {
+					var screenshots = testMethodMap[testMethod];
+					var child = {
+						text: testMethod,
+						children: [],
+						state: {
+							opened: true
+						}
+					};
+					children.push(child);
+
+					for (var i = 0, len = screenshots.length; i < len; i++) {
+						var s = screenshots[i];
+						child.children.push({
+							text: s.screenshotName,
+							icon: false,
+							a_attr: {
+								'class': 'screenshot',
+								'data-explorer-screenshot-id': s.id
+							},
+							state: {
+								opened: true
+							}
+						});
+					}
+				}
+				treeData.push({
+					text: testClass,
+					children: children,
+					state: {
+						opened: true
+					}
+				});
+			}
+
+			this.$find('#tree_root').jstree({
+				'core': {
+					data: treeData
+				}
+			});
+		},
+
+		'.screenshot click': function(context, $el) {
+			var id = $el.data('explorerScreenshotId');
+			this.trigger('selectScreenshot', {
+				id: id
+			});
+		}
+	};
+
+	h5.core.expose(screenshotListController);
+
+})(jQuery);
+
+(function($) {
+	/**
+	 * This class is a controller for the test result comparison.
 	 * 
 	 * @class
 	 * @memberOf hifive.pitalium.explorer.controller
@@ -60,37 +198,38 @@
 
 		_screenshot: {},
 
+		_imageLoadDeferred: null,
+
 		/**
 		 * Called after the controller has been initialized.<br>
-		 * Get the id of the right screenshot, and update views.
+		 * Get the id of the right screenshot, and init views.
 		 * 
 		 * @memberOf hifive.pitalium.explorer.controller.TestResultDiffController
 		 */
 		__ready: function() {
-			// Get the id of the test result from url query parameters.
-			var queryParams = hifive.pitalium.explorer.utils.getParameters();
-			if (!queryParams.hasOwnProperty('id')) {
-				alert('ID not found');
-				return;
-			}
-
-			var id = queryParams.id;
-
-			// Get screenshot details
-			this._testResultDiffLogic.getScreenshot(id).done(this.own(function(screenshot) {
-				this._screenshot = screenshot;
-				this._initializeImageSelector(screenshot.targets);
-				this.view.update('#detail', 'testResultListTemplate', {
-					testResult: screenshot
-				});
-				this._changeTitle();
-			}));
-
 			this._initializeSwipeHandle();
 			this._initializeOnionHandle();
 
 			this.$find('#quick-flipping .image-diff.expected').css('opacity', 0.2);
 			this.$find('#quick-flipping .image-overlay .expected').hide();
+		},
+
+		/**
+		 * Show the result of the selected screenshot id.
+		 * 
+		 * @memberOf hifive.pitalium.explorer.controller.TestResultDiffController
+		 */
+		showResult: function(screenshot) {
+			this._imageLoadPromises = [];
+
+			this._screenshot = screenshot;
+			this._initializeImageSelector(screenshot.targets);
+			this.view.update('#detail', 'testResultListTemplate', {
+				testResult: screenshot
+			});
+			this._changeTitle();
+
+			return h5.async.when(this._imageLoadPromises);
 		},
 
 		_changeTitle: function() {
@@ -315,8 +454,14 @@
 		 * @param {Object} params extra paramters
 		 */
 		_setImageSrc: function(selector, withMarker, params) {
+			var dfd = this.deferred();
+
 			var url = withMarker ? 'image/getDiff' : 'image/get';
 			this.$find(selector).attr('src', hifive.pitalium.explorer.utils.formatUrl(url, params));
+			this.$find(selector)[0].onload = function() {
+				dfd.resolve();
+			};
+			this._imageLoadPromises.push(dfd.promise());
 		},
 
 		/**
@@ -396,7 +541,83 @@
 
 	h5.core.expose(testResultDiffController);
 })(jQuery);
+
+(function($) {
+	/**
+	 * This class is a controller for the test result diff page.
+	 * 
+	 * @class
+	 * @memberOf hifive.pitalium.explorer.controller
+	 * @name DiffPageController
+	 */
+	var diffPageController = {
+		__name: 'hifive.pitalium.explorer.controller.DiffPageController',
+
+		/**
+		 * The &quot;Logic&quot; class
+		 * 
+		 * @type Logic
+		 * @memberOf hifive.pitalium.explorer.controller.DiffPageController
+		 */
+		_testResultDiffLogic: hifive.pitalium.explorer.logic.TestResultDiffLogic,
+
+		_dividedboxController: h5.ui.components.DividedBox.DividedBox,
+
+		_screenshotListController: hifive.pitalium.explorer.controller.ScreenshotListController,
+
+		_testResultDiffController: hifive.pitalium.explorer.controller.TestResultDiffController,
+
+		__meta: {
+			_screenshotListController: {
+				rootElement: '#list'
+			},
+			_testResultDiffController: {
+				rootElement: '#main'
+			}
+		},
+
+		/**
+		 * Called after the controller has been initialized.<br>
+		 * Get the id of the right screenshot, and update views.
+		 * 
+		 * @memberOf hifive.pitalium.explorer.controller.DiffPageController
+		 */
+		__ready: function() {
+			// Get the id of the test result from url query parameters.
+			var queryParams = hifive.pitalium.explorer.utils.getParameters();
+			if (!queryParams.hasOwnProperty('id')) {
+				alert('ID not found');
+				return;
+			}
+
+			var id = queryParams.id;
+
+			// Get screenshot detailsT
+			this._testResultDiffLogic.getScreenshot(id).done(this.own(function(screenshot) {
+				var diffPromise = this._testResultDiffController.showResult(screenshot);
+				var listPromise = this._screenshotListController.showList(screenshot);
+
+				h5.async.when(diffPromise, listPromise).done(this.own(this._refreshView));
+			}));
+		},
+
+		_refreshView: function() {
+			var height = this.rootElement.scrollHeight;
+			$(this.rootElement).height(height);
+			this._dividedboxController.refresh();
+		},
+
+		'#list selectScreenshot': function(context, $el) {
+			var id = context.evArg.id;
+			this._testResultDiffLogic.getScreenshot(id).done(this.own(function(screenshot) {
+				this._testResultDiffController.showResult(screenshot);
+			}));
+		}
+	};
+
+	h5.core.expose(diffPageController);
+
+})(jQuery);
 $(function() {
-	h5.core.controller('body>div.container',
-			hifive.pitalium.explorer.controller.TestResultDiffController);
+	h5.core.controller('#container', hifive.pitalium.explorer.controller.DiffPageController);
 });
