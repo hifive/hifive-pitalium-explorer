@@ -243,7 +243,11 @@
 			// Generate select options
 			var imageSelector = this.$find('#imageSelector');
 			// Fire change event and show images.
-			imageSelector.change();
+			this._setImage(imageSelector.val());
+		},
+
+		'.nav-tabs shown.bs.tab': function(context, $el) {
+			this._triggerViewChange();
 		},
 
 		/**
@@ -257,9 +261,13 @@
 		'#imageSelector change': function(context, $el) {
 			var val = $el.val();
 			this._setImage(val);
+			h5.async.when(this._imageLoadPromises).done(this.own(function() {
+				this._triggerViewChange();
+			}));
 		},
 
 		_setImage: function(targetId) {
+			this._imageLoadPromises = [];
 			var screenshotId = this._screenshot.id;
 
 			var expectedScreenshotId = this._screenshot.expectedScreenshotId;
@@ -523,6 +531,10 @@
 			$handle.on('change', inputHandler); // for IE
 
 			inputHandler();
+		},
+
+		_triggerViewChange: function() {
+			this.trigger('viewChanged');
 		}
 	};
 
@@ -621,8 +633,11 @@
 			}));
 		},
 
+		'#main viewChanged': function(context, $el) {
+			this._refreshView();
+		},
+
 		'{window} [resize]': function() {
-			//			this._dividedboxController.refresh();
 			this._refreshView();
 		}
 	};
