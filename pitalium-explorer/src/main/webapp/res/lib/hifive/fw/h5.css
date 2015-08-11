@@ -1,0 +1,196 @@
+@charset "utf-8";
+/*
+ * Copyright (C) 2012-2014 NS Solutions Corporation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * hifive css
+ *   version 1.1.14
+ *   gitCommitId : a4c4bbab5019987c08ee2ba99ec4612a7054b8b3
+ *   build at 2014/09/02 13:16:23.002 (+0900)
+ *   (util,controller,modelWithBinding,view,ui,api.geo,api.sqldb,api.storage)
+ */
+
+
+/* インジケータ オーバーレイDIV,メッセージDIV 共通設定 */
+.h5-indicator {
+	text-align: center;
+	padding: 5px 10px 5px 10px;
+	white-space: nowarp;
+	cursor: wait;
+}
+
+/* インジケータ オーバレイDIV */
+.h5-indicator.overlay {
+	height: 100%;
+	width: 100%;
+	border: none;
+	margin: 0px;
+	padding: 0px;
+	top: 0;
+	left: 0;
+	z-index: 1001;
+}
+
+/* インジケータメッセージDIV - スロバーSPAN */
+.h5-indicator .indicator-throbber {
+	display: inline-block;
+	vertical-align: middle;
+	zoom: 1;
+}
+
+/* インジケータメッセージDIV - メッセージSPAN */
+.h5-indicator .indicator-message {
+	display: inline-block;
+	vertical-align: middle;
+	zoom: 1;
+}
+
+/*---- インジケータメッセージDIV - パーセントSPAN (IE6,7,8以外) ----*/
+.h5-indicator .throbber-percent {
+	position: absolute;
+	text-align: center;
+}
+
+/*---- インジケータメッセージDIV - パーセントSPAN (IE6,7,8用) -----*/
+.h5-indicator .vml-root {
+	display: inline-block;
+	vertical-align: middle;
+	zoom: 1;
+}
+
+.h5-indicator .vml-root .throbber-percent {
+	position: relative;
+	margin: 0;
+	padding: 0;
+	border: none;
+	zoom: 1;
+}
+
+/*---- オーバーレイ(iframe) (IE6用) -----*/
+.h5-indicator.skin {
+	position: absolute;
+	filter: alpha(opacity=0);
+	height: 100%;
+	width: 100%;
+	border: none;
+	margin: 0px;
+	padding: 0px;
+	top: 0;
+	left: 0;
+	z-index: 1000;
+	overflow: hidden;
+}
+
+/*------------------------ Theme 'a' start ---------------------------*/
+
+/*---- スロバーの大きさ (幅と高さは同じ値を設定して下さい) ----*/
+div.a.throbber {
+	width: 42px;
+	height: 42px;
+}
+
+/*---- スロバーの線の幅・色 -----*/
+div.a.throbber-line {
+	width: 2px;
+	color: #fff;
+}
+
+/* ----- スロバーの動作 ------*/
+/** Chrome/Safari */
+@-webkit-keyframes rotateThrobber {
+    from {-webkit-transform: rotate(0deg);}
+    to {-webkit-transform: rotate(360deg);}
+}
+
+/** Firefox */
+@-moz-keyframes rotateThrobber {
+    from {-moz-transform: rotate(0deg);}
+    to {-moz-transform: rotate(360deg);}
+}
+
+/** Opera */
+@-o-keyframes rotateThrobber {
+    from {-o-transform: rotate(0deg);}
+    to {-o-transform: rotate(360deg);}
+}
+
+/** no-prefix (IE10) */
+@keyframes rotateThrobber {
+    from {transform: rotate(0deg);}
+    to {transform: rotate(360deg);}
+}
+
+.h5-indicator.a .throbber-canvas {
+	/** Chrome/Safari */
+	-webkit-animation-name: rotateThrobber;
+    -webkit-animation-delay: 0;
+    -webkit-animation-duration: 2s;
+    -webkit-animation-timing-function: linear;
+    -webkit-animation-iteration-count: infinite;
+    /** Firefox */
+	-moz-animation-name: rotateThrobber;
+    -moz-animation-delay: 0;
+    -moz-animation-duration: 2s;
+    -moz-animation-timing-function: linear;
+    -moz-animation-iteration-count: infinite;
+    /** Opera */
+    -o-animation-name: rotateThrobber;
+    -o-animation-delay: 0;
+    -o-animation-duration: 2s;
+    -o-animation-timing-function: linear;
+    -o-animation-iteration-count: infinite;
+    /** no-prefix (IE10) */
+    animation-name: rotateThrobber;
+    animation-delay: 0;
+    animation-duration: 2s;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+}
+
+/*---- パーセント (スロバーの大きさに合わせて修正して下さい) ----*/
+.h5-indicator.a .throbber-percent {
+	font-size: 12px;
+	font-family: ＭＳ ゴシック;
+	color: #fff;
+}
+
+/* メッセージ */
+.h5-indicator.a .indicator-message {
+	font-size: 14px;
+	color: #fff;
+}
+
+/** オーバーレイDIV */
+.h5-indicator.a.overlay {
+	background-color: #000;
+	opacity: 0.6;
+	filter: alpha(opacity=60);
+}
+
+/* メッセージDIV */
+.h5-indicator.a.content {
+	background-color: #333;
+	opacity: 0.7;
+	filter: alpha(opacity=70);
+	color: #fff;
+	border: none;
+	-webkit-border-radius: 10px;
+	-moz-border-radius: 10px;
+	-o-border-radius: 10px;
+	-ms-border-radius: 10px;
+	border-radius: 10px;
+	z-index: 1002;
+}
+
+/*------------------------ Theme 'a' end ---------------------------*/
