@@ -594,7 +594,7 @@
 		},
 
 		_refreshView: function() {
-			var height = this.rootElement.scrollHeight;
+			var height = this.$find('#main')[0].scrollHeight;
 			$(this.rootElement).height(height);
 			this._dividedboxController.refresh();
 		},
@@ -619,6 +619,11 @@
 			this._testResultDiffLogic.getScreenshot(id).done(this.own(function(screenshot) {
 				this._testResultDiffController.showResult(screenshot);
 			}));
+		},
+
+		'{window} [resize]': function() {
+			//			this._dividedboxController.refresh();
+			this._refreshView();
 		}
 	};
 
