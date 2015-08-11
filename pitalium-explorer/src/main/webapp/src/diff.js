@@ -639,6 +639,11 @@
 
 		'{window} [resize]': function() {
 			this._refreshView();
+		},
+
+		'{rootElement} boxSizeChange': function() {
+			var height = this.$find('#main')[0].scrollHeight;
+			$(this.rootElement).height(height);
 		}
 	};
 
