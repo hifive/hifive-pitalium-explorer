@@ -389,9 +389,11 @@
 					screenshotId: screenshotId,
 					targetId: targetId
 				});
+				this._showExpectedMode();
 				this._hideActualMode();
 				return;
 			}
+			this._showActualMode();
 			this._hideExpectedMode();
 
 			if (this._screenshot.comparisonResult) {
@@ -572,6 +574,24 @@
 				dfd.resolve();
 			};
 			this._imageLoadPromises.push(dfd.promise());
+		},
+
+		/**
+		 * Show actual mode.
+		 * 
+		 * @memberOf hifive.pitalium.explorer.controller.TestResultDiffController
+		 */
+		_showActualMode: function() {
+			this.$find('#actual-mode').show();
+		},
+
+		/**
+		 * Show expected mode.
+		 * 
+		 * @memberOf hifive.pitalium.explorer.controller.TestResultDiffController
+		 */
+		_showExpectedMode: function() {
+			this.$find('#expected-mode').show();
 		},
 
 		/**
