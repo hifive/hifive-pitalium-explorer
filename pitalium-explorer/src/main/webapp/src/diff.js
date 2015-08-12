@@ -79,12 +79,94 @@
 				screenshotsOfMethod.push(s);
 			}
 			return retMap;
+		},
+
+		listCompositeTestExecution: function() {
+			return h5.ajax({
+				type: 'get',
+				url: 'api/listCompositeTestExecution'
+			});
 		}
 	};
 
 	h5.core.expose(testResultDiffLogic);
 })(jQuery);
 (function($) {
+	/**
+	 * This class is a controller for the list of screeenshots.
+	 * 
+	 * @class
+	 * @memberOf hifive.pitalium.explorer.controller
+	 * @name ScreenshotListController
+	 */
+	var selectExecutionController = {
+		__name: 'hifive.pitalium.explorer.controller.SelectExecutionController',
+
+		/**
+		 * The &quot;Logic&quot; class
+		 * 
+		 * @type Logic
+		 * @memberOf hifive.pitalium.explorer.controller.SelectExecutionController
+		 */
+		_testResultDiffLogic: hifive.pitalium.explorer.logic.TestResultDiffLogic,
+
+		_$selected: null,
+
+		_executionList: null,
+
+		__init: function(context) {
+			this._popup = context.args.popup;
+		},
+
+		__ready: function(context) {
+			this._testResultDiffLogic.listCompositeTestExecution().done(
+					this.own(function(response) {
+						this._executionList = response.content;
+						this.view.update('#execution_list', 'screenshotListTemplate', {
+							executions: this._executionList
+						});
+					}));
+		},
+
+		'[name="execution"] change': function(context, $el) {
+			if (this._$selected) {
+				this._$selected.removeClass('success');
+			}
+			this._$selected = $el.parent().parent();
+			this._$selected.addClass('success');
+		},
+
+		'.ok click': function() {
+			if (!this._$selected) {
+				return;
+			}
+
+			var index = this._$selected.data('explorerIndex');
+			var e = this._executionList[index];
+
+			this._popup.close({
+				testExecution: {
+					id: e.executionId,
+					timeString: e.executionTime
+				},
+				testEnvironment: {
+					id: e.environmentId,
+					browserName: e.browserName
+				}
+			});
+		},
+
+		'.cancel click': function() {
+			this._popup.close();
+		}
+	};
+
+	h5.core.expose(selectExecutionController);
+})(jQuery);
+(function($) {
+
+	var SelectExecutionControllerDef = hifive.pitalium.explorer.controller.SelectExecutionController;
+
 	/**
 	 * This class is a controller for the list of screeenshots.
 	 * 
@@ -109,6 +191,13 @@
 		 * @memberOf hifive.pitalium.explorer.controller.ScreenshotListController
 		 */
 		showList: function(screenshot) {
+			if (!screenshot) {
+				return;
+			}
+
+			this.$find('#time').text(screenshot.testExecution.timeString);
+			this.$find('#browser_name').text(screenshot.testEnvironment.browserName);
+
 			return this._testResultDiffLogic.listScreenshot(screenshot.testExecution.id,
 					screenshot.testEnvironment.id).done(this.own(function(screenshotMap) {
 				this._showList(screenshotMap);
@@ -117,6 +206,7 @@
 
 		_showList: function(screenshotMap) {
 			var treeData = [];
+			var firstScreenshotId = null;
 			for ( var testClass in screenshotMap) {
 				var children = [];
 				var testMethodMap = screenshotMap[testClass];
@@ -133,6 +223,11 @@
 
 					for (var i = 0, len = screenshots.length; i < len; i++) {
 						var s = screenshots[i];
+						var selected = false;
+						if (!firstScreenshotId) {
+							firstScreenshotId = s.id;
+							selected = true;
+						}
 						child.children.push({
 							text: s.screenshotName,
 							icon: false,
@@ -141,7 +236,8 @@
 								'data-explorer-screenshot-id': s.id
 							},
 							state: {
-								opened: true
+								opened: true,
+								selected: selected
 							}
 						});
 					}
@@ -155,10 +251,20 @@
 				});
 			}
 
-			this.$find('#tree_root').jstree({
-				'core': {
-					data: treeData
-				}
+			if (!this._$tree) {
+				this._$tree = this.$find('#tree_root');
+				this._$tree.jstree({
+					'core': {
+						data: treeData
+					}
+				});
+			} else {
+				this._$tree.jstree(true).settings.core.data = treeData;
+				this._$tree.jstree(true).refresh();
+			}
+
+			this.trigger('selectScreenshot', {
+				id: firstScreenshotId
 			});
 		},
 
@@ -167,6 +273,15 @@
 			this.trigger('selectScreenshot', {
 				id: id
 			});
+		},
+
+		'#select_execution click': function() {
+			var popup = h5.ui.popupManager.createPopup('execution', 'Select an execution', this
+					.$find('#popup_content').html(), SelectExecutionControllerDef, {
+				draggable: true
+			});
+			popup.promise.done(this.own(this.showList));
+			popup.show();
 		}
 	};
 

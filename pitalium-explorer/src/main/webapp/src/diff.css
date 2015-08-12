@@ -180,3 +180,14 @@ body {
 .image-selector {
 	width: auto
 }
+
+/** execution selection popup */
+#execution_list {
+	height: 400px;
+	overflow-y:scroll;
+	overflow-x:auto;
+}
+
+.cancel {
+	float: right;
+}

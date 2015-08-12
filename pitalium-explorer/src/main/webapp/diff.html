@@ -16,6 +16,7 @@
 
 	<link rel="stylesheet" href="/hifive-res/fw/current/h5.css" data-h5-module="hifive">
 	<link rel="stylesheet" href="res/lib/hifive/ui/DividedBox.css">
+	<link rel="stylesheet" href="/hifive-ui-library/components/popup/src/popup.css">
 
 	<link rel="stylesheet" href="src/common.css">
 	<link rel="stylesheet" href="src/diff.css">
@@ -25,8 +26,9 @@
 	<script src="/hifive-res/ext/jqplugins/jstree/3.0.8/jstree.min.js"></script>
 
 	<script src="/hifive-res/fw/current/ejs-h5mod.js" data-h5-module="hifive:ejs"></script>
-	<script src="/hifive-res/fw/current/h5.js" data-h5-module="hifive"></script>
+	<script src="/hifive-res/fw/current/h5.dev.js" data-h5-module="hifive"></script>
 	<script src="res/lib/hifive/ui/DividedBox.js"></script>
+	<script src="/hifive-ui-library/components/popup/src/popup.js"></script>
 	
 	<script src="src/common/constant.js"></script>
 	<script src="src/common/util.js"></script>
@@ -75,6 +77,22 @@
 		%]
 		</select>
 	</script>
+	<script type="text/ejs" id="screenshotListTemplate">
+		<table class="table table-striped table-hover">
+				[%
+					for (var i = 0; i < executions.length; i++) {
+						var e = executions[i];
+				%]
+				<tr class="explorer-test-result"  data-explorer-index="[%= i %]">
+					<td><input type="radio" name="execution"></td>
+					<td>[%= e.executionTime %]</td>
+					<td>[%= e.platform %]</td>
+					<td>[%= e.browserName %]</td>
+					<td>[%= e.browserVersion %]</td>
+				</tr>
+				[% } %]
+		</table>
+	</script>
 	</head>
 	<body>
 		<!-- Navigation -->
@@ -89,7 +107,23 @@
 		
 		<div id="container">
 			<div id="list" class="box autoSize">
+				<div>
+					<button id="select_execution"  class="btn btn-primary">Select Execution</button>
+				</div>
+				<div id="list_info">
+					<div>
+						Time: <span id="time"></span><br>
+						Browser Name: <span id="browser_name"></span>
+					</div>
+				</div>
 				<div id="tree_root"></div>
+				<div id="popup_content" style="display:none">
+					<div id="execution_list"></div>
+					<div>
+						<button class="ok btn btn-primary">Select</button>
+						<button class="cancel btn btn-primary">Cancel</button>
+					</div>
+				</div>
 			</div>
 	
 			<div id="main" class="box autoSize">
