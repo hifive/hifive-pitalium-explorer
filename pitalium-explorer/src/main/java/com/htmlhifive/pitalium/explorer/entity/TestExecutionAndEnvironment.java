@@ -16,7 +16,7 @@ public class TestExecutionAndEnvironment implements Serializable {
 
 	private Integer executionId;
 
-	private Integer enviromentId; 
+	private Integer environmentId;
 
 	private String executionTime;
 
@@ -33,19 +33,18 @@ public class TestExecutionAndEnvironment implements Serializable {
 	public TestExecutionAndEnvironment() {
 	}
 
-	public TestExecutionAndEnvironment(Integer executionId, Date executionTime, 
-			Integer enviromentId, String platform, String platformVersion, String deviceName, 
-			String browserName, String browserVersion) {
+	public TestExecutionAndEnvironment(Integer executionId, Date executionTime, Integer environmentId, String platform,
+			String platformVersion, String deviceName, String browserName, String browserVersion) {
 		this.executionId = executionId;
 		this.executionTime = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss").format(executionTime);
-		this.enviromentId = enviromentId;
+		this.environmentId = environmentId;
 		this.platform = platform;
 		this.platformVersion = platformVersion;
 		this.deviceName = deviceName;
 		this.browserName = browserName;
 		this.browserVersion = browserVersion;
 	}
-	
+
 	public Integer getExecutionId() {
 		return executionId;
 	}
@@ -54,12 +53,12 @@ public class TestExecutionAndEnvironment implements Serializable {
 		this.executionId = executionId;
 	}
 
-	public Integer getEnviromentId() {
-		return enviromentId;
+	public Integer getEnvironmentId() {
+		return environmentId;
 	}
 
-	public void setEnviromentId(Integer enviromentId) {
-		this.enviromentId = enviromentId;
+	public void setEnvironmentId(Integer environmentId) {
+		this.environmentId = environmentId;
 	}
 
 	public String getExecutionTime() {
@@ -117,7 +116,7 @@ public class TestExecutionAndEnvironment implements Serializable {
 		result = prime * result + ((browserName == null) ? 0 : browserName.hashCode());
 		result = prime * result + ((browserVersion == null) ? 0 : browserVersion.hashCode());
 		result = prime * result + ((deviceName == null) ? 0 : deviceName.hashCode());
-		result = prime * result + ((enviromentId == null) ? 0 : enviromentId.hashCode());
+		result = prime * result + ((environmentId == null) ? 0 : environmentId.hashCode());
 		result = prime * result + ((executionId == null) ? 0 : executionId.hashCode());
 		result = prime * result + ((executionTime == null) ? 0 : executionTime.hashCode());
 		result = prime * result + ((platform == null) ? 0 : platform.hashCode());
@@ -149,10 +148,10 @@ public class TestExecutionAndEnvironment implements Serializable {
 				return false;
 		} else if (!deviceName.equals(other.deviceName))
 			return false;
-		if (enviromentId == null) {
-			if (other.enviromentId != null)
+		if (environmentId == null) {
+			if (other.environmentId != null)
 				return false;
-		} else if (!enviromentId.equals(other.enviromentId))
+		} else if (!environmentId.equals(other.environmentId))
 			return false;
 		if (executionId == null) {
 			if (other.executionId != null)

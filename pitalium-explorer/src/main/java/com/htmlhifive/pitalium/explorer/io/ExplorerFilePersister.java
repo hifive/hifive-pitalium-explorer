@@ -498,7 +498,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 				testEE.setExecutionTime(testExec.getTimeString());
 
 				TestEnvironment testEnv = screenshot.getTestEnvironment();
-				testEE.setEnviromentId(testEnv.getId());
+				testEE.setEnvironmentId(testEnv.getId());
 				testEE.setBrowserName(testEnv.getBrowserName());
 				testEE.setBrowserVersion(testEnv.getBrowserVersion());
 				testEE.setPlatform(testEnv.getPlatform());
