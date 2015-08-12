@@ -569,6 +569,9 @@
 		/** original title */
 		_orgTitle: null,
 
+		/** current result screenshot id */
+		_currentScreenshotId: null,
+
 		__meta: {
 			_screenshotListController: {
 				rootElement: '#list'
@@ -593,6 +596,7 @@
 			}
 
 			var id = queryParams.id;
+			this._currentScreenshotId = id;
 
 			// Get screenshot detailsT
 			this._testResultDiffLogic.getScreenshot(id).done(this.own(function(screenshot) {
@@ -628,8 +632,13 @@
 
 		'#list selectScreenshot': function(context, $el) {
 			var id = context.evArg.id;
+			if (this._currentScreenshotId == id) {
+				return;
+			}
+
 			this._testResultDiffLogic.getScreenshot(id).done(this.own(function(screenshot) {
 				this._testResultDiffController.showResult(screenshot);
+				this._currentScreenshotId = id;
 			}));
 		},
 
