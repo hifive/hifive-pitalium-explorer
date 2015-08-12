@@ -391,6 +391,9 @@
 				});
 				this._showExpectedMode();
 				this._hideActualMode();
+				h5.async.when(this._imageLoadPromises).done(this.own(function() {
+					this._triggerViewChange();
+				}));
 				return;
 			}
 			this._showActualMode();
