@@ -261,9 +261,6 @@
 		'#imageSelector change': function(context, $el) {
 			var val = $el.val();
 			this._setImage(val);
-			h5.async.when(this._imageLoadPromises).done(this.own(function() {
-				this._triggerViewChange();
-			}));
 		},
 
 		_setImage: function(targetId) {
@@ -309,6 +306,9 @@
 			}
 
 			this._initEdgeOverlapping(expectedScreenshotId, screenshotId, targetId);
+			h5.async.when(this._imageLoadPromises).done(this.own(function() {
+				this._triggerViewChange();
+			}));
 		},
 
 		'#quick-flipping .image-diff click': function(context, $el) {
