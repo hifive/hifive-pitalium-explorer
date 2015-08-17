@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="pitalium-explorer" default="all">
+
+	<property file="build.properties"/>
+	
+	<property name="src" value="src/main/java"/>
+	<property name="resources" value="src/main/resources"/>
+	<property name="lib" value="lib"/>
+	<property name="webapp" value="src/main/webapp"/>
+	<property name="dest" value="build"/>
+	<property name="dest_webapp" value="build/webapp"/>
+	<property name="source" value="1.7"/>
+
+	<path id="classpath">
+		<fileset dir="${lib}" includes="**/*.jar"/>
+		<fileset file="${tomcat_home}/lib/servlet-api.jar"/>
+	</path>
+
+	<target name="all" depends="clean, build-war"/>
+
+	<target name="clean">
+		<delete dir="${dest}"/>
+		<delete dir="${dest_webapp}"/>
+	</target>
+
+	<target name="prepare">
+		<mkdir dir="${dest}"/>
+		<mkdir dir="${dest_webapp}/WEB-INF/classes"/>
+	</target>
+
+	<target name="copy" depends="prepare">
+		<copy todir="${dest_webapp}">
+			<fileset dir="${webapp}">
+				<exclude name="WEB-INF/classes/**"/>
+			</fileset>
+		</copy>
+	
+		<copy todir="${dest_webapp}/WEB-INF/classes">
+			<fileset dir="${resources}"/>
+		</copy>
+
+		<copy todir="${dest_webapp}/lib">
+			<fileset dir="${hifive-res_home}">
+				<include name="ext/bootstrap/${bootstrap_version}/css/bootstrap.min.css"/>
+				<include name="ext/bootstrap/${bootstrap_version}/css/bootstrap-theme.min.css"/>
+				<include name="ext/bootstrap/${bootstrap_version}/js/bootstrap.min.js"/>
+
+				<include name="ext/jqplugins/jstree/${jstree_version}/themes/default/style.min.css"/>
+				<include name="ext/jqplugins/jstree/${jstree_version}/jstree.min.js"/>
+				<include name="ext/jqplugins/jstree/${jstree_version}/themes/default/throbber.gif"/>
+				<include name="ext/jqplugins/jstree/${jstree_version}/themes/default/32px.png"/>
+
+				<include name="ext/jquery/jquery-2.js"/>
+
+				<include name="fw/current/ejs-h5mod.js"/>
+				<include name="fw/current/h5.js"/>
+				<include name="fw/current/h5.dev.js"/>
+				<include name="fw/current/h5.css"/>
+			</fileset>
+		</copy>
+	</target>
+
+	<target name="replace" depends="copy">
+		<replace dir="${dest_webapp}" token="/hifive-res" value="lib">
+			<include name="**/*.html" />
+		</replace>
+	</target>
+	
+	<target name="compile" depends="prepare">
+		<javac destdir="${dest_webapp}/WEB-INF/classes" source="${source}" includeantruntime="false">
+			<src path="${src}"/>
+			<classpath refid="classpath"/>
+		</javac>
+	</target>
+	
+	<target name="build-war" depends="replace, compile">
+		<war destfile="${dest}/pitalium-explorer.war" webxml="${dest_webapp}/WEB-INF/web.xml">
+			<fileset dir="${dest_webapp}" excludes="WEB-INF/web.xml"/>
+			<lib dir="${lib}">
+				<include name="**/*.jar"/>
+				<exclude name="ivy/*.jar"/>
+				<exclude name="sources/*.jar"/>
+			</lib>
+		</war>
+	</target>
+
+</project>
