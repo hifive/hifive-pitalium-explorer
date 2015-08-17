@@ -483,7 +483,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 	}
 
 	@Override
-	public Page<TestExecutionAndEnvironment> findTestExecutionAndEnviroment(int page, int pageSize) {
+	public Page<TestExecutionAndEnvironment> findTestExecutionAndEnvironment(int page, int pageSize) {
 		if (screenshotListMap == null) {
 			return new PageImpl<TestExecutionAndEnvironment>(new ArrayList<TestExecutionAndEnvironment>());
 		}

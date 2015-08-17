@@ -172,7 +172,7 @@ public class ExplorerDBPersister extends DBPersister implements ExplorerPersiste
 	}
 
 	@Override
-	public Page<TestExecutionAndEnvironment> findTestExecutionAndEnviroment(int page, int pageSize) {
+	public Page<TestExecutionAndEnvironment> findTestExecutionAndEnvironment(int page, int pageSize) {
 		if (pageSize == 0) {
 			pageSize = defaultPageSize;
 		} else if (pageSize == -1) {

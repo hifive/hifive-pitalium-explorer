@@ -324,8 +324,8 @@ public class ExplorerService implements Serializable {
 		return persister.findScreenshot(testExecutionId, testEnvironmentId, page, pageSize);
 	}
 	
-	public Page<TestExecutionAndEnvironment> findTestExecutionAndEnviroment(int page, int pageSize) {
-		return persister.findTestExecutionAndEnviroment(page, pageSize);
+	public Page<TestExecutionAndEnvironment> findTestExecutionAndEnvironment(int page, int pageSize) {
+		return persister.findTestExecutionAndEnvironment(page, pageSize);
 	}
 
 }

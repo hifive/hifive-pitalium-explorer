@@ -79,13 +79,13 @@ public interface ExplorerPersister extends Persister {
 	Page<Screenshot> findScreenshot(Integer testExecutionId, Integer testEnvironmentId, int page, int pageSize);
 	
 	/**
-	 * TestExecutionAndEnviromentのリストを取得する。
+	 * TestExecutionAndEnvironmentのリストを取得する。
 	 * 
 	 * @param page 表示ページ番号
 	 * @param pageSize 1ページあたりの表示数
 	 * @return TestExecutionAndEnviromentのリスト
 	 */
-	Page<TestExecutionAndEnvironment> findTestExecutionAndEnviroment(int page, int pageSize);
+	Page<TestExecutionAndEnvironment> findTestExecutionAndEnvironment(int page, int pageSize);
 	
 	File searchProcessedImageFile(Integer screenshotId, String algorithm);
 

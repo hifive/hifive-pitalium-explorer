@@ -115,7 +115,7 @@ public class ApiController {
 	public ResponseEntity<Page<TestExecutionAndEnvironment>> listCompositeTestExecution(
 			@RequestParam(defaultValue = "1") int page,
 			@RequestParam(value = "limit", defaultValue = "-1") int pageSize) {
-		Page<TestExecutionAndEnvironment> testPage = service.findTestExecutionAndEnviroment(page, pageSize);
+		Page<TestExecutionAndEnvironment> testPage = service.findTestExecutionAndEnvironment(page, pageSize);
 		return new ResponseEntity<Page<TestExecutionAndEnvironment>>(testPage, HttpStatus.OK);
 	}
 
