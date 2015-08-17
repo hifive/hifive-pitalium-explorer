@@ -26,6 +26,7 @@ public class Screenshot implements Serializable {
 	@Id
 	private Integer id;
 
+	@Column(name = "testScreen", insertable = false, updatable = false)
 	private String screenshotName;
 
 	@Column(name = "expectedId")
