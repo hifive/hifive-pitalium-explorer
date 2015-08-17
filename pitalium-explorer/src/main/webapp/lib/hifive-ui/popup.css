@@ -1,0 +1,117 @@
+@charset 'utf-8';
+/*
+ * Copyright (C) 2013-2014 NS Solutions Corporation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+.h5Popup {
+	margin: 0;
+	padding: 0;
+	background-color: #303030;
+	border: solid 1px black;
+	color: #f5f5f5;
+	z-index: 9997;
+	box-shadow: 10px 10px 10px 3px rgba(0, 0, 0, 0.7);
+	-moz-box-shadow: 10px 10px 10px 3px rgba(0, 0, 0, 0.7);
+	-o-box-shadow: 10px 10px 10px 3px rgba(0, 0, 0, 0.7);
+	-ms-box-shadow: 10px 10px 10px 3px rgba(0, 0, 0, 0.7);
+
+	/** IE8以下のみ **/
+	filter: progid:DXImageTransform.Microsoft.Shadow(Color='#030303', Direction=125, Strength=10) \9;
+}
+
+.h5Popup.current {
+	z-index: 9999;
+}
+
+.h5Popup .popupDragger {
+	cursor: crosshair;
+}
+
+.popupHeader {
+	height: 33px;
+	width: 100%;
+}
+
+.popupHeader>h1 {
+	line-height: 18px;
+	margin: 7px;
+	font-size: 18px;
+	display: inline-block;
+}
+
+.popupHeader>.popupCloseBtn {
+	/** bootstrapから流用 **/
+	position: absolute;
+	top: 3px;
+	right: 3px;
+	padding: 5px;
+	margin: 0;
+	height: 15px;
+	line-height: 15px;
+	cursor: pointer;
+	text-align: center;
+	vertical-align: middle;
+	background-color: #da4f49;
+	background-color: #da4f49;
+	background-image: -moz-linear-gradient(top, #ee5f5b, #bd362f);
+	background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#ee5f5b), to(#bd362f));
+	background-image: -webkit-linear-gradient(top, #ee5f5b, #bd362f);
+	background-image: -o-linear-gradient(top, #ee5f5b, #bd362f);
+	background-image: linear-gradient(to bottom, #ee5f5b, #bd362f);
+	border: 1px solid;
+	border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	border-radius: 4px;
+	width: 13px;
+	height: 13px;
+	box-sizing: content-box;
+}
+
+.popupHeader>.popupCloseBtn:hover {
+	background-color: #bd362f;
+}
+
+.popupHeader>.popupCloseBtn>.icon-remove {
+	/** bootstrapから流用 **/
+	display: inline-block;
+	width: 13px;
+	height: 13px;
+	font-family: 'Impact','Verdana', sans-serif;
+	font-size: 20pt;
+	color: black;
+	background-image: url("data:image/svg+xml;base64, PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAxMyAxMycgd2lkdGg9JzEzJyBoZWlnaHQ9JzEzJyB2ZXJzaW9uPScxLjEnPjxwYXRoIHN0eWxlPSdmaWxsOiBub25lOyBzdHJva2U6ICMwMDAwMDA7IHN0cm9rZS13aWR0aDogMzsnIGQ9J00gMS41IDExLjUgQyAxMS41IDEuNSAxMS41IDEuNSAxMS41IDEuNScgLz48cGF0aCBzdHlsZT0nZmlsbDogbm9uZTsgc3Ryb2tlOiAjMDAwMDAwOyBzdHJva2Utd2lkdGg6IDM7JyBkPSdNIDExLjUgMTEuNSBDIDEuNSAxLjUgMS41IDEuNSAxLjUgMS41JyAvPjwvc3ZnPg==");
+	background-repeat: no-repeat;
+}
+
+.popupContents {
+	width: 100%;
+}
+
+/** オーバレイ **/
+.h5PopupOverlay{
+	position:absolute;
+	background-color: #000;
+	opacity: 0.6;
+	filter: alpha(opacity=60);
+	height: 100%;
+	width: 100%;
+	border: none;
+	margin: 0px;
+	padding: 0px;
+	top: 0;
+	left: 0;
+	z-index: 9998;
+}
