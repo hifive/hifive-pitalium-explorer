@@ -10,6 +10,7 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
@@ -178,8 +179,24 @@ public class ExplorerDBPersister extends DBPersister implements ExplorerPersiste
 		} else if (pageSize == -1) {
 			pageSize = Integer.MAX_VALUE;
 		}
-		PageRequest pageRequest = new PageRequest(page - 1, pageSize);
-		return screenshotRepo.findTestExecutionAndEnvironment(pageRequest);
+
+		/*
+		 * findTestExecutionAndEnvironmentで実行するSQLの結果は正しく取れるのだが、
+		 * totalを取得するHQLが正しくないため
+		 * (Pageオブジェクトを作成するために、Springで実行されている。HQLは自動生成されているため、書き換えることは無理そう。)、
+		 * Pageオブジェクトを自力で作成することにする。
+		 */
+		List<TestExecutionAndEnvironment> list = screenshotRepo.findTestExecutionAndEnvironment();
+		int size = list.size();
+
+		// 表示ページ番号、ページ表示数に合わせてリストを作成する。
+		List<TestExecutionAndEnvironment> resultList = new ArrayList<>();
+		for (int i = (page - 1) * pageSize; i < Math.min(page * pageSize, size); i++) {
+			resultList.add(list.get(i));
+		}
+
+		PageRequest pageable = new PageRequest(page - 1, pageSize);
+		return new PageImpl<TestExecutionAndEnvironment>(resultList, pageable, size);
 	}
 
 	@Override
