@@ -3,12 +3,15 @@
  */
 package com.htmlhifive.pitalium.explorer.api;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
@@ -160,62 +163,27 @@ public class ImageControllerTest {
 	@Test
 	public void testGetProcessedNotFound() {
 		HttpServletResponse response = mock(HttpServletResponse.class);
-		HashMap<String, String> params = new HashMap<String, String>();
-		params.put("id", "-1");
-		params.put("algorithm", "edge");
-		params.put("colorIndex", "-1");
-		this.imageController.getProcessed(-1, 0, "edge", params, response);
+		this.imageController.getProcessed(-1, 0, "edge", -1, response);
 		verify(response).setStatus(HttpServletResponse.SC_NOT_FOUND);
 	}
 
 	@Test
 	public void testGetProcessedUnknownMethod() {
 		HttpServletResponse response = mock(HttpServletResponse.class);
-		HashMap<String, String> params = new HashMap<String, String>();
-		params.put("id", "-1");
-		params.put("algorithm", "aaaaaa");
-		params.put("colorIndex", "-1");
-		this.imageController.getProcessed(-1, 0, "aaaaaa", params, response);
+		this.imageController.getProcessed(-1, 0, "aaaaaa", -1, response);
 		verify(response).setStatus(HttpServletResponse.SC_BAD_REQUEST);
 	}
 
 	@Test
 	public void testGetProcessedFileError() {
 		HttpServletResponse response = mock(HttpServletResponse.class);
-		HashMap<String, String> params = new HashMap<String, String>();
-		params.put("id", "0");
-		params.put("algorithm", "edge");
-		params.put("colorIndex", "-1");
-		this.imageController.getProcessed(0, 0, "edge", params, response);
+		this.imageController.getProcessed(0, 0, "edge", -1, response);
 		verify(response).setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-	}
-
-	@Test
-	public void testGetProcessedEdgeNoColorIndex() throws IOException {
-		HttpServletResponse response = mock(HttpServletResponse.class);
-		HashMap<String, String> params = new HashMap<String, String>();
-		params.put("id", "0");
-		params.put("algorithm", "edge");
-
-		ExplorerPersister persister = mock(ExplorerFilePersister.class);
-		when(TestResultManager.getInstance().getPersister()).thenReturn(persister);
-		ImageController spy = spy(this.imageController);
-
-		doReturn(new File("src/test/resources/images/edge_detector_0.png")).when(persister).getImage(0, 0);
-		when(response.getOutputStream()).thenReturn(mock(ServletOutputStream.class));
-
-		spy.getProcessed(0, 0, "edge", params, response);
-
-		verify(response).setContentType("image/png");
 	}
 
 	@Test
 	public void testGetProcessedEdgeColorIndex0() throws IOException {
 		HttpServletResponse response = mock(HttpServletResponse.class);
-		HashMap<String, String> params = new HashMap<String, String>();
-		params.put("id", "0");
-		params.put("algorithm", "edge");
-		params.put("colorIndex", "0");
 
 		ExplorerPersister persister = mock(ExplorerFilePersister.class);
 		when(TestResultManager.getInstance().getPersister()).thenReturn(persister);
@@ -224,7 +192,7 @@ public class ImageControllerTest {
 		doReturn(new File("src/test/resources/images/edge_detector_0.png")).when(persister).getImage(0, 0);
 		when(response.getOutputStream()).thenReturn(mock(ServletOutputStream.class));
 
-		spy.getProcessed(0, 0, "edge", params, response);
+		spy.getProcessed(0, 0, "edge", 0, response);
 
 		verify(response).setContentType("image/png");
 	}
@@ -232,10 +200,6 @@ public class ImageControllerTest {
 	@Test
 	public void testGetProcessedEdgeColorIndex1() throws IOException {
 		HttpServletResponse response = mock(HttpServletResponse.class);
-		HashMap<String, String> params = new HashMap<String, String>();
-		params.put("id", "0");
-		params.put("algorithm", "edge");
-		params.put("colorIndex", "1");
 
 		ExplorerPersister persister = mock(ExplorerFilePersister.class);
 		when(TestResultManager.getInstance().getPersister()).thenReturn(persister);
@@ -244,27 +208,7 @@ public class ImageControllerTest {
 		doReturn(new File("src/test/resources/images/edge_detector_0.png")).when(persister).getImage(0, 0);
 		when(response.getOutputStream()).thenReturn(mock(ServletOutputStream.class));
 
-		spy.getProcessed(0, 0, "edge", params, response);
-
-		verify(response).setContentType("image/png");
-	}
-
-	@Test
-	public void testGetProcessedEdgeColorIndexInvalid() throws IOException {
-		HttpServletResponse response = mock(HttpServletResponse.class);
-		HashMap<String, String> params = new HashMap<String, String>();
-		params.put("id", "0");
-		params.put("algorithm", "edge");
-		params.put("colorIndex", "invalid");
-
-		ExplorerPersister persister = mock(ExplorerFilePersister.class);
-		when(TestResultManager.getInstance().getPersister()).thenReturn(persister);
-		ImageController spy = spy(this.imageController);
-
-		doReturn(new File("src/test/resources/images/edge_detector_0.png")).when(persister).getImage(0, 0);
-		when(response.getOutputStream()).thenReturn(mock(ServletOutputStream.class));
-
-		spy.getProcessed(0, 0, "edge", params, response);
+		spy.getProcessed(0, 0, "edge", 1, response);
 
 		verify(response).setContentType("image/png");
 	}
