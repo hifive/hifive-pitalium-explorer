@@ -3,8 +3,6 @@
  */
 package com.htmlhifive.pitalium.explorer.api;
 
-import java.util.Map;
-
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.servlet.http.HttpServletResponse;
@@ -63,7 +61,8 @@ public class ImageController {
 	 * @param response HttpServletResponse
 	 */
 	@RequestMapping(value = "/get", method = RequestMethod.GET)
-	public void getImage(@RequestParam Integer screenshotId, @RequestParam Integer targetId,
+	public void getImage(@RequestParam(value = "screenshotId") Integer screenshotId, 
+			@RequestParam(value = "targetId") Integer targetId,
 			HttpServletResponse response) {
 		service.getImage(screenshotId, targetId, response);
 	}
@@ -73,12 +72,12 @@ public class ImageController {
 	 *
 	 * @param screenshotId id of screenshot to be processed by edge detector.
 	 * @param targetId id of the target area to be used for image comparison
-	 * @param allparams all parameters received by API
+	 * @param colorIndex edge color index
 	 * @param response HttpServletResponse
 	 */
-	public void getEdgeImage(Integer screenshotId, Integer targetId, Map<String, String> allparams,
+	public void getEdgeImage(Integer screenshotId, Integer targetId, int colorIndex,
 			HttpServletResponse response) {
-		service.getEdgeImage(screenshotId, targetId, allparams, response);
+		service.getEdgeImage(screenshotId, targetId, colorIndex, response);
 	}
 
 	/**
@@ -87,13 +86,16 @@ public class ImageController {
 	 * @param screenshotId id of an image to be processed
 	 * @param targetId id of the target area to be used for image comparison
 	 * @param algorithm currently only "edge" is supported
-	 * @param allparams received all parameters
+	 * @param colorIndex edge color index
 	 * @param response HttpServletResponse
 	 */
 	@RequestMapping(value = "/getProcessed", method = RequestMethod.GET)
-	public void getProcessed(@RequestParam Integer screenshotId, @RequestParam Integer targetId,
-			@RequestParam String algorithm, @RequestParam Map<String, String> allparams, HttpServletResponse response) {
-		service.getProcessed(screenshotId, targetId, algorithm, allparams, response);
+	public void getProcessed(@RequestParam(value = "screenshotId") Integer screenshotId, 
+			@RequestParam(value = "targetId") Integer targetId,
+			@RequestParam(value = "algorithm") String algorithm, 
+			@RequestParam(value = "colorIndex") int colorIndex, 
+			HttpServletResponse response) {
+		service.getProcessed(screenshotId, targetId, algorithm, colorIndex, response);
 	}
 
 	/**
@@ -105,8 +107,10 @@ public class ImageController {
 	 * @param response HttpServletResponse
 	 */
 	@RequestMapping(value = "/getDiff", method = RequestMethod.GET)
-	public void getDiffImage(@RequestParam Integer sourceSceenshotId, @RequestParam Integer targetScreenshotId,
-			@RequestParam Integer targetId, HttpServletResponse response) {
+	public void getDiffImage(@RequestParam(value = "sourceSceenshotId") Integer sourceSceenshotId, 
+			@RequestParam(value = "targetScreenshotId") Integer targetScreenshotId,
+			@RequestParam(value = "targetId") Integer targetId, 
+			HttpServletResponse response) {
 		service.getDiffImage(sourceSceenshotId, targetScreenshotId, targetId, response);
 	}
 }

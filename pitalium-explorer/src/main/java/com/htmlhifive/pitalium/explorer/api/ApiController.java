@@ -44,10 +44,11 @@ public class ApiController {
 	 */
 	@RequestMapping(value = "/listTestExecution", method = RequestMethod.GET, produces = "application/json;charset=utf-8")
 	@ResponseBody
-	public ResponseEntity<Page<TestExecutionResult>> listTestExecution(@RequestParam(defaultValue = "1") int page,
+	public ResponseEntity<Page<TestExecutionResult>> listTestExecution(
+			@RequestParam(value = "page", defaultValue = "1") int page,
 			@RequestParam(value = "limit", defaultValue = "0") int pageSize,
-			@RequestParam(defaultValue = "") String searchTestMethod,
-			@RequestParam(defaultValue = "") String searchTestScreen) {
+			@RequestParam(value = "searchTestMethod", defaultValue = "") String searchTestMethod,
+			@RequestParam(value = "searchTestScreen", defaultValue = "") String searchTestScreen) {
 		Page<TestExecutionResult> list = service.findTestExecution(searchTestMethod, searchTestScreen, page, pageSize);
 		return new ResponseEntity<Page<TestExecutionResult>>(list, HttpStatus.OK);
 	}
@@ -60,9 +61,10 @@ public class ApiController {
 	 */
 	@RequestMapping(value = "/listCompositeScreenshot", method = RequestMethod.GET, produces = "application/json;charset=utf-8")
 	@ResponseBody
-	public ResponseEntity<List<Screenshot>> listCompositeScreenshot(@RequestParam Integer testExecutionId,
-			@RequestParam(defaultValue = "") String searchTestMethod,
-			@RequestParam(defaultValue = "") String searchTestScreen) {
+	public ResponseEntity<List<Screenshot>> listCompositeScreenshot(
+			@RequestParam(value = "testExecutionId")  Integer testExecutionId,
+			@RequestParam(value = "searchTestMethod", defaultValue = "") String searchTestMethod,
+			@RequestParam(value = "searchTestScreen", defaultValue = "") String searchTestScreen) {
 		List<Screenshot> list = service.findScreenshot(testExecutionId, searchTestMethod, searchTestScreen);
 		return new ResponseEntity<List<Screenshot>>(list, HttpStatus.OK);
 	}
@@ -75,7 +77,8 @@ public class ApiController {
 	 */
 	@RequestMapping(value = "/getScreenshot", method = RequestMethod.GET, produces = "application/json;charset=utf-8")
 	@ResponseBody
-	public ResponseEntity<Screenshot> getDetail(@RequestParam Integer screenshotId) {
+	public ResponseEntity<Screenshot> getDetail(
+			@RequestParam(value = "screenshotId") Integer screenshotId) {
 		Screenshot item = service.getScreenshot(screenshotId);
 		return new ResponseEntity<Screenshot>(item, HttpStatus.OK);
 	}
@@ -93,9 +96,10 @@ public class ApiController {
 	 */
 	@RequestMapping(value = "/listScreenshot", method = RequestMethod.GET, produces = "application/json;charset=utf-8")
 	@ResponseBody
-	public ResponseEntity<Page<Screenshot>> listScreenshot(@RequestParam Integer testExecutionId,
-			@RequestParam Integer testEnvironmentId,
-			@RequestParam(defaultValue = "1") int page,
+	public ResponseEntity<Page<Screenshot>> listScreenshot(
+			@RequestParam(value = "testExecutionId") Integer testExecutionId,
+			@RequestParam(value = "testEnvironmentId") Integer testEnvironmentId,
+			@RequestParam(value = "page", defaultValue = "1") int page,
 			@RequestParam(value = "limit", defaultValue = "-1") int pageSize) {
 		Page<Screenshot> screenshotPage = service.findScreenshot(testExecutionId, testEnvironmentId, page, pageSize);
 		return new ResponseEntity<Page<Screenshot>>(screenshotPage, HttpStatus.OK);
@@ -113,7 +117,7 @@ public class ApiController {
 	@RequestMapping(value = "/listCompositeTestExecution", method = RequestMethod.GET, produces = "application/json;charset=utf-8")
 	@ResponseBody
 	public ResponseEntity<Page<TestExecutionAndEnvironment>> listCompositeTestExecution(
-			@RequestParam(defaultValue = "1") int page,
+			@RequestParam(value = "page", defaultValue = "1") int page,
 			@RequestParam(value = "limit", defaultValue = "-1") int pageSize) {
 		Page<TestExecutionAndEnvironment> testPage = service.findTestExecutionAndEnvironment(page, pageSize);
 		return new ResponseEntity<Page<TestExecutionAndEnvironment>>(testPage, HttpStatus.OK);

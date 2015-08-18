@@ -15,7 +15,6 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletResponse;
@@ -135,17 +134,8 @@ public class ExplorerService implements Serializable {
 		}
 	}
 
-	public void getEdgeImage(Integer screenshotId, Integer targetId, Map<String, String> allparams,
+	public void getEdgeImage(Integer screenshotId, Integer targetId, int colorIndex,
 			HttpServletResponse response) {
-		int colorIndex = -1;
-		if (allparams.containsKey("colorIndex")) {
-			try {
-				colorIndex = Integer.parseInt(allparams.get("colorIndex"));
-			} catch (NumberFormatException nfe) {
-				// ignore
-			}
-		}
-
 		// FIXME キャッシュ対応後に復活させる
 		//		File cachedFile = persister.searchProcessedImageFile(id, ProcessedImageUtility.getAlgorithmNameForEdge(colorIndex));
 		//		if (cachedFile != null) {
@@ -187,11 +177,11 @@ public class ExplorerService implements Serializable {
 		}
 	}
 
-	public void getProcessed(Integer screenshotId, Integer targetId, String algorithm, Map<String, String> allparams,
+	public void getProcessed(Integer screenshotId, Integer targetId, String algorithm, int colorIndex,
 			HttpServletResponse response) {
 		switch (algorithm) {
 			case "edge":
-				getEdgeImage(screenshotId, targetId, allparams, response);
+				getEdgeImage(screenshotId, targetId, colorIndex, response);
 				break;
 			default:
 				response.setStatus(HttpStatus.BAD_REQUEST.value());
