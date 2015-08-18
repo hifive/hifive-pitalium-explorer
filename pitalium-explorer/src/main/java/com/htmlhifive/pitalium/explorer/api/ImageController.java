@@ -18,7 +18,6 @@ import com.htmlhifive.pitalium.explorer.cache.CacheTaskQueue;
 import com.htmlhifive.pitalium.explorer.service.ExplorerService;
 
 @Controller
-@RequestMapping("/image")
 public class ImageController {
 	@Autowired
 	private ExplorerService service;
@@ -60,7 +59,7 @@ public class ImageController {
 	 * @param targetId id of the target area to be used for image comparison
 	 * @param response HttpServletResponse
 	 */
-	@RequestMapping(value = "/get", method = RequestMethod.GET)
+	@RequestMapping(value = "image", method = RequestMethod.GET)
 	public void getImage(@RequestParam(value = "screenshotId") Integer screenshotId, 
 			@RequestParam(value = "targetId") Integer targetId,
 			HttpServletResponse response) {
@@ -89,7 +88,7 @@ public class ImageController {
 	 * @param colorIndex edge color index
 	 * @param response HttpServletResponse
 	 */
-	@RequestMapping(value = "/getProcessed", method = RequestMethod.GET)
+	@RequestMapping(value = "image/processed", method = RequestMethod.GET)
 	public void getProcessed(@RequestParam(value = "screenshotId") Integer screenshotId, 
 			@RequestParam(value = "targetId") Integer targetId,
 			@RequestParam(value = "algorithm") String algorithm, 
@@ -106,7 +105,7 @@ public class ImageController {
 	 * @param targetId id of the target area to be used for image comparison
 	 * @param response HttpServletResponse
 	 */
-	@RequestMapping(value = "/getDiff", method = RequestMethod.GET)
+	@RequestMapping(value = "image/diff", method = RequestMethod.GET)
 	public void getDiffImage(@RequestParam(value = "sourceSceenshotId") Integer sourceSceenshotId, 
 			@RequestParam(value = "targetScreenshotId") Integer targetScreenshotId,
 			@RequestParam(value = "targetId") Integer targetId, 

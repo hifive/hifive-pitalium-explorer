@@ -26,7 +26,7 @@
 		getScreenshot: function(id) {
 			return h5.ajax({
 				type: 'get',
-				url: 'api/getScreenshot',
+				url: 'screenshot',
 				data: {
 					screenshotId: id
 				}
@@ -43,7 +43,7 @@
 		listScreenshot: function(executionId, environmentId) {
 			var dfd = this.deferred();
 
-			h5.ajax('api/listScreenshot', {
+			h5.ajax('screenshot/list', {
 				data: {
 					testExecutionId: executionId,
 					testEnvironmentId: environmentId
@@ -84,7 +84,7 @@
 		listCompositeTestExecution: function() {
 			return h5.ajax({
 				type: 'get',
-				url: 'api/listCompositeTestExecution'
+				url: 'compositeExecution/list'
 			});
 		}
 	};
@@ -481,13 +481,13 @@
 			actual.onload = d2.resolve;
 
 			var format = hifive.pitalium.explorer.utils.formatUrl;
-			expected.src = format('image/getProcessed', {
+			expected.src = format('image/processed', {
 				screenshotId: expectedId,
 				targetId: targetId,
 				algorithm: 'edge',
 				colorIndex: 1
 			});
-			actual.src = format('image/getProcessed', {
+			actual.src = format('image/processed', {
 				screenshotId: actualId,
 				targetId: targetId,
 				algorithm: 'edge',
@@ -516,7 +516,7 @@
 						context.drawImage(actual, 0, 0);
 						this._initImageMagnifier(native_width, native_height);
 					};
-					actualBlack.src = format('image/getProcessed', {
+					actualBlack.src = format('image/processed', {
 						screenshotId: actualId,
 						targetId: targetId,
 						algorithm: 'edge',
@@ -571,7 +571,7 @@
 		_setImageSrc: function(selector, withMarker, params) {
 			var dfd = this.deferred();
 
-			var url = withMarker ? 'image/getDiff' : 'image/get';
+			var url = withMarker ? 'image/diff' : 'image';
 			this.$find(selector).attr('src', hifive.pitalium.explorer.utils.formatUrl(url, params));
 			this.$find(selector)[0].onload = function() {
 				dfd.resolve();

@@ -51,7 +51,7 @@
 			return h5.ajax({
 				type: 'get',
 				dataType: 'json',
-				url: hifive.pitalium.explorer.utils.formatUrl('api/listTestExecution'),
+				url: hifive.pitalium.explorer.utils.formatUrl('execution/list'),
 				data: data
 			});
 		},
@@ -67,7 +67,7 @@
 			return h5.ajax({
 				type: 'get',
 				dataType: 'json',
-				url: 'api/listCompositeScreenshot',
+				url: 'compositeScreenshot/list',
 				data: {
 					testExecutionId: testExecutionId,
 					searchTestMethod: this.searchTestMethod,

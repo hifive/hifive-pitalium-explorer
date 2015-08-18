@@ -23,7 +23,6 @@ import com.htmlhifive.pitalium.explorer.response.TestExecutionResult;
 import com.htmlhifive.pitalium.explorer.service.ExplorerService;
 
 @Controller
-@RequestMapping("/api")
 public class ApiController {
 
 	@Autowired
@@ -42,7 +41,7 @@ public class ApiController {
 	 * @param pageSize Page size.
 	 * @return Page of test execution
 	 */
-	@RequestMapping(value = "/listTestExecution", method = RequestMethod.GET, produces = "application/json;charset=utf-8")
+	@RequestMapping(value = "execution/list", method = RequestMethod.GET, produces = "application/json;charset=utf-8")
 	@ResponseBody
 	public ResponseEntity<Page<TestExecutionResult>> listTestExecution(
 			@RequestParam(value = "page", defaultValue = "1") int page,
@@ -59,7 +58,7 @@ public class ApiController {
 	 * @param executionId test execution id
 	 * @return list of screenshots
 	 */
-	@RequestMapping(value = "/listCompositeScreenshot", method = RequestMethod.GET, produces = "application/json;charset=utf-8")
+	@RequestMapping(value = "compositeScreenshot/list", method = RequestMethod.GET, produces = "application/json;charset=utf-8")
 	@ResponseBody
 	public ResponseEntity<List<Screenshot>> listCompositeScreenshot(
 			@RequestParam(value = "testExecutionId")  Integer testExecutionId,
@@ -75,7 +74,7 @@ public class ApiController {
 	 * @param screenshotId screenshot id
 	 * @return screenshot
 	 */
-	@RequestMapping(value = "/getScreenshot", method = RequestMethod.GET, produces = "application/json;charset=utf-8")
+	@RequestMapping(value = "screenshot", method = RequestMethod.GET, produces = "application/json;charset=utf-8")
 	@ResponseBody
 	public ResponseEntity<Screenshot> getDetail(
 			@RequestParam(value = "screenshotId") Integer screenshotId) {
@@ -94,7 +93,7 @@ public class ApiController {
 	 * @param pageSize Page size.
 	 * @return Page of test execution
 	 */
-	@RequestMapping(value = "/listScreenshot", method = RequestMethod.GET, produces = "application/json;charset=utf-8")
+	@RequestMapping(value = "screenshot/list", method = RequestMethod.GET, produces = "application/json;charset=utf-8")
 	@ResponseBody
 	public ResponseEntity<Page<Screenshot>> listScreenshot(
 			@RequestParam(value = "testExecutionId") Integer testExecutionId,
@@ -114,7 +113,7 @@ public class ApiController {
 	 * @param pageSize Page size.
 	 * @return Page of test execution and environment
 	 */
-	@RequestMapping(value = "/listCompositeTestExecution", method = RequestMethod.GET, produces = "application/json;charset=utf-8")
+	@RequestMapping(value = "compositeExecution/list", method = RequestMethod.GET, produces = "application/json;charset=utf-8")
 	@ResponseBody
 	public ResponseEntity<Page<TestExecutionAndEnvironment>> listCompositeTestExecution(
 			@RequestParam(value = "page", defaultValue = "1") int page,
