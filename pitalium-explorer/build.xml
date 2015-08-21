@@ -9,11 +9,9 @@
 	<property name="webapp" value="src/main/webapp"/>
 	<property name="dest" value="build"/>
 	<property name="dest_webapp" value="build/webapp"/>
-	<property name="source" value="1.7"/>
 
 	<path id="classpath">
 		<fileset dir="${lib}" includes="**/*.jar"/>
-		<fileset file="${tomcat_home}/lib/servlet-api.jar"/>
 	</path>
 
 	<target name="all" depends="clean, build-war"/>
@@ -67,7 +65,8 @@
 	</target>
 	
 	<target name="compile" depends="prepare">
-		<javac destdir="${dest_webapp}/WEB-INF/classes" source="${source}" includeantruntime="false">
+		<javac destdir="${dest_webapp}/WEB-INF/classes" source="${java.sourceVersion}" 
+			target="${java.targetVersion}" encoding="${java.encoding}" includeantruntime="false">
 			<src path="${src}"/>
 			<classpath refid="classpath"/>
 		</javac>
@@ -78,6 +77,9 @@
 			<fileset dir="${dest_webapp}" excludes="WEB-INF/web.xml"/>
 			<lib dir="${lib}">
 				<include name="**/*.jar"/>
+				<exclude name="javax.servlet-api-3.1.0.jar"/>
+				<exclude name="sqltool-2.3.2.jar"/>
+				<exclude name="gson-2.3.1.jar"/>
 				<exclude name="ivy/*.jar"/>
 				<exclude name="sources/*.jar"/>
 			</lib>
