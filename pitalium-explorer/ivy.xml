@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ivy-module version="2.0" xmlns:m="http://ant.apache.org/ivy/maven">
 	<info organisation="com.htmlhifive"
-		module="hifive test explorer"
+		module="pitalium explorer"
 		status="release"
 		publication="20130501000000"
 	>
@@ -39,7 +39,7 @@
 		<dependency org="org.hibernate" name="hibernate-entitymanager" rev="4.3.8.Final" conf="default,test->default(*)" />
 		<dependency org="org.springframework.data" name="spring-data-jpa" rev="1.6.5.RELEASE" conf="default,test->default(*)" />
 		<dependency org="joda-time" name="joda-time" rev="2.8.1" conf="default,test->default(*)" />
-		<!-- hifive-test-libraryに依存 -->
+		<!-- pitaliumに依存 -->
 		<dependency org="com.google.guava" name="guava" rev="18.0" conf="default,test->default(*)" />
 		<dependency org="org.seleniumhq.selenium" name="selenium-api" rev="2.46.0" conf="default,test->default(*)" />
 		
