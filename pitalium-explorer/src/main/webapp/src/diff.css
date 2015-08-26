@@ -181,6 +181,22 @@ body {
 	width: auto
 }
 
+.glyphicon.glyphicon-file.actual {
+	color: red;
+}
+
+.glyphicon.glyphicon-file.actual.none {
+	opacity: 0.1
+}
+
+.glyphicon.glyphicon-file.expected {
+	color: blue;
+}
+
+.glyphicon.glyphicon-file.expected.none {
+	opacity: 0.1
+}
+
 /** execution selection popup */
 #execution_list {
 	height: 400px;

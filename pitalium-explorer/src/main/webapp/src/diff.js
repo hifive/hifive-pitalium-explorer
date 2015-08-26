@@ -136,7 +136,7 @@
 			this._$selected.addClass('success');
 		},
 
-		'.ok click': function() {
+		'.actual click': function() {
 			if (!this._$selected) {
 				return;
 			}
@@ -144,14 +144,62 @@
 			var index = this._$selected.data('explorerIndex');
 			var e = this._executionList[index];
 
+			this.$find('#actualExecution').attr('data-actual-explorer-index', index);
+			this.$find('#actualExecution #executionTime').text(e.executionTime);
+			this.$find('#actualExecution #platform').text(e.platform);
+			this.$find('#actualExecution #browserName').text(e.browserName);
+			this.$find('#actualExecution #browserVersion').text(e.browserVersion);
+
+			if (this.$find('#expectedExecution').data('expectedExplorerIndex') != null) {
+				this.$find('.ok').show();
+			}
+		},
+
+		'.expected click': function() {
+			if (!this._$selected) {
+				return;
+			}
+
+			var index = this._$selected.data('explorerIndex');
+			var e = this._executionList[index];
+
+			this.$find('#expectedExecution').attr('data-expected-explorer-index', index);
+			this.$find('#expectedExecution #executionTime').text(e.executionTime);
+			this.$find('#expectedExecution #platform').text(e.platform);
+			this.$find('#expectedExecution #browserName').text(e.browserName);
+			this.$find('#expectedExecution #browserVersion').text(e.browserVersion);
+
+			if (this.$find('#actualExecution').data('actualExplorerIndex') != null) {
+				this.$find('.ok').show();
+			}
+		},
+
+		'.ok click': function() {
+			var actualIndex = this.$find('#actualExecution').data('actualExplorerIndex');
+			var expectedIndex = this.$find('#expectedExecution').data('expectedExplorerIndex');
+			if (actualIndex == null || expectedIndex == null) {
+				return;
+			}
+
+			var actualExecution = this._executionList[actualIndex];
+			var expectedExecution = this._executionList[expectedIndex];
+
 			this._popup.close({
 				testExecution: {
-					id: e.executionId,
-					timeString: e.executionTime
+					id: actualExecution.executionId,
+					timeString: actualExecution.executionTime
 				},
 				testEnvironment: {
-					id: e.environmentId,
-					browserName: e.browserName
+					id: actualExecution.environmentId,
+					browserName: actualExecution.browserName
+				},
+				expectedTestExecution: {
+					id: expectedExecution.executionId,
+					timeString: expectedExecution.executionTime
+				},
+				expectedTestEnvironment: {
+					id: expectedExecution.environmentId,
+					browserName: expectedExecution.browserName
 				}
 			});
 		},
@@ -198,15 +246,53 @@
 			this.$find('#time').text(screenshot.testExecution.timeString);
 			this.$find('#browser_name').text(screenshot.testEnvironment.browserName);
 
+			if (screenshot.expectedScreenshotId != null) {
+				return this._testResultDiffLogic.listScreenshot(screenshot.testExecution.id,
+						screenshot.testEnvironment.id).done(
+						this.own(function(screenshotMap) {
+							this._testResultDiffLogic
+									.getScreenshot(screenshot.expectedScreenshotId).done(
+											this.own(function(expScreenshot) {
+												this._testResultDiffLogic.listScreenshot(
+														expScreenshot.testExecution.id,
+														expScreenshot.testEnvironment.id).done(
+														this.own(function(expScreenshotMap) {
+															this._showList(screenshotMap,
+																	expScreenshotMap);
+														}));
+
+											}));
+						}));
+			}
+
+			if (screenshot.expectedTestExecution != null
+					&& screenshot.expectedTestEnvironment != null) {
+				return this._testResultDiffLogic.listScreenshot(screenshot.testExecution.id,
+						screenshot.testEnvironment.id).done(
+						this.own(function(screenshotMap) {
+							this._testResultDiffLogic.listScreenshot(
+									screenshot.expectedTestExecution.id,
+									screenshot.expectedTestEnvironment.id).done(
+									this.own(function(expScreenshotMap) {
+										this._showList(screenshotMap, expScreenshotMap);
+									}));
+
+						}));
+			}
+
 			return this._testResultDiffLogic.listScreenshot(screenshot.testExecution.id,
 					screenshot.testEnvironment.id).done(this.own(function(screenshotMap) {
-				this._showList(screenshotMap);
+				this._showList(screenshotMap, null);
 			}));
+
 		},
 
-		_showList: function(screenshotMap) {
+		_showList: function(screenshotMap, expectedScreenshotMap) {
+			this._merge(screenshotMap, expectedScreenshotMap);
+
 			var treeData = [];
 			var firstScreenshotId = null;
+			var firstExpectedScreenshotId = null;
 			for ( var testClass in screenshotMap) {
 				var children = [];
 				var testMethodMap = screenshotMap[testClass];
@@ -226,6 +312,7 @@
 						var selected = false;
 						if (!firstScreenshotId) {
 							firstScreenshotId = s.id;
+							firstExpectedScreenshotId = s.expectedScreenshotId;
 							selected = true;
 						}
 						child.children.push({
@@ -233,13 +320,27 @@
 							icon: false,
 							a_attr: {
 								'class': 'screenshot',
-								'data-explorer-screenshot-id': s.id
+								'data-explorer-screenshot-id': s.id,
+								'data-explorer-expected-screenshot-id': s.expectedScreenshotId,
 							},
 							state: {
 								opened: true,
 								selected: selected
 							}
 						});
+
+						var iconText = null;
+						if (s.existsExpected) {
+							iconText += "<span class='glyphicon glyphicon-file expected'></span>";
+						} else {
+							iconText += "<span class='glyphicon glyphicon-file expected none'></span>";
+						}
+						if (s.existsActual) {
+							iconText += "<span class='glyphicon glyphicon-file actual'></span>";
+						} else {
+							iconText += "<span class='glyphicon glyphicon-file actual none'></span>";
+						}
+						child.children[i].text += iconText;
 					}
 				}
 				treeData.push({
@@ -264,14 +365,96 @@
 			}
 
 			this.trigger('selectScreenshot', {
-				id: firstScreenshotId
+				id: firstScreenshotId,
+				expectedId: firstExpectedScreenshotId
 			});
+		},
+
+		_merge: function(screenshotMap, expectedScreenshotMap) {
+			for ( var testClass in screenshotMap) {
+				var testMethodMap = screenshotMap[testClass];
+				for ( var testMethod in testMethodMap) {
+					var screenshots = testMethodMap[testMethod];
+					for (var i = 0, len = screenshots.length; i < len; i++) {
+						var s = screenshots[i];
+						// add flag;
+						s.existsActual = true;
+						s.existsExpected = false;
+						s.expectedScreenshotId = null;
+					}
+				}
+			}
+
+			// merge
+			if (expectedScreenshotMap != null) {
+				for ( var testClass in expectedScreenshotMap) {
+					var testMethodMap = screenshotMap[testClass];
+					if (testMethodMap) {
+						var expectedTestMethodMap = expectedScreenshotMap[testClass];
+						for ( var testMethod in expectedTestMethodMap) {
+							var screenshots = testMethodMap[testMethod];
+							if (screenshots) {
+								var expectedScreenshots = expectedTestMethodMap[testMethod];
+								for (var j = 0, expectedLen = expectedScreenshots.length; j < expectedLen; j++) {
+									var expectedS = expectedScreenshots[j];
+									var existsFlag = false;
+									for (var i = 0, len = screenshots.length; i < len; i++) {
+										var s = screenshots[i];
+										if (s.screenshotName == expectedS.screenshotName) {
+											existsFlag = true;
+											s.existsExpected = true;
+											s.expectedScreenshotId = expectedS.id;
+											break;
+										}
+									}
+
+									if (!existsFlag) {
+										// screenshots に追加
+										screenshots.push(expectedS);
+										// add flag;
+										expectedS.existsActual = false;
+										expectedS.existsExpected = true;
+										expectedS.expectedScreenshotId = null;
+									}
+								}
+							} else {
+								// testMethodMap に追加
+								var expectedScreenshots = expectedTestMethodMap[testMethod];
+								testMethodMap[testMethod] = expectedScreenshots;
+								for (var j = 0, expectedLen = expectedScreenshots.length; j < expectedLen; j++) {
+									var expectedS = expectedScreenshots[j];
+									// add flag;
+									expectedS.existsActual = false;
+									expectedS.existsExpected = true;
+									expectedS.expectedScreenshotId = null;
+								}
+							}
+						}
+					} else {
+						// screenshotMap に追加
+						var expectedTestMethodMap = expectedScreenshotMap[testClass];
+						screenshotMap[testClass] = expectedTestMethodMap;
+						for ( var testMethod in expectedTestMethodMap) {
+							var expectedScreenshots = expectedTestMethodMap[testMethod];
+							for (var j = 0, expectedLen = expectedScreenshots.length; j < expectedLen; j++) {
+								var expectedS = expectedScreenshots[j];
+								// add flag;
+								expectedS.existsActual = false;
+								expectedS.existsExpected = true;
+								expectedS.expectedScreenshotId = null;
+							}
+						}
+					}
+				}
+			}
 		},
 
 		'.screenshot click': function(context, $el) {
 			var id = $el.data('explorerScreenshotId');
+			var expectedId = $el.data('explorerExpectedScreenshotId');
 			this.trigger('selectScreenshot', {
-				id: id
+				id: id,
+				expectedId: expectedId
 			});
 		},
 
@@ -281,6 +464,7 @@
 				draggable: true
 			});
 			popup.promise.done(this.own(this.showList));
+			popup.setContentsSize(500, 550);
 			popup.show();
 		}
 	};
@@ -770,11 +954,20 @@
 
 		'#list selectScreenshot': function(context, $el) {
 			var id = context.evArg.id;
+			var expectedId = context.evArg.expectedId;
 			if (this._currentScreenshotId == id) {
 				return;
 			}
 
 			this._testResultDiffLogic.getScreenshot(id).done(this.own(function(screenshot) {
+				// expectedの値を書き換える
+				screenshot.expectedScreenshotId = expectedId;
+				// 比較結果を書き換える
+				if (expectedId == null) {
+					screenshot.comparisonResult = null;
+				} else {
+					screenshot.comparisonResult = false;
+				}
 				this._testResultDiffController.showResult(screenshot);
 				this._currentScreenshotId = id;
 			}));
