@@ -120,7 +120,25 @@
 				<div id="popup_content" style="display:none">
 					<div id="execution_list"></div>
 					<div>
-						<button class="ok btn btn-primary">Select</button>
+						<table class="table">
+							<tr id="actualExecution">
+								<td><button class="actual btn btn-danger btn-sm" style="float: left;">Actual</button></td>
+								<td id="executionTime"></td>
+								<td id="platform"></td>
+								<td id="browserName"></td>
+								<td id="browserVersion"></td>
+							</tr>
+							<tr id="expectedExecution">
+								<td><button class="expected btn btn-info btn-sm" style="float: left;">Expected</button></td>
+								<td id="executionTime"></td>
+								<td id="platform"></td>
+								<td id="browserName"></td>
+								<td id="browserVersion"></td>
+							</tr>
+						</table>
+					</div>
+					<div>
+						<button class="ok btn btn-primary" style="display:none">Select</button>
 						<button class="cancel btn btn-primary">Cancel</button>
 					</div>
 				</div>
