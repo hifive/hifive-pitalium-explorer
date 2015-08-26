@@ -52,7 +52,6 @@
 
 				<include name="fw/current/ejs-h5mod.js"/>
 				<include name="fw/current/h5.js"/>
-				<include name="fw/current/h5.dev.js"/>
 				<include name="fw/current/h5.css"/>
 			</fileset>
 		</copy>
