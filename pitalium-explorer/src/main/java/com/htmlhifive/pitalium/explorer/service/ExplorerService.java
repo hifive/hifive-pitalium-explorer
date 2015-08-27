@@ -197,6 +197,34 @@ public class ExplorerService implements Serializable {
 		}
 	}
 
+	public Boolean getComparisonResult(Integer sourceScreenshotId, Integer targetScreenshotId, Integer targetId) {
+		try {
+			File sourceFile = persister.getImage(sourceScreenshotId, targetId);
+			File targetFile = persister.getImage(targetScreenshotId, targetId);
+			Target target = persister.getTarget(sourceScreenshotId, targetId);
+
+			if (!sourceFile.exists()) {
+				log.error("File Not Found. screenshotId = {}.", sourceScreenshotId);
+				return null;
+			}
+
+			if (!targetFile.exists()) {
+				log.error("File Not Found. screenshotId = {}.", targetScreenshotId);
+				return null;
+			}
+
+			DiffPoints diffPoints = compare(sourceFile, targetFile, target);
+			if (diffPoints == null) {
+				log.error("DiffPoints Not Get.");
+				return null;
+			}
+			return diffPoints.isSucceeded();
+		} catch (IOException e) {
+			log.error(e.getMessage(), e);
+			return null;
+		}
+	}
+
 	public void getDiffImage(Integer sourceScreenshotId, Integer targetScreenshotId, Integer targetId,
 			HttpServletResponse response) {
 		try {

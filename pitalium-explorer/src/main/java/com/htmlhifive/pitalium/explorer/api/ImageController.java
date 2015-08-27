@@ -117,6 +117,13 @@ public class ImageController {
 		service.getDiffImage(sourceScreenshotId, targetScreenshotId, targetId, response);
 	}
 
+	@RequestMapping(value = "comparisonResult", method = RequestMethod.GET)
+	public Boolean getComparisonResult(@RequestParam(value = "sourceScreenshotId") Integer sourceScreenshotId, 
+			@RequestParam(value = "targetScreenshotId") Integer targetScreenshotId,
+			@RequestParam(value = "targetId") Integer targetId) {
+		return service.getComparisonResult(sourceScreenshotId, targetScreenshotId, targetId);
+	}
+	
 	@RequestMapping(value = "files/upload", method = RequestMethod.POST)
 	@ResponseBody
 	public List<String> multipartUpload(@RequestParam("files") List<MultipartFile> files) throws Exception {
