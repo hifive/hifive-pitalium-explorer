@@ -14,6 +14,7 @@
         <webClassPathEntry>/pitalium-explorer/lib/aspectjrt-1.8.4.jar</webClassPathEntry>
         <webClassPathEntry>/pitalium-explorer/lib/cal10n-api-0.8.1.jar</webClassPathEntry>
         <webClassPathEntry>/pitalium-explorer/lib/commons-dbcp2-2.1.jar</webClassPathEntry>
+        <webClassPathEntry>/pitalium-explorer/lib/commons-fileupload-1.3.1.jar</webClassPathEntry>
         <webClassPathEntry>/pitalium-explorer/lib/commons-io-2.4.jar</webClassPathEntry>
         <webClassPathEntry>/pitalium-explorer/lib/commons-lang3-3.3.2.jar</webClassPathEntry>
         <webClassPathEntry>/pitalium-explorer/lib/commons-logging-1.2.jar</webClassPathEntry>
