@@ -104,17 +104,17 @@ public class ImageController {
 	/**
 	 * Get the diff image with a marker of comparison result. If there is no difference, return normal image.
 	 *
-	 * @param sourceSceenshotId comparison source image id
+	 * @param sourceScreenshotId comparison source image id
 	 * @param targetScreenshotId comparison target image id
 	 * @param targetId id of the target area to be used for image comparison
 	 * @param response HttpServletResponse
 	 */
 	@RequestMapping(value = "image/diff", method = RequestMethod.GET)
-	public void getDiffImage(@RequestParam(value = "sourceSceenshotId") Integer sourceSceenshotId, 
+	public void getDiffImage(@RequestParam(value = "sourceScreenshotId") Integer sourceScreenshotId, 
 			@RequestParam(value = "targetScreenshotId") Integer targetScreenshotId,
 			@RequestParam(value = "targetId") Integer targetId, 
 			HttpServletResponse response) {
-		service.getDiffImage(sourceSceenshotId, targetScreenshotId, targetId, response);
+		service.getDiffImage(sourceScreenshotId, targetScreenshotId, targetId, response);
 	}
 
 	@RequestMapping(value = "files/upload", method = RequestMethod.POST)

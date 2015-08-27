@@ -598,13 +598,13 @@
 			} else {
 				// Test failed
 				this._setActualImageSrc(true, {
-					sourceSceenshotId: screenshotId,
+					sourceScreenshotId: screenshotId,
 					targetScreenshotId: expectedScreenshotId,
 					targetId: targetId
 				});
 
 				this._setExpectedImageSrc(true, {
-					sourceSceenshotId: expectedScreenshotId,
+					sourceScreenshotId: expectedScreenshotId,
 					targetScreenshotId: screenshotId,
 					targetId: targetId
 				});
