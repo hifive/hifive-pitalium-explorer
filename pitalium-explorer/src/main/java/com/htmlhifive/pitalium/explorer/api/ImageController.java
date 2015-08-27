@@ -3,6 +3,8 @@
  */
 package com.htmlhifive.pitalium.explorer.api;
 
+import java.util.List;
+
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.servlet.http.HttpServletResponse;
@@ -12,6 +14,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.htmlhifive.pitalium.explorer.cache.BackgroundImageDispatcher;
 import com.htmlhifive.pitalium.explorer.cache.CacheTaskQueue;
@@ -112,4 +116,17 @@ public class ImageController {
 			HttpServletResponse response) {
 		service.getDiffImage(sourceSceenshotId, targetScreenshotId, targetId, response);
 	}
+
+	@RequestMapping(value = "files/upload", method = RequestMethod.POST)
+	@ResponseBody
+	public List<String> multipartUpload(@RequestParam("files") List<MultipartFile> files) throws Exception {
+		return service.multipartUpload(files);
+	}
+	
+	@RequestMapping(value="files/diff", method = RequestMethod.GET)
+	public void getDiffImage(@RequestParam("file1") String fileName1, @RequestParam("file2") String fileName2, 
+			HttpServletResponse response) throws Exception {
+		service.getDiffImage(fileName1, fileName2, response);
+	}
+	
 }

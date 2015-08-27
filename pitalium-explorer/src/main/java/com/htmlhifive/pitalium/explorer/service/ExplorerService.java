@@ -19,11 +19,16 @@ import java.util.List;
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.htmlhifive.pitalium.core.result.TestResultManager;
 import com.htmlhifive.pitalium.explorer.conf.ApplicationConfig;
@@ -51,6 +56,9 @@ public class ExplorerService implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = -7097257097122078409L;
+
+	private static Logger log = LoggerFactory.getLogger(ExplorerService.class);
+
 	@Autowired
 	private ApplicationConfig config;
 	@Autowired
@@ -150,7 +158,7 @@ public class ExplorerService implements Serializable {
 		try {
 			File imageFile = persister.getImage(screenshotId, targetId);
 
-			if (imageFile == null) {
+			if (!imageFile.exists()) {
 				response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
 				return;
 			}
@@ -192,33 +200,21 @@ public class ExplorerService implements Serializable {
 	public void getDiffImage(Integer sourceScreenshotId, Integer targetScreenshotId, Integer targetId,
 			HttpServletResponse response) {
 		try {
-			DiffPoints diffPoints = compare(sourceScreenshotId, targetScreenshotId, targetId);
+			File sourceFile = persister.getImage(sourceScreenshotId, targetId);
+			File targetFile = persister.getImage(targetScreenshotId, targetId);
+			Target target = persister.getTarget(sourceScreenshotId, targetId);
+
+			if (!sourceFile.exists()|| !targetFile.exists()) {
+				response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+				return;
+			}
+
+			DiffPoints diffPoints = compare(sourceFile, targetFile, target);
 			if (diffPoints == null) {
 				response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
 				return;
 			}
-			File sourceFile = persister.getImage(sourceScreenshotId, targetId);
-			Target target = persister.getTarget(sourceScreenshotId, targetId);
-			if (target.getExcludeAreas().isEmpty()) {
-				if (!diffPoints.isFailed()) {
-					sendFile(sourceFile, response);
-				} else {
-					BufferedImage marked = getMarkedImage(sourceFile, diffPoints);
-					sendImage(marked, response);
-				}
-			} else {
-				BufferedImage image = ImageIO.read(sourceFile);
-				List<Rectangle> excludeRectangleList = createExcludRectangleList(target);
-				// permeabilize
-				fillRect(image, excludeRectangleList, new Color(0, 0, 0, 150));
-
-				if (!diffPoints.isFailed()) {
-					sendImage(image, response);
-				} else {
-					BufferedImage marked = getMarkedImage(image, diffPoints);
-					sendImage(marked, response);
-				}
-			}
+			sendMarkedImage(sourceFile, target, diffPoints, response);
 
 		} catch (IOException e) {
 			response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
@@ -251,29 +247,22 @@ public class ExplorerService implements Serializable {
 		graphics.dispose();
 	}
 
-	private DiffPoints compare(Integer sourceScreenshotId, Integer targetScreenshotId, Integer targetId)
-			throws IOException {
-		File sourceFile = persister.getImage(sourceScreenshotId, targetId);
-		File targetFile = persister.getImage(targetScreenshotId, targetId);
-		if (sourceFile == null || targetFile == null) {
-			return null;
-		}
-
+	private DiffPoints compare(File sourceFile, File targetFile, Target target) throws IOException {
 		// Create a partial image
 		BufferedImage actual = ImageIO.read(sourceFile);
 		BufferedImage expected = ImageIO.read(targetFile);
 
-		Target target = persister.getTarget(sourceScreenshotId, targetId);
-		if (!target.getExcludeAreas().isEmpty()) {
+		if (target != null && !target.getExcludeAreas().isEmpty()) {
 			List<Rectangle> excludeRectangleList = createExcludRectangleList(target);
 			fillRect(actual, excludeRectangleList, Color.BLACK);
 			fillRect(expected, excludeRectangleList, Color.BLACK);
 		}
 
 		// Compare.
-		return ImageUtils.compare(expected, null, actual, null, null);
+		return ImageUtils.compare(actual, null, expected, null, null);
 	}
-
+	
+	
 	private BufferedImage getMarkedImage(File image, DiffPoints diffPoints) throws IOException {
 		BufferedImage bufferedImage = ImageIO.read(image);
 		return getMarkedImage(bufferedImage, diffPoints);
@@ -283,6 +272,29 @@ public class ExplorerService implements Serializable {
 		return ImageUtils.getMarkedImage(image, diffPoints);
 	}
 
+	private void sendMarkedImage(File file, Target target, DiffPoints diffPoints, HttpServletResponse response) throws IOException {
+		if (target != null && !target.getExcludeAreas().isEmpty()) {
+			BufferedImage image = ImageIO.read(file);
+			List<Rectangle> excludeRectangleList = createExcludRectangleList(target);
+			// permeabilize
+			fillRect(image, excludeRectangleList, new Color(0, 0, 0, 150));
+
+			if (!diffPoints.isFailed()) {
+				sendImage(image, response);
+			} else {
+				BufferedImage marked = getMarkedImage(image, diffPoints);
+				sendImage(marked, response);
+			}
+		} else {
+			if (!diffPoints.isFailed()) {
+				sendFile(file, response);
+			} else {
+				BufferedImage marked = getMarkedImage(file, diffPoints);
+				sendImage(marked, response);
+			}
+		}
+	}
+	
 	/**
 	 * Send a file over http response
 	 * 
@@ -318,4 +330,48 @@ public class ExplorerService implements Serializable {
 		return persister.findTestExecutionAndEnvironment(page, pageSize);
 	}
 
+	public List<String> multipartUpload(List<MultipartFile> files) {
+		List<String> list = new ArrayList<>();
+		try {
+			long l = System.nanoTime();
+			for (int i = 0, size = files.size(); i < size; i++) {
+				MultipartFile f = files.get(i);
+				String fileName = f.getOriginalFilename();
+				String extension = FilenameUtils.getExtension(fileName);
+				String uniqueFileName = 
+						new StringBuilder().append(l).append("_").append(i).append(".").append(extension).toString();
+				FileUtils.copyInputStreamToFile(f.getInputStream(), new File(config.getUploadPath(), uniqueFileName));
+				list.add(uniqueFileName);
+			}
+		} catch (IOException e) {
+			log.error("Failed to save the files.", e);
+			return new ArrayList<>();
+		}
+
+		return list;
+	}
+
+	public void getDiffImage(String fileName1, String fileName2, HttpServletResponse response) {
+		try {
+			File file1 = new File(config.getUploadPath(), fileName1);
+			File file2 = new File(config.getUploadPath(), fileName2);
+	
+			if (!file1.exists()|| !file2.exists()) {
+				response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+				return;
+			}
+
+			// Compare.
+			DiffPoints diffPoints = compare(file1, file2, null);
+			if (diffPoints == null) {
+				response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+				return;
+			}
+
+			sendMarkedImage(file1, null, diffPoints, response);
+
+		} catch (IOException e) {
+			response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+		}
+	}
 }
