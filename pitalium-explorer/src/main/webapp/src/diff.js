@@ -518,13 +518,14 @@
 		 * 
 		 * @memberOf hifive.pitalium.explorer.controller.TestResultDiffController
 		 */
-		showResult: function(screenshot) {
+		showResult: function(screenshot, expectedScreenshot) {
 			this._imageLoadPromises = [];
 
 			this._screenshot = screenshot;
 			this._initializeImageSelector(screenshot.targets);
 			this.view.update('#detail', 'testResultListTemplate', {
-				testResult: screenshot
+				actual: screenshot,
+				expected: expectedScreenshot
 			});
 			return h5.async.when(this._imageLoadPromises);
 		},
@@ -893,6 +894,7 @@
 
 		/** current result screenshot id */
 		_currentScreenshotId: null,
+		_currentExpectedScreenshotId: null,
 
 		__meta: {
 			_screenshotListController: {
@@ -921,14 +923,29 @@
 			this._currentScreenshotId = id;
 
 			// Get screenshot detailsT
-			this._testResultDiffLogic.getScreenshot(id).done(this.own(function(screenshot) {
-				this._changeTitle(screenshot.comparisonResult);
+			this._testResultDiffLogic.getScreenshot(id).done(
+					this.own(function(screenshot) {
+						this._changeTitle(screenshot.comparisonResult);
 
-				var diffPromise = this._testResultDiffController.showResult(screenshot);
-				var listPromise = this._screenshotListController.showList(screenshot);
+						var expectedScreenshotId = screenshot.expectedScreenshotId;
+						this._currentExpectedScreenshotId = expectedScreenshotId;
 
-				h5.async.when(diffPromise, listPromise).done(this.own(this._refreshView));
-			}));
+						var diffPromise = null;
+						if (expectedScreenshotId != null) {
+							this._testResultDiffLogic.getScreenshot(expectedScreenshotId).done(
+									this.own(function(expectedScreenshot) {
+										diffPromise = this._testResultDiffController.showResult(
+												screenshot, expectedScreenshot);
+									}));
+						} else {
+							diffPromise = this._testResultDiffController.showResult(screenshot,
+									null);
+						}
+
+						var listPromise = this._screenshotListController.showList(screenshot);
+
+						h5.async.when(diffPromise, listPromise).done(this.own(this._refreshView));
+					}));
 		},
 
 		_refreshView: function() {
@@ -955,22 +972,29 @@
 		'#list selectScreenshot': function(context, $el) {
 			var id = context.evArg.id;
 			var expectedId = context.evArg.expectedId;
-			if (this._currentScreenshotId == id) {
+			if (this._currentScreenshotId == id && this._currentExpectedScreenshotId == expectedId) {
 				return;
 			}
 
-			this._testResultDiffLogic.getScreenshot(id).done(this.own(function(screenshot) {
-				// expectedの値を書き換える
-				screenshot.expectedScreenshotId = expectedId;
-				// 比較結果を書き換える
-				if (expectedId == null) {
-					screenshot.comparisonResult = null;
-				} else {
-					screenshot.comparisonResult = false;
-				}
-				this._testResultDiffController.showResult(screenshot);
-				this._currentScreenshotId = id;
-			}));
+			this._testResultDiffLogic.getScreenshot(id).done(
+					this.own(function(screenshot) {
+						// expectedの値を書き換える
+						screenshot.expectedScreenshotId = expectedId;
+						// 比較結果を書き換える
+						if (expectedId == null) {
+							screenshot.comparisonResult = null;
+							this._testResultDiffController.showResult(screenshot, null);
+						} else {
+							screenshot.comparisonResult = false;
+							this._testResultDiffLogic.getScreenshot(expectedId).done(
+									this.own(function(expectedScreenshot) {
+										this._testResultDiffController.showResult(screenshot,
+												expectedScreenshot);
+									}));
+						}
+						this._currentScreenshotId = id;
+						this._currentExpectedScreenshotId = expectedId;
+					}));
 		},
 
 		'#main viewChanged': function(context, $el) {

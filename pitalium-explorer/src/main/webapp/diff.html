@@ -38,6 +38,7 @@
 		<table class="table table-striped table-hover">
 			<thead>
 				<tr>
+					<th></th>
 					<th>Execution time</th>
 					<th>Test class</th>
 					<th>Test method</th>
@@ -49,16 +50,30 @@
 				</tr>
 			</thead>
 			<tbody>
-				<tr class="explorer-test-result" data-test-result-id="[%= testResult.id %]">
-					<td>[%= testResult.testExecution.timeString %]</td>
-					<td>[%= testResult.testClass %]</td>
-					<td>[%= testResult.testMethod %]</td>
-					<td>[%= testResult.testScreen %]</td>
-					<td>[%= testResult.testEnvironment.platform %]</td>
-					<td>[%= testResult.testEnvironment.browserName %]</td>
-					<td>[%= testResult.testEnvironment.browserVersion %]</td>
-					<td>[%= testResult.comparisonResult ? "○" : testResult.comparisonResult == null ? "-" : "×" %]</td>
+				<tr class="explorer-test-result">
+					<th>Actual</th>
+					<td>[%= actual.testExecution.timeString %]</td>
+					<td>[%= actual.testClass %]</td>
+					<td>[%= actual.testMethod %]</td>
+					<td>[%= actual.testScreen %]</td>
+					<td>[%= actual.testEnvironment.platform %]</td>
+					<td>[%= actual.testEnvironment.browserName %]</td>
+					<td>[%= actual.testEnvironment.browserVersion %]</td>
+					<td>[%= actual.comparisonResult ? "○" : actual.comparisonResult == null ? "-" : "×" %]</td>
 				</tr>
+				[% if (expected != null) { %]
+				<tr class="explorer-test-result">
+					<th>Expected</th>
+					<td>[%= expected.testExecution.timeString %]</td>
+					<td>[%= expected.testClass %]</td>
+					<td>[%= expected.testMethod %]</td>
+					<td>[%= expected.testScreen %]</td>
+					<td>[%= expected.testEnvironment.platform %]</td>
+					<td>[%= expected.testEnvironment.browserName %]</td>
+					<td>[%= expected.testEnvironment.browserVersion %]</td>
+					<td>[%= expected.comparisonResult ? "○" : expected.comparisonResult == null ? "-" : "×" %]</td>
+				</tr>
+				[% } %]
 			</tbody>
 		</table>
 	</script>
