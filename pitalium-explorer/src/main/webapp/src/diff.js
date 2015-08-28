@@ -86,6 +86,18 @@
 				type: 'get',
 				url: 'compositeExecution/list'
 			});
+		},
+
+		getCompareResult: function(screenshot, targetId) {
+			return h5.ajax('comparisonResult', {
+				data: {
+					sourceScreenshotId: screenshot.id,
+					targetScreenshotId: screenshot.expectedScreenshotId,
+					targetId: targetId,
+				},
+				type: 'GET',
+				dataType: 'json'
+			});
 		}
 	};
 
@@ -542,8 +554,8 @@
 			});
 			// Generate select options
 			var imageSelector = this.$find('#imageSelector');
-			// Fire change event and show images.
-			this._setImage(imageSelector.val());
+			var val = imageSelector.val();
+			this._compare(val);
 		},
 
 		'.nav-tabs shown.bs.tab': function(context, $el) {
@@ -560,7 +572,28 @@
 		 */
 		'#imageSelector change': function(context, $el) {
 			var val = $el.val();
-			this._setImage(val);
+			this._compare(val);
+		},
+
+		_compare: function(targetId) {
+			if (this._screenshot.expectedScreenshotId != null) {
+				this._testResultDiffLogic.getCompareResult(this._screenshot, targetId).done(
+						this.own(function(compareResult) {
+							this._screenshot.comparisonResult = compareResult;
+							// Fire change event and show images.
+							this._setImage(targetId);
+							this.view.update('#comparisonResult', 'comparisonResultTemplate', {
+								comparisonResult: this._screenshot.comparisonResult
+							});
+						}));
+			} else {
+				this._screenshot.comparisonResult = null;
+				// Fire change event and show images.
+				this._setImage(targetId);
+				this.view.update('#comparisonResult', 'comparisonResultTemplate', {
+					comparisonResult: ''
+				});
+			}
 		},
 
 		_setImage: function(targetId) {

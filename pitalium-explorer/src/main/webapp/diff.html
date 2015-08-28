@@ -46,7 +46,6 @@
 					<th>Platform</th>
 					<th>Browser name</th>
 					<th>Browser Version</th>
-					<th>Comparison result</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -59,7 +58,6 @@
 					<td>[%= actual.testEnvironment.platform %]</td>
 					<td>[%= actual.testEnvironment.browserName %]</td>
 					<td>[%= actual.testEnvironment.browserVersion %]</td>
-					<td>[%= actual.comparisonResult ? "○" : actual.comparisonResult == null ? "-" : "×" %]</td>
 				</tr>
 				[% if (expected != null) { %]
 				<tr class="explorer-test-result">
@@ -71,7 +69,6 @@
 					<td>[%= expected.testEnvironment.platform %]</td>
 					<td>[%= expected.testEnvironment.browserName %]</td>
 					<td>[%= expected.testEnvironment.browserVersion %]</td>
-					<td>[%= expected.comparisonResult ? "○" : expected.comparisonResult == null ? "-" : "×" %]</td>
 				</tr>
 				[% } %]
 			</tbody>
@@ -107,6 +104,17 @@
 				</tr>
 				[% } %]
 		</table>
+	</script>
+	<script type="text/ejs" id="comparisonResultTemplate">
+			<h4>Comparison Result : 
+			[% if (comparisonResult === true) { %]
+				○
+			[% } else if (comparisonResult === false) { %]
+				×
+			[% } else { %]
+				-
+			[% } %]
+			</h4>
 	</script>
 	</head>
 	<body>
@@ -169,6 +177,7 @@
 				        </a>
 				      </h4>
 				    </div>
+				    <div id="comparisonResult"></div>
 				    <div id="collapseOne" class="panel-collapse collapse in">
 				      <div class="panel-body">
 				      	<div id="detail"></div>
