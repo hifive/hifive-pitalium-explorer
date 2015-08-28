@@ -255,9 +255,6 @@
 				return;
 			}
 
-			this.$find('#time').text(screenshot.testExecution.timeString);
-			this.$find('#browser_name').text(screenshot.testEnvironment.browserName);
-
 			if (screenshot.expectedScreenshotId != null) {
 				return this._testResultDiffLogic.listScreenshot(screenshot.testExecution.id,
 						screenshot.testEnvironment.id).done(
