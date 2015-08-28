@@ -555,7 +555,7 @@
 			// Generate select options
 			var imageSelector = this.$find('#imageSelector');
 			var val = imageSelector.val();
-			this._compare(val);
+			this._compareImages(val);
 		},
 
 		'.nav-tabs shown.bs.tab': function(context, $el) {
@@ -572,10 +572,10 @@
 		 */
 		'#imageSelector change': function(context, $el) {
 			var val = $el.val();
-			this._compare(val);
+			this._compareImages(val);
 		},
 
-		_compare: function(targetId) {
+		_compareImages: function(targetId) {
 			if (this._screenshot.expectedScreenshotId != null) {
 				this._testResultDiffLogic.getCompareResult(this._screenshot, targetId).done(
 						this.own(function(compareResult) {
@@ -1015,10 +1015,8 @@
 						screenshot.expectedScreenshotId = expectedId;
 						// 比較結果を書き換える
 						if (expectedId == null) {
-							screenshot.comparisonResult = null;
 							this._testResultDiffController.showResult(screenshot, null);
 						} else {
-							screenshot.comparisonResult = false;
 							this._testResultDiffLogic.getScreenshot(expectedId).done(
 									this.own(function(expectedScreenshot) {
 										this._testResultDiffController.showResult(screenshot,
