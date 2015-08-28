@@ -88,7 +88,7 @@
 			});
 		},
 
-		getCompareResult: function(screenshot, targetId) {
+		getComparisonResult: function(screenshot, targetId) {
 			return h5.ajax('comparisonResult', {
 				data: {
 					sourceScreenshotId: screenshot.id,
@@ -580,15 +580,15 @@
 
 		_compareImages: function(targetId) {
 			if (this._screenshot.expectedScreenshotId != null) {
-				this._testResultDiffLogic.getCompareResult(this._screenshot, targetId).done(
-						this.own(function(compareResult) {
-							this._screenshot.comparisonResult = compareResult;
+				this._testResultDiffLogic.getComparisonResult(this._screenshot, targetId).done(
+						this.own(function(comparisonResult) {
+							this._screenshot.comparisonResult = comparisonResult;
 							// Fire change event and show images.
 							this._setImage(targetId);
 							this.view.update('#comparisonResult', 'comparisonResultTemplate', {
-								comparisonResult: this._screenshot.comparisonResult
+								comparisonResult: comparisonResult
 							});
-							this._changeTitle(compareResult);
+							this._changeTitle(comparisonResult);
 						}));
 			} else {
 				this._screenshot.comparisonResult = null;
