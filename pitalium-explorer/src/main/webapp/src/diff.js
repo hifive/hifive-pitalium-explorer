@@ -511,6 +511,9 @@
 
 		_imageLoadDeferred: null,
 
+		/** original title */
+		_orgTitle: null,
+
 		/**
 		 * Called after the controller has been initialized.<br>
 		 * Get the id of the right screenshot, and init views.
@@ -585,6 +588,7 @@
 							this.view.update('#comparisonResult', 'comparisonResultTemplate', {
 								comparisonResult: this._screenshot.comparisonResult
 							});
+							this._changeTitle(compareResult);
 						}));
 			} else {
 				this._screenshot.comparisonResult = null;
@@ -593,6 +597,22 @@
 				this.view.update('#comparisonResult', 'comparisonResultTemplate', {
 					comparisonResult: ''
 				});
+				this._changeTitle(null);
+			}
+		},
+
+		_changeTitle: function(comparisonResult) {
+			if (this._orgTitle == null) {
+				this._$title = $('title');
+				this._orgTitle = this._$title.text();
+			}
+
+			if (comparisonResult == null) {
+				this._$title.text(this._orgTitle);
+			} else if (comparisonResult) {
+				this._$title.text('○ ' + this._orgTitle);
+			} else {
+				this._$title.text('× ' + this._orgTitle);
 			}
 		},
 
@@ -922,9 +942,6 @@
 
 		_testResultDiffController: hifive.pitalium.explorer.controller.TestResultDiffController,
 
-		/** original title */
-		_orgTitle: null,
-
 		/** current result screenshot id */
 		_currentScreenshotId: null,
 		_currentExpectedScreenshotId: null,
@@ -958,8 +975,6 @@
 			// Get screenshot detailsT
 			this._testResultDiffLogic.getScreenshot(id).done(
 					this.own(function(screenshot) {
-						this._changeTitle(screenshot.comparisonResult);
-
 						var expectedScreenshotId = screenshot.expectedScreenshotId;
 						this._currentExpectedScreenshotId = expectedScreenshotId;
 
@@ -985,21 +1000,6 @@
 			var height = this.$find('#main')[0].scrollHeight;
 			$(this.rootElement).height(height);
 			this._dividedboxController.refresh();
-		},
-
-		_changeTitle: function(comparisonResult) {
-			if (this._orgTitle == null) {
-				this._$title = $('title');
-				this._orgTitle = this._$title.text();
-			}
-
-			if (comparisonResult == null) {
-				this._$title.text(this._orgTitle);
-			} else if (comparisonResult) {
-				this._$title.text('○ ' + this._orgTitle);
-			} else {
-				this._$title.text('× ' + this._orgTitle);
-			}
 		},
 
 		'#list selectScreenshot': function(context, $el) {
