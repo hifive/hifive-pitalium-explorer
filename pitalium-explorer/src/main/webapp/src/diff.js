@@ -338,7 +338,7 @@
 							}
 						});
 
-						var iconText = null;
+						var iconText = '';
 						if (s.existsExpected) {
 							iconText += "<span class='glyphicon glyphicon-file expected'></span>";
 						} else {
