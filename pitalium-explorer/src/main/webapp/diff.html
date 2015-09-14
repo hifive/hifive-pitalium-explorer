@@ -29,7 +29,7 @@
 	<script src="/hifive-res/fw/current/h5.js" data-h5-module="hifive"></script>
 	<script src="lib/hifive-ui/DividedBox.js"></script>
 	<script src="lib/hifive-ui/popup.js"></script>
-	
+
 	<script src="src/common/constant.js"></script>
 	<script src="src/common/util.js"></script>
 	<script src="src/diff.js"></script>
@@ -106,7 +106,7 @@
 		</table>
 	</script>
 	<script type="text/ejs" id="comparisonResultTemplate">
-			<h4>Comparison Result : 
+			<h4>Comparison Result :
 			[% if (comparisonResult === true) { %]
 				○
 			[% } else if (comparisonResult === false) { %]
@@ -127,7 +127,7 @@
 			</div>
 		</nav>
 		<!-- Navigation -->
-		
+
 		<div id="container">
 			<div id="list" class="box autoSize">
 				<div>
@@ -155,12 +155,12 @@
 						</table>
 					</div>
 					<div>
-						<button class="ok btn btn-primary" style="display:none">Select</button>
 						<button class="cancel btn btn-primary">Cancel</button>
+						<button class="ok btn btn-primary" style="display:none">Select</button>
 					</div>
 				</div>
 			</div>
-	
+
 			<div id="main" class="box autoSize">
 				<div class="panel-group" id="accordion">
 				  <div class="panel panel-default">
@@ -184,13 +184,13 @@
 				      	<div id="selector"></div>
 					</div>
 				</div>
-	
+
 				<div id="expected-mode">
 					<div class="col-xs-12 image-diff actual">
 						<img>
 					</div>
 				</div>
-	
+
 				<div id="actual-mode">
 					<ul class="nav nav-tabs">
 						<li><a href="#quick-flipping" data-toggle="tab">Quick flipping</a></li>
@@ -199,9 +199,9 @@
 						<li><a href="#onion-skin" data-toggle="tab">Onion skin</a></li>
 						<li><a href="#edge-overlapping" data-toggle="tab">Edge overlapping</a></li>
 					</ul>
-	
+
 					<div class="tab-content">
-	
+
 						<div class="tab-pane" id="quick-flipping">
 	 						<div class="row label-row">
 								<div class="col-xs-6 image-diff image-label expected">
@@ -222,7 +222,7 @@
 								</div>
 							</div>
 						</div>
-	
+
 						<div class="tab-pane active" id="two-up">
 	 						<div class="row label-row">
 								<div class="col-xs-6 image-diff image-label expected">
@@ -241,7 +241,7 @@
 								</div>
 							</div>
 						</div>
-	
+
 						<div class="tab-pane" id="swipe">
 							<div class="handle row label-row">
 								<div>
@@ -264,7 +264,7 @@
 								</div>
 							</div>
 						</div>
-	
+
 						<div class="tab-pane" id="onion-skin">
 							<div class="handle row label-row">
 								<div>
@@ -286,7 +286,7 @@
 								</div>
 							</div>
 						</div>
-	
+
 						<div class="tab-pane" id="edge-overlapping">
 							<div class="row label-row">
 								<div>
