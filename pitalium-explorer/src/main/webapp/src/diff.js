@@ -267,7 +267,7 @@
 														expScreenshot.testEnvironment.id).done(
 														this.own(function(expScreenshotMap) {
 															this._showList(screenshotMap,
-																	expScreenshotMap);
+																	expScreenshotMap, screenshot);
 														}));
 
 											}));
@@ -282,9 +282,11 @@
 							this._testResultDiffLogic.listScreenshot(
 									screenshot.expectedTestExecution.id,
 									screenshot.expectedTestEnvironment.id).done(
-									this.own(function(expScreenshotMap) {
-										this._showList(screenshotMap, expScreenshotMap);
-									}));
+									this
+											.own(function(expScreenshotMap) {
+												this._showList(screenshotMap, expScreenshotMap,
+														screenshot);
+											}));
 
 						}));
 			}
@@ -296,12 +298,12 @@
 
 		},
 
-		_showList: function(screenshotMap, expectedScreenshotMap) {
+		_showList: function(screenshotMap, expectedScreenshotMap, screenshot) {
 			this._merge(screenshotMap, expectedScreenshotMap);
 
 			var treeData = [];
-			var firstScreenshotId = null;
-			var firstExpectedScreenshotId = null;
+			var selectedScreenshotId = screenshot.id;
+			var selectedExpectedScreenshotId = screenshot.expectedScreenshotId;
 			for ( var testClass in screenshotMap) {
 				var children = [];
 				var testMethodMap = screenshotMap[testClass];
@@ -319,11 +321,15 @@
 					for (var i = 0, len = screenshots.length; i < len; i++) {
 						var s = screenshots[i];
 						var selected = false;
-						if (!firstScreenshotId) {
-							firstScreenshotId = s.id;
-							firstExpectedScreenshotId = s.expectedScreenshotId;
+						if (selectedScreenshotId == null) {
+							selectedScreenshotId = s.id;
+							selectedExpectedScreenshotId = s.expectedScreenshotId;
+						}
+						if (s.id === selectedScreenshotId
+								&& s.expectedScreenshotId === selectedExpectedScreenshotId) {
 							selected = true;
 						}
+
 						child.children.push({
 							text: s.screenshotName,
 							icon: false,
@@ -361,22 +367,26 @@
 				});
 			}
 
+			var isInit = false;
 			if (!this._$tree) {
 				this._$tree = this.$find('#tree_root');
-				this._$tree.jstree({
-					'core': {
-						data: treeData
-					}
-				});
+				isInit = true;
 			} else {
-				this._$tree.jstree(true).settings.core.data = treeData;
-				this._$tree.jstree(true).refresh();
+				this._$tree.jstree(true).destroy();
 			}
 
-			this.trigger('selectScreenshot', {
-				id: firstScreenshotId,
-				expectedId: firstExpectedScreenshotId
+			this._$tree.jstree({
+				'core': {
+					data: treeData
+				}
 			});
+
+			if (!isInit) {
+				this.trigger('selectScreenshot', {
+					id: selectedScreenshotId,
+					expectedId: selectedExpectedScreenshotId
+				});
+			}
 		},
 
 		_merge: function(screenshotMap, expectedScreenshotMap) {
