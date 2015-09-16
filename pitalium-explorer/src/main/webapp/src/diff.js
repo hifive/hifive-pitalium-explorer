@@ -549,7 +549,9 @@
 				actual: screenshot,
 				expected: expectedScreenshot
 			});
-			return h5.async.when(this._imageLoadPromises);
+			return h5.async.when(this._imageLoadPromises).done(this.own(function() {
+				this._triggerViewChange();
+			}));
 		},
 
 		/**
@@ -1004,6 +1006,8 @@
 		},
 
 		_refreshView: function() {
+			var $root = $(this.rootElement);
+			$root.height(0); // 高さを一度リセット
 			var mainHeight = this.$find('#main')[0].scrollHeight;
 			var listHeight = this.$find('#list')[0].scrollHeight;
 			$(this.rootElement).height(Math.max(mainHeight, listHeight));
