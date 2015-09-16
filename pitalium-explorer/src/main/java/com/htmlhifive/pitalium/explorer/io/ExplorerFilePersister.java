@@ -101,14 +101,8 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 			TestResult testResult = super.loadTestResult(metadata);
 
 			TestExecution testExecution = new TestExecution();
-			testExecution.setId(executionId);
 			DateTime dateTime = DateTimeFormat.forPattern("yyyy_MM_dd_HH_mm_ss").parseDateTime(executionDate);
 			testExecution.setTime(new Timestamp(dateTime.getMillis()));
-
-			ExecResult result = testResult.getResult();
-			if (result != null) {
-				testExecution.setExecResult(testResult.getResult().toString());
-			}
 
 			// 重複チェック
 			boolean exists = false;
@@ -122,7 +116,17 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 
 			if (!exists) {
 				testExecutionList.add(testExecution);
+				testExecution.setId(executionId);
 				executionId++;
+			}
+
+			ExecResult result = testResult.getResult();
+			if (result != null) {
+				if (result == ExecResult.FAILURE || ExecResult.FAILURE.name().equals(testExecution.getExecResult())) {
+					testExecution.setExecResult(ExecResult.FAILURE.name());
+				} else {
+					testExecution.setExecResult(ExecResult.SUCCESS.name());
+				}
 			}
 
 			List<Screenshot> screenshotList = new ArrayList<>();
