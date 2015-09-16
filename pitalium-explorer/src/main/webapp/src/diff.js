@@ -43,7 +43,7 @@
 		listScreenshot: function(executionId, environmentId) {
 			var dfd = this.deferred();
 
-			h5.ajax('screenshot/list', {
+			h5.ajax('screenshots/list', {
 				data: {
 					testExecutionId: executionId,
 					testEnvironmentId: environmentId
@@ -81,10 +81,10 @@
 			return retMap;
 		},
 
-		listCompositeTestExecution: function() {
+		listTestExecutionsWithEnvironment: function() {
 			return h5.ajax({
 				type: 'get',
-				url: 'compositeExecution/list'
+				url: 'executions/environments/list'
 			});
 		},
 
@@ -131,7 +131,7 @@
 		},
 
 		__ready: function(context) {
-			this._testResultDiffLogic.listCompositeTestExecution().done(
+			this._testResultDiffLogic.listTestExecutionsWithEnvironment().done(
 					this.own(function(response) {
 						this._executionList = response.content;
 						this.view.update('#execution_list', 'screenshotListTemplate', {
