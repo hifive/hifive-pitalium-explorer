@@ -244,7 +244,7 @@
 		 * @memberOf hifive.pitalium.explorer.controller.TestResultListController
 		 */
 		onHashChange: function() {
-			var pageStart = Math.max(0, parseInt(window.location.hash.substr(1)));
+			var pageStart = Math.max(0, parseInt(window.location.hash.substr(1), 10));
 			if (isNaN(pageStart)) {
 				pageStart = 0;
 			}

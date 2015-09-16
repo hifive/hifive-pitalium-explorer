@@ -93,7 +93,7 @@
 				data: {
 					sourceScreenshotId: screenshot.id,
 					targetScreenshotId: screenshot.expectedScreenshotId,
-					targetId: targetId,
+					targetId: targetId
 				},
 				type: 'GET',
 				dataType: 'json'
@@ -336,7 +336,7 @@
 							a_attr: {
 								'class': 'screenshot',
 								'data-explorer-screenshot-id': s.id,
-								'data-explorer-expected-screenshot-id': s.expectedScreenshotId,
+								'data-explorer-expected-screenshot-id': s.expectedScreenshotId
 							},
 							state: {
 								opened: true,
