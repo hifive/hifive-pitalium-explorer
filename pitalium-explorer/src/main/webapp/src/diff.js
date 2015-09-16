@@ -293,7 +293,7 @@
 
 			return this._testResultDiffLogic.listScreenshot(screenshot.testExecution.id,
 					screenshot.testEnvironment.id).done(this.own(function(screenshotMap) {
-				this._showList(screenshotMap, null);
+				this._showList(screenshotMap, null, screenshot);
 			}));
 
 		},
@@ -1004,8 +1004,9 @@
 		},
 
 		_refreshView: function() {
-			var height = this.$find('#main')[0].scrollHeight;
-			$(this.rootElement).height(height);
+			var mainHeight = this.$find('#main')[0].scrollHeight;
+			var listHeight = this.$find('#list')[0].scrollHeight;
+			$(this.rootElement).height(Math.max(mainHeight, listHeight));
 			this._dividedboxController.refresh();
 		},
 
