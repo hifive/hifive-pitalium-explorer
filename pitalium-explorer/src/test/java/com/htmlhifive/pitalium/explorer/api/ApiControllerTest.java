@@ -70,8 +70,8 @@ public class ApiControllerTest {
 	 */
 	@Before
 	public void initializeDefaultMockObjects() {
-		RepositoryMockCreator r = new RepositoryMockCreator(new Repositories(configRepo, processedImageRepo,
-				screenshotRepo, testExecutionRepo));
+		RepositoryMockCreator r = new RepositoryMockCreator(
+				new Repositories(configRepo, processedImageRepo, screenshotRepo, testExecutionRepo));
 		configs = r.getConfigs();
 		screenshots = r.getScreenshots();
 		new ArrayList<ProcessedImage>();
@@ -110,10 +110,10 @@ public class ApiControllerTest {
 		Assert.assertEquals(200, response.getStatusCode().value());
 		List<TestExecutionResult> responseBody = response.getBody().getContent();
 		for (int i = 0; i < responseBody.size(); i++) {
-			Assert.assertEquals(testExecutions.get(i).getId().intValue(), responseBody.get(i).getTestExecution()
-					.getId().intValue());
-			Assert.assertEquals(testExecutions.get(i).getTimeString(), responseBody.get(i).getTestExecution()
-					.getTimeString());
+			Assert.assertEquals(testExecutions.get(i).getId().intValue(),
+					responseBody.get(i).getTestExecution().getId().intValue());
+			Assert.assertEquals(testExecutions.get(i).getTimeString(),
+					responseBody.get(i).getTestExecution().getTimeString());
 		}
 		verify(testExecutionRepo).search(eq(""), eq(""), any(Pageable.class));
 	}
@@ -136,10 +136,10 @@ public class ApiControllerTest {
 		Assert.assertEquals(200, response.getStatusCode().value());
 		List<TestExecutionResult> responseBody = response.getBody().getContent();
 		for (int i = 0; i < responseBody.size(); i++) {
-			Assert.assertEquals(testExecutions.get(i).getId().intValue(), responseBody.get(i).getTestExecution()
-					.getId().intValue());
-			Assert.assertEquals(testExecutions.get(i).getTimeString(), responseBody.get(i).getTestExecution()
-					.getTimeString());
+			Assert.assertEquals(testExecutions.get(i).getId().intValue(),
+					responseBody.get(i).getTestExecution().getId().intValue());
+			Assert.assertEquals(testExecutions.get(i).getTimeString(),
+					responseBody.get(i).getTestExecution().getTimeString());
 		}
 		verify(testExecutionRepo).search(eq(""), eq(""), any(Pageable.class));
 	}
@@ -162,10 +162,10 @@ public class ApiControllerTest {
 		Assert.assertEquals(200, response.getStatusCode().value());
 		List<TestExecutionResult> responseBody = response.getBody().getContent();
 		for (int i = 0; i < responseBody.size(); i++) {
-			Assert.assertEquals(testExecutions.get(i).getId().intValue(), responseBody.get(i).getTestExecution()
-					.getId().intValue());
-			Assert.assertEquals(testExecutions.get(i).getTimeString(), responseBody.get(i).getTestExecution()
-					.getTimeString());
+			Assert.assertEquals(testExecutions.get(i).getId().intValue(),
+					responseBody.get(i).getTestExecution().getId().intValue());
+			Assert.assertEquals(testExecutions.get(i).getTimeString(),
+					responseBody.get(i).getTestExecution().getTimeString());
 		}
 		verify(testExecutionRepo).search(eq(""), eq(""), any(Pageable.class));
 	}
@@ -225,14 +225,13 @@ public class ApiControllerTest {
 			mapTE2S.get(tid).add(sc);
 		}
 		for (Map.Entry<Integer, ArrayList<Screenshot>> entry : mapTE2S.entrySet()) {
-			when(
-					screenshotRepo.findByTestExecutionIdAndTestMethodContainingAndTestScreenContaining(eq(entry
-							.getKey().intValue()), eq(""), eq(""))).thenReturn(entry.getValue());
+			when(screenshotRepo.findByTestExecutionIdAndTestMethodContainingAndTestScreenContaining(
+					eq(entry.getKey().intValue()), eq(""), eq(""))).thenReturn(entry.getValue());
 		}
 
 		for (Map.Entry<Integer, ArrayList<Screenshot>> entry : mapTE2S.entrySet()) {
 			int testExecuteId = entry.getKey().intValue();
-			ResponseEntity<List<Screenshot>> response = this.apiController.listCompositeScreenshot(testExecuteId, "", "");
+			ResponseEntity<List<Screenshot>> response = this.apiController.searchScreenshots(testExecuteId, "", "");
 			Assert.assertEquals(200, response.getStatusCode().value());
 			verify(screenshotRepo).findByTestExecutionIdAndTestMethodContainingAndTestScreenContaining(
 					eq(testExecuteId), eq(""), eq(""));
@@ -244,7 +243,7 @@ public class ApiControllerTest {
 		for (int i = 0; i < screenshots.size(); i++) {
 			int id = screenshots.get(i).getId().intValue();
 			when(screenshotRepo.findOne(i)).thenReturn(screenshots.get(i));
-			ResponseEntity<Screenshot> response = this.apiController.getDetail(id);
+			ResponseEntity<Screenshot> response = this.apiController.getScreenshot(id);
 			Assert.assertEquals(200, response.getStatusCode().value());
 			Assert.assertEquals(id, response.getBody().getId().intValue());
 			verify(screenshotRepo).findOne(id);
@@ -253,7 +252,7 @@ public class ApiControllerTest {
 
 	@Test
 	public void testGetDetailFail() {
-		ResponseEntity<Screenshot> response = this.apiController.getDetail(-1);
+		ResponseEntity<Screenshot> response = this.apiController.getScreenshot(-1);
 		Assert.assertEquals(null, response.getBody());
 	}
 }
