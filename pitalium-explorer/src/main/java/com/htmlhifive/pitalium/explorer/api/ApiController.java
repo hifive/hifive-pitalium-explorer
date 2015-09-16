@@ -60,7 +60,7 @@ public class ApiController {
 	 */
 	@RequestMapping(value = "screenshots/search", method = RequestMethod.GET, produces = "application/json;charset=utf-8")
 	@ResponseBody
-	public ResponseEntity<List<Screenshot>> searchScreenshot(
+	public ResponseEntity<List<Screenshot>> searchScreenshots(
 			@RequestParam(value = "testExecutionId") Integer testExecutionId,
 			@RequestParam(value = "searchTestMethod", defaultValue = "") String searchTestMethod,
 			@RequestParam(value = "searchTestScreen", defaultValue = "") String searchTestScreen) {
