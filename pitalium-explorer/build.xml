@@ -2,7 +2,7 @@
 <project name="pitalium-explorer" default="all">
 
 	<property file="build.properties"/>
-	
+
 	<property name="src" value="src/main/java"/>
 	<property name="resources" value="src/main/resources"/>
 	<property name="lib" value="lib"/>
@@ -27,26 +27,21 @@
 	</target>
 
 	<target name="copy" depends="prepare">
-		<copy todir="${dest_webapp}">
+		<copy todir="${dest_webapp}" encoding="${encoding}">
 			<fileset dir="${webapp}">
 				<exclude name="WEB-INF/classes/**"/>
 			</fileset>
 		</copy>
-	
-		<copy todir="${dest_webapp}/WEB-INF/classes">
+
+		<copy todir="${dest_webapp}/WEB-INF/classes" encoding="${encoding}">
 			<fileset dir="${resources}"/>
 		</copy>
 
-		<copy todir="${dest_webapp}/lib">
+		<copy todir="${dest_webapp}/lib" encoding="${encoding}">
 			<fileset dir="${hifive-res_home}">
-				<include name="ext/bootstrap/${bootstrap_version}/css/bootstrap.min.css"/>
-				<include name="ext/bootstrap/${bootstrap_version}/css/bootstrap-theme.min.css"/>
-				<include name="ext/bootstrap/${bootstrap_version}/js/bootstrap.min.js"/>
+				<include name="ext/bootstrap/${bootstrap_version}/**"/>
 
-				<include name="ext/jqplugins/jstree/${jstree_version}/themes/default/style.min.css"/>
-				<include name="ext/jqplugins/jstree/${jstree_version}/jstree.min.js"/>
-				<include name="ext/jqplugins/jstree/${jstree_version}/themes/default/throbber.gif"/>
-				<include name="ext/jqplugins/jstree/${jstree_version}/themes/default/32px.png"/>
+				<include name="ext/jqplugins/jstree/${jstree_version}/**"/>
 
 				<include name="ext/jquery/jquery-2.js"/>
 
@@ -58,19 +53,19 @@
 	</target>
 
 	<target name="replace" depends="copy">
-		<replace dir="${dest_webapp}" token="/hifive-res" value="lib">
+		<replace dir="${dest_webapp}" token="/hifive-res" value="lib" encoding="${encoding}">
 			<include name="**/*.html" />
 		</replace>
 	</target>
-	
+
 	<target name="compile" depends="prepare">
-		<javac destdir="${dest_webapp}/WEB-INF/classes" source="${java.sourceVersion}" 
-			target="${java.targetVersion}" encoding="${java.encoding}" includeantruntime="false">
+		<javac destdir="${dest_webapp}/WEB-INF/classes" source="${java.sourceVersion}"
+			target="${java.targetVersion}" encoding="${encoding}" includeantruntime="false">
 			<src path="${src}"/>
 			<classpath refid="classpath"/>
 		</javac>
 	</target>
-	
+
 	<target name="build-war" depends="replace, compile">
 		<war destfile="${dest}/pitalium-explorer.war" webxml="${dest_webapp}/WEB-INF/web.xml">
 			<fileset dir="${dest_webapp}" excludes="WEB-INF/web.xml"/>
