@@ -142,8 +142,7 @@ public class ExplorerService implements Serializable {
 		}
 	}
 
-	public void getEdgeImage(Integer screenshotId, Integer targetId, int colorIndex,
-			HttpServletResponse response) {
+	public void getEdgeImage(Integer screenshotId, Integer targetId, int colorIndex, HttpServletResponse response) {
 		// FIXME キャッシュ対応後に復活させる
 		//		File cachedFile = persister.searchProcessedImageFile(id, ProcessedImageUtility.getAlgorithmNameForEdge(colorIndex));
 		//		if (cachedFile != null) {
@@ -232,7 +231,7 @@ public class ExplorerService implements Serializable {
 			File targetFile = persister.getImage(targetScreenshotId, targetId);
 			Target target = persister.getTarget(sourceScreenshotId, targetId);
 
-			if (!sourceFile.exists()|| !targetFile.exists()) {
+			if (!sourceFile.exists() || !targetFile.exists()) {
 				response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
 				return;
 			}
@@ -255,8 +254,9 @@ public class ExplorerService implements Serializable {
 		for (Area excludeArea : target.getExcludeAreas()) {
 			// Get the relative coordinates from the starting position of the actualArea.
 			// Based on the obtained relative coordinates, to create a rectangle.
-			Rectangle rectangle = new Rectangle((int) excludeArea.getX() - (int) area.getX(), (int) excludeArea.getY()
-					- (int) area.getY(), (int) excludeArea.getWidth(), (int) excludeArea.getHeight());
+			Rectangle rectangle = new Rectangle((int) excludeArea.getX() - (int) area.getX(),
+					(int) excludeArea.getY() - (int) area.getY(), (int) excludeArea.getWidth(),
+					(int) excludeArea.getHeight());
 			excludeList.add(rectangle);
 		}
 		return excludeList;
@@ -289,8 +289,7 @@ public class ExplorerService implements Serializable {
 		// Compare.
 		return ImageUtils.compare(actual, null, expected, null, null);
 	}
-	
-	
+
 	private BufferedImage getMarkedImage(File image, DiffPoints diffPoints) throws IOException {
 		BufferedImage bufferedImage = ImageIO.read(image);
 		return getMarkedImage(bufferedImage, diffPoints);
@@ -300,7 +299,8 @@ public class ExplorerService implements Serializable {
 		return ImageUtils.getMarkedImage(image, diffPoints);
 	}
 
-	private void sendMarkedImage(File file, Target target, DiffPoints diffPoints, HttpServletResponse response) throws IOException {
+	private void sendMarkedImage(File file, Target target, DiffPoints diffPoints, HttpServletResponse response)
+			throws IOException {
 		if (target != null && !target.getExcludeAreas().isEmpty()) {
 			BufferedImage image = ImageIO.read(file);
 			List<Rectangle> excludeRectangleList = createExcludRectangleList(target);
@@ -322,7 +322,7 @@ public class ExplorerService implements Serializable {
 			}
 		}
 	}
-	
+
 	/**
 	 * Send a file over http response
 	 * 
@@ -348,12 +348,11 @@ public class ExplorerService implements Serializable {
 		response.flushBuffer();
 		ImageIO.write(image, "png", response.getOutputStream());
 	}
-	
-	public Page<Screenshot> findScreenshot(Integer testExecutionId, Integer testEnvironmentId, 
-			int page, int pageSize) {
+
+	public Page<Screenshot> findScreenshot(Integer testExecutionId, Integer testEnvironmentId, int page, int pageSize) {
 		return persister.findScreenshot(testExecutionId, testEnvironmentId, page, pageSize);
 	}
-	
+
 	public Page<TestExecutionAndEnvironment> findTestExecutionAndEnvironment(int page, int pageSize) {
 		return persister.findTestExecutionAndEnvironment(page, pageSize);
 	}
@@ -366,8 +365,8 @@ public class ExplorerService implements Serializable {
 				MultipartFile f = files.get(i);
 				String fileName = f.getOriginalFilename();
 				String extension = FilenameUtils.getExtension(fileName);
-				String uniqueFileName = 
-						new StringBuilder().append(l).append("_").append(i).append(".").append(extension).toString();
+				String uniqueFileName = new StringBuilder().append(l).append("_").append(i).append(".")
+						.append(extension).toString();
 				FileUtils.copyInputStreamToFile(f.getInputStream(), new File(config.getUploadPath(), uniqueFileName));
 				list.add(uniqueFileName);
 			}
@@ -383,8 +382,8 @@ public class ExplorerService implements Serializable {
 		try {
 			File file1 = new File(config.getUploadPath(), fileName1);
 			File file2 = new File(config.getUploadPath(), fileName2);
-	
-			if (!file1.exists()|| !file2.exists()) {
+
+			if (!file1.exists() || !file2.exists()) {
 				response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
 				return;
 			}

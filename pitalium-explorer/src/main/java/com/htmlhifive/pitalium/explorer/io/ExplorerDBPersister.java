@@ -160,16 +160,16 @@ public class ExplorerDBPersister extends DBPersister implements ExplorerPersiste
 	}
 
 	@Override
-	public Page<Screenshot> findScreenshot(Integer testExecutionId, Integer testEnvironmentId, 
-			int page, int pageSize) {
+	public Page<Screenshot> findScreenshot(Integer testExecutionId, Integer testEnvironmentId, int page, int pageSize) {
 		if (pageSize == 0) {
 			pageSize = defaultPageSize;
 		} else if (pageSize == -1) {
 			pageSize = Integer.MAX_VALUE;
 		}
-		PageRequest pageRequest = 
-				new PageRequest(page - 1, pageSize, new Sort(Sort.Direction.ASC, "testClass", "testMethod", "testScreen"));
-		return screenshotRepo.findByTestExecutionIdAndTestEnvironmentId(testExecutionId, testEnvironmentId, pageRequest);
+		PageRequest pageRequest = new PageRequest(page - 1, pageSize,
+				new Sort(Sort.Direction.ASC, "testClass", "testMethod", "testScreen"));
+		return screenshotRepo.findByTestExecutionIdAndTestEnvironmentId(testExecutionId, testEnvironmentId,
+				pageRequest);
 	}
 
 	@Override
@@ -181,10 +181,8 @@ public class ExplorerDBPersister extends DBPersister implements ExplorerPersiste
 		}
 
 		/*
-		 * findTestExecutionAndEnvironmentで実行するSQLの結果は正しく取れるのだが、
-		 * totalを取得するHQLが正しくないため
-		 * (Pageオブジェクトを作成するために、Springで実行されている。HQLは自動生成されているため、書き換えることは無理そう。)、
-		 * Pageオブジェクトを自力で作成することにする。
+		 * findTestExecutionAndEnvironmentで実行するSQLの結果は正しく取れるのだが、 totalを取得するHQLが正しくないため
+		 * (Pageオブジェクトを作成するために、Springで実行されている。HQLは自動生成されているため、書き換えることは無理そう。)、 Pageオブジェクトを自力で作成することにする。
 		 */
 		List<TestExecutionAndEnvironment> list = screenshotRepo.findTestExecutionAndEnvironment();
 		int size = list.size();
@@ -205,8 +203,9 @@ public class ExplorerDBPersister extends DBPersister implements ExplorerPersiste
 		ProcessedImage p = processedImageRepo.findOne(new ProcessedImageKey(screenshotId, algorithm));
 		if (p != null) {
 			// FIXME 直したい
-			result = new File(new FileUtility(new Repositories(configRepo, processedImageRepo, screenshotRepo,
-					testExecutionRepo)).getAbsoluteFilePath(p.getFileName()));
+			result = new File(
+					new FileUtility(new Repositories(configRepo, processedImageRepo, screenshotRepo, testExecutionRepo))
+							.getAbsoluteFilePath(p.getFileName()));
 		}
 		return result;
 	}

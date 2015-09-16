@@ -61,7 +61,7 @@ public class ApiController {
 	@RequestMapping(value = "compositeScreenshot/list", method = RequestMethod.GET, produces = "application/json;charset=utf-8")
 	@ResponseBody
 	public ResponseEntity<List<Screenshot>> listCompositeScreenshot(
-			@RequestParam(value = "testExecutionId")  Integer testExecutionId,
+			@RequestParam(value = "testExecutionId") Integer testExecutionId,
 			@RequestParam(value = "searchTestMethod", defaultValue = "") String searchTestMethod,
 			@RequestParam(value = "searchTestScreen", defaultValue = "") String searchTestScreen) {
 		List<Screenshot> list = service.findScreenshot(testExecutionId, searchTestMethod, searchTestScreen);
@@ -76,16 +76,14 @@ public class ApiController {
 	 */
 	@RequestMapping(value = "screenshot", method = RequestMethod.GET, produces = "application/json;charset=utf-8")
 	@ResponseBody
-	public ResponseEntity<Screenshot> getDetail(
-			@RequestParam(value = "screenshotId") Integer screenshotId) {
+	public ResponseEntity<Screenshot> getDetail(@RequestParam(value = "screenshotId") Integer screenshotId) {
 		Screenshot item = service.getScreenshot(screenshotId);
 		return new ResponseEntity<Screenshot>(item, HttpStatus.OK);
 	}
 
 	/**
-	 * Gets list of the screenshots which is narrowed down by a test execution id and test environment id.
-	 * If pageSize equals to zero, the default page size is used. If pageSize equals to
-	 * -1, the entire list is returned.
+	 * Gets list of the screenshots which is narrowed down by a test execution id and test environment id. If pageSize
+	 * equals to zero, the default page size is used. If pageSize equals to -1, the entire list is returned.
 	 * 
 	 * @param testExecutionId test execution id
 	 * @param testEnviromentId test environment id
@@ -105,11 +103,9 @@ public class ApiController {
 	}
 
 	/**
-	 * Gets list of the TestExecutionAndEnvironment.
-	 * If pageSize equals to zero, the default page size is used. If pageSize equals to
-	 * -1, the entire list is returned.
+	 * Gets listGets list of the TestExecutionAndEnvironment. If pageSize equals to zero, the default page size is used.
+	 * If pageSize equals to -1, the entire list is returned. param page Which page to show.
 	 * 
-	 * @param page Which page to show.
 	 * @param pageSize Page size.
 	 * @return Page of test execution and environment
 	 */

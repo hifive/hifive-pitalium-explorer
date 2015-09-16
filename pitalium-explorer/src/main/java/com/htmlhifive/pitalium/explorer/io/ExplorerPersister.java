@@ -28,7 +28,8 @@ public interface ExplorerPersister extends Persister {
 	 * @param pageSize 1ページあたりの表示数
 	 * @return TestExecutionのリスト
 	 */
-	Page<TestExecutionResult> findTestExecution(String searchTestMethod, String searchTestScreen, int page, int pageSize);
+	Page<TestExecutionResult> findTestExecution(String searchTestMethod, String searchTestScreen, int page,
+			int pageSize);
 
 	/**
 	 * Screenshotのリストを取得する。 引数のメソッド名、スクリーンショットを含む（like検索）Screenshotのリストを取得する。
@@ -77,7 +78,7 @@ public interface ExplorerPersister extends Persister {
 	 * @return Screenshotのリスト
 	 */
 	Page<Screenshot> findScreenshot(Integer testExecutionId, Integer testEnvironmentId, int page, int pageSize);
-	
+
 	/**
 	 * TestExecutionAndEnvironmentのリストを取得する。
 	 * 
@@ -86,7 +87,7 @@ public interface ExplorerPersister extends Persister {
 	 * @return TestExecutionAndEnviromentのリスト
 	 */
 	Page<TestExecutionAndEnvironment> findTestExecutionAndEnvironment(int page, int pageSize);
-	
+
 	File searchProcessedImageFile(Integer screenshotId, String algorithm);
 
 	List<Screenshot> findNotProcessedEdge();

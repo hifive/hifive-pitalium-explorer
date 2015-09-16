@@ -44,7 +44,7 @@ public class ImageController {
 
 	/**
 	 * This method is called when the application is about to die. Cleanup things.
-	 * 
+	 *
 	 * @throws InterruptedException
 	 */
 	@PreDestroy
@@ -64,9 +64,8 @@ public class ImageController {
 	 * @param response HttpServletResponse
 	 */
 	@RequestMapping(value = "image", method = RequestMethod.GET)
-	public void getImage(@RequestParam(value = "screenshotId") Integer screenshotId, 
-			@RequestParam(value = "targetId") Integer targetId,
-			HttpServletResponse response) {
+	public void getImage(@RequestParam(value = "screenshotId") Integer screenshotId,
+			@RequestParam(value = "targetId") Integer targetId, HttpServletResponse response) {
 		service.getImage(screenshotId, targetId, response);
 	}
 
@@ -78,14 +77,13 @@ public class ImageController {
 	 * @param colorIndex edge color index
 	 * @param response HttpServletResponse
 	 */
-	public void getEdgeImage(Integer screenshotId, Integer targetId, int colorIndex,
-			HttpServletResponse response) {
+	public void getEdgeImage(Integer screenshotId, Integer targetId, int colorIndex, HttpServletResponse response) {
 		service.getEdgeImage(screenshotId, targetId, colorIndex, response);
 	}
 
 	/**
 	 * Get processed image.
-	 * 
+	 *
 	 * @param screenshotId id of an image to be processed
 	 * @param targetId id of the target area to be used for image comparison
 	 * @param algorithm currently only "edge" is supported
@@ -93,11 +91,9 @@ public class ImageController {
 	 * @param response HttpServletResponse
 	 */
 	@RequestMapping(value = "image/processed", method = RequestMethod.GET)
-	public void getProcessed(@RequestParam(value = "screenshotId") Integer screenshotId, 
-			@RequestParam(value = "targetId") Integer targetId,
-			@RequestParam(value = "algorithm") String algorithm, 
-			@RequestParam(value = "colorIndex") int colorIndex, 
-			HttpServletResponse response) {
+	public void getProcessed(@RequestParam(value = "screenshotId") Integer screenshotId,
+			@RequestParam(value = "targetId") Integer targetId, @RequestParam(value = "algorithm") String algorithm,
+			@RequestParam(value = "colorIndex") int colorIndex, HttpServletResponse response) {
 		service.getProcessed(screenshotId, targetId, algorithm, colorIndex, response);
 	}
 
@@ -110,31 +106,30 @@ public class ImageController {
 	 * @param response HttpServletResponse
 	 */
 	@RequestMapping(value = "image/diff", method = RequestMethod.GET)
-	public void getDiffImage(@RequestParam(value = "sourceScreenshotId") Integer sourceScreenshotId, 
+	public void getDiffImage(@RequestParam(value = "sourceScreenshotId") Integer sourceScreenshotId,
 			@RequestParam(value = "targetScreenshotId") Integer targetScreenshotId,
-			@RequestParam(value = "targetId") Integer targetId, 
-			HttpServletResponse response) {
+			@RequestParam(value = "targetId") Integer targetId, HttpServletResponse response) {
 		service.getDiffImage(sourceScreenshotId, targetScreenshotId, targetId, response);
 	}
 
 	@RequestMapping(value = "comparisonResult", method = RequestMethod.GET, produces = "application/json;charset=utf-8")
 	@ResponseBody
-	public Boolean getComparisonResult(@RequestParam(value = "sourceScreenshotId") Integer sourceScreenshotId, 
+	public Boolean getComparisonResult(@RequestParam(value = "sourceScreenshotId") Integer sourceScreenshotId,
 			@RequestParam(value = "targetScreenshotId") Integer targetScreenshotId,
 			@RequestParam(value = "targetId") Integer targetId) {
 		return service.getComparisonResult(sourceScreenshotId, targetScreenshotId, targetId);
 	}
-	
+
 	@RequestMapping(value = "files/upload", method = RequestMethod.POST)
 	@ResponseBody
 	public List<String> multipartUpload(@RequestParam("files") List<MultipartFile> files) throws Exception {
 		return service.multipartUpload(files);
 	}
-	
-	@RequestMapping(value="files/diff", method = RequestMethod.GET)
-	public void getDiffImage(@RequestParam("file1") String fileName1, @RequestParam("file2") String fileName2, 
+
+	@RequestMapping(value = "files/diff", method = RequestMethod.GET)
+	public void getDiffImage(@RequestParam("file1") String fileName1, @RequestParam("file2") String fileName2,
 			HttpServletResponse response) throws Exception {
 		service.getDiffImage(fileName1, fileName2, response);
 	}
-	
+
 }

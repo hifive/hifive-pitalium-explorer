@@ -256,8 +256,8 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 		Screenshot screenshot = new Screenshot();
 		screenshot.setId(screenshotId);
 		screenshot.setScreenshotName(screenshotResult.getScreenshotId());
-		screenshot.setComparisonResult(screenshotResult.getResult() != null ? screenshotResult.getResult().isSuccess()
-				: null);
+		screenshot.setComparisonResult(
+				screenshotResult.getResult() != null ? screenshotResult.getResult().isSuccess() : null);
 		screenshot.setTestClass(screenshotResult.getTestClass());
 		screenshot.setTestMethod(screenshotResult.getTestMethod());
 		screenshot.setTestScreen(screenshotResult.getScreenshotId());
@@ -308,8 +308,8 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 
 		PersistMetadata targetMetadata = new PersistMetadata(screenshotResult.getExpectedId(),
 				screenshotResult.getTestClass(), screenshotResult.getTestMethod(), screenshotResult.getScreenshotId(),
-				screenAreaResult.getSelector(), screenAreaResult.getRectangle(), new PtlCapabilities(
-						screenshotResult.getCapabilities()));
+				screenAreaResult.getSelector(), screenAreaResult.getRectangle(),
+				new PtlCapabilities(screenshotResult.getCapabilities()));
 		target.setFileName(getScreenshotImageFileName(targetMetadata));
 		return target;
 	}

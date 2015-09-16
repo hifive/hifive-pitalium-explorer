@@ -15,7 +15,7 @@ public class ApplicationConfig {
 
 	@Value("${uploadPath:C:/temp}")
 	private String uploadPath;
-	
+
 	/**
 	 * Diff画像のキャッシュ機能を有効にするか判定する。
 	 * 
