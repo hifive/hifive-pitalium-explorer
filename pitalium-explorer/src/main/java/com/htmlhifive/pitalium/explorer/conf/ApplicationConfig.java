@@ -13,6 +13,9 @@ public class ApplicationConfig {
 	@Value("${diffImageCache:}")
 	private String diffImageCache;
 
+	@Value("${uploadPath:C:/temp}")
+	private String uploadPath;
+
 	/**
 	 * Diff画像のキャッシュ機能を有効にするか判定する。
 	 * 
@@ -22,4 +25,12 @@ public class ApplicationConfig {
 		return StringUtils.equals(diffImageCache, "on");
 	}
 
+	/**
+	 * アップロードされたファイルの格納先を取得する。
+	 * 
+	 * @return ファイルの格納先
+	 */
+	public String getUploadPath() {
+		return uploadPath;
+	}
 }

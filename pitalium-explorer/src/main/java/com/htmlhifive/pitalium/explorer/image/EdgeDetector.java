@@ -112,7 +112,8 @@ public class EdgeDetector {
 				Color p12 = new Color(imageRGBs[i * width + Math.min(width - 1, j + 1)], true);
 				Color p20 = new Color(imageRGBs[Math.min(height - 1, i + 1) * width + Math.max(0, j - 1)], true);
 				Color p21 = new Color(imageRGBs[Math.min(height - 1, i + 1) * width + j], true);
-				Color p22 = new Color(imageRGBs[Math.min(height - 1, i + 1) * width + Math.min(width - 1, j + 1)], true);
+				Color p22 = new Color(imageRGBs[Math.min(height - 1, i + 1) * width + Math.min(width - 1, j + 1)],
+						true);
 				int rX = (p02.getRed() * 3 + p12.getRed() * 10 + p22.getRed() * 3)
 						- (p00.getRed() * 3 + p10.getRed() * 10 + p20.getRed() * 3);
 				int gX = (p02.getGreen() * 3 + p12.getGreen() * 10 + p22.getGreen() * 3)

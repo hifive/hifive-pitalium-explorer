@@ -25,3 +25,14 @@ License:
 	(ver.3 and later versions) MIT license
 		https://github.com/twbs/bootstrap/blob/master/LICENSE
 Local Modifications: None.
+
+-----
+Code under:
+ext/jqplugins/jstree
+
+jsTree
+URL:http://jstree.com/
+License:
+		MIT license
+		https://jquery.org/license/
+Local Modifications: None.

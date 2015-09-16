@@ -26,10 +26,77 @@
 		getScreenshot: function(id) {
 			return h5.ajax({
 				type: 'get',
-				url: 'api/getScreenshot',
+				url: 'screenshot',
 				data: {
 					screenshotId: id
 				}
+			});
+		},
+
+		/**
+		 * Get screenshots of the current execution and environment.
+		 * 
+		 * @memberOf hifive.pitalium.explorer.logic.TestResultDiffLogic
+		 * @param {string} id the id of the screenshot
+		 * @returns {JqXHRWrapper}
+		 */
+		listScreenshot: function(executionId, environmentId) {
+			var dfd = this.deferred();
+
+			h5.ajax('screenshots/list', {
+				data: {
+					testExecutionId: executionId,
+					testEnvironmentId: environmentId
+				},
+				type: 'GET',
+				dataType: 'json'
+			}).done(this.own(function(response) {
+				var screenshots = response.content;
+				var map = this._convertToTreeMap(screenshots);
+				dfd.resolve(map);
+			}));
+			return dfd.promise();
+		},
+
+		_convertToTreeMap: function(screenshotArray) {
+			var retMap = {};
+			for (var i = 0, len = screenshotArray.length; i < len; i++) {
+				var s = screenshotArray[i];
+				var testClass = s.testClass;
+				var testClassObj = retMap[testClass];
+				if (!testClassObj) {
+					testClassObj = {};
+					retMap[testClass] = testClassObj;
+				}
+
+				var testMethod = s.testMethod;
+				var screenshotsOfMethod = testClassObj[testMethod];
+				if (!screenshotsOfMethod) {
+					screenshotsOfMethod = [];
+					testClassObj[testMethod] = screenshotsOfMethod;
+				}
+
+				screenshotsOfMethod.push(s);
+			}
+			return retMap;
+		},
+
+		listTestExecutionsWithEnvironment: function() {
+			return h5.ajax({
+				type: 'get',
+				url: 'executions/environments/list'
+			});
+		},
+
+		getComparisonResult: function(screenshot, targetId) {
+			return h5.ajax('comparisonResult', {
+				data: {
+					sourceScreenshotId: screenshot.id,
+					targetScreenshotId: screenshot.expectedScreenshotId,
+					targetId: targetId
+				},
+				type: 'GET',
+				dataType: 'json'
 			});
 		}
 	};
@@ -38,7 +105,396 @@
 })(jQuery);
 (function($) {
 	/**
-	 * This class is a controller for the test result comparison page.
+	 * This class is a controller for the list of screeenshots.
+	 * 
+	 * @class
+	 * @memberOf hifive.pitalium.explorer.controller
+	 * @name ScreenshotListController
+	 */
+	var selectExecutionController = {
+		__name: 'hifive.pitalium.explorer.controller.SelectExecutionController',
+
+		/**
+		 * The &quot;Logic&quot; class
+		 * 
+		 * @type Logic
+		 * @memberOf hifive.pitalium.explorer.controller.SelectExecutionController
+		 */
+		_testResultDiffLogic: hifive.pitalium.explorer.logic.TestResultDiffLogic,
+
+		_$selected: null,
+
+		_executionList: null,
+
+		__init: function(context) {
+			this._popup = context.args.popup;
+		},
+
+		__ready: function(context) {
+			this._testResultDiffLogic.listTestExecutionsWithEnvironment().done(
+					this.own(function(response) {
+						this._executionList = response.content;
+						this.view.update('#execution_list', 'screenshotListTemplate', {
+							executions: this._executionList
+						});
+					}));
+		},
+
+		'[name="execution"] change': function(context, $el) {
+			if (this._$selected) {
+				this._$selected.removeClass('success');
+			}
+			this._$selected = $el.parent().parent();
+			this._$selected.addClass('success');
+		},
+
+		'.actual click': function() {
+			if (!this._$selected) {
+				return;
+			}
+
+			var index = this._$selected.data('explorerIndex');
+			var e = this._executionList[index];
+
+			this.$find('#actualExecution').attr('data-actual-explorer-index', index);
+			this.$find('#actualExecution #executionTime').text(e.executionTime);
+			this.$find('#actualExecution #platform').text(e.platform);
+			this.$find('#actualExecution #browserName').text(e.browserName);
+			this.$find('#actualExecution #browserVersion').text(e.browserVersion);
+
+			if (this.$find('#expectedExecution').data('expectedExplorerIndex') != null) {
+				this.$find('.ok').show();
+			}
+		},
+
+		'.expected click': function() {
+			if (!this._$selected) {
+				return;
+			}
+
+			var index = this._$selected.data('explorerIndex');
+			var e = this._executionList[index];
+
+			this.$find('#expectedExecution').attr('data-expected-explorer-index', index);
+			this.$find('#expectedExecution #executionTime').text(e.executionTime);
+			this.$find('#expectedExecution #platform').text(e.platform);
+			this.$find('#expectedExecution #browserName').text(e.browserName);
+			this.$find('#expectedExecution #browserVersion').text(e.browserVersion);
+
+			if (this.$find('#actualExecution').data('actualExplorerIndex') != null) {
+				this.$find('.ok').show();
+			}
+		},
+
+		'.ok click': function() {
+			var actualIndex = this.$find('#actualExecution').data('actualExplorerIndex');
+			var expectedIndex = this.$find('#expectedExecution').data('expectedExplorerIndex');
+			if (actualIndex == null || expectedIndex == null) {
+				return;
+			}
+
+			var actualExecution = this._executionList[actualIndex];
+			var expectedExecution = this._executionList[expectedIndex];
+
+			this._popup.close({
+				testExecution: {
+					id: actualExecution.executionId,
+					timeString: actualExecution.executionTime
+				},
+				testEnvironment: {
+					id: actualExecution.environmentId,
+					browserName: actualExecution.browserName
+				},
+				expectedTestExecution: {
+					id: expectedExecution.executionId,
+					timeString: expectedExecution.executionTime
+				},
+				expectedTestEnvironment: {
+					id: expectedExecution.environmentId,
+					browserName: expectedExecution.browserName
+				}
+			});
+		},
+
+		'.cancel click': function() {
+			this._popup.close();
+		}
+	};
+
+	h5.core.expose(selectExecutionController);
+})(jQuery);
+(function($) {
+
+	var SelectExecutionControllerDef = hifive.pitalium.explorer.controller.SelectExecutionController;
+
+	/**
+	 * This class is a controller for the list of screeenshots.
+	 * 
+	 * @class
+	 * @memberOf hifive.pitalium.explorer.controller
+	 * @name ScreenshotListController
+	 */
+	var screenshotListController = {
+		__name: 'hifive.pitalium.explorer.controller.ScreenshotListController',
+
+		/**
+		 * The &quot;Logic&quot; class
+		 * 
+		 * @type Logic
+		 * @memberOf hifive.pitalium.explorer.controller.ScreenshotListController
+		 */
+		_testResultDiffLogic: hifive.pitalium.explorer.logic.TestResultDiffLogic,
+
+		/**
+		 * Show the list of screenshots.
+		 * 
+		 * @memberOf hifive.pitalium.explorer.controller.ScreenshotListController
+		 */
+		showList: function(screenshot) {
+			if (!screenshot) {
+				return;
+			}
+
+			if (screenshot.expectedScreenshotId != null) {
+				return this._testResultDiffLogic.listScreenshot(screenshot.testExecution.id,
+						screenshot.testEnvironment.id).done(
+						this.own(function(screenshotMap) {
+							this._testResultDiffLogic
+									.getScreenshot(screenshot.expectedScreenshotId).done(
+											this.own(function(expScreenshot) {
+												this._testResultDiffLogic.listScreenshot(
+														expScreenshot.testExecution.id,
+														expScreenshot.testEnvironment.id).done(
+														this.own(function(expScreenshotMap) {
+															this._showList(screenshotMap,
+																	expScreenshotMap, screenshot);
+														}));
+
+											}));
+						}));
+			}
+
+			if (screenshot.expectedTestExecution != null
+					&& screenshot.expectedTestEnvironment != null) {
+				return this._testResultDiffLogic.listScreenshot(screenshot.testExecution.id,
+						screenshot.testEnvironment.id).done(
+						this.own(function(screenshotMap) {
+							this._testResultDiffLogic.listScreenshot(
+									screenshot.expectedTestExecution.id,
+									screenshot.expectedTestEnvironment.id).done(
+									this
+											.own(function(expScreenshotMap) {
+												this._showList(screenshotMap, expScreenshotMap,
+														screenshot);
+											}));
+
+						}));
+			}
+
+			return this._testResultDiffLogic.listScreenshot(screenshot.testExecution.id,
+					screenshot.testEnvironment.id).done(this.own(function(screenshotMap) {
+				this._showList(screenshotMap, null, screenshot);
+			}));
+
+		},
+
+		_showList: function(screenshotMap, expectedScreenshotMap, screenshot) {
+			this._merge(screenshotMap, expectedScreenshotMap);
+
+			var treeData = [];
+			var selectedScreenshotId = screenshot.id;
+			var selectedExpectedScreenshotId = screenshot.expectedScreenshotId;
+			for ( var testClass in screenshotMap) {
+				var children = [];
+				var testMethodMap = screenshotMap[testClass];
+				for ( var testMethod in testMethodMap) {
+					var screenshots = testMethodMap[testMethod];
+					var child = {
+						text: testMethod,
+						children: [],
+						state: {
+							opened: true
+						}
+					};
+					children.push(child);
+
+					for (var i = 0, len = screenshots.length; i < len; i++) {
+						var s = screenshots[i];
+						var selected = false;
+						if (selectedScreenshotId == null) {
+							selectedScreenshotId = s.id;
+							selectedExpectedScreenshotId = s.expectedScreenshotId;
+						}
+						if (s.id === selectedScreenshotId
+								&& s.expectedScreenshotId === selectedExpectedScreenshotId) {
+							selected = true;
+						}
+
+						child.children.push({
+							text: s.screenshotName,
+							icon: false,
+							a_attr: {
+								'class': 'screenshot',
+								'data-explorer-screenshot-id': s.id,
+								'data-explorer-expected-screenshot-id': s.expectedScreenshotId
+							},
+							state: {
+								opened: true,
+								selected: selected
+							}
+						});
+
+						var iconText = '';
+						if (s.existsExpected) {
+							iconText += "<span class='glyphicon glyphicon-file expected'></span>";
+						} else {
+							iconText += "<span class='glyphicon glyphicon-file expected none'></span>";
+						}
+						if (s.existsActual) {
+							iconText += "<span class='glyphicon glyphicon-file actual'></span>";
+						} else {
+							iconText += "<span class='glyphicon glyphicon-file actual none'></span>";
+						}
+						child.children[i].text += iconText;
+					}
+				}
+				treeData.push({
+					text: testClass,
+					children: children,
+					state: {
+						opened: true
+					}
+				});
+			}
+
+			var isInit = false;
+			if (!this._$tree) {
+				this._$tree = this.$find('#tree_root');
+				isInit = true;
+			} else {
+				this._$tree.jstree(true).destroy();
+			}
+
+			this._$tree.jstree({
+				'core': {
+					data: treeData
+				}
+			});
+
+			if (!isInit) {
+				this.trigger('selectScreenshot', {
+					id: selectedScreenshotId,
+					expectedId: selectedExpectedScreenshotId
+				});
+			}
+		},
+
+		_merge: function(screenshotMap, expectedScreenshotMap) {
+			for ( var testClass in screenshotMap) {
+				var testMethodMap = screenshotMap[testClass];
+				for ( var testMethod in testMethodMap) {
+					var screenshots = testMethodMap[testMethod];
+					for (var i = 0, len = screenshots.length; i < len; i++) {
+						var s = screenshots[i];
+						// add flag;
+						s.existsActual = true;
+						s.existsExpected = false;
+						s.expectedScreenshotId = null;
+					}
+				}
+			}
+
+			// merge
+			if (expectedScreenshotMap != null) {
+				for ( var testClass in expectedScreenshotMap) {
+					var testMethodMap = screenshotMap[testClass];
+					if (testMethodMap) {
+						var expectedTestMethodMap = expectedScreenshotMap[testClass];
+						for ( var testMethod in expectedTestMethodMap) {
+							var screenshots = testMethodMap[testMethod];
+							if (screenshots) {
+								var expectedScreenshots = expectedTestMethodMap[testMethod];
+								for (var j = 0, expectedLen = expectedScreenshots.length; j < expectedLen; j++) {
+									var expectedS = expectedScreenshots[j];
+									var existsFlag = false;
+									for (var i = 0, len = screenshots.length; i < len; i++) {
+										var s = screenshots[i];
+										if (s.screenshotName == expectedS.screenshotName) {
+											existsFlag = true;
+											s.existsExpected = true;
+											s.expectedScreenshotId = expectedS.id;
+											break;
+										}
+									}
+
+									if (!existsFlag) {
+										// screenshots に追加
+										screenshots.push(expectedS);
+										// add flag;
+										expectedS.existsActual = false;
+										expectedS.existsExpected = true;
+										expectedS.expectedScreenshotId = null;
+									}
+								}
+							} else {
+								// testMethodMap に追加
+								var expectedScreenshots = expectedTestMethodMap[testMethod];
+								testMethodMap[testMethod] = expectedScreenshots;
+								for (var j = 0, expectedLen = expectedScreenshots.length; j < expectedLen; j++) {
+									var expectedS = expectedScreenshots[j];
+									// add flag;
+									expectedS.existsActual = false;
+									expectedS.existsExpected = true;
+									expectedS.expectedScreenshotId = null;
+								}
+							}
+						}
+					} else {
+						// screenshotMap に追加
+						var expectedTestMethodMap = expectedScreenshotMap[testClass];
+						screenshotMap[testClass] = expectedTestMethodMap;
+						for ( var testMethod in expectedTestMethodMap) {
+							var expectedScreenshots = expectedTestMethodMap[testMethod];
+							for (var j = 0, expectedLen = expectedScreenshots.length; j < expectedLen; j++) {
+								var expectedS = expectedScreenshots[j];
+								// add flag;
+								expectedS.existsActual = false;
+								expectedS.existsExpected = true;
+								expectedS.expectedScreenshotId = null;
+							}
+						}
+					}
+				}
+			}
+		},
+
+		'.screenshot click': function(context, $el) {
+			var id = $el.data('explorerScreenshotId');
+			var expectedId = $el.data('explorerExpectedScreenshotId');
+			this.trigger('selectScreenshot', {
+				id: id,
+				expectedId: expectedId
+			});
+		},
+
+		'#select_execution click': function() {
+			var popup = h5.ui.popupManager.createPopup('execution', 'Select an execution', this
+					.$find('#popup_content').html(), SelectExecutionControllerDef, {
+				draggable: true
+			});
+			popup.promise.done(this.own(this.showList));
+			popup.setContentsSize(500, 550);
+			popup.show();
+		}
+	};
+
+	h5.core.expose(screenshotListController);
+
+})(jQuery);
+
+(function($) {
+	/**
+	 * This class is a controller for the test result comparison.
 	 * 
 	 * @class
 	 * @memberOf hifive.pitalium.explorer.controller
@@ -60,32 +516,18 @@
 
 		_screenshot: {},
 
+		_imageLoadDeferred: null,
+
+		/** original title */
+		_orgTitle: null,
+
 		/**
 		 * Called after the controller has been initialized.<br>
-		 * Get the id of the right screenshot, and update views.
+		 * Get the id of the right screenshot, and init views.
 		 * 
 		 * @memberOf hifive.pitalium.explorer.controller.TestResultDiffController
 		 */
 		__ready: function() {
-			// Get the id of the test result from url query parameters.
-			var queryParams = hifive.pitalium.explorer.utils.getParameters();
-			if (!queryParams.hasOwnProperty('id')) {
-				alert('ID not found');
-				return;
-			}
-
-			var id = queryParams.id;
-
-			// Get screenshot details
-			this._testResultDiffLogic.getScreenshot(id).done(this.own(function(screenshot) {
-				this._screenshot = screenshot;
-				this._initializeImageSelector(screenshot.targets);
-				this.view.update('#detail', 'testResultListTemplate', {
-					testResult: screenshot
-				});
-				this._changeTitle();
-			}));
-
 			this._initializeSwipeHandle();
 			this._initializeOnionHandle();
 
@@ -93,15 +535,23 @@
 			this.$find('#quick-flipping .image-overlay .expected').hide();
 		},
 
-		_changeTitle: function() {
-			var title = $('title').text();
-			if (this._screenshot.comparisonResult == null) {
-				// ignore
-			} else if (this._screenshot.comparisonResult) {
-				$('title').text('○ ' + title);
-			} else {
-				$('title').text('× ' + title);
-			}
+		/**
+		 * Show the result of the selected screenshot id.
+		 * 
+		 * @memberOf hifive.pitalium.explorer.controller.TestResultDiffController
+		 */
+		showResult: function(screenshot, expectedScreenshot) {
+			this._imageLoadPromises = [];
+
+			this._screenshot = screenshot;
+			this._initializeImageSelector(screenshot.targets);
+			this.view.update('#detail', 'testResultListTemplate', {
+				actual: screenshot,
+				expected: expectedScreenshot
+			});
+			return h5.async.when(this._imageLoadPromises).done(this.own(function() {
+				this._triggerViewChange();
+			}));
 		},
 
 		/**
@@ -116,8 +566,12 @@
 			});
 			// Generate select options
 			var imageSelector = this.$find('#imageSelector');
-			// Fire change event and show images.
-			imageSelector.change();
+			var val = imageSelector.val();
+			this._compareImages(val);
+		},
+
+		'.nav-tabs shown.bs.tab': function(context, $el) {
+			this._triggerViewChange();
 		},
 
 		/**
@@ -130,22 +584,66 @@
 		 */
 		'#imageSelector change': function(context, $el) {
 			var val = $el.val();
-			this._setImage(val);
+			this._compareImages(val);
+		},
+
+		_compareImages: function(targetId) {
+			if (this._screenshot.expectedScreenshotId != null) {
+				this._testResultDiffLogic.getComparisonResult(this._screenshot, targetId).done(
+						this.own(function(comparisonResult) {
+							this._screenshot.comparisonResult = comparisonResult;
+							// Fire change event and show images.
+							this._setImage(targetId);
+							this.view.update('#comparisonResult', 'comparisonResultTemplate', {
+								comparisonResult: comparisonResult
+							});
+							this._changeTitle(comparisonResult);
+						}));
+			} else {
+				this._screenshot.comparisonResult = null;
+				// Fire change event and show images.
+				this._setImage(targetId);
+				this.view.update('#comparisonResult', 'comparisonResultTemplate', {
+					comparisonResult: ''
+				});
+				this._changeTitle(null);
+			}
+		},
+
+		_changeTitle: function(comparisonResult) {
+			if (this._orgTitle == null) {
+				this._$title = $('title');
+				this._orgTitle = this._$title.text();
+			}
+
+			if (comparisonResult == null) {
+				this._$title.text(this._orgTitle);
+			} else if (comparisonResult) {
+				this._$title.text('○ ' + this._orgTitle);
+			} else {
+				this._$title.text('× ' + this._orgTitle);
+			}
 		},
 
 		_setImage: function(targetId) {
+			this._imageLoadPromises = [];
 			var screenshotId = this._screenshot.id;
 
-			var expectedScreenshot = this._screenshot.expectedScreenshot;
+			var expectedScreenshotId = this._screenshot.expectedScreenshotId;
 			// Expected mode
-			if (expectedScreenshot == null) {
+			if (expectedScreenshotId == null) {
 				this._setActualImageSrc(false, {
 					screenshotId: screenshotId,
 					targetId: targetId
 				});
+				this._showExpectedMode();
 				this._hideActualMode();
+				h5.async.when(this._imageLoadPromises).done(this.own(function() {
+					this._triggerViewChange();
+				}));
 				return;
 			}
+			this._showActualMode();
 			this._hideExpectedMode();
 
 			if (this._screenshot.comparisonResult) {
@@ -156,25 +654,28 @@
 				});
 
 				this._setExpectedImageSrc(false, {
-					screenshotId: expectedScreenshot.id,
+					screenshotId: expectedScreenshotId,
 					targetId: targetId
 				});
 			} else {
 				// Test failed
 				this._setActualImageSrc(true, {
-					sourceSceenshotId: screenshotId,
-					targetScreenshotId: expectedScreenshot.id,
+					sourceScreenshotId: screenshotId,
+					targetScreenshotId: expectedScreenshotId,
 					targetId: targetId
 				});
 
 				this._setExpectedImageSrc(true, {
-					sourceSceenshotId: expectedScreenshot.id,
+					sourceScreenshotId: expectedScreenshotId,
 					targetScreenshotId: screenshotId,
 					targetId: targetId
 				});
 			}
 
-			this._initEdgeOverlapping(expectedScreenshot.id, screenshotId, targetId);
+			this._initEdgeOverlapping(expectedScreenshotId, screenshotId, targetId);
+			h5.async.when(this._imageLoadPromises).done(this.own(function() {
+				this._triggerViewChange();
+			}));
 		},
 
 		'#quick-flipping .image-diff click': function(context, $el) {
@@ -227,13 +728,13 @@
 			actual.onload = d2.resolve;
 
 			var format = hifive.pitalium.explorer.utils.formatUrl;
-			expected.src = format('image/getProcessed', {
+			expected.src = format('image/processed', {
 				screenshotId: expectedId,
 				targetId: targetId,
 				algorithm: 'edge',
 				colorIndex: 1
 			});
-			actual.src = format('image/getProcessed', {
+			actual.src = format('image/processed', {
 				screenshotId: actualId,
 				targetId: targetId,
 				algorithm: 'edge',
@@ -262,7 +763,7 @@
 						context.drawImage(actual, 0, 0);
 						this._initImageMagnifier(native_width, native_height);
 					};
-					actualBlack.src = format('image/getProcessed', {
+					actualBlack.src = format('image/processed', {
 						screenshotId: actualId,
 						targetId: targetId,
 						algorithm: 'edge',
@@ -315,8 +816,32 @@
 		 * @param {Object} params extra paramters
 		 */
 		_setImageSrc: function(selector, withMarker, params) {
-			var url = withMarker ? 'image/getDiff' : 'image/get';
+			var dfd = this.deferred();
+
+			var url = withMarker ? 'image/diff' : 'image';
 			this.$find(selector).attr('src', hifive.pitalium.explorer.utils.formatUrl(url, params));
+			this.$find(selector)[0].onload = function() {
+				dfd.resolve();
+			};
+			this._imageLoadPromises.push(dfd.promise());
+		},
+
+		/**
+		 * Show actual mode.
+		 * 
+		 * @memberOf hifive.pitalium.explorer.controller.TestResultDiffController
+		 */
+		_showActualMode: function() {
+			this.$find('#actual-mode').show();
+		},
+
+		/**
+		 * Show expected mode.
+		 * 
+		 * @memberOf hifive.pitalium.explorer.controller.TestResultDiffController
+		 */
+		_showExpectedMode: function() {
+			this.$find('#expected-mode').show();
 		},
 
 		/**
@@ -391,12 +916,147 @@
 			$handle.on('change', inputHandler); // for IE
 
 			inputHandler();
+		},
+
+		_triggerViewChange: function() {
+			this.trigger('viewChanged');
 		}
 	};
 
 	h5.core.expose(testResultDiffController);
 })(jQuery);
+
+(function($) {
+	/**
+	 * This class is a controller for the test result diff page.
+	 * 
+	 * @class
+	 * @memberOf hifive.pitalium.explorer.controller
+	 * @name DiffPageController
+	 */
+	var diffPageController = {
+		__name: 'hifive.pitalium.explorer.controller.DiffPageController',
+
+		/**
+		 * The &quot;Logic&quot; class
+		 * 
+		 * @type Logic
+		 * @memberOf hifive.pitalium.explorer.controller.DiffPageController
+		 */
+		_testResultDiffLogic: hifive.pitalium.explorer.logic.TestResultDiffLogic,
+
+		_dividedboxController: h5.ui.components.DividedBox.DividedBox,
+
+		_screenshotListController: hifive.pitalium.explorer.controller.ScreenshotListController,
+
+		_testResultDiffController: hifive.pitalium.explorer.controller.TestResultDiffController,
+
+		/** current result screenshot id */
+		_currentScreenshotId: null,
+		_currentExpectedScreenshotId: null,
+
+		__meta: {
+			_screenshotListController: {
+				rootElement: '#list'
+			},
+			_testResultDiffController: {
+				rootElement: '#main'
+			}
+		},
+
+		/**
+		 * Called after the controller has been initialized.<br>
+		 * Get the id of the right screenshot, and update views.
+		 * 
+		 * @memberOf hifive.pitalium.explorer.controller.DiffPageController
+		 */
+		__ready: function() {
+			// Get the id of the test result from url query parameters.
+			var queryParams = hifive.pitalium.explorer.utils.getParameters();
+			if (!queryParams.hasOwnProperty('id')) {
+				alert('ID not found');
+				return;
+			}
+
+			var id = queryParams.id;
+			this._currentScreenshotId = id;
+
+			// Get screenshot detailsT
+			this._testResultDiffLogic.getScreenshot(id).done(
+					this.own(function(screenshot) {
+						var expectedScreenshotId = screenshot.expectedScreenshotId;
+						this._currentExpectedScreenshotId = expectedScreenshotId;
+
+						var diffPromise = null;
+						if (expectedScreenshotId != null) {
+							this._testResultDiffLogic.getScreenshot(expectedScreenshotId).done(
+									this.own(function(expectedScreenshot) {
+										diffPromise = this._testResultDiffController.showResult(
+												screenshot, expectedScreenshot);
+									}));
+						} else {
+							diffPromise = this._testResultDiffController.showResult(screenshot,
+									null);
+						}
+
+						var listPromise = this._screenshotListController.showList(screenshot);
+
+						h5.async.when(diffPromise, listPromise).done(this.own(this._refreshView));
+					}));
+		},
+
+		_refreshView: function() {
+			var $root = $(this.rootElement);
+			$root.height(0); // 高さを一度リセット
+			var mainHeight = this.$find('#main')[0].scrollHeight;
+			var listHeight = this.$find('#list')[0].scrollHeight;
+			$(this.rootElement).height(Math.max(mainHeight, listHeight));
+			this._dividedboxController.refresh();
+		},
+
+		'#list selectScreenshot': function(context, $el) {
+			var id = context.evArg.id;
+			var expectedId = context.evArg.expectedId;
+			if (this._currentScreenshotId == id && this._currentExpectedScreenshotId == expectedId) {
+				return;
+			}
+
+			this._testResultDiffLogic.getScreenshot(id).done(
+					this.own(function(screenshot) {
+						// expectedの値を書き換える
+						screenshot.expectedScreenshotId = expectedId;
+						// 比較結果を書き換える
+						if (expectedId == null) {
+							this._testResultDiffController.showResult(screenshot, null);
+						} else {
+							this._testResultDiffLogic.getScreenshot(expectedId).done(
+									this.own(function(expectedScreenshot) {
+										this._testResultDiffController.showResult(screenshot,
+												expectedScreenshot);
+									}));
+						}
+						this._currentScreenshotId = id;
+						this._currentExpectedScreenshotId = expectedId;
+					}));
+		},
+
+		'#main viewChanged': function(context, $el) {
+			this._refreshView();
+		},
+
+		'{window} [resize]': function() {
+			this._refreshView();
+		},
+
+		'{rootElement} boxSizeChange': function() {
+			var height = this.$find('#main')[0].scrollHeight;
+			$(this.rootElement).height(height);
+		}
+	};
+
+	h5.core.expose(diffPageController);
+
+})(jQuery);
 $(function() {
-	h5.core.controller('body>div.container',
-			hifive.pitalium.explorer.controller.TestResultDiffController);
+	h5.core.controller('#container', hifive.pitalium.explorer.controller.DiffPageController);
 });

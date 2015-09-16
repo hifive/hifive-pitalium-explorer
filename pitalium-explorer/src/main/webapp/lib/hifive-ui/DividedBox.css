@@ -1,0 +1,103 @@
+@charset 'utf-8';
+/*
+ * Copyright (C) 2012-2014 NS Solutions Corporation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+.dividedBox {
+	padding: 0px;
+}
+
+.dividedBox>* {
+	margin: 0px;
+}
+
+.dividedBox.horizontal {
+	white-space: nowrap;
+}
+
+.dividedBox.horizontal>* {
+	display: inline-block;
+	vertical-align: middle;
+}
+
+.dividedBox.horizontal>.dividedbox-managed {
+	height: 100%;
+}
+
+.dividedBox.horizontal>.dividedbox-managed.noFill {
+	height: auto;
+}
+
+.dividedBox.horizontal>.divider {
+	display: inline-block;
+	cursor: col-resize;
+	width: 4px;
+	height: 100%;
+	margin: 0;
+	padding: 0;
+}
+
+.dividedBox.vertical>* {
+	display: block;
+}
+
+.dividedBox.vertical>.dividedbox-managed {
+	width: 100%;
+}
+
+.dividedBox.vertical>.dividedbox-managed.noFill {
+	width: auto;
+}
+
+.dividedBox.vertical>.divider {
+	display: block;
+	cursor: row-resize;
+	width: 100%;
+	height: 4px;
+	width: 100%;
+}
+
+.dividedBox>.divider {
+	overflow: visible;
+}
+
+.dividedBox>.divider>.dividerHandler {
+	width: 30px;
+	height: 30px;
+	border-style: solid;
+	border-width: 1px;
+	border-radius: 15px;
+	-moz-border-radius: 15px;
+	-webkit-border-radius: 15px;
+	-o-border-radius: 15px;
+	-ms-border-radius: 15px;
+}
+
+.dividedBox.vertical>.divider .dividerHandler {
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.dividedBox>.divider,.dividedBox .dividerHandler {
+	background-color: #eee;
+}
+
+.dividedBox>.divider.fixedDivider {
+	cursor: auto;
+}
+
+.dividedBox>.divider.fixedDivider .dividerHandler {
+	display: none;
+}

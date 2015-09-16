@@ -42,6 +42,7 @@ import com.htmlhifive.pitalium.explorer.entity.Screenshot;
 import com.htmlhifive.pitalium.explorer.entity.Target;
 import com.htmlhifive.pitalium.explorer.entity.TestEnvironment;
 import com.htmlhifive.pitalium.explorer.entity.TestExecution;
+import com.htmlhifive.pitalium.explorer.entity.TestExecutionAndEnvironment;
 import com.htmlhifive.pitalium.explorer.response.TestExecutionResult;
 import com.htmlhifive.pitalium.image.model.RectangleArea;
 
@@ -85,10 +86,13 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 		Map<String, List<Screenshot>> workScreenshotListMap = new HashMap<>();
 		Map<ScreenshotResult, Screenshot> workScreenshotMap = new HashMap<>();
 
+		List<TestEnvironment> workEnvList = new ArrayList<>();
+
 		int executionId = 0;
 		int screenshotId = 0;
 		int targetId = 0;
 		int areaId = 0;
+		int environmentId = 0;
 
 		File[] files = collection.toArray(new File[collection.size()]);
 		for (int i = 0, len = files.length; i < len; i++) {
@@ -97,14 +101,8 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 			TestResult testResult = super.loadTestResult(metadata);
 
 			TestExecution testExecution = new TestExecution();
-			testExecution.setId(executionId);
 			DateTime dateTime = DateTimeFormat.forPattern("yyyy_MM_dd_HH_mm_ss").parseDateTime(executionDate);
 			testExecution.setTime(new Timestamp(dateTime.getMillis()));
-
-			ExecResult result = testResult.getResult();
-			if (result != null) {
-				testExecution.setExecResult(testResult.getResult().toString());
-			}
 
 			// 重複チェック
 			boolean exists = false;
@@ -118,7 +116,17 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 
 			if (!exists) {
 				testExecutionList.add(testExecution);
+				testExecution.setId(executionId);
 				executionId++;
+			}
+
+			ExecResult result = testResult.getResult();
+			if (result != null) {
+				if (result == ExecResult.FAILURE || ExecResult.FAILURE.name().equals(testExecution.getExecResult())) {
+					testExecution.setExecResult(ExecResult.FAILURE.name());
+				} else {
+					testExecution.setExecResult(ExecResult.SUCCESS.name());
+				}
 			}
 
 			List<Screenshot> screenshotList = new ArrayList<>();
@@ -129,6 +137,15 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 				// Capability
 				Map<String, ?> capabilities = screenshotResult.getCapabilities();
 				TestEnvironment testEnvironment = createTestEnvironment(capabilities);
+				// リストの何番目に一致するデータがあるか探す。
+				int index = indexOf(workEnvList, testEnvironment);
+				if (index == -1) {
+					workEnvList.add(testEnvironment);
+					testEnvironment.setId(environmentId);
+					environmentId++;
+				} else {
+					testEnvironment = workEnvList.get(index);
+				}
 				screenshot.setTestEnvironment(testEnvironment);
 
 				// Target
@@ -188,7 +205,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 			for (Screenshot expectedScreenshot : screenshotList) {
 				if (StringUtils.equals(expectedScreenshot.getTestClass(), screenshot.getTestClass())
 						&& StringUtils.equals(expectedScreenshot.getFileName(), screenshot.getFileName())) {
-					screenshot.setExpectedScreenshot(expectedScreenshot);
+					screenshot.setExpectedScreenshotId(expectedScreenshot.getId());
 					break;
 				}
 			}
@@ -242,8 +259,9 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 	private Screenshot createScreenshot(Integer screenshotId, ScreenshotResult screenshotResult) {
 		Screenshot screenshot = new Screenshot();
 		screenshot.setId(screenshotId);
-		screenshot.setComparisonResult(screenshotResult.getResult() != null ? screenshotResult.getResult().isSuccess()
-				: null);
+		screenshot.setScreenshotName(screenshotResult.getScreenshotId());
+		screenshot.setComparisonResult(
+				screenshotResult.getResult() != null ? screenshotResult.getResult().isSuccess() : null);
 		screenshot.setTestClass(screenshotResult.getTestClass());
 		screenshot.setTestMethod(screenshotResult.getTestMethod());
 		screenshot.setTestScreen(screenshotResult.getScreenshotId());
@@ -267,6 +285,21 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 		return testEnvironment;
 	}
 
+	private int indexOf(List<TestEnvironment> environmentList, TestEnvironment environment) {
+		// idの値を除いて一致するデータを探す。
+		for (int i = 0, size = environmentList.size(); i < size; i++) {
+			TestEnvironment env = environmentList.get(i);
+			if (StringUtils.equals(env.getPlatform(), environment.getPlatform())
+					&& StringUtils.equals(env.getPlatformVersion(), environment.getPlatformVersion())
+					&& StringUtils.equals(env.getDeviceName(), environment.getDeviceName())
+					&& StringUtils.equals(env.getBrowserName(), environment.getBrowserName())
+					&& StringUtils.equals(env.getBrowserVersion(), environment.getBrowserVersion())) {
+				return i;
+			}
+		}
+		return -1;
+	}
+
 	private Target createTarget(Integer targetId, Integer screenshotId, TargetResult targetResult,
 			ScreenshotResult screenshotResult) {
 		Target target = new Target();
@@ -279,8 +312,8 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 
 		PersistMetadata targetMetadata = new PersistMetadata(screenshotResult.getExpectedId(),
 				screenshotResult.getTestClass(), screenshotResult.getTestMethod(), screenshotResult.getScreenshotId(),
-				screenAreaResult.getSelector(), screenAreaResult.getRectangle(), new PtlCapabilities(
-						screenshotResult.getCapabilities()));
+				screenAreaResult.getSelector(), screenAreaResult.getRectangle(),
+				new PtlCapabilities(screenshotResult.getCapabilities()));
 		target.setFileName(getScreenshotImageFileName(targetMetadata));
 		return target;
 	}
@@ -418,6 +451,94 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 				rectangleArea, new PtlCapabilities(map));
 		// Send PNG image
 		return super.getScreenshotImageFile(metadata);
+	}
+
+	@Override
+	public Page<Screenshot> findScreenshot(Integer testExecutionId, Integer testEnvironmentId, int page, int pageSize) {
+		if (screenshotListMap == null) {
+			return new PageImpl<Screenshot>(new ArrayList<Screenshot>());
+		}
+
+		List<Screenshot> screenshotList = screenshotListMap.get(testExecutionId);
+
+		List<Screenshot> extractScreenshotList = new ArrayList<>();
+		for (Screenshot screenshot : screenshotList) {
+			if (screenshot.getTestEnvironment().getId() == testEnvironmentId) {
+				extractScreenshotList.add(screenshot);
+			}
+		}
+
+		int size = extractScreenshotList.size();
+
+		if (pageSize == 0) {
+			pageSize = defaultPageSize;
+		} else if (pageSize == -1) {
+			pageSize = Integer.MAX_VALUE;
+		}
+
+		// 表示ページ番号、ページ表示数に合わせてリストを作成する。
+		List<Screenshot> resultList = new ArrayList<>();
+		for (int i = (page - 1) * pageSize; i < Math.min(page * pageSize, size); i++) {
+			resultList.add(extractScreenshotList.get(i));
+		}
+
+		PageRequest pageable = new PageRequest(page - 1, pageSize);
+		return new PageImpl<Screenshot>(resultList, pageable, size);
+	}
+
+	@Override
+	public Page<TestExecutionAndEnvironment> findTestExecutionAndEnvironment(int page, int pageSize) {
+		if (screenshotListMap == null) {
+			return new PageImpl<TestExecutionAndEnvironment>(new ArrayList<TestExecutionAndEnvironment>());
+		}
+
+		List<TestExecutionAndEnvironment> extractList = new ArrayList<>();
+		for (Entry<Integer, List<Screenshot>> entry : screenshotListMap.entrySet()) {
+			for (Screenshot screenshot : entry.getValue()) {
+				TestExecutionAndEnvironment testEE = new TestExecutionAndEnvironment();
+
+				TestExecution testExec = screenshot.getTestExecution();
+				testEE.setExecutionId(testExec.getId());
+				testEE.setExecutionTime(testExec.getTimeString());
+
+				TestEnvironment testEnv = screenshot.getTestEnvironment();
+				testEE.setEnvironmentId(testEnv.getId());
+				testEE.setBrowserName(testEnv.getBrowserName());
+				testEE.setBrowserVersion(testEnv.getBrowserVersion());
+				testEE.setPlatform(testEnv.getPlatform());
+				testEE.setPlatformVersion(testEnv.getPlatformVersion());
+				testEE.setDeviceName(testEnv.getDeviceName());
+
+				if (!extractList.contains(testEE)) {
+					extractList.add(testEE);
+				}
+			}
+		}
+
+		// 実行日時の降順にソート
+		List<TestExecutionAndEnvironment> tempTestExecutionAndEnvironmentList = new ArrayList<>();
+		for (int i = extractList.size() - 1; i >= 0; i--) {
+			TestExecutionAndEnvironment testEE = extractList.get(i);
+			tempTestExecutionAndEnvironmentList.add(testEE);
+		}
+		extractList = tempTestExecutionAndEnvironmentList;
+
+		int size = extractList.size();
+
+		if (pageSize == 0) {
+			pageSize = defaultPageSize;
+		} else if (pageSize == -1) {
+			pageSize = Integer.MAX_VALUE;
+		}
+
+		// 表示ページ番号、ページ表示数に合わせてリストを作成する。
+		List<TestExecutionAndEnvironment> resultList = new ArrayList<>();
+		for (int i = (page - 1) * pageSize; i < Math.min(page * pageSize, size); i++) {
+			resultList.add(extractList.get(i));
+		}
+
+		PageRequest pageable = new PageRequest(page - 1, pageSize);
+		return new PageImpl<TestExecutionAndEnvironment>(resultList, pageable, size);
 	}
 
 	@Override

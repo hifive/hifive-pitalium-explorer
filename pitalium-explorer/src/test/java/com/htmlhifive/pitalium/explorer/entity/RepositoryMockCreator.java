@@ -89,7 +89,7 @@ public class RepositoryMockCreator {
 		for (int i = 0; i < 40; i++) {
 			Screenshot sc = new Screenshot();
 			if (i % 3 != 0) {
-				sc.setExpectedScreenshot(getScreenshots().get(1000000007 % i));
+				sc.setExpectedScreenshotId(getScreenshots().get(1000000007 % i).getId());
 				sc.setComparisonResult(i % 2 == 0);
 			}
 			sc.setFileName("screenshot" + Integer.toString(i));

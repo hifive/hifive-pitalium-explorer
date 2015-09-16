@@ -8,8 +8,16 @@ html {
 	min-height: 100%;
 }
 body {
-	margin-top: 70px;
-	margin-bottom: 14px;
+}
+
+.navbar {
+	min-height: 0px;
+	margin-bottom: 10px;
+}
+
+.navbar-brand {
+	padding: 5px 15px;
+	height: auto;
 }
 
 .footer {
@@ -25,4 +33,10 @@ body {
 
 .footer p {
 	margin: 0;
+}
+
+.h5Popup {
+	background-color: #f5f5f5;
+	border: solid 1px white;
+	color: #303030;
 }

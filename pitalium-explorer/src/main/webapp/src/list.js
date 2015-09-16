@@ -51,7 +51,7 @@
 			return h5.ajax({
 				type: 'get',
 				dataType: 'json',
-				url: hifive.pitalium.explorer.utils.formatUrl('api/listTestExecution'),
+				url: hifive.pitalium.explorer.utils.formatUrl('executions/list'),
 				data: data
 			});
 		},
@@ -67,7 +67,7 @@
 			return h5.ajax({
 				type: 'get',
 				dataType: 'json',
-				url: 'api/listScreenshot',
+				url: 'screenshots/search',
 				data: {
 					testExecutionId: testExecutionId,
 					searchTestMethod: this.searchTestMethod,
@@ -244,7 +244,7 @@
 		 * @memberOf hifive.pitalium.explorer.controller.TestResultListController
 		 */
 		onHashChange: function() {
-			var pageStart = Math.max(0, parseInt(window.location.hash.substr(1)));
+			var pageStart = Math.max(0, parseInt(window.location.hash.substr(1), 10));
 			if (isNaN(pageStart)) {
 				pageStart = 0;
 			}

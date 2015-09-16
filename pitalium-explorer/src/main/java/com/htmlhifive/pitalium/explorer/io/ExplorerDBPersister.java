@@ -10,6 +10,7 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
@@ -26,6 +27,7 @@ import com.htmlhifive.pitalium.explorer.entity.ScreenshotRepository;
 import com.htmlhifive.pitalium.explorer.entity.Target;
 import com.htmlhifive.pitalium.explorer.entity.TargetRepository;
 import com.htmlhifive.pitalium.explorer.entity.TestExecutionRepository;
+import com.htmlhifive.pitalium.explorer.entity.TestExecutionAndEnvironment;
 import com.htmlhifive.pitalium.explorer.file.FileUtility;
 import com.htmlhifive.pitalium.explorer.response.TestExecutionResult;
 
@@ -158,13 +160,52 @@ public class ExplorerDBPersister extends DBPersister implements ExplorerPersiste
 	}
 
 	@Override
+	public Page<Screenshot> findScreenshot(Integer testExecutionId, Integer testEnvironmentId, int page, int pageSize) {
+		if (pageSize == 0) {
+			pageSize = defaultPageSize;
+		} else if (pageSize == -1) {
+			pageSize = Integer.MAX_VALUE;
+		}
+		PageRequest pageRequest = new PageRequest(page - 1, pageSize,
+				new Sort(Sort.Direction.ASC, "testClass", "testMethod", "testScreen"));
+		return screenshotRepo.findByTestExecutionIdAndTestEnvironmentId(testExecutionId, testEnvironmentId,
+				pageRequest);
+	}
+
+	@Override
+	public Page<TestExecutionAndEnvironment> findTestExecutionAndEnvironment(int page, int pageSize) {
+		if (pageSize == 0) {
+			pageSize = defaultPageSize;
+		} else if (pageSize == -1) {
+			pageSize = Integer.MAX_VALUE;
+		}
+
+		/*
+		 * findTestExecutionAndEnvironmentで実行するSQLの結果は正しく取れるのだが、 totalを取得するHQLが正しくないため
+		 * (Pageオブジェクトを作成するために、Springで実行されている。HQLは自動生成されているため、書き換えることは無理そう。)、 Pageオブジェクトを自力で作成することにする。
+		 */
+		List<TestExecutionAndEnvironment> list = screenshotRepo.findTestExecutionAndEnvironment();
+		int size = list.size();
+
+		// 表示ページ番号、ページ表示数に合わせてリストを作成する。
+		List<TestExecutionAndEnvironment> resultList = new ArrayList<>();
+		for (int i = (page - 1) * pageSize; i < Math.min(page * pageSize, size); i++) {
+			resultList.add(list.get(i));
+		}
+
+		PageRequest pageable = new PageRequest(page - 1, pageSize);
+		return new PageImpl<TestExecutionAndEnvironment>(resultList, pageable, size);
+	}
+
+	@Override
 	public File searchProcessedImageFile(Integer screenshotId, String algorithm) {
 		File result = null;
 		ProcessedImage p = processedImageRepo.findOne(new ProcessedImageKey(screenshotId, algorithm));
 		if (p != null) {
 			// FIXME 直したい
-			result = new File(new FileUtility(new Repositories(configRepo, processedImageRepo, screenshotRepo,
-					testExecutionRepo)).getAbsoluteFilePath(p.getFileName()));
+			result = new File(
+					new FileUtility(new Repositories(configRepo, processedImageRepo, screenshotRepo, testExecutionRepo))
+							.getAbsoluteFilePath(p.getFileName()));
 		}
 		return result;
 	}
