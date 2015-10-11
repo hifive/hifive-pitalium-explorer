@@ -545,10 +545,6 @@
 
 			this._screenshot = screenshot;
 			this._initializeImageSelector(screenshot.targets);
-			this.view.update('#detail', 'testResultListTemplate', {
-				actual: screenshot,
-				expected: expectedScreenshot
-			});
 			return h5.async.when(this._imageLoadPromises).done(this.own(function() {
 				this._triggerViewChange();
 			}));
@@ -594,35 +590,20 @@
 							this._screenshot.comparisonResult = comparisonResult;
 							// Fire change event and show images.
 							this._setImage(targetId);
-							this.view.update('#comparisonResult', 'comparisonResultTemplate', {
+							this.trigger('updateComparisonResult', {
 								comparisonResult: comparisonResult
 							});
-							this._changeTitle(comparisonResult);
 						}));
 			} else {
 				this._screenshot.comparisonResult = null;
 				// Fire change event and show images.
 				this._setImage(targetId);
-				this.view.update('#comparisonResult', 'comparisonResultTemplate', {
-					comparisonResult: ''
+				this.trigger('updateComparisonResult', {
+					comparisonResult: null
 				});
-				this._changeTitle(null);
-			}
-		},
-
-		_changeTitle: function(comparisonResult) {
-			if (this._orgTitle == null) {
-				this._$title = $('title');
-				this._orgTitle = this._$title.text();
 			}
 
-			if (comparisonResult == null) {
-				this._$title.text(this._orgTitle);
-			} else if (comparisonResult) {
-				this._$title.text('○ ' + this._orgTitle);
-			} else {
-				this._$title.text('× ' + this._orgTitle);
-			}
+
 		},
 
 		_setImage: function(targetId) {
@@ -925,7 +906,47 @@
 
 	h5.core.expose(testResultDiffController);
 })(jQuery);
+(function($) {
+	/**
+	 *
+	 */
+	var infoController = {
+		/**
+		 * @memberOf hifive.pitalium.explorer.controller.InfoController
+		 */
+		__name: 'hifive.pitalium.explorer.controller.InfoController',
 
+		showInfo: function(screenshot, expectedScreenshot) {
+			this.view.update('#detail', 'testResultListTemplate', {
+				actual: screenshot,
+				expected: expectedScreenshot
+			});
+		},
+
+		updateComparisonResult: function(comparisonResult) {
+			this.view.update('#comparisonResult', 'comparisonResultTemplate', {
+				comparisonResult: comparisonResult
+			});
+			this._changeTitle(comparisonResult);
+		},
+
+		_changeTitle: function(comparisonResult) {
+			if (this._orgTitle == null) {
+				this._$title = $('title');
+				this._orgTitle = this._$title.text();
+			}
+
+			if (!comparisonResult) {
+				this._$title.text(this._orgTitle);
+			} else if (comparisonResult) {
+				this._$title.text('○ ' + this._orgTitle);
+			} else {
+				this._$title.text('× ' + this._orgTitle);
+			}
+		},
+	};
+	h5.core.expose(infoController);
+})(jQuery);
 (function($) {
 	/**
 	 * This class is a controller for the test result diff page.
@@ -947,6 +968,8 @@
 
 		_dividedboxController: h5.ui.components.DividedBox.DividedBox,
 
+		_infoController: hifive.pitalium.explorer.controller.InfoController,
+
 		_screenshotListController: hifive.pitalium.explorer.controller.ScreenshotListController,
 
 		_testResultDiffController: hifive.pitalium.explorer.controller.TestResultDiffController,
@@ -956,6 +979,12 @@
 		_currentExpectedScreenshotId: null,
 
 		__meta: {
+			_infoController: {
+				rootElement: '#info'
+			},
+			_dividedboxController: {
+				rootElement: '.dividedbox'
+			},
 			_screenshotListController: {
 				rootElement: '#list'
 			},
@@ -981,7 +1010,7 @@
 			var id = queryParams.id;
 			this._currentScreenshotId = id;
 
-			// Get screenshot detailsT
+			// Get screenshot details
 			this._testResultDiffLogic.getScreenshot(id).done(
 					this.own(function(screenshot) {
 						var expectedScreenshotId = screenshot.expectedScreenshotId;
@@ -993,10 +1022,13 @@
 									this.own(function(expectedScreenshot) {
 										diffPromise = this._testResultDiffController.showResult(
 												screenshot, expectedScreenshot);
+										this._infoController.showInfo(screenshot,
+												expectedScreenshot);
 									}));
 						} else {
 							diffPromise = this._testResultDiffController.showResult(screenshot,
 									null);
+							this._infoController.showInfo(screenshot, null);
 						}
 
 						var listPromise = this._screenshotListController.showList(screenshot);
@@ -1042,6 +1074,10 @@
 
 		'#main viewChanged': function(context, $el) {
 			this._refreshView();
+		},
+
+		'#main updateComparisonResult': function(context, $el) {
+			this._infoController.updateComparisonResult(context.evArg.comparisonResult);
 		},
 
 		'{window} [resize]': function() {
