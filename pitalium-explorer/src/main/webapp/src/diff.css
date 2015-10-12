@@ -43,10 +43,17 @@ body {
 	overflow-y: scroll;
 	max-height: 700px;
 }
+
+/* Information Result */
 .tab-pane > .row {
 	margin: 0px;
 }
 
+#select_execution {
+	padding: 0px;
+}
+
+/* detail area */
 .legend {
 	vertical-align: top;
 }

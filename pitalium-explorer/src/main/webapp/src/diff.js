@@ -225,8 +225,6 @@
 })(jQuery);
 (function($) {
 
-	var SelectExecutionControllerDef = hifive.pitalium.explorer.controller.SelectExecutionController;
-
 	/**
 	 * This class is a controller for the list of screeenshots.
 	 * 
@@ -475,16 +473,6 @@
 				id: id,
 				expectedId: expectedId
 			});
-		},
-
-		'#select_execution click': function() {
-			var popup = h5.ui.popupManager.createPopup('execution', 'Select an execution', this
-					.$find('#popup_content').html(), SelectExecutionControllerDef, {
-				draggable: true
-			});
-			popup.promise.done(this.own(this.showList));
-			popup.setContentsSize(500, 550);
-			popup.show();
 		}
 	};
 
@@ -907,6 +895,9 @@
 	h5.core.expose(testResultDiffController);
 })(jQuery);
 (function($) {
+
+	var SelectExecutionControllerDef = hifive.pitalium.explorer.controller.SelectExecutionController;
+
 	/**
 	 *
 	 */
@@ -944,6 +935,22 @@
 				this._$title.text('× ' + this._orgTitle);
 			}
 		},
+
+		'#select_execution click': function() {
+			var popup = h5.ui.popupManager.createPopup('execution', 'Select an execution', this
+					.$find('#popup_content').html(), SelectExecutionControllerDef, {
+				draggable: true
+			});
+			popup.promise.done(this.own(this._triggerSelectExecution));
+			popup.setContentsSize(500, 550);
+			popup.show();
+		},
+
+		_triggerSelectExecution: function(screenshot) {
+			this.trigger('selectExecution', {
+				screenshot: screenshot
+			});
+		}
 	};
 	h5.core.expose(infoController);
 })(jQuery);
@@ -1046,6 +1053,10 @@
 			this._dividedboxController.refresh();
 		},
 
+		'#info selectExecution': function(context, $el) {
+			this._screenshotListController.showList(context.evArg.screenshot);
+		},
+
 		'#list selectScreenshot': function(context, $el) {
 			var id = context.evArg.id;
 			var expectedId = context.evArg.expectedId;
@@ -1060,10 +1071,13 @@
 						// 比較結果を書き換える
 						if (expectedId == null) {
 							this._testResultDiffController.showResult(screenshot, null);
+							this._infoController.showInfo(screenshot, null);
 						} else {
 							this._testResultDiffLogic.getScreenshot(expectedId).done(
 									this.own(function(expectedScreenshot) {
 										this._testResultDiffController.showResult(screenshot,
+												expectedScreenshot);
+										this._infoController.showInfo(screenshot,
 												expectedScreenshot);
 									}));
 						}

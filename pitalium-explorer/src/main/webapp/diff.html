@@ -133,10 +133,11 @@
 				<div class="panel-group" id="accordion">
 					<div class="panel panel-default">
 						<div class="panel-heading">
-							<h4 class="panel-title">
-							<a data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="false">
-								Result Information
+							<h4 class="panel-title row">
+								<a class="col-xs-11" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="false">
+									Result Information
 								</a>
+								<button id="select_execution"  class="btn btn-primary col-xs-1">Select Execution</button>
 							</h4>
 						</div>
 						<div id="comparisonResult"></div>
@@ -147,38 +148,35 @@
 						</div>
 					</div>
 				</div>
+				<div id="popup_content" style="display:none">
+					<div id="execution_list"></div>
+					<div>
+						<table class="table">
+							<tr id="actualExecution">
+								<td><button class="actual btn btn-danger btn-sm" style="float: left;">Actual</button></td>
+								<td id="executionTime"></td>
+								<td id="platform"></td>
+								<td id="browserName"></td>
+								<td id="browserVersion"></td>
+							</tr>
+							<tr id="expectedExecution">
+								<td><button class="expected btn btn-info btn-sm" style="float: left;">Expected</button></td>
+								<td id="executionTime"></td>
+								<td id="platform"></td>
+								<td id="browserName"></td>
+								<td id="browserVersion"></td>
+							</tr>
+						</table>
+					</div>
+					<div>
+						<button class="cancel btn btn-primary">Cancel</button>
+						<button class="ok btn btn-primary" style="display:none">Select</button>
+					</div>
+				</div>
 			</div>
 			<div class="dividedbox">
 				<div id="list" class="box autoSize">
-					<div>
-						<button id="select_execution"  class="btn btn-primary">Select Execution</button>
-					</div>
 					<div id="tree_root"></div>
-					<div id="popup_content" style="display:none">
-						<div id="execution_list"></div>
-						<div>
-							<table class="table">
-								<tr id="actualExecution">
-									<td><button class="actual btn btn-danger btn-sm" style="float: left;">Actual</button></td>
-									<td id="executionTime"></td>
-									<td id="platform"></td>
-									<td id="browserName"></td>
-									<td id="browserVersion"></td>
-								</tr>
-								<tr id="expectedExecution">
-									<td><button class="expected btn btn-info btn-sm" style="float: left;">Expected</button></td>
-									<td id="executionTime"></td>
-									<td id="platform"></td>
-									<td id="browserName"></td>
-									<td id="browserVersion"></td>
-								</tr>
-							</table>
-						</div>
-						<div>
-							<button class="cancel btn btn-primary">Cancel</button>
-							<button class="ok btn btn-primary" style="display:none">Select</button>
-						</div>
-					</div>
 				</div>
 
 				<div id="main" class="box autoSize">
