@@ -4,5 +4,5 @@
  */
 $(function() {
 	h5.core.controller('body>div.container',
-			hifive.pitalium.explorer.controller.TestResultListController);
+			hifive.pitalium.explorer.controller.ResultListPageController);
 });

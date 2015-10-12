@@ -8,19 +8,19 @@
 	 * 
 	 * @class
 	 * @memberOf hifive.pitalium.explorer.controller
-	 * @name TestResultListController
+	 * @name ResultListPageController
 	 */
-	var testResultListController = {
+	var resultListPageController = {
 		/**
-		 * @memberOf hifive.pitalium.explorer.controller.TestResultListController
+		 * @memberOf hifive.pitalium.explorer.controller.ResultListPageController
 		 */
-		__name: 'hifive.pitalium.explorer.controller.TestResultListController',
+		__name: 'hifive.pitalium.explorer.controller.ResultListPageController',
 
 		/**
 		 * The &quot;logic&quot; class
 		 * 
 		 * @type Logic
-		 * @memberOf hifive.pitalium.explorer.controller.TestResultListController
+		 * @memberOf hifive.pitalium.explorer.controller.ResultListPageController
 		 */
 		_testResultListLogic: hifive.pitalium.explorer.logic.TestResultListLogic,
 
@@ -28,7 +28,7 @@
 		 * The number of items to show in one page.
 		 * 
 		 * @type Number
-		 * @memberOf hifive.pitalium.explorer.controller.TestResultListController
+		 * @memberOf hifive.pitalium.explorer.controller.ResultListPageController
 		 */
 		_pageSize: 20,
 
@@ -36,7 +36,7 @@
 		 * The 0-based index of the item at the top of the current page.
 		 * 
 		 * @type Number
-		 * @memberOf hifive.pitalium.explorer.controller.TestResultListController
+		 * @memberOf hifive.pitalium.explorer.controller.ResultListPageController
 		 */
 		_pageStart: 0,
 
@@ -44,7 +44,7 @@
 		 * Called after the controller has been initialized.<br>
 		 * Load list of test execution time asynchronously and update views.
 		 * 
-		 * @memberOf hifive.pitalium.explorer.controller.TestResultListController
+		 * @memberOf hifive.pitalium.explorer.controller.ResultListPageController
 		 */
 		__ready: function() {
 			this.collectSearchParameters();
@@ -56,7 +56,7 @@
 		 * Called when a label of test execution has been clicked.<br>
 		 * Load list of test results of selected item asynchronously, and update views.
 		 * 
-		 * @memberOf hifive.pitalium.explorer.controller.TestResultListController
+		 * @memberOf hifive.pitalium.explorer.controller.ResultListPageController
 		 * @param {Object} context the event context
 		 * @param {jQuery} $el the event target element
 		 */
@@ -93,7 +93,7 @@
 		 * Called when a test result has been clicked.<br>
 		 * Go to a new page which shows the difference images of the selected test result.
 		 * 
-		 * @memberOf hifive.pitalium.explorer.controller.TestResultListController
+		 * @memberOf hifive.pitalium.explorer.controller.ResultListPageController
 		 * @param {Object} context the event context
 		 * @param {jQuery} $el the event target element
 		 */
@@ -110,7 +110,7 @@
 		 * Called when the search form has been opened.<br>
 		 * Update button label.
 		 * 
-		 * @memberOf hifive.pitalium.explorer.controller.TestResultListController
+		 * @memberOf hifive.pitalium.explorer.controller.ResultListPageController
 		 * @param {Object} context the event context
 		 * @param {jQuery} $el the event target element
 		 */
@@ -122,7 +122,7 @@
 		 * Called when the search form has been closed.<br>
 		 * Update button label.
 		 * 
-		 * @memberOf hifive.pitalium.explorer.controller.TestResultListController
+		 * @memberOf hifive.pitalium.explorer.controller.ResultListPageController
 		 * @param {Object} context the event context
 		 * @param {jQuery} $el the event target element
 		 */
@@ -134,7 +134,7 @@
 		 * Called when the search form has been submitted.<br>
 		 * Collect input parameters, search test results asynchronously, and update views.
 		 * 
-		 * @memberOf hifive.pitalium.explorer.controller.TestResultListController
+		 * @memberOf hifive.pitalium.explorer.controller.ResultListPageController
 		 * @param {Object} context the event context
 		 * @param {jQuery} $el the event target element
 		 */
@@ -153,7 +153,7 @@
 		/**
 		 * Called when the page size select value has been changed. Updates view.
 		 * 
-		 * @memberOf hifive.pitalium.explorer.controller.TestResultListController
+		 * @memberOf hifive.pitalium.explorer.controller.ResultListPageController
 		 * @param {Object} context the event context
 		 * @param {jQuery} $el the event target element
 		 */
@@ -165,7 +165,7 @@
 		/**
 		 * Called when the page link has been clicked. Update view.
 		 * 
-		 * @memberOf hifive.pitalium.explorer.controller.TestResultListController
+		 * @memberOf hifive.pitalium.explorer.controller.ResultListPageController
 		 */
 		onHashChange: function() {
 			var pageStart = Math.max(0, parseInt(window.location.hash.substr(1), 10));
@@ -180,7 +180,7 @@
 		/**
 		 * Collect search keyword parameters and save them to logic.
 		 * 
-		 * @memberOf hifive.pitalium.explorer.controller.TestResultListController
+		 * @memberOf hifive.pitalium.explorer.controller.ResultListPageController
 		 * @param {jQuery} $el the search element
 		 */
 		collectSearchParameters: function($el) {
@@ -201,7 +201,7 @@
 		/**
 		 * Set pageSize and pageStart, and update view.
 		 * 
-		 * @memberOf hifive.pitalium.explorer.controller.TestResultListController
+		 * @memberOf hifive.pitalium.explorer.controller.ResultListPageController
 		 */
 		updatePage: function() {
 			var page = 1 + Math.floor(this._pageStart / this._pageSize);
@@ -211,7 +211,7 @@
 		/**
 		 * Load test execution list from server and update view.
 		 * 
-		 * @memberOf hifive.pitalium.explorer.controller.TestResultListController
+		 * @memberOf hifive.pitalium.explorer.controller.ResultListPageController
 		 * @param {number} page desired page number
 		 */
 		loadTestExecutionList: function(page) {
@@ -232,5 +232,5 @@
 			});
 		}
 	};
-	h5.core.expose(testResultListController);
+	h5.core.expose(resultListPageController);
 })(jQuery);
