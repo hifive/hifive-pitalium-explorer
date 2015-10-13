@@ -44,11 +44,14 @@ import com.htmlhifive.pitalium.explorer.entity.TestEnvironment;
 import com.htmlhifive.pitalium.explorer.entity.TestExecution;
 import com.htmlhifive.pitalium.explorer.entity.TestExecutionAndEnvironment;
 import com.htmlhifive.pitalium.explorer.response.TestExecutionResult;
+import com.htmlhifive.pitalium.explorer.service.ScreenshotIdService;
 import com.htmlhifive.pitalium.image.model.RectangleArea;
 
 public class ExplorerFilePersister extends FilePersister implements ExplorerPersister {
 
 	private static Logger log = LoggerFactory.getLogger(ExplorerFilePersister.class);
+
+	private ScreenshotIdService screenshotIdService;
 
 	private Map<Integer, Screenshot> screenshotMap;
 	private Map<Integer, List<Screenshot>> screenshotListMap;
@@ -62,6 +65,11 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 	public ExplorerFilePersister(FilePersisterConfig config) {
 		// FIXME 独自のConfigに差し替える必要があるかも
 		super(config);
+	}
+
+	@Override
+	public void setScreenshotIdService(ScreenshotIdService screenshotIdService) {
+		this.screenshotIdService = screenshotIdService;
 	}
 
 	@Override
@@ -89,7 +97,6 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 		List<TestEnvironment> workEnvList = new ArrayList<>();
 
 		int executionId = 0;
-		int screenshotId = 0;
 		int targetId = 0;
 		int areaId = 0;
 		int environmentId = 0;
@@ -131,6 +138,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 
 			List<Screenshot> screenshotList = new ArrayList<>();
 			for (ScreenshotResult screenshotResult : testResult.getScreenshotResults()) {
+				int screenshotId = screenshotIdService.nextId(ScreenshotIdService.ScreenshotType.PITALIUM_FILE);
 				Screenshot screenshot = createScreenshot(screenshotId, screenshotResult);
 				screenshot.setTestExecution(testExecution);
 
@@ -177,7 +185,6 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 
 				screenshotMap.put(screenshotId, screenshot);
 				screenshotList.add(screenshot);
-				screenshotId++;
 
 				workScreenshotMap.put(screenshotResult, screenshot);
 			}
