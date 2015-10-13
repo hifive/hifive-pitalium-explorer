@@ -53,6 +53,8 @@ public class PersisterServiceImpl implements PersisterService {
 
 	@Autowired
 	private ScreenshotIdService screenshotIdService;
+	@Autowired
+	private TemporaryFileService temporaryFileService;
 
 	@Resource(name = "configExplorerPersister")
 	private ExplorerPersister persister;
@@ -93,18 +95,33 @@ public class PersisterServiceImpl implements PersisterService {
 	}
 
 	@Override
-	public Screenshot getScreenshot(Integer screenshotid) {
-		return persister.getScreenshot(screenshotid);
+	public Screenshot getScreenshot(Integer screenshotId) {
+		ScreenshotIdService.ScreenshotType type = screenshotIdService.getScreenshotType(screenshotId);
+		if (type == ScreenshotIdService.ScreenshotType.TEMPORARY_FILE) {
+			return temporaryFileService.getScreenshot(screenshotId);
+		} else {
+			return persister.getScreenshot(screenshotId);
+		}
 	}
 
 	@Override
 	public Target getTarget(Integer screenshotId, Integer targetId) {
-		return persister.getTarget(screenshotId, targetId);
+		ScreenshotIdService.ScreenshotType type = screenshotIdService.getScreenshotType(screenshotId);
+		if (type == ScreenshotIdService.ScreenshotType.TEMPORARY_FILE) {
+			return temporaryFileService.getTarget(screenshotId, targetId);
+		} else {
+			return persister.getTarget(screenshotId, targetId);
+		}
 	}
 
 	@Override
 	public File getImage(Integer screenshotId, Integer targetId) throws IOException {
-		return persister.getImage(screenshotId, targetId);
+		ScreenshotIdService.ScreenshotType type = screenshotIdService.getScreenshotType(screenshotId);
+		if (type == ScreenshotIdService.ScreenshotType.TEMPORARY_FILE) {
+			return temporaryFileService.getImage(screenshotId, targetId);
+		} else {
+			return persister.getImage(screenshotId, targetId);
+		}
 	}
 
 	@Override

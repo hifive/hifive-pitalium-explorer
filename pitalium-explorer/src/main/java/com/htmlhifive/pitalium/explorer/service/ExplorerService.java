@@ -32,14 +32,12 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.htmlhifive.pitalium.explorer.conf.ApplicationConfig;
 import com.htmlhifive.pitalium.explorer.entity.Area;
-import com.htmlhifive.pitalium.explorer.entity.AreaRepository;
 import com.htmlhifive.pitalium.explorer.entity.ConfigRepository;
 import com.htmlhifive.pitalium.explorer.entity.ProcessedImageRepository;
 import com.htmlhifive.pitalium.explorer.entity.Repositories;
 import com.htmlhifive.pitalium.explorer.entity.Screenshot;
 import com.htmlhifive.pitalium.explorer.entity.ScreenshotRepository;
 import com.htmlhifive.pitalium.explorer.entity.Target;
-import com.htmlhifive.pitalium.explorer.entity.TargetRepository;
 import com.htmlhifive.pitalium.explorer.entity.TestExecutionAndEnvironment;
 import com.htmlhifive.pitalium.explorer.entity.TestExecutionRepository;
 import com.htmlhifive.pitalium.explorer.image.EdgeDetector;
@@ -234,9 +232,8 @@ public class ExplorerService implements Serializable {
 		for (Area excludeArea : target.getExcludeAreas()) {
 			// Get the relative coordinates from the starting position of the actualArea.
 			// Based on the obtained relative coordinates, to create a rectangle.
-			Rectangle rectangle = new Rectangle((int) excludeArea.getX() - (int) area.getX(),
-					(int) excludeArea.getY() - (int) area.getY(), (int) excludeArea.getWidth(),
-					(int) excludeArea.getHeight());
+			Rectangle rectangle = new Rectangle((int) excludeArea.getX() - (int) area.getX(), (int) excludeArea.getY()
+					- (int) area.getY(), (int) excludeArea.getWidth(), (int) excludeArea.getHeight());
 			excludeList.add(rectangle);
 		}
 		return excludeList;

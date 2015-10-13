@@ -20,11 +20,15 @@ import org.springframework.web.multipart.MultipartFile;
 import com.htmlhifive.pitalium.explorer.cache.BackgroundImageDispatcher;
 import com.htmlhifive.pitalium.explorer.cache.CacheTaskQueue;
 import com.htmlhifive.pitalium.explorer.service.ExplorerService;
+import com.htmlhifive.pitalium.explorer.service.TemporaryFileService;
 
 @Controller
 public class ImageController {
 	@Autowired
 	private ExplorerService service;
+
+	@Autowired
+	private TemporaryFileService temporaryFileService;
 
 	private CacheTaskQueue cacheTaskQueue;
 	private BackgroundImageDispatcher backgroundImageDispatcher;
@@ -122,8 +126,8 @@ public class ImageController {
 
 	@RequestMapping(value = "files/upload", method = RequestMethod.POST)
 	@ResponseBody
-	public List<String> multipartUpload(@RequestParam("files") List<MultipartFile> files) throws Exception {
-		return service.multipartUpload(files);
+	public List<Integer> multipartUpload(@RequestParam("files") List<MultipartFile> files) throws Exception {
+		return temporaryFileService.upload(files);
 	}
 
 	@RequestMapping(value = "files/diff", method = RequestMethod.GET)
