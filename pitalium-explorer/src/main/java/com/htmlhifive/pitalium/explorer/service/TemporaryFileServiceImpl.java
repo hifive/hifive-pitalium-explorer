@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.htmlhifive.pitalium.explorer.conf.ApplicationConfig;
+import com.htmlhifive.pitalium.explorer.entity.Area;
 import com.htmlhifive.pitalium.explorer.entity.Screenshot;
 import com.htmlhifive.pitalium.explorer.entity.Target;
 
@@ -79,7 +80,9 @@ public class TemporaryFileServiceImpl implements TemporaryFileService {
 
 	@Override
 	public synchronized Target getTarget(Integer screenshotId, Integer targetId) {
-		return null; // TODO
+		Target target = new Target();
+		target.setExcludeAreas(new ArrayList<Area>());
+		return target;
 	}
 
 	@Override
