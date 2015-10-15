@@ -15,6 +15,7 @@
 	<title>Test results - Pitalium Explorer</title>
 	<link rel="stylesheet" href="/hifive-res/ext/bootstrap/3.3.5/css/bootstrap.min.css">
 	<link rel="stylesheet" href="/hifive-res/ext/bootstrap/3.3.5/css/bootstrap-theme.min.css">
+	<link rel="stylesheet" href="/hifive-res/ext/jqplugins/jstree/3.0.8/themes/default/style.min.css">
 	<link rel="stylesheet" href="/hifive-res/fw/current/h5.css" data-h5-module="hifive">
 
 	<link rel="stylesheet" href="lib/hifive-ui/DividedBox.css">
@@ -24,6 +25,7 @@
 
 	<script src="/hifive-res/ext/jquery/jquery-2.1.4.js"></script>
 	<script src="/hifive-res/ext/bootstrap/3.3.5/js/bootstrap.js"></script>
+	<script src="/hifive-res/ext/jqplugins/jstree/3.0.8/jstree.min.js"></script>
 	<script src="/hifive-res/fw/current/ejs-h5mod.js" data-h5-module="hifive:ejs"></script>
 	<script src="/hifive-res/fw/current/h5.dev.js" data-h5-module="hifive"></script>
 
@@ -36,6 +38,7 @@
 	<script src="src/diff/TestResultDiffController.js"></script>
 	<script src="src/fileDiff/FileUploadLogic.js"></script>
 	<script src="src/fileDiff/FileUploadController.js"></script>
+	<script src="src/fileDiff/ImageListController.js"></script>
 
 	<script src="src/fileDiff/FileDiffPageController.js"></script>
 	<script src="src/fileDiff/init.js"></script>
@@ -54,6 +57,8 @@
 			}
 		%]
 		</select>
+
+
 	</script>
 
 </head>
@@ -70,18 +75,24 @@
 <!-- Navigation -->
 
 <!-- Main -->
-<div id="main" class="container">
-
-	<!-- FileUpload -->
-	<div id="fileUploadContainer">
-		<div class="file-upload-container">
-			<div class="file-upload expected"></div>
-			<div class="file-upload actual"></div>
-		</div>
-	</div>
-	<!-- FileUpload -->
+<div id="main">
 
 	<div class="dividedbox">
+
+		<!-- List -->
+		<div id="imageListContainer" class="autoSize">
+			<div class="image-list expected box">
+				<div class="scrollable">
+					<div class="tree-root"></div>
+				</div>
+			</div>
+			<div class="image-list actual box">
+				<div class="scrollable">
+					<div class="tree-root"></div>
+				</div>
+			</div>
+		</div>
+		<!-- List -->
 
 		<!-- Image -->
 		<div id="imageDiffContainer" class="box autoSize">
@@ -209,6 +220,16 @@
 					</div>
 				</div>
 			</div>
+
+			<!-- FileUpload -->
+			<div id="fileUploadContainer">
+				<div class="file-upload-container">
+					<div class="file-upload expected"></div>
+					<div class="file-upload actual"></div>
+				</div>
+			</div>
+			<!-- FileUpload -->
+
 		</div>
 		<!-- Image -->
 

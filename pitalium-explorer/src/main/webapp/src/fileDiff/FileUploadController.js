@@ -22,7 +22,7 @@
 		 * @type Logic
 		 * @memberOf hifive.pitalium.explorer.controller.FileUploadController
 		 */
-		'_logic': hifive.pitalium.explorer.logic.FileUploadLogic,
+		'_fileUploadLogic': hifive.pitalium.explorer.logic.FileUploadLogic,
 
 		'_dragging': false,
 
@@ -30,21 +30,7 @@
 		'_$containerElement': null,
 		'_$fileUploadElement': null,
 
-		'__construct': function() {
-			this.log.debug('FileUploadController construct');
-		},
-
-		'__init': function() {
-			this.log.debug('FileUploadController init');
-		},
-
-		'__postInit': function() {
-			this.log.debug('FileUploadController postInit');
-		},
-
 		'__ready': function() {
-			this.log.debug('FileUploadController ready');
-
 			this._$rootElement = $(this.rootElement);
 			this._$containerElement = this.$find('.file-upload-container');
 			this._$fileUploadElement = this.$find('.file-upload');
@@ -53,8 +39,6 @@
 		},
 
 		'{rootElement} dragenter': function(context, $el) {
-			this.log.debug('root enter');
-
 			context.event.stopPropagation();
 			context.event.preventDefault();
 
@@ -68,15 +52,11 @@
 		},
 
 		'{rootElement} dragleave': function(context, $el) {
-			this.log.debug('root leave');
-
 			context.event.stopPropagation();
 			context.event.preventDefault();
 		},
 
 		'.file-upload-container dragenter': function(context, $el) {
-			this.log.debug('container enter');
-
 			context.event.stopPropagation();
 			context.event.preventDefault();
 
@@ -84,8 +64,6 @@
 		},
 
 		'.file-upload-container dragleave': function(context, $el) {
-			this.log.debug('container leave');
-
 			context.event.stopPropagation();
 			context.event.preventDefault();
 
@@ -133,33 +111,11 @@
 				return;
 			}
 
-			var form = new FormData();
-			form.append('files', files[0]);
-
-			h5.ajax({
-				url: 'files/upload',
-				type: 'POST',
-				data: form,
-				processData: false,
-				contentType: false
-			}).done(this.own(function(result) {
-				var screenshotId = result[0];
-				this.trigger('ptlFileUploaded', {
-					'screenshotId': screenshotId,
-					'mode': expected ? 'expected' : 'actual'
-				});
+			this._fileUploadLogic.upload(files[0]).done(this.own(function(data) {
+				data.mode = expected ? 'expected' : 'actual';
+				this.trigger('uploadFile', data);
 			}));
-
-		},
-
-		'{window} dragenter': function() {
-			this.log.debug('window enter');
-		},
-
-		'{window} dragleave': function() {
-			this.log.debug('window dragleave');
 		}
-
 
 	};
 

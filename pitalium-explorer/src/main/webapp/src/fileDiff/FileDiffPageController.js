@@ -17,10 +17,10 @@
 		'__name': 'hifive.pitalium.explorer.controller.FileDiffPageController',
 
 		'_dividedboxController': h5.ui.components.DividedBox.DividedBox,
-
 		'_testResultDiffController': hifive.pitalium.explorer.controller.TestResultDiffController,
-
 		'_fileUploadController': hifive.pitalium.explorer.controller.FileUploadController,
+		'_expectedImageListController': h5.pitalium.explorer.controller.ImageListController,
+		'_actualImageListController': h5.pitalium.explorer.controller.ImageListController,
 
 		'__meta': {
 			'_dividedboxController': {
@@ -31,6 +31,12 @@
 			},
 			'_fileUploadController': {
 				'rootElement': '#fileUploadContainer'
+			},
+			'_expectedImageListController': {
+				'rootElement': '#imageListContainer > .image-list.expected'
+			},
+			'_actualImageListController': {
+				'rootElement': '#imageListContainer > .image-list.actual'
 			}
 		},
 
@@ -61,6 +67,12 @@
 
 		'__ready': function() {
 			this.log.debug('FileDiffPageController ready');
+
+			// ターゲット選択ドロップダウンを非表示
+			this.$find('.image-selector-row').hide();
+
+			// Expectedモードを非表示
+			this.$find('#imageDiffContainer #expected-mode').hide();
 		},
 
 		'setExpectedScreenshotId': function(screenshotId) {
@@ -75,7 +87,28 @@
 			return this._screenshot.id !== null && this._screenshot.expectedScreenshotId !== null;
 		},
 
-		'{rootElement} ptlFileUploaded': function(context) {
+		'_showResult': function() {
+			if (!this._validateScreenshot()) {
+				return;
+			}
+
+			this._testResultDiffController.showResult(this._screenshot);
+		},
+
+		'{rootElement} uploadFile': function(context) {
+			var args = context.evArg;
+			if (args.mode == 'expected') {
+				this.setExpectedScreenshotId(args.screenshotId);
+				this._expectedImageListController.addTemporaryFile(args);
+			} else {
+				this.setActualScreenshotId(args.screenshotId);
+				this._actualImageListController.addTemporaryFile(args);
+			}
+
+			this._showResult();
+		},
+
+		'{rootElement} screenshotSelect': function(context) {
 			var args = context.evArg;
 			if (args.mode == 'expected') {
 				this.setExpectedScreenshotId(args.screenshotId);
@@ -83,11 +116,7 @@
 				this.setActualScreenshotId(args.screenshotId);
 			}
 
-			if (!this._validateScreenshot()) {
-				return;
-			}
-
-			this._testResultDiffController.showResult(this._screenshot);
+			this._showResult();
 		}
 
 	};
