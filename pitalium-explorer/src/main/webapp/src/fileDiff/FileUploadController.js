@@ -38,7 +38,7 @@
 			this._$containerElement.hide();
 		},
 
-		'{rootElement} dragenter': function(context, $el) {
+		'dragStart': function(context, $el) {
 			context.event.stopPropagation();
 			context.event.preventDefault();
 
@@ -49,11 +49,6 @@
 			// ドラッグ領域を前面に移動し、ドラッグ領域を表示する
 			this._$rootElement.addClass('container-over');
 			this._$containerElement.show();
-		},
-
-		'{rootElement} dragleave': function(context, $el) {
-			context.event.stopPropagation();
-			context.event.preventDefault();
 		},
 
 		'.file-upload-container dragenter': function(context, $el) {

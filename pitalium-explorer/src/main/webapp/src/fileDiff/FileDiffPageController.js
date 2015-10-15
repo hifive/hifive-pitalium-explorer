@@ -53,21 +53,7 @@
 			}]
 		},
 
-		'__construct': function() {
-			this.log.debug('FileDiffPageController construct');
-		},
-
-		'__init': function() {
-			this.log.debug('FileDiffPageController init');
-		},
-
-		'__postInit': function() {
-			this.log.debug('FileDiffPageController postInit');
-		},
-
 		'__ready': function() {
-			this.log.debug('FileDiffPageController ready');
-
 			// ターゲット選択ドロップダウンを非表示
 			this.$find('.image-selector-row').hide();
 
@@ -93,6 +79,10 @@
 			}
 
 			this._testResultDiffController.showResult(this._screenshot);
+		},
+
+		'#imageDiffContainer dragenter': function(context, $el) {
+			this._fileUploadController.dragStart(context, $el);
 		},
 
 		'{rootElement} uploadFile': function(context) {
