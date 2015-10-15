@@ -58,9 +58,17 @@
 		},
 
 		'addTemporaryFile': function(file) {
+			this._uploadImageList.children.forEach(function(el) {
+				if (el.state) {
+					el.state.selected = false;
+				}
+			});
 			this._uploadImageList.children.push({
 				'text': file.fileName,
 				'icon': false,
+				'state': {
+					'selected': true
+				},
 				'a_attr': {
 					'class': 'screenshot',
 					'data-screenshot-type': 'temporary',
