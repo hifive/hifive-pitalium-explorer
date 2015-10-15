@@ -42,6 +42,12 @@
 			context.event.stopPropagation();
 			context.event.preventDefault();
 
+			// ファイルドラッグか否かをチェック
+			var types = context.event.originalEvent.dataTransfer.types;
+			if (types && types[0] != 'Files') {
+				return;
+			}
+
 			if (this._dragging) {
 				return;
 			}
