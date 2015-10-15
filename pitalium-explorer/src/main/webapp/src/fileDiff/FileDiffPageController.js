@@ -74,7 +74,16 @@
 		},
 
 		'_showResult': function() {
+			// 両方のIDが登録されていない場合Expectedモードで表示
 			if (!this._validateScreenshot()) {
+				var id = this._screenshot.id !== null ? this._screenshot.id
+						: this._screenshot.expectedScreenshotId;
+				var targets = this._screenshot.targets;
+				this._testResultDiffController.showResult({
+					'id': id,
+					'targets': targets
+				});
+
 				return;
 			}
 
