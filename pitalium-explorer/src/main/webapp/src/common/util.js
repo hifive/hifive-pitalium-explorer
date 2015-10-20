@@ -62,6 +62,24 @@
 				}
 			}
 			return url + paramStr.replace('&', '?');
+		},
+
+		/**
+		 * Compare properties of two objects.
+		 *
+		 * @param {Object} obj1
+		 * @param {Object} obj2
+		 * @param {Array} props
+		 * @returns {boolean}
+		 */
+		propertyEquals: function(obj1, obj2, props) {
+			for (var i = 0; i < props.length; i++) {
+				if (obj1[props[i]] !== obj2[props[i]]) {
+					return false;
+				}
+			}
+
+			return true;
 		}
 	});
 })();

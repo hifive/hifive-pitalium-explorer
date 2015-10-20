@@ -19,8 +19,8 @@
 		'_dividedboxController': h5.ui.components.DividedBox.DividedBox,
 		'_testResultDiffController': hifive.pitalium.explorer.controller.TestResultDiffController,
 		'_fileUploadController': hifive.pitalium.explorer.controller.FileUploadController,
-		'_expectedImageListController': h5.pitalium.explorer.controller.ImageListController,
-		'_actualImageListController': h5.pitalium.explorer.controller.ImageListController,
+		'_expectedImageListController': hifive.pitalium.explorer.controller.ImageListController,
+		'_actualImageListController': hifive.pitalium.explorer.controller.ImageListController,
 
 		'__meta': {
 			'_dividedboxController': {
@@ -116,6 +116,15 @@
 			}
 
 			this._showResult();
+		},
+
+		'{rootElement} selectExecution': function(context) {
+			var args = context.evArg;
+			if (args.mode == 'expected') {
+				this._actualImageListController.disableSelectExecution();
+			} else {
+				this._expectedImageListController.disableSelectExecution();
+			}
 		}
 
 	};
