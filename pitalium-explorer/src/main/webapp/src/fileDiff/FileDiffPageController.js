@@ -125,6 +125,10 @@
 			} else {
 				this._expectedImageListController.disableSelectExecution();
 			}
+		},
+
+		'{window} [resize]': function() {
+			this._dividedboxController.refresh();
 		}
 
 	};
