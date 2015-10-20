@@ -59,6 +59,8 @@
 
 			// Expectedモードを非表示
 			this.$find('#imageDiffContainer #expected-mode').hide();
+
+			this._fileUploadController.setTarget(this.$find('#imageDiffContainer'));
 		},
 
 		'setExpectedScreenshotId': function(screenshotId) {
@@ -88,10 +90,6 @@
 			}
 
 			this._testResultDiffController.showResult(this._screenshot);
-		},
-
-		'#imageDiffContainer dragenter': function(context, $el) {
-			this._fileUploadController.dragStart(context, $el);
 		},
 
 		'{rootElement} uploadFile': function(context) {
@@ -129,6 +127,15 @@
 
 		'{window} [resize]': function() {
 			this._dividedboxController.refresh();
+			this._fileUploadController.resetPosition();
+		},
+
+		'{window} dragenter': function(context, $el) {
+			this._fileUploadController.dragStart(context, $el);
+		},
+
+		'{window} dragleave': function() {
+			this._fileUploadController.dragLeaved();
 		}
 
 	};

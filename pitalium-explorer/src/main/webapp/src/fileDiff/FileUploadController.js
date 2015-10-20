@@ -26,21 +26,68 @@
 
 		'_dragging': false,
 
-		'_$rootElement': null,
-		'_$containerElement': null,
-		'_$fileUploadElement': null,
+		'_$target': null,
+
+		'_$root': null,
+		'_$container': null,
+		'_$fileUpload': null,
+
+		'_lastDraggingTime': null,
+
+		'_checkTimerId': null,
+		'_leaveTimerId': null,
 
 		'__ready': function() {
-			this._$rootElement = $(this.rootElement);
-			this._$containerElement = this.$find('.file-upload-container');
-			this._$fileUploadElement = this.$find('.file-upload');
+			this._$root = $(this.rootElement);
+			this._$container = this.$find('.file-upload-container');
+			this._$fileUpload = this.$find('.file-upload');
 
-			this._$containerElement.hide();
+			this._$root.hide();
+		},
+
+		'setTarget': function($target) {
+			this._$target = $target;
+			this.resetPosition();
+		},
+
+		'resetPosition': function() {
+			var offset = this._$target.offset();
+			this._$container.css({
+				'top': offset.top,
+				'left': offset.left,
+				'width': this._$target.width(),
+				'height': this._$target.height()
+			});
+		},
+
+		/**
+		 * ドラッグイベント発生時に記録したtimeをタイマーで定期チェックし、一定間隔以上開いた場合ドラッグ領域の表示を終了する。
+		 */
+		'_checkDragging': function() {
+			this._checkTimerId = setTimeout(this.own(function() {
+				this._checkTimerId = null;
+
+				if (!this._lastDraggingTime) {
+					return;
+				}
+
+				var now = $.now();
+				if (now - this._lastDraggingTime > 100) {
+					this._dragEnd();
+					return;
+				}
+
+				this._checkDragging();
+			}), 100);
 		},
 
 		'dragStart': function(context, $el) {
 			context.event.stopPropagation();
 			context.event.preventDefault();
+
+			if (this._dragging) {
+				return;
+			}
 
 			// ファイルドラッグか否かをチェック
 			var types = context.event.originalEvent.dataTransfer.types;
@@ -48,57 +95,78 @@
 				return;
 			}
 
-			if (this._dragging) {
-				return;
+			// ドラッグ領域を表示する
+			this._$root.show();
+			this._lastDraggingTime = $.now();
+
+			if (!this._checkTimerId) {
+				this._checkDragging();
+			}
+		},
+
+		'dragLeaved': function() {
+			if (this._leaveTimerId) {
+				window.clearTimeout(this._leaveTimerId);
 			}
 
-			// ドラッグ領域を前面に移動し、ドラッグ領域を表示する
-			this._$rootElement.addClass('container-over');
-			this._$containerElement.show();
+			// 画面内要素の出入りでdragleaveが発生するため、遅延チェック
+			this._leaveTimerId = setTimeout(this.own(this._dragEnd), 100);
 		},
 
-		'.file-upload-container dragenter': function(context, $el) {
-			context.event.stopPropagation();
-			context.event.preventDefault();
-
-			this._dragging = true;
-		},
-
-		'.file-upload-container dragleave': function(context, $el) {
-			context.event.stopPropagation();
-			context.event.preventDefault();
-
+		'_dragEnd': function() {
 			this._dragging = false;
+			this._lastDraggingTime = null;
 
-			// ドラッグ領域を背面に移動し、ドラッグ領域を非表示にする
-			this._$rootElement.removeClass('container-over');
-			this._$containerElement.hide();
+			this._$root.hide();
+			this._$fileUpload.removeClass('active');
+		},
+
+		'{rootElement} dragover': function(context, $el) {
+			context.event.stopPropagation();
+			context.event.preventDefault();
+
+			if (this._leaveTimerId) {
+				window.clearTimeout(this._leaveTimerId);
+				this._leaveTimerId = null;
+			}
+
+			this._lastDraggingTime = $.now();
 		},
 
 		'.file-upload dragover': function(context, $el) {
 			context.event.stopPropagation();
 			context.event.preventDefault();
 
-			this._$fileUploadElement.removeClass('active');
+			this._$fileUpload.removeClass('active');
 			$el.addClass('active');
+
+			if (this._leaveTimerId) {
+				window.clearTimeout(this._leaveTimerId);
+				this._leaveTimerId = null;
+			}
+
+			this._lastDraggingTime = $.now();
 		},
 
 		'.file-upload dragleave': function(context, $el) {
 			context.event.stopPropagation();
 			context.event.preventDefault();
 
-			this._$fileUploadElement.removeClass('active');
+			this._$fileUpload.removeClass('active');
+		},
+
+		'{rootElement} drop': function(context) {
+			context.event.stopPropagation();
+			context.event.preventDefault();
+
+			this._dragEnd();
 		},
 
 		'.file-upload drop': function(context, $el) {
 			context.event.stopPropagation();
 			context.event.preventDefault();
 
-			this._dragging = false;
-
-			this._$rootElement.removeClass('container-over');
-			this._$containerElement.hide();
-			this._$fileUploadElement.removeClass('active');
+			this._dragEnd();
 
 			var expected = $el.hasClass('expected');
 

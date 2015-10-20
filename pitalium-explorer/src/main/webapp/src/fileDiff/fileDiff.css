@@ -233,12 +233,13 @@ html, body {
 	position: absolute;
 	width: 100%;
 	height: 100%;
-	margin: -5px
+	top: 0;
+	z-index: 1500;
+	cursor: not-allowed;
 }
 
 .file-upload-container {
-	width: 100%;
-	height: 100%;
+	position: absolute;
 	border: 8px solid gray;
 	border-radius: 6px;
 }

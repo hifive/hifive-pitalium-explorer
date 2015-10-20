@@ -3,5 +3,5 @@
  */
 
 $(function() {
-	h5.core.controller('#main', hifive.pitalium.explorer.controller.FileDiffPageController);
+	h5.core.controller('body', hifive.pitalium.explorer.controller.FileDiffPageController);
 });
