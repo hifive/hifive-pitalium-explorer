@@ -256,6 +256,7 @@
 						testTree.push({
 							'text': test.screenshotName,
 							'icon': false,
+							'state': {},
 							'a_attr': {
 								'class': 'screenshot',
 								'data-screenshot-type': 'execution',

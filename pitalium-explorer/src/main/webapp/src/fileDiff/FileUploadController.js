@@ -177,7 +177,7 @@
 
 			this._fileUploadLogic.upload(dataTransfer).done(this.own(function(files) {
 				if (!files || files.length == 0) {
-					alert('画像ファイルが検出されませんでした。');
+					alert("画像ファイルが検出されませんでした。\nフォルダのアップロードはChromeのみ対応しています。");
 					return;
 				}
 
