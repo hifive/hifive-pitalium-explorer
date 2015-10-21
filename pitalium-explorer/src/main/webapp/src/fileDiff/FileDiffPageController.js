@@ -125,6 +125,10 @@
 			}
 		},
 
+		'{rootElement} dividerTrackend': function() {
+			this._fileUploadController.resetPosition();
+		},
+
 		'{window} [resize]': function() {
 			this._dividedboxController.refresh();
 			this._fileUploadController.resetPosition();
