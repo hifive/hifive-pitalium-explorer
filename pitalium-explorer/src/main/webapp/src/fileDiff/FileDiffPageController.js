@@ -76,7 +76,7 @@
 		},
 
 		'_showResult': function() {
-			// 両方のIDが登録されていない場合Expectedモードで表示
+			// Show as expected mode when both expected id and actual id are not registered.
 			if (!this._validateScreenshot()) {
 				var id = this._screenshot.id !== null ? this._screenshot.id
 						: this._screenshot.expectedScreenshotId;
@@ -92,14 +92,44 @@
 			this._testResultDiffController.showResult(this._screenshot);
 		},
 
+		/**
+		 * Handle events of file upload sent by FileUploadController.
+		 *
+		 * @param {HifiveEventContext} context
+		 * @method
+		 * @memberOf hifive.pitalium.explorer.controller.FileDiffPageController
+		 */
 		'{rootElement} uploadFile': function(context) {
-			var args = context.evArg;
-			if (args.mode == 'expected') {
-				this.setExpectedScreenshotId(args.screenshotId);
-				this._expectedImageListController.addTemporaryFile(args);
+			var arg = context.evArg;
+			var findFirstScreenshotId = function(file) {
+				if (file.isFile) {
+					return file.screenshotId;
+				}
+
+				var files;
+				if (jQuery.isArray(file)) {
+					files = file;
+				} else {
+					files = file.children;
+				}
+
+				for (var i = 0; i < files.length; i++) {
+					var id = findFirstScreenshotId(files[i]);
+					if (id !== null) {
+						return id;
+					}
+				}
+
+				return null;
+			};
+
+			var screenshotId = findFirstScreenshotId(arg.files);
+			if (arg.mode == 'expected') {
+				this.setExpectedScreenshotId(screenshotId);
+				this._expectedImageListController.addTemporaryFile(arg.files);
 			} else {
-				this.setActualScreenshotId(args.screenshotId);
-				this._actualImageListController.addTemporaryFile(args);
+				this.setActualScreenshotId(screenshotId);
+				this._actualImageListController.addTemporaryFile(arg.files);
 			}
 
 			this._showResult();

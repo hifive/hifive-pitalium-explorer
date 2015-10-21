@@ -91,7 +91,7 @@
 
 			// ファイルドラッグか否かをチェック
 			var types = context.event.originalEvent.dataTransfer.types;
-			if (types && types[0] != 'Files') {
+			if (types && $.inArray('Files', types) == -1) {
 				return;
 			}
 
@@ -170,19 +170,21 @@
 
 			var expected = $el.hasClass('expected');
 
-			var files = context.event.originalEvent.dataTransfer.files;
-			if (!files) {
+			var dataTransfer = context.event.originalEvent.dataTransfer;
+			if (!dataTransfer.files) {
 				return;
 			}
 
-			if (files.length != 1) {
-				alert('ドラッグするファイルは一つだけにして下さい。');
-				return;
-			}
+			this._fileUploadLogic.upload(dataTransfer).done(this.own(function(files) {
+				if (!files || files.length == 0) {
+					alert('画像ファイルが検出されませんでした。');
+					return;
+				}
 
-			this._fileUploadLogic.upload(files[0]).done(this.own(function(data) {
-				data.mode = expected ? 'expected' : 'actual';
-				this.trigger('uploadFile', data);
+				this.trigger('uploadFile', {
+					'files': files,
+					'mode': expected ? 'expected' : 'actual'
+				});
 			}));
 		}
 

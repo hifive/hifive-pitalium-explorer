@@ -64,25 +64,83 @@
 			return this._mode;
 		},
 
-		'addTemporaryFile': function(file) {
-			this._uploadImageList.children.forEach(function(el) {
-				if (el.state) {
-					el.state.selected = false;
+		/**
+		 * Add temporary uploaded files to file tree.
+		 * 
+		 * @param {Array} files
+		 * @method
+		 * @memberOf hifive.pitalium.explorer.controller.ImageListController
+		 */
+		'addTemporaryFile': function(files) {
+			this._resetSelection();
+
+			var first = true;
+
+			var addDirectory = function(file, parent) {
+				var dir = {
+					'text': file.name,
+					'state': {
+						'opened': true
+					},
+					'children': [],
+					'a_attr': {
+						'data-screenshot-type': 'directory'
+					}
+				};
+				parent.children.push(dir);
+
+				for (var i = 0; i < file.children.length; i++) {
+					var f = file.children[i];
+					if (f.isFile) {
+						addFile(f, dir);
+					} else {
+						addDirectory(f, dir);
+					}
 				}
-			});
-			this._uploadImageList.children.push({
-				'text': file.fileName,
-				'icon': false,
-				'state': {
-					'selected': true
-				},
-				'a_attr': {
-					'class': 'screenshot',
-					'data-screenshot-type': 'temporary',
-					'data-screenshot-id': file.screenshotId
+			};
+
+			var addFile = function(file, parent) {
+				var _first = first;
+				if (first) {
+					first = false;
 				}
-			});
+
+				parent.children.push({
+					'text': file.name,
+					'icon': false,
+					'state': {
+						'selected': _first
+					},
+					'a_attr': {
+						'class': 'screenshot',
+						'data-screenshot-type': 'temporary',
+						'data-screenshot-id': file.screenshotId
+					}
+				});
+			};
+
+			for (var i = 0; i < files.length; i++) {
+				var f = files[i];
+				if (f.isFile) {
+					addFile(f, this._uploadImageList);
+				} else {
+					addDirectory(f, this._uploadImageList);
+				}
+			}
+
 			this._refreshTree();
+		},
+
+		'_resetSelection': function() {
+			var resetSelection = function(obj) {
+				// Directory
+				if (obj.children) {
+					obj.children.forEach(resetSelection);
+				}
+
+				obj.state.selected = false;
+			};
+			this._treeData.forEach(resetSelection);
 		},
 
 		'.screenshot click': function(context, $el) {
