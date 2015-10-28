@@ -88,12 +88,13 @@
 			});
 		},
 
-		getComparisonResult: function(screenshot, targetId) {
+		getComparisonResult: function(screenshot) {
 			return h5.ajax('comparisonResult', {
 				data: {
-					sourceScreenshotId: screenshot.id,
-					targetScreenshotId: screenshot.expectedScreenshotId,
-					targetId: targetId
+					sourceScreenshotId: screenshot.actual.screenshotId,
+					targetScreenshotId: screenshot.expected.screenshotId,
+					sourceTargetId: screenshot.actual.targetId,
+					targetTargetId: screenshot.expected.targetId
 				},
 				type: 'GET',
 				dataType: 'json'

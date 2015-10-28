@@ -24,7 +24,11 @@
 		 */
 		_testResultDiffLogic: hifive.pitalium.explorer.logic.TestResultDiffLogic,
 
-		_screenshot: {},
+		_screenshot:  {
+			'expected': null,
+			'actual': null
+		},
+		_comparisonResult: null,
 
 		_imageLoadDeferred: null,
 
@@ -50,11 +54,32 @@
 		 * 
 		 * @memberOf hifive.pitalium.explorer.controller.TestResultDiffController
 		 */
-		showResult: function(screenshot, expectedScreenshot) {
+		showResult: function(screenshot) {
 			this._imageLoadPromises = [];
 
-			this._screenshot = screenshot;
-			this._initializeImageSelector(screenshot.targets);
+			if (screenshot.actual) {
+				this._screenshot = screenshot;
+				this._initializeImageSelector(null);
+			} else {
+				var targetId = screenshot.targets[0].targetId;
+				this._screenshot.actual = {
+					'screenshotId': screenshot.id,
+					'targetId': targetId
+				};
+
+				if (screenshot.expectedScreenshotId) {
+					this._screenshot.expected = {
+						'screenshotId': screenshot.expectedScreenshotId,
+						'targetId': targetId
+					};
+				} else {
+					this._screenshot.expected = null;
+				}
+
+				this._comparisonResult = screenshot.comparisonResult;
+				this._initializeImageSelector(screenshot.targets);
+			}
+
 			return h5.async.when(this._imageLoadPromises).done(this.own(function() {
 				this._triggerViewChange();
 			}));
@@ -63,20 +88,29 @@
 		/**
 		 * Initialize the drop down of image selection.
 		 * 
-		 * @memberOf hifiveTestExplorer.controller.TestResultDiffController
-		 * @param {Array} includes the selectors for the test area inclusion.
+		 * @memberOf hifive.pitalium.explorer.controller.TestResultDiffController
+		 * @param {Array} targets the selectors for the test area inclusion.
 		 */
 		_initializeImageSelector: function(targets) {
+			// No targets... do not show selector
+			if (targets === null) {
+				this.$find('#selector').hide();
+				this._compareImages(null);
+				return;
+			}
+
+			this.$find('#selector').show();
 			this.view.update('#selector', 'imageSelectorTemplate', {
-				targets: targets
+				'targets': targets
 			});
+
 			// Generate select options
 			var imageSelector = this.$find('#imageSelector');
 			var val = imageSelector.val();
 			this._compareImages(val);
 		},
 
-		'.nav-tabs shown.bs.tab': function(context, $el) {
+		'.nav-tabs shown.bs.tab': function() {
 			this._triggerViewChange();
 		},
 
@@ -84,7 +118,7 @@
 		 * Called when the selection of the drop down changed.<br>
 		 * Update images.
 		 * 
-		 * @memberOf hifiveTestExplorer.controller.TestResultDiffController
+		 * @memberOf hifive.pitalium.explorer.controller.TestResultDiffController
 		 * @param {Object} context the event context
 		 * @param {jQuery} $el the event target element
 		 */
@@ -94,76 +128,80 @@
 		},
 
 		_compareImages: function(targetId) {
-			if (this._screenshot.expectedScreenshotId != null) {
-				this._testResultDiffLogic.getComparisonResult(this._screenshot, targetId).done(
+			if (targetId !== null) {
+				this._screenshot.actual.targetId = targetId;
+				if (this._screenshot.expected != null) {
+					this._screenshot.expected.targetId = targetId;
+				}
+			}
+
+			if (this._screenshot.expected != null) {
+				this._testResultDiffLogic.getComparisonResult(this._screenshot).done(
 						this.own(function(comparisonResult) {
-							this._screenshot.comparisonResult = comparisonResult;
+							this._comparisonResult = comparisonResult;
 							// Fire change event and show images.
-							this._setImage(targetId);
+							this._setImage();
 							this.trigger('updateComparisonResult', {
 								comparisonResult: comparisonResult
 							});
 						}));
-			} else {
-				this._screenshot.comparisonResult = null;
-				// Fire change event and show images.
-				this._setImage(targetId);
-				this.trigger('updateComparisonResult', {
-					comparisonResult: null
-				});
-			}
 
-
-		},
-
-		_setImage: function(targetId) {
-			this._imageLoadPromises = [];
-			var screenshotId = this._screenshot.id;
-
-			var expectedScreenshotId = this._screenshot.expectedScreenshotId;
-			// Expected mode
-			if (expectedScreenshotId == null) {
-				this._setActualImageSrc(false, {
-					screenshotId: screenshotId,
-					targetId: targetId
-				});
-				this._showExpectedMode();
-				this._hideActualMode();
-				h5.async.when(this._imageLoadPromises).done(this.own(function() {
-					this._triggerViewChange();
-				}));
 				return;
 			}
+
+			this._comparisonResult = null;
+			// Fire change event and show images.
+			this._setImage();
+			this.trigger('updateComparisonResult', {
+				comparisonResult: null
+			});
+		},
+
+		_setImage: function() {
+			this._imageLoadPromises = [];
+			var expected = this._screenshot.expected;
+			var actual = this._screenshot.actual;
+
+			// Expected mode
+			if (expected == null) {
+				this._setImageExpected(actual);
+				return;
+			}
+
 			this._showActualMode();
 			this._hideExpectedMode();
 
-			if (this._screenshot.comparisonResult) {
+			if (this._comparisonResult) {
 				// Test succeeded
-				this._setActualImageSrc(false, {
-					screenshotId: screenshotId,
-					targetId: targetId
-				});
-
-				this._setExpectedImageSrc(false, {
-					screenshotId: expectedScreenshotId,
-					targetId: targetId
-				});
+				this._setActualImageSrc(false, actual);
+				this._setExpectedImageSrc(false, expected);
 			} else {
 				// Test failed
 				this._setActualImageSrc(true, {
-					sourceScreenshotId: screenshotId,
-					targetScreenshotId: expectedScreenshotId,
-					targetId: targetId
+					sourceScreenshotId: actual.screenshotId,
+					targetScreenshotId: expected.screenshotId,
+					sourceTargetId: actual.targetId,
+					targetTargetId: expected.targetId
 				});
 
 				this._setExpectedImageSrc(true, {
-					sourceScreenshotId: expectedScreenshotId,
-					targetScreenshotId: screenshotId,
-					targetId: targetId
+					sourceScreenshotId: expected.screenshotId,
+					targetScreenshotId: actual.screenshotId,
+					sourceTargetId: expected.targetId,
+					targetTargetId: actual.targetId
 				});
 			}
 
-			this._initEdgeOverlapping(expectedScreenshotId, screenshotId, targetId);
+			this._initEdgeOverlapping(expected, actual);
+			h5.async.when(this._imageLoadPromises).done(this.own(function() {
+				this._triggerViewChange();
+			}));
+		},
+
+		'_setImageExpected': function(screenshot) {
+			this._setActualImageSrc(false, screenshot);
+			this._showExpectedMode();
+			this._hideActualMode();
 			h5.async.when(this._imageLoadPromises).done(this.own(function() {
 				this._triggerViewChange();
 			}));
@@ -205,53 +243,52 @@
 
 		/**
 		 * @memberOf hifive.pitalium.explorer.controller.TestResultDiffController
-		 * @param {Number} expectedId ID of expected image
-		 * @param {Number} actualId ID of actual image
-		 * @param {Number} targetId ID the target area to be used for image comparison
+		 * @param {object} expected object which contains ID of expected image and ID the target area to be used for image comparison
+		 * @param {object} actual object which contains ID of actual image and ID the target area to be used for image comparison
 		 */
-		_initEdgeOverlapping: function(expectedId, actualId, targetId) {
+		_initEdgeOverlapping: function(expected, actual) {
 			// Initialize <canvas>
-			var expected = new Image();
-			var actual = new Image();
+			var expectedImage = new Image();
+			var actualImage = new Image();
 
 			var d1 = $.Deferred(),d2 = $.Deferred();
-			expected.onload = d1.resolve;
-			actual.onload = d2.resolve;
+			expectedImage.onload = d1.resolve;
+			actualImage.onload = d2.resolve;
 
 			var format = hifive.pitalium.explorer.utils.formatUrl;
-			expected.src = format('image/processed', {
-				screenshotId: expectedId,
-				targetId: targetId,
+			expectedImage.src = format('image/processed', {
+				screenshotId: expected.screenshotId,
+				targetId: expected.targetId,
 				algorithm: 'edge',
 				colorIndex: 1
 			});
-			actual.src = format('image/processed', {
-				screenshotId: actualId,
-				targetId: targetId,
+			actualImage.src = format('image/processed', {
+				screenshotId: actual.screenshotId,
+				targetId: actual.targetId,
 				algorithm: 'edge',
 				colorIndex: 0
 			});
 
 			$.when.apply($, [d1.promise(), d2.promise()]).done(this.own(function() {
 				var canvas = this.$find('#edge-overlapping canvas')[0];
-				var native_width = canvas.width = expected.width;
-				var native_height = canvas.height = expected.height;
+				var native_width = canvas.width = expectedImage.width;
+				var native_height = canvas.height = expectedImage.height;
 
 				var context = canvas.getContext('2d');
 				context.globalCompositeOperation = 'multiply';
 				if (context.globalCompositeOperation == 'multiply') {
-					context.drawImage(expected, 0, 0);
-					context.drawImage(actual, 0, 0);
+					context.drawImage(expectedImage, 0, 0);
+					context.drawImage(actualImage, 0, 0);
 					this._initImageMagnifier(native_width, native_height);
 				} else {
 					// IE workaround
 					var actualBlack = new Image();
 					actualBlack.onload = function() {
-						context.drawImage(expected, 0, 0);
+						context.drawImage(expectedImage, 0, 0);
 						context.globalCompositeOperation = 'source-atop';
 						context.drawImage(actualBlack, 0, 0);
 						context.globalCompositeOperation = 'destination-over';
-						context.drawImage(actual, 0, 0);
+						context.drawImage(actualImage, 0, 0);
 						this._initImageMagnifier(native_width, native_height);
 					};
 					actualBlack.src = format('image/processed', {

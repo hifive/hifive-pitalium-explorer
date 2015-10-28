@@ -41,16 +41,8 @@
 		},
 
 		'_screenshot': {
-			'id': null,
-			'expectedScreenshotId': null,
-			'targets': [{
-				'targetId': 0,
-				'area': {
-					'selectorType': '',
-					'selectorValue': '',
-					'selectorIndex': 0
-				}
-			}]
+			'expected': null,
+			'actual': null
 		},
 
 		'__ready': function() {
@@ -63,27 +55,45 @@
 			this._fileUploadController.setTarget(this.$find('#imageDiffContainer'));
 		},
 
-		'setExpectedScreenshotId': function(screenshotId) {
-			this._screenshot.expectedScreenshotId = screenshotId;
+		'setExpected': function(screenshot) {
+			this._screenshot.expected = {
+				'screenshotId': screenshot.screenshotId,
+				'targetId': screenshot.targetId
+			};
 		},
 
-		'setActualScreenshotId': function(screenshotId) {
-			this._screenshot.id = screenshotId;
+		'setActual': function(screenshot) {
+			this._screenshot.actual = {
+				'screenshotId': screenshot.screenshotId,
+				'targetId': screenshot.targetId
+			};
+		},
+
+		'setExpectedScreenshotId': function(id) {
+			this.setExpected({
+				'screenshotId': id,
+				'targetId': 0
+			});
+		},
+
+		'setActualScreenshotId': function(id) {
+			this.setActual({
+				'screenshotId': id,
+				'targetId': 0
+			});
 		},
 
 		'_validateScreenshot': function() {
-			return this._screenshot.id !== null && this._screenshot.expectedScreenshotId !== null;
+			return this._screenshot.expected && this._screenshot.actual;
 		},
 
 		'_showResult': function() {
 			// Show as expected mode when both expected id and actual id are not registered.
 			if (!this._validateScreenshot()) {
-				var id = this._screenshot.id !== null ? this._screenshot.id
-						: this._screenshot.expectedScreenshotId;
-				var targets = this._screenshot.targets;
+				var data = this._screenshot.expected ? this._screenshot.expected
+						: this._screenshot.actual;
 				this._testResultDiffController.showResult({
-					'id': id,
-					'targets': targets
+					'actual': data
 				});
 
 				return;
@@ -138,21 +148,16 @@
 		'{rootElement} screenshotSelect': function(context) {
 			var args = context.evArg;
 			if (args.mode == 'expected') {
-				this.setExpectedScreenshotId(args.screenshotId);
+				this.setExpected(args);
 			} else {
-				this.setActualScreenshotId(args.screenshotId);
+				this.setActual(args);
 			}
 
 			this._showResult();
 		},
 
 		'{rootElement} selectExecution': function(context) {
-			var args = context.evArg;
-			if (args.mode == 'expected') {
-				this._actualImageListController.disableSelectExecution();
-			} else {
-				this._expectedImageListController.disableSelectExecution();
-			}
+		// Do nothing
 		},
 
 		'{rootElement} dividerTrackend': function() {

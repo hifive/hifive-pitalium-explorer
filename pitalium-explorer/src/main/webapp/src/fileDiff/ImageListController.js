@@ -114,7 +114,8 @@
 					'a_attr': {
 						'class': 'screenshot',
 						'data-screenshot-type': 'temporary',
-						'data-screenshot-id': file.screenshotId
+						'data-screenshot-id': file.screenshotId,
+						'data-target-id': 0
 					}
 				});
 			};
@@ -145,9 +146,11 @@
 
 		'.screenshot click': function(context, $el) {
 			var screenshotId = $el.data('screenshotId');
+			var targetId = $el.data('targetId');
 			var mode = this._mode;
 			this.trigger('screenshotSelect', {
 				'screenshotId': screenshotId,
+				'targetId': targetId,
 				'mode': mode
 			});
 		},
@@ -253,16 +256,20 @@
 					var tests = methods[methodName];
 					for (var i = 0; i < tests.length; i++) {
 						var test = tests[i];
-						testTree.push({
-							'text': test.screenshotName,
-							'icon': false,
-							'state': {},
-							'a_attr': {
-								'class': 'screenshot',
-								'data-screenshot-type': 'execution',
-								'data-screenshot-id': test.id
-							}
-						});
+						for (var j = 0; j < test.targets.length; j++) {
+							var target = test.targets[j];
+							testTree.push({
+								'text': test.screenshotName + ' [' + j + ']',
+								'icon': false,
+								'state': {},
+								'a_attr': {
+									'class': 'screenshot',
+									'data-screenshot-type': 'execution',
+									'data-screenshot-id': test.id,
+									'data-target-id': target.targetId
+								}
+							});
+						}
 					}
 				}
 			}
