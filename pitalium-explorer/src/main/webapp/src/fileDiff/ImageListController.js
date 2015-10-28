@@ -258,8 +258,9 @@
 						var test = tests[i];
 						for (var j = 0; j < test.targets.length; j++) {
 							var target = test.targets[j];
+							var targetName = this._buildScreenshotTargetName(target);
 							testTree.push({
-								'text': test.screenshotName + ' [' + j + ']',
+								'text': test.screenshotName + ' ' + targetName,
 								'icon': false,
 								'state': {},
 								'a_attr': {
@@ -275,6 +276,18 @@
 			}
 
 			this._refreshTree();
+		},
+
+		'_buildScreenshotTargetName': function(target) {
+			var area = target.area;
+			var name;
+			if (area.selectorType) {
+				name = area.selectorType + ': ' + area.selectorValue + ' (' + area.selectorIndex + ')';
+			} else {
+				name = area.x + ', ' + area.y + ', ' + area.width + ', ' + area.height;
+			}
+
+			return '[' + name + ']';
 		}
 	};
 
