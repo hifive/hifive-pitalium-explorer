@@ -174,11 +174,12 @@ public class ExplorerService implements Serializable {
 		}
 	}
 
-	public Boolean getComparisonResult(Integer sourceScreenshotId, Integer targetScreenshotId, Integer targetId) {
+	public Boolean getComparisonResult(Integer sourceScreenshotId, Integer targetScreenshotId, Integer sourceTargetId,
+			Integer targetTargetId) {
 		try {
-			File sourceFile = persisterService.getImage(sourceScreenshotId, targetId);
-			File targetFile = persisterService.getImage(targetScreenshotId, targetId);
-			Target target = persisterService.getTarget(sourceScreenshotId, targetId);
+			File sourceFile = persisterService.getImage(sourceScreenshotId, sourceTargetId);
+			File targetFile = persisterService.getImage(targetScreenshotId, targetTargetId);
+			Target target = persisterService.getTarget(sourceScreenshotId, sourceTargetId);
 
 			if (!sourceFile.exists()) {
 				log.error("File Not Found. screenshotId = {}.", sourceScreenshotId);
@@ -202,12 +203,12 @@ public class ExplorerService implements Serializable {
 		}
 	}
 
-	public void getDiffImage(Integer sourceScreenshotId, Integer targetScreenshotId, Integer targetId,
-			HttpServletResponse response) {
+	public void getDiffImage(Integer sourceScreenshotId, Integer targetScreenshotId, Integer sourceTargetId,
+			Integer targetTargetId, HttpServletResponse response) {
 		try {
-			File sourceFile = persisterService.getImage(sourceScreenshotId, targetId);
-			File targetFile = persisterService.getImage(targetScreenshotId, targetId);
-			Target target = persisterService.getTarget(sourceScreenshotId, targetId);
+			File sourceFile = persisterService.getImage(sourceScreenshotId, sourceTargetId);
+			File targetFile = persisterService.getImage(targetScreenshotId, targetTargetId);
+			Target target = persisterService.getTarget(sourceScreenshotId, sourceTargetId);
 
 			if (!sourceFile.exists() || !targetFile.exists()) {
 				response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());

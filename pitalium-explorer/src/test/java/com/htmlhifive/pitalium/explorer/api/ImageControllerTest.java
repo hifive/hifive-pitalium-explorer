@@ -108,22 +108,21 @@ public class ImageControllerTest {
 	@Test
 	public void testGetDiffImageNotFoundSource() {
 		HttpServletResponse response = mock(HttpServletResponse.class);
-		this.imageController.getDiffImage(-1, 0, 0, response);
+		this.imageController.getDiffImage(-1, 0, 0, 0, response);
 		verify(response).setStatus(HttpServletResponse.SC_NOT_FOUND);
 	}
 
 	@Test
 	public void testGetDiffImageNotFoundTarget() {
 		HttpServletResponse response = mock(HttpServletResponse.class);
-		this.imageController.getDiffImage(0, -1, 0, response);
-		;
+		this.imageController.getDiffImage(0, -1, 0, 0, response);
 		verify(response).setStatus(HttpServletResponse.SC_NOT_FOUND);
 	}
 
 	@Test
 	public void testGetDiffImageFileError() {
 		HttpServletResponse response = mock(HttpServletResponse.class);
-		this.imageController.getDiffImage(0, 1, 0, response);
+		this.imageController.getDiffImage(0, 1, 0, 0, response);
 		verify(response).setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 	}
 
@@ -138,7 +137,7 @@ public class ImageControllerTest {
 		doReturn(new Target()).when(persister).getTarget(0, 0);
 		when(response.getOutputStream()).thenReturn(mock(ServletOutputStream.class));
 
-		spy.getDiffImage(0, 0, 0, response);
+		spy.getDiffImage(0, 0, 0, 0, response);
 
 		verify(response).setContentType("image/png");
 	}
@@ -155,7 +154,7 @@ public class ImageControllerTest {
 		doReturn(new File("src/test/resources/images/edge_detector_0_edge.png")).when(persister).getImage(1, 0);
 		when(response.getOutputStream()).thenReturn(mock(ServletOutputStream.class));
 
-		spy.getDiffImage(0, 1, 0, response);
+		spy.getDiffImage(0, 1, 0, 0, response);
 
 		verify(response).setContentType("image/png");
 	}
