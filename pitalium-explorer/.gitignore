@@ -5,6 +5,8 @@
 /db/hsqldb/images/
 /db/hsqldb/processed-images/
 /lib/
+!/lib/pitalium-*.jar
+!/lib/sources/pitalium-*.jar
 /bin/
 /src/main/webapp/WEB-INF/classes
 /src/test/resources/processed-images/
