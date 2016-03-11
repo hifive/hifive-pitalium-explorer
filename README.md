@@ -49,9 +49,11 @@ Let's **hifive**!
 4.  Update Tomcat context definition. Right-click `hifive-res`
     project and choose `Tomcat project` → `Update context definition`.
 
-5.  Start Tomcat.
+5. Set a result folder. Open `pitalium-explorer/src/main/resources/persistentConfig.json` and change `file.resultDirectory` value to an absolute path of your result folder or a relative one from the `pitalium-explorer` project folder.
 
-6.  Go [http://localhost:8080/pitalium-explorer/list.html][url-list]
+6.  Start Tomcat.
+
+7.  Go [http://localhost:8080/pitalium-explorer/list.html][url-list]
 
 [url-list]: http://localhost:8080/pitalium-explorer/list.html
 
