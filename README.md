@@ -23,10 +23,12 @@ Let's **hifive**!
   * Set `Tomcat home` in `Window` → `Preferences` → `Tomcat` in *Eclipse*.
   * Copy `DevloaderTomcat7.jar` from `com.sysdeo.eclipse.tomcat_3.3.1.jar` to
     `$TOMCAT_HOME/lib`.
+* [hifive-res project][hifive-res]
 
 [ide]: https://eclipse.org/downloads/packages/release/Luna/SR2
 [tomcat]: http://tomcat.apache.org/download-70.cgi
 [plugin]: http://www.eclipsetotale.com/tomcatPlugin.html
+[hifive-res]:https://github.com/hifive/hifive-res.git
 
 ### Supported browsers
 * Chrome *≥ 44*
@@ -37,16 +39,19 @@ Let's **hifive**!
 1.  Run `ivy_build.xml`. To do so, right-click on `ivy_build.xml.launch` and
     choose `Run As` → `ivy_build.xml`.
 
-2.  Initialize and start database. Change current directory to
+2.  Initialize and start database (if you want to use). Change current directory to
     `pitalium-explorer/db/hsql` and run `./init.sh` or `init.bat`.
     And then, run `./start.sh` or `start.bat`.
 
 3.  Update Tomcat context definition. Right-click `pitalium-explorer`
     project and choose `Tomcat project` → `Update context definition`.
 
-4.  Start Tomcat.
+4.  Update Tomcat context definition. Right-click `hifive-res`
+    project and choose `Tomcat project` → `Update context definition`.
 
-5.  Go [http://localhost:8080/pitalium-explorer/list.html][url-list]
+5.  Start Tomcat.
+
+6.  Go [http://localhost:8080/pitalium-explorer/list.html][url-list]
 
 [url-list]: http://localhost:8080/pitalium-explorer/list.html
 
