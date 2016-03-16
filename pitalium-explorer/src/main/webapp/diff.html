@@ -81,7 +81,7 @@
 		</table>
 	</script>
 	<script type="text/ejs" id="imageSelectorTemplate">
-		<select id="imageSelector" class="form-control image-selector">
+		<select id="imageSelector" class="image-selector">
 		[%
 			for (var i = 0, len = targets.length; i < len; i++) {
 			var target = targets[i];
@@ -112,15 +112,11 @@
 		</table>
 	</script>
 	<script type="text/ejs" id="comparisonResultTemplate">
-			<h4>Comparison Result :
-			[% if (comparisonResult === true) { %]
-				○
-			[% } else if (comparisonResult === false) { %]
-				×
-			[% } else { %]
-				-
-			[% } %]
-			</h4>
+		[% if (comparisonResult === true) { %]
+			<img class="test-result-icon" src="res/img/checkmark.png" alt="○" aria-label="All tests passed">
+		[% } else if (comparisonResult === false) { %]
+			<img class="test-result-icon" src="res/img/xmark.png" alt="×" aria-label="Some tests failed">
+		[% } %]
 	</script>
 	</head>
 	<body>
@@ -135,23 +131,19 @@
 		<!-- Navigation -->
 
 		<div id="container">
-			<div id="info" class="box">
-				<div class="panel-group" id="accordion">
-					<div class="panel panel-default">
-						<div class="panel-heading">
-							<h4 class="panel-title row">
-								<a class="col-xs-11" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="false">
-									Result Information
-								</a>
-								<button id="select_execution"  class="btn btn-primary col-xs-1">Select Execution</button>
-							</h4>
-						</div>
-						<div id="comparisonResult"></div>
-						<div id="collapseOne" class="panel-collapse collapse in">
-							<div class="panel-body">
-								<div id="detail"></div>
-							</div>
-						</div>
+			<div id="info" class="panel panel-default">
+				<div class="panel-heading">
+					<h4 class="panel-title row">
+						<a class="col-xs-11" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="false">
+							Result Information
+							<span id="comparisonResult"></span>
+						</a>
+						<button id="select_execution"  class="btn btn-info col-xs-1">Select Executions</button>
+					</h4>
+				</div>
+				<div id="collapseOne" class="panel-collapse collapse in">
+					<div class="panel-body">
+						<div id="detail"></div>
 					</div>
 				</div>
 				<div id="popup_content" style="display:none">
@@ -181,133 +173,134 @@
 				</div>
 			</div>
 			<div class="dividedbox">
-				<div id="list" class="box autoSize">
-					<div id="tree_root"></div>
+				<div id="list" class="panel panel-default autoSize">
+					<div class="panel-heading">
+						<span>Test Cases</span>
+					</div>
+					<div id="tree_root" class="panel-body"></div>
 				</div>
-
-				<div id="main" class="box autoSize">
-					<div class="image-selector-row">
-						<div class="image-selector-container">
-					      	<div id="selector"></div>
-						</div>
+				<div id="main" class="panel panel-default autoSize">
+					<div class="panel-heading">
+						<span>Screenshots</span>
+						<span id="selector"></span>
 					</div>
+                    <div class="panel-body">
+	  					<div id="expected-mode">
+  							<div class="col-xs-12 image-diff actual">
+  								<img>
+  							</div>
+  						</div>
+	  					<div id="actual-mode">
+  							<ul class="nav nav-tabs">
+  								<li><a href="#quick-flipping" data-toggle="tab">Quick flipping</a></li>
+	  							<li class="active"><a href="#two-up" data-toggle="tab">2-up</a></li>
+	  							<li><a href="#swipe" data-toggle="tab">Swipe</a></li>
+	  							<li><a href="#onion-skin" data-toggle="tab">Onion skin</a></li>
+	  							<li><a href="#edge-overlapping" data-toggle="tab">Edge overlapping</a></li>
+	  						</ul>
 
-					<div id="expected-mode">
-						<div class="col-xs-12 image-diff actual">
-							<img>
-						</div>
-					</div>
+	  						<div class="tab-content">
 
-					<div id="actual-mode">
-						<ul class="nav nav-tabs">
-							<li><a href="#quick-flipping" data-toggle="tab">Quick flipping</a></li>
-							<li class="active"><a href="#two-up" data-toggle="tab">2-up</a></li>
-							<li><a href="#swipe" data-toggle="tab">Swipe</a></li>
-							<li><a href="#onion-skin" data-toggle="tab">Onion skin</a></li>
-							<li><a href="#edge-overlapping" data-toggle="tab">Edge overlapping</a></li>
-						</ul>
+	  							<div class="tab-pane" id="quick-flipping">
+	  		 						<div class="row label-row">
+	  									<div class="col-xs-6 image-diff image-label expected">
+	  										<div class="image-label">EXPECTED</div>
+	  									</div>
+	  									<div class="col-xs-6 image-diff image-label actual">
+	  										<div class="image-label">ACTUAL</div>
+	  									</div>
+	  		 						</div>
+	  		 						<div class="row">
+	  									<div class="col-xs-12 image-diff image-overlay">
+	  										<div class="expected">
+	  											<img>
+	  										</div>
+	  										<div class="actual">
+	  											<img>
+	  										</div>
+	  									</div>
+	  								</div>
+	  							</div>
 
-						<div class="tab-content">
+	  							<div class="tab-pane active" id="two-up">
+	  		 						<div class="row label-row">
+	  									<div class="col-xs-6 image-diff image-label expected">
+	  										<div class="image-label">EXPECTED</div>
+	  									</div>
+	  									<div class="col-xs-6 image-diff image-label actual">
+	  										<div class="image-label">ACTUAL</div>
+	  									</div>
+	  		 						</div>
+	  								<div class="row">
+	  									<div class="col-xs-6 image-diff expected">
+	  										<img>
+	  									</div>
+	  									<div class="col-xs-6 image-diff actual">
+	  										<img>
+	  									</div>
+	  								</div>
+	  							</div>
 
-							<div class="tab-pane" id="quick-flipping">
-		 						<div class="row label-row">
-									<div class="col-xs-6 image-diff image-label expected">
-										<div class="image-label">EXPECTED</div>
-									</div>
-									<div class="col-xs-6 image-diff image-label actual">
-										<div class="image-label">ACTUAL</div>
-									</div>
-		 						</div>
-		 						<div class="row">
-									<div class="col-xs-12 image-diff image-overlay">
-										<div class="expected">
-											<img>
-										</div>
-										<div class="actual">
-											<img>
-										</div>
-									</div>
-								</div>
-							</div>
+	  							<div class="tab-pane" id="swipe">
+	  								<div class="handle row label-row">
+	  									<div>
+	  										<span class="expected legend">EXPECTED</span>
+	  										<span class="actual legend">ACTUAL</span>
+	  									</div>
+	  									<div>
+	  										<input type="range" id="swipe-handle">
+	  									</div>
+	  								</div>
+	  								<div class="row">
+	  									<div class="col-xs-12 image-diff image-overlay">
+	  										<div class="expected">
+	  											<img>
+	  										</div>
+	  										<div class="actual">
+	  											<div class="swipe-bar"></div>
+	  											<img>
+	  										</div>
+	  									</div>
+	  								</div>
+	  							</div>
 
-							<div class="tab-pane active" id="two-up">
-		 						<div class="row label-row">
-									<div class="col-xs-6 image-diff image-label expected">
-										<div class="image-label">EXPECTED</div>
-									</div>
-									<div class="col-xs-6 image-diff image-label actual">
-										<div class="image-label">ACTUAL</div>
-									</div>
-		 						</div>
-								<div class="row">
-									<div class="col-xs-6 image-diff expected">
-										<img>
-									</div>
-									<div class="col-xs-6 image-diff actual">
-										<img>
-									</div>
-								</div>
-							</div>
+	  							<div class="tab-pane" id="onion-skin">
+	  								<div class="handle row label-row">
+	  									<div>
+	  										<span class="expected legend">EXPECTED</span>
+	  										<span class="actual legend">ACTUAL</span>
+	  									</div>
+	  									<div>
+	  										<input type="range" id="onion-handle">
+	  									</div>
+	  								</div>
+	  								<div class="row">
+	  									<div class="col-xs-12 image-diff image-overlay">
+	  										<div class="expected">
+	  											<img>
+	  										</div>
+	  										<div class="actual">
+	  											<img>
+	  										</div>
+	  									</div>
+	  								</div>
+	  							</div>
 
-							<div class="tab-pane" id="swipe">
-								<div class="handle row label-row">
-									<div>
-										<span class="expected legend">EXPECTED</span>
-										<span class="actual legend">ACTUAL</span>
-									</div>
-									<div>
-										<input type="range" id="swipe-handle">
-									</div>
-								</div>
-								<div class="row">
-									<div class="col-xs-12 image-diff image-overlay">
-										<div class="expected">
-											<img>
-										</div>
-										<div class="actual">
-											<div class="swipe-bar"></div>
-											<img>
-										</div>
-									</div>
-								</div>
-							</div>
-
-							<div class="tab-pane" id="onion-skin">
-								<div class="handle row label-row">
-									<div>
-										<span class="expected legend">EXPECTED</span>
-										<span class="actual legend">ACTUAL</span>
-									</div>
-									<div>
-										<input type="range" id="onion-handle">
-									</div>
-								</div>
-								<div class="row">
-									<div class="col-xs-12 image-diff image-overlay">
-										<div class="expected">
-											<img>
-										</div>
-										<div class="actual">
-											<img>
-										</div>
-									</div>
-								</div>
-							</div>
-
-							<div class="tab-pane" id="edge-overlapping">
-								<div class="row label-row">
-									<div>
-										<span class="expected legend">EXPECTED</span>
-										<span class="actual legend">ACTUAL</span>
-									</div>
-								</div>
-								<div class="row">
-									<div class="col-xs-12 image-diff image-overlay">
-										<div class="large"></div>
-										<canvas class="small"></canvas>
-									</div>
-								</div>
-							</div>
+	  							<div class="tab-pane" id="edge-overlapping">
+	  								<div class="row label-row">
+	  									<div>
+	  										<span class="expected legend">EXPECTED</span>
+	  										<span class="actual legend">ACTUAL</span>
+	  									</div>
+	  								</div>
+	  								<div class="row">
+	  									<div class="col-xs-12 image-diff image-overlay">
+	  										<div class="large"></div>
+	  										<canvas class="small"></canvas>
+	  									</div>
+	  								</div>
+	  							</div>
+	  						</div>
 						</div>
 					</div>
 				</div>
