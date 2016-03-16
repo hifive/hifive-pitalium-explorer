@@ -40,3 +40,8 @@ body {
 	border: solid 1px white;
 	color: #303030;
 }
+
+.test-result-icon {
+	width: 17px;
+	height: 17px;
+}
