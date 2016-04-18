@@ -30,3 +30,50 @@
 .panel-title .progress {
 	margin: 0;
 }
+.navbar-brand img {
+	height: 40px;
+}
+
+.navbar {
+	box-shadow: 0 2px 5px rgba(0,0,0,0.26);
+	background-color: #03A9F4;
+}
+.navbar-brand {
+	color: white;
+	text-shadow: none;
+	padding-top: 15px;
+	padding-bottom: 15px;
+	padding-left:18px;
+	font-weight:300;
+	
+}
+.container {
+	background-color:white;
+	box-shadow: 0 2px 5px rgba(0,0,0,0.26);
+	padding: 20px 40px 100px 40px;
+}
+.margin-top {
+	
+	margin-top: 140px;
+}
+
+.background-pattern {
+	position:absolute;
+	background-color: #03A9F4;
+
+	width:100%;
+	box-shadow: 0 2px 7px rgba(0,0,0,0.26);
+	color: white;
+	padding-left: 45px;
+	padding-top: 25px;
+	padding-bottom: 80px;
+	
+	top: 0;
+	
+}
+.background-pattern h2 {
+	margin-bottom: 2px;
+	font-weight:300;
+
+	}
+
