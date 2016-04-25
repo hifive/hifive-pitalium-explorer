@@ -10,16 +10,6 @@ html {
 body {
 }
 
-.navbar {
-	min-height: 0px;
-	margin-bottom: 10px;
-}
-
-.navbar-brand {
-	padding: 5px 15px;
-	height: auto;
-}
-
 .footer {
 	position: absolute;
 	bottom: 0;
