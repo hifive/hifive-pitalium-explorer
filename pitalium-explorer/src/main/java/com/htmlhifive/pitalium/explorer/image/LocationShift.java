@@ -1,17 +1,21 @@
 package com.htmlhifive.pitalium.explorer.image;
 
-
 import com.htmlhifive.pitalium.image.util.ImageUtils;
 import java.awt.image.BufferedImage;
 import java.awt.Rectangle;
 import java.awt.image.Raster;
 import java.util.ArrayList;
 import java.util.List;
-
+import java.awt.Graphics2D;
+import java.awt.Color;
+import java.io.File;
+import java.io.IOException;
+import javax.imageio.ImageIO;
+import java.lang.Math;
 
 /**
  * For given two images which are expected and actual,
- * this class check whether sub image of actual image is shifted
+ * this class check whether subimage of actual image is shifted
  * and matched at some position in expected image.
  * Then it stores ShiftRectangle which is the information of location shift of given area.
  */
@@ -21,43 +25,159 @@ public class LocationShift {
 	 * The maximal range of location shift.
 	 */
 	private static final int MAXIMUM_SHIFT = 5;
-	
+	private static final int TEMPLATE_MARGIN = 5;
+
 	private BufferedImage expectedImage;
 	private BufferedImage actualImage;
 
-	private List<ShiftRectangle> ShiftRectangles;
+	private List<ComparedRectangle> ComparedRectangles;
 	private List<Rectangle> rectangles;
 	
+	private static double entireSimilarity = 0;
+
+	/**
+	 *The size of result image is set as minimum width and height of given two images.
+	 */
+	public static int minWidth;
+	public static int minHeight;
+
+	// Q. After reshaping, what is minimum width and height of rectangle?
+	// Do we have to set this value?
+	public static double minLength = 3;
+
+	// image save option
+	public boolean save = true;
+
 	/**
 	 * Constructor
-	 * @param expectedImage The image which we will compare with the template
-	 * @param actualImage The image which we will take the template
+	 * @param expectedImage The image which we will compare with the template.
+	 * @param actualImage The image which we will take the template.
 	 * @param rectangles This rectangles represent area where two images are different.
 	 */
 	public LocationShift(BufferedImage expectedImage, BufferedImage actualImage, List<Rectangle> rectangles) {
 		this.expectedImage = expectedImage;
 		this.actualImage = actualImage;
 		this.rectangles = rectangles;
-		this.ShiftRectangles = new ArrayList<ShiftRectangle>();
+		this.ComparedRectangles = new ArrayList<ComparedRectangle>();
+
+		this.minWidth = expectedImage.getWidth();
+		if(minWidth > actualImage.getWidth())
+			minWidth = actualImage.getWidth();
+
+		this.minHeight = expectedImage.getHeight();
+		if(minHeight > actualImage.getHeight())
+			minHeight = actualImage.getHeight();
 	}
-	
-	/**
-	 * Check every rectangle and fill the list of ShiftRectangle with every shifted area
-	 */
-	public void excute() {
+
+
+	public void execute() {
+
+		// variables for similarity
+		double similarityPixelByPixel, similarityFeatureMatrix;
+		BufferedImage	expectedSubImage,	actualSubImage;
+		double entireDifference = 0;
+
 		for (Rectangle rectangle : rectangles)
 		{
-			CheckShift(rectangle);
+			// if the rectangle is still useful after reshping, check shift.
+			reshapeRect(rectangle);
+			if (checkRect(rectangle) && checkRect(getTemplateArea(rectangle))) {
+
+				// get subImages
+				expectedSubImage = getExpectedSubImage(rectangle);
+				actualSubImage = getActualSubImage(rectangle);
+
+
+				/** if this rectangle is shift, then process shift information in CheckShift method **/
+				if (CheckShift(rectangle))
+					continue;
+
+				/** else calculate similarity **/
+				else {
+
+					// construct new similar rectangle
+					ComparedRectangle newSimilar = new ComparedRectangle(rectangle);
+
+
+					/* calculate similarity using average norm of RGB difference vector. */
+					similarityPixelByPixel = SimilarityUtils.calcSimilarityPixelByPixel(expectedSubImage, actualSubImage, rectangle, newSimilar);
+
+					// calculate the similarity of entire image using pixel by pixel method
+					int actualArea = actualSubImage.getWidth() * actualSubImage.getHeight();
+
+					if (SimilarityUtils.averageNorm) {
+						entireDifference += (1-similarityPixelByPixel)*actualArea;
+					} else {
+						entireDifference += (1-similarityPixelByPixel)*(1-similarityPixelByPixel)*actualArea;
+					}
+
+					/* calculate similarity using feature matrix. */
+					int comparedRectangleWidth = (int)rectangle.getWidth()-2*TEMPLATE_MARGIN, comparedRectangleHeight = (int)rectangle.getHeight()-2*TEMPLATE_MARGIN;
+
+					// execute this only when comparedRectangleWidth >= FeatureCol && comparedRectangleHeight >= FeatureRow
+					if (SimilarityUtils.checkFeatureSize(comparedRectangleWidth, comparedRectangleHeight)) {
+						similarityFeatureMatrix = SimilarityUtils.calcSimilarityByFeatureMatrix(expectedSubImage, actualSubImage, rectangle, newSimilar);
+					}
+
+					// insert the similar rectangle into the list of ComparedRectangles
+					ComparedRectangles.add(newSimilar);
+				}
+			}
+		}
+
+		if (SimilarityUtils.averageNorm) {
+			entireSimilarity = 1-entireDifference/((minWidth-2*MAXIMUM_SHIFT)*(minHeight-2*MAXIMUM_SHIFT));
+		}	else {
+			entireSimilarity = 1-Math.sqrt(entireDifference/((minWidth-2*MAXIMUM_SHIFT)*(minHeight-2*MAXIMUM_SHIFT)));
 		}
 	}
+
+
+	/**
+	 * Check if this rectangle is available
+	 * @param rectangle the rectangle checked
+	 * @return true if this rectangle area is available
+	 */
+	public static boolean checkRect(Rectangle rectangle)
+	{
+		return (rectangle.getX() < (minWidth-1) && rectangle.getY() < (minHeight-1) && rectangle.getWidth() >= minLength && rectangle.getHeight() >= minLength);
+	}
+
+	/**
+	 * Reshape rectangle in order to avoid raster error
+	 */
+	private void reshapeRect(Rectangle rectangle)
+	{
+		double width= rectangle.getWidth(), height = rectangle.getHeight();
+		double x = rectangle.getX(), y = rectangle.getY();
+		
+		if (x < 0) {
+			width += x;
+			x = 0;
+		}
+		if (y < 0) {
+			height += y;
+			y = 0;
+		}
+		if (x + width >= minWidth - minLength)
+			width = minWidth - minLength - x;
+		if (y + height >= minHeight - minLength)
+			height = minHeight - minLength - y;
 	
+		rectangle.setRect(x, y, width, height);
+	}
+
+
+
 	/**
 	 * Check the template is contained and shifted in this area
-	 * if then, create ShiftRectangle and insert it into ShiftRectangles list.
+	 * if then, create ComparedRectangle with shift information and insert it into ComparedRectangles list.
 	 * @param rectangle One of the areas where two images are different.
+	 * @return true if thie rectangle is shifted
 	 */
-	private void CheckShift (Rectangle rectangle)
+	private boolean CheckShift (Rectangle rectangle)
 	{
+
 		BufferedImage entireImage = getSubImage(expectedImage, rectangle);
 		BufferedImage templateImage = getSubImage(actualImage, getTemplateArea(rectangle));
 		
@@ -78,8 +198,8 @@ public class LocationShift {
 		int templateHeight = templateImage.getHeight();
 		double topLeft, topRight, bottomLeft, bottomRight;
 		double sumEntire;
-		final int yMax = entireImage.getHeight() - templateImage.getHeight() + 1;
-		final int xMax = entireImage.getWidth() - templateImage.getWidth() + 1;
+		int yMax = entireImage.getHeight() - templateImage.getHeight() + 1;
+		int xMax = entireImage.getWidth() - templateImage.getWidth() + 1;
 		for (int y = 0; y < yMax; y++) {
 			for (int x = 0; x < xMax; x++) {
 				bottomRight = integralImage[y + templateHeight - 1][x + templateWidth - 1];
@@ -91,15 +211,16 @@ public class LocationShift {
 				if (Double.compare(sumEntire, sumTemplate) == 0) {
 					BufferedImage cropEntire = entireImage.getSubimage(x, y, templateWidth, templateHeight);
 					
-					// If the template match at this position, create new ShiftRectangle and add it in the list
+					// If the template match at this position, create new ComparedRectangle and add it in the list
 					if (ImageUtils.imageEquals(cropEntire, templateImage)) {
-						ShiftRectangle newMatch = new ShiftRectangle(rectangle, x-MAXIMUM_SHIFT, y-MAXIMUM_SHIFT);
-						ShiftRectangles.add(newMatch);
-						return;
+						ComparedRectangle newMatch = new ComparedRectangle(rectangle, x-TEMPLATE_MARGIN, y-TEMPLATE_MARGIN);
+						ComparedRectangles.add(newMatch);
+						return true;
 					}
 				}
 			}
 		}
+		return false;
 	}
 
 
@@ -108,12 +229,12 @@ public class LocationShift {
 	 * @param rectangle The different area of two images
 	 * @return the template area
 	 */
-	public Rectangle getTemplateArea (Rectangle rectangle)
+	public static Rectangle getTemplateArea (Rectangle rectangle)
 	{
-		int x = (int) rectangle.getX() + MAXIMUM_SHIFT;
-		int y = (int) rectangle.getY() + MAXIMUM_SHIFT;
-		int w = (int) rectangle.getWidth() - 2*MAXIMUM_SHIFT;
-		int h = (int) rectangle.getHeight() - 2*MAXIMUM_SHIFT;
+		int x = (int) rectangle.getX() + TEMPLATE_MARGIN;
+		int y = (int) rectangle.getY() + TEMPLATE_MARGIN;
+		int w = (int) rectangle.getWidth() - 2*TEMPLATE_MARGIN;
+		int h = (int) rectangle.getHeight() - 2*TEMPLATE_MARGIN;
 		
 		return new Rectangle(x,y,w,h);
 	}
@@ -142,13 +263,114 @@ public class LocationShift {
 	}	
 	
 	/**
-	 * get sub image from given image and rectangle
+	 * get subimage from given image and rectangle
 	 * @param image
 	 * @param rectangle 
 	 * @return
 	 */
 	private BufferedImage getSubImage(BufferedImage image, Rectangle rectangle) {
-		return image.getSubimage((int) rectangle.getX(), (int) rectangle.getY(), (int) rectangle.getWidth(), (int) rectangle.getHeight());
+		// Initialize variables
+		int width= (int)rectangle.getWidth(), height = (int)rectangle.getHeight();
+		int x = (int)rectangle.getX(), y = (int)rectangle.getY();
+		
+		return image.getSubimage(x, y, width, height);
+	}
+
+	/**
+	 * return the subimage of the given rectangle area of expectedImage
+	 * @param rectangle rectangle area where expectedImage is taken
+	 * @return the subimage of expectedImage
+	 */
+	public BufferedImage getExpectedSubImage (Rectangle rectangle) {
+		return getSubImage(expectedImage, rectangle);
+	}
+
+	/**
+	 * return the subimage of the template size of given rectangle area of actualImage
+	 * @param rectangle rectangle area where actualImage is taken
+	 * @return the subimage of actualImage
+	 */
+	public BufferedImage getActualSubImage (Rectangle rectangle) {
+		return getSubImage(actualImage, getTemplateArea(rectangle));
 	}
 	
+
+	/**
+	 *	print the different rectangle information
+	 */
+	public void printDiffRectangles() {
+		for (Rectangle rect : rectangles) {
+			System.out.printf("x:%d, y:%d, w:%d, h:%d\n",(int)rect.getX(), (int)rect.getY(), (int)rect.getWidth(), (int)rect.getHeight());
+		}
+	}	
+
+	/**
+	 * print the shift rectangle information
+ 	 */
+	public void printShiftRectangles() {
+		for (ComparedRectangle ComparedRect : ComparedRectangles) {
+			if (ComparedRect.isShifted()) {
+				Rectangle rect = ComparedRect.getRectangle();
+				System.out.printf("x:%d, y:%d, w:%d, h:%d => shifted x:%d, y:%d\n",(int)rect.getX(), (int)rect.getY(), (int)rect.getWidth(), (int)rect.getHeight(), ComparedRect.getXShift(), ComparedRect.getYShift());
+			}
+		}
+	}
+
+	/**
+	 * print the similar rectangle information
+ 	 */
+	public void printSimilarRectangles() {
+		for (ComparedRectangle ComparedRect : ComparedRectangles) {
+			if (ComparedRect.isSimilar()) {
+				Rectangle rect = ComparedRect.getRectangle();
+				if(ComparedRect.checkAvailable(1))
+					System.out.printf("x:%d, y:%d, w:%d, h:%d => %.2f at x:%d, y:%d shifted (Difference Norm)\n",(int)rect.getX(), (int)rect.getY(), (int)rect.getWidth(), (int)rect.getHeight(), ComparedRect.getSimilarity(1), ComparedRect.getXSimilar(1), ComparedRect.getYSimilar(1));
+				if(ComparedRect.checkAvailable(2))
+				System.out.printf("x:%d, y:%d, w:%d, h:%d => %.2f at x:%d, y:%d shifted (Number of Diffs)\n",(int)rect.getX(), (int)rect.getY(), (int)rect.getWidth(), (int)rect.getHeight(), ComparedRect.getSimilarity(2), ComparedRect.getXSimilar(2), ComparedRect.getYSimilar(2));
+				if(ComparedRect.checkAvailable(3))
+				System.out.printf("x:%d, y:%d, w:%d, h:%d => %.2f at x:%d, y:%d shifted (Feature Matrix)\n",(int)rect.getX(), (int)rect.getY(), (int)rect.getWidth(), (int)rect.getHeight(), ComparedRect.getSimilarity(3), ComparedRect.getXSimilar(3), ComparedRect.getYSimilar(3));
+				System.out.println();
+			}
+		}
+		System.out.printf("entire similarity : %.2f\n", entireSimilarity);
+	
+	}
+
+	/**
+	 * @return TEMPLATE_MARGIN
+	 */
+	public static int getTemplateMargin() {
+		return TEMPLATE_MARGIN;
+	}
+
+	
+	/**
+	 * It stores the image marked with rectangles which represents different areas between two images.
+	 */
+	public void markedImage() {
+		
+		// Initialize output image.
+		BufferedImage resultImage = new BufferedImage(minWidth, minHeight, BufferedImage.TYPE_INT_ARGB);
+
+		// Set graphics.
+		Graphics2D graphics = resultImage.createGraphics();
+
+		// Draw rectangles.
+		for(ComparedRectangle ComparedRect : ComparedRectangles) {
+			Rectangle rect = ComparedRect.getRectangle();
+				graphics.fill(rect);
+		}
+		graphics.dispose();
+		
+		if (save) {
+			try {
+				ImageIO.write(resultImage, "png", new File("test_result.png"));
+			} catch (IOException e) {}
+		}
+	}
+	
+
+
 }
+
+
