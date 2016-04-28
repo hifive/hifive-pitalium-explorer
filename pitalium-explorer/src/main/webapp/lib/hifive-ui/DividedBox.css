@@ -23,6 +23,10 @@
 	margin: 0px;
 }
 
+.dividedBox>.dividedbox-managed {
+	position: absolute;
+}
+
 .dividedBox.horizontal {
 	white-space: nowrap;
 }
@@ -74,8 +78,10 @@
 }
 
 .dividedBox>.divider>.dividerHandler {
+	background-color: #eee;
 	width: 30px;
 	height: 30px;
+    margin-top: -15px; /* heightの半分 */
 	border-style: solid;
 	border-width: 1px;
 	border-radius: 15px;
@@ -85,13 +91,13 @@
 	-ms-border-radius: 15px;
 }
 
-.dividedBox.vertical>.divider .dividerHandler {
+.dividedBox.vertical>.divider>.dividerHandler {
 	margin-left: auto;
 	margin-right: auto;
 }
 
-.dividedBox>.divider,.dividedBox .dividerHandler {
-	background-color: #eee;
+.dividedBox.horizontal>.divider>.dividerHandler {
+	margin-left: -13px; /* -(divderHandlerのwidth - dviderのwidth) / 2 */
 }
 
 .dividedBox>.divider.fixedDivider {

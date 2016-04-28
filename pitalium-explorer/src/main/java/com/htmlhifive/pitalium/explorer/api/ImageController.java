@@ -20,11 +20,15 @@ import org.springframework.web.multipart.MultipartFile;
 import com.htmlhifive.pitalium.explorer.cache.BackgroundImageDispatcher;
 import com.htmlhifive.pitalium.explorer.cache.CacheTaskQueue;
 import com.htmlhifive.pitalium.explorer.service.ExplorerService;
+import com.htmlhifive.pitalium.explorer.service.TemporaryFileService;
 
 @Controller
 public class ImageController {
 	@Autowired
 	private ExplorerService service;
+
+	@Autowired
+	private TemporaryFileService temporaryFileService;
 
 	private CacheTaskQueue cacheTaskQueue;
 	private BackgroundImageDispatcher backgroundImageDispatcher;
@@ -102,30 +106,34 @@ public class ImageController {
 	 *
 	 * @param sourceScreenshotId comparison source image id
 	 * @param targetScreenshotId comparison target image id
-	 * @param targetId id of the target area to be used for image comparison
+	 * @param sourceTargetId id of the target area of source image to be used for image comparison
+	 * @param targetTargetId id of the target area of target image
 	 * @param response HttpServletResponse
 	 */
 	@RequestMapping(value = "image/diff", method = RequestMethod.GET)
 	public void getDiffImage(@RequestParam(value = "sourceScreenshotId") Integer sourceScreenshotId,
 			@RequestParam(value = "targetScreenshotId") Integer targetScreenshotId,
-			@RequestParam(value = "targetId") Integer targetId, HttpServletResponse response) {
-		service.getDiffImage(sourceScreenshotId, targetScreenshotId, targetId, response);
+			@RequestParam(value = "sourceTargetId") Integer sourceTargetId,
+			@RequestParam(value = "targetTargetId") Integer targetTargetId, HttpServletResponse response) {
+		service.getDiffImage(sourceScreenshotId, targetScreenshotId, sourceTargetId, targetTargetId, response);
 	}
 
 	@RequestMapping(value = "comparisonResult", method = RequestMethod.GET, produces = "application/json;charset=utf-8")
 	@ResponseBody
 	public Boolean getComparisonResult(@RequestParam(value = "sourceScreenshotId") Integer sourceScreenshotId,
 			@RequestParam(value = "targetScreenshotId") Integer targetScreenshotId,
-			@RequestParam(value = "targetId") Integer targetId) {
-		return service.getComparisonResult(sourceScreenshotId, targetScreenshotId, targetId);
+			@RequestParam(value = "sourceTargetId") Integer sourceTargetId,
+			@RequestParam(value = "targetTargetId") Integer targetTargetId) {
+		return service.getComparisonResult(sourceScreenshotId, targetScreenshotId, sourceTargetId, targetTargetId);
 	}
 
 	@RequestMapping(value = "files/upload", method = RequestMethod.POST)
 	@ResponseBody
-	public List<String> multipartUpload(@RequestParam("files") List<MultipartFile> files) throws Exception {
-		return service.multipartUpload(files);
+	public List<Integer> multipartUpload(@RequestParam("files") List<MultipartFile> files) throws Exception {
+		return temporaryFileService.upload(files);
 	}
 
+	@Deprecated
 	@RequestMapping(value = "files/diff", method = RequestMethod.GET)
 	public void getDiffImage(@RequestParam("file1") String fileName1, @RequestParam("file2") String fileName2,
 			HttpServletResponse response) throws Exception {

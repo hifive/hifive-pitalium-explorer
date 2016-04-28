@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.htmlhifive.pitalium.explorer.service.ScreenshotIdService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -40,6 +41,8 @@ public class ExplorerDBPersister extends DBPersister implements ExplorerPersiste
 	private ProcessedImageRepository processedImageRepo;
 	private ConfigRepository configRepo;
 
+	private ScreenshotIdService screenshotIdService;
+
 	public void setTestExecutionRepository(TestExecutionRepository repository) {
 		testExecutionRepo = repository;
 	}
@@ -62,6 +65,11 @@ public class ExplorerDBPersister extends DBPersister implements ExplorerPersiste
 
 	public void setConfigRepository(ConfigRepository repository) {
 		configRepo = repository;
+	}
+
+	@Override
+	public void setScreenshotIdService(ScreenshotIdService screenshotIdService) {
+		this.screenshotIdService = screenshotIdService;
 	}
 
 	@Override

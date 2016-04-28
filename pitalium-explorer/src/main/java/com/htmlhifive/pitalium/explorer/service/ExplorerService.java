@@ -30,21 +30,17 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.htmlhifive.pitalium.core.result.TestResultManager;
 import com.htmlhifive.pitalium.explorer.conf.ApplicationConfig;
 import com.htmlhifive.pitalium.explorer.entity.Area;
-import com.htmlhifive.pitalium.explorer.entity.AreaRepository;
 import com.htmlhifive.pitalium.explorer.entity.ConfigRepository;
 import com.htmlhifive.pitalium.explorer.entity.ProcessedImageRepository;
 import com.htmlhifive.pitalium.explorer.entity.Repositories;
 import com.htmlhifive.pitalium.explorer.entity.Screenshot;
 import com.htmlhifive.pitalium.explorer.entity.ScreenshotRepository;
 import com.htmlhifive.pitalium.explorer.entity.Target;
-import com.htmlhifive.pitalium.explorer.entity.TargetRepository;
 import com.htmlhifive.pitalium.explorer.entity.TestExecutionAndEnvironment;
 import com.htmlhifive.pitalium.explorer.entity.TestExecutionRepository;
 import com.htmlhifive.pitalium.explorer.image.EdgeDetector;
-import com.htmlhifive.pitalium.explorer.io.ExplorerDBPersister;
 import com.htmlhifive.pitalium.explorer.io.ExplorerPersister;
 import com.htmlhifive.pitalium.explorer.response.TestExecutionResult;
 import com.htmlhifive.pitalium.image.model.DiffPoints;
@@ -53,7 +49,7 @@ import com.htmlhifive.pitalium.image.util.ImageUtils;
 @Service
 public class ExplorerService implements Serializable {
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = -7097257097122078409L;
 
@@ -66,29 +62,11 @@ public class ExplorerService implements Serializable {
 	@Autowired
 	private ScreenshotRepository screenshotRepo;
 	@Autowired
-	private TargetRepository targetRepo;
-	@Autowired
-	private AreaRepository areaRepo;
-	@Autowired
 	private ConfigRepository configRepo;
 	@Autowired
 	private ProcessedImageRepository processedImageRepo;
-
-	private ExplorerPersister persister;
-
-	public void init() {
-		TestResultManager manager = TestResultManager.getInstance();
-		persister = (ExplorerPersister) manager.getPersister();
-
-		if (persister instanceof ExplorerDBPersister) {
-			((ExplorerDBPersister) persister).setTestExecutionRepository(testExecutionRepo);
-			((ExplorerDBPersister) persister).setScreenshotRepository(screenshotRepo);
-			((ExplorerDBPersister) persister).setTargetRepository(targetRepo);
-			((ExplorerDBPersister) persister).setAreaRepository(areaRepo);
-			((ExplorerDBPersister) persister).setProcessedImageRepository(processedImageRepo);
-			((ExplorerDBPersister) persister).setConfigRepository(configRepo);
-		}
-	}
+	@Autowired
+	private PersisterService persisterService;
 
 	// TODO とりあえず用意。後で消したい。
 	public Repositories getRepositories() {
@@ -102,32 +80,32 @@ public class ExplorerService implements Serializable {
 	}
 
 	public ExplorerPersister getExplorerPersister() {
-		return persister;
+		return persisterService;
 	}
 
 	public Page<TestExecutionResult> findTestExecution(String searchTestMethod, String searchTestScreen, int page,
 			int pageSize) {
-		return persister.findTestExecution(searchTestMethod, searchTestScreen, page, pageSize);
+		return persisterService.findTestExecution(searchTestMethod, searchTestScreen, page, pageSize);
 	}
 
 	public List<Screenshot> findScreenshot(Integer testExecutionId, String searchTestMethod, String searchTestScreen) {
-		return persister.findScreenshot(testExecutionId, searchTestMethod, searchTestScreen);
+		return persisterService.findScreenshot(testExecutionId, searchTestMethod, searchTestScreen);
 	}
 
 	public Screenshot getScreenshot(Integer screenshotId) {
-		return persister.getScreenshot(screenshotId);
+		return persisterService.getScreenshot(screenshotId);
 	}
 
 	public void getImage(Integer screenshotId, Integer targetId, HttpServletResponse response) {
 		File file;
 		try {
-			file = persister.getImage(screenshotId, targetId);
+			file = persisterService.getImage(screenshotId, targetId);
 			if (file == null) {
 				response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
 				return;
 			}
 
-			Target target = persister.getTarget(screenshotId, targetId);
+			Target target = persisterService.getTarget(screenshotId, targetId);
 			if (target.getExcludeAreas().isEmpty()) {
 				sendFile(file, response);
 			} else {
@@ -144,7 +122,7 @@ public class ExplorerService implements Serializable {
 
 	public void getEdgeImage(Integer screenshotId, Integer targetId, int colorIndex, HttpServletResponse response) {
 		// FIXME キャッシュ対応後に復活させる
-		//		File cachedFile = persister.searchProcessedImageFile(id, ProcessedImageUtility.getAlgorithmNameForEdge(colorIndex));
+		//		File cachedFile = persisterService.searchProcessedImageFile(id, ProcessedImageUtility.getAlgorithmNameForEdge(colorIndex));
 		//		if (cachedFile != null) {
 		//			try {
 		//				sendFile(cachedFile, response);
@@ -155,7 +133,7 @@ public class ExplorerService implements Serializable {
 		//		}
 
 		try {
-			File imageFile = persister.getImage(screenshotId, targetId);
+			File imageFile = persisterService.getImage(screenshotId, targetId);
 
 			if (!imageFile.exists()) {
 				response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
@@ -196,11 +174,12 @@ public class ExplorerService implements Serializable {
 		}
 	}
 
-	public Boolean getComparisonResult(Integer sourceScreenshotId, Integer targetScreenshotId, Integer targetId) {
+	public Boolean getComparisonResult(Integer sourceScreenshotId, Integer targetScreenshotId, Integer sourceTargetId,
+			Integer targetTargetId) {
 		try {
-			File sourceFile = persister.getImage(sourceScreenshotId, targetId);
-			File targetFile = persister.getImage(targetScreenshotId, targetId);
-			Target target = persister.getTarget(sourceScreenshotId, targetId);
+			File sourceFile = persisterService.getImage(sourceScreenshotId, sourceTargetId);
+			File targetFile = persisterService.getImage(targetScreenshotId, targetTargetId);
+			Target target = persisterService.getTarget(sourceScreenshotId, sourceTargetId);
 
 			if (!sourceFile.exists()) {
 				log.error("File Not Found. screenshotId = {}.", sourceScreenshotId);
@@ -224,12 +203,12 @@ public class ExplorerService implements Serializable {
 		}
 	}
 
-	public void getDiffImage(Integer sourceScreenshotId, Integer targetScreenshotId, Integer targetId,
-			HttpServletResponse response) {
+	public void getDiffImage(Integer sourceScreenshotId, Integer targetScreenshotId, Integer sourceTargetId,
+			Integer targetTargetId, HttpServletResponse response) {
 		try {
-			File sourceFile = persister.getImage(sourceScreenshotId, targetId);
-			File targetFile = persister.getImage(targetScreenshotId, targetId);
-			Target target = persister.getTarget(sourceScreenshotId, targetId);
+			File sourceFile = persisterService.getImage(sourceScreenshotId, sourceTargetId);
+			File targetFile = persisterService.getImage(targetScreenshotId, targetTargetId);
+			Target target = persisterService.getTarget(sourceScreenshotId, sourceTargetId);
 
 			if (!sourceFile.exists() || !targetFile.exists()) {
 				response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
@@ -254,9 +233,8 @@ public class ExplorerService implements Serializable {
 		for (Area excludeArea : target.getExcludeAreas()) {
 			// Get the relative coordinates from the starting position of the actualArea.
 			// Based on the obtained relative coordinates, to create a rectangle.
-			Rectangle rectangle = new Rectangle((int) excludeArea.getX() - (int) area.getX(),
-					(int) excludeArea.getY() - (int) area.getY(), (int) excludeArea.getWidth(),
-					(int) excludeArea.getHeight());
+			Rectangle rectangle = new Rectangle((int) excludeArea.getX() - (int) area.getX(), (int) excludeArea.getY()
+					- (int) area.getY(), (int) excludeArea.getWidth(), (int) excludeArea.getHeight());
 			excludeList.add(rectangle);
 		}
 		return excludeList;
@@ -325,7 +303,7 @@ public class ExplorerService implements Serializable {
 
 	/**
 	 * Send a file over http response
-	 * 
+	 *
 	 * @param file file to send
 	 * @param response response to use
 	 * @throws IOException
@@ -338,7 +316,7 @@ public class ExplorerService implements Serializable {
 
 	/**
 	 * Send image over response
-	 * 
+	 *
 	 * @param image image to send
 	 * @param response response to use
 	 * @throws IOException
@@ -350,11 +328,11 @@ public class ExplorerService implements Serializable {
 	}
 
 	public Page<Screenshot> findScreenshot(Integer testExecutionId, Integer testEnvironmentId, int page, int pageSize) {
-		return persister.findScreenshot(testExecutionId, testEnvironmentId, page, pageSize);
+		return persisterService.findScreenshot(testExecutionId, testEnvironmentId, page, pageSize);
 	}
 
 	public Page<TestExecutionAndEnvironment> findTestExecutionAndEnvironment(int page, int pageSize) {
-		return persister.findTestExecutionAndEnvironment(page, pageSize);
+		return persisterService.findTestExecutionAndEnvironment(page, pageSize);
 	}
 
 	public List<String> multipartUpload(List<MultipartFile> files) {

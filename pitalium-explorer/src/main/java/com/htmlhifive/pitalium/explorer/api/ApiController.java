@@ -5,8 +5,6 @@ package com.htmlhifive.pitalium.explorer.api;
 
 import java.util.List;
 
-import javax.annotation.PostConstruct;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -27,11 +25,6 @@ public class ApiController {
 
 	@Autowired
 	private ExplorerService service;
-
-	@PostConstruct
-	public void init() {
-		service.init();
-	}
 
 	/**
 	 * Gets list of the test execution. If pageSize equals to zero, the default page size is used. If pageSize equals to

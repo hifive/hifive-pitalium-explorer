@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
+import com.htmlhifive.pitalium.explorer.service.ScreenshotIdService;
 import org.springframework.data.domain.Page;
 
 import com.htmlhifive.pitalium.core.io.Persister;
@@ -18,6 +19,8 @@ import com.htmlhifive.pitalium.explorer.response.TestExecutionResult;
 public interface ExplorerPersister extends Persister {
 
 	int defaultPageSize = 20;
+
+	void setScreenshotIdService(ScreenshotIdService screenshotIdService);
 
 	/**
 	 * TestExecutionのリストを取得する。 引数のメソッド名、スクリーンショットを含む（like検索）Screenshotを持つ TestExecutionのリストを取得する。
