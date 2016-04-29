@@ -1,14 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <tomcatProjectProperties>
     <rootDir>/src/main/webapp</rootDir>
-    <workDir>/work</workDir>
     <exportSource>false</exportSource>
-    <reloadable>true</reloadable>
-    <redirectLogger>false</redirectLogger>
+    <reloadable>false</reloadable>
+    <redirectLogger>true</redirectLogger>
     <updateXml>true</updateXml>
     <warLocation></warLocation>
     <extraInfo></extraInfo>
-    <webPath>pitalium-explorer</webPath>
+    <webPath>/pitalium-explorer</webPath>
     <webClassPathEntries>
         <webClassPathEntry>/pitalium-explorer/lib/antlr-2.7.7.jar</webClassPathEntry>
         <webClassPathEntry>/pitalium-explorer/lib/aopalliance-1.0.jar</webClassPathEntry>
@@ -61,7 +60,5 @@
         <webClassPathEntry>/pitalium-explorer/lib/spring-webmvc-3.2.13.RELEASE.jar</webClassPathEntry>
         <webClassPathEntry>/pitalium-explorer/src/main/webapp/WEB-INF/classes</webClassPathEntry>
         <webClassPathEntry>/pitalium-explorer/target/classes</webClassPathEntry>
-        <webClassPathEntry>org.eclipse.jst.j2ee.internal.module.container</webClassPathEntry>
-        <webClassPathEntry>org.eclipse.jst.j2ee.internal.web.container</webClassPathEntry>
     </webClassPathEntries>
 </tomcatProjectProperties>
