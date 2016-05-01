@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.htmlhifive.pitalium.explorer.entity.Screenshot;
 import com.htmlhifive.pitalium.explorer.entity.TestExecutionAndEnvironment;
+import com.htmlhifive.pitalium.explorer.response.ResultDirectory;
 import com.htmlhifive.pitalium.explorer.response.TestExecutionResult;
 import com.htmlhifive.pitalium.explorer.service.ExplorerService;
 
@@ -26,6 +27,17 @@ public class ApiController {
 	@Autowired
 	private ExplorerService service;
 
+	
+	@RequestMapping(value = "_results/list", method = RequestMethod.GET, produces="application/json;charset=utf-8")
+	@ResponseBody
+	public ResponseEntity<Page<ResultDirectory>> getList(
+			@RequestParam(value = "page", defaultValue = "1") int page,
+			@RequestParam(value = "limit", defaultValue = "0") int pageSize,
+			@RequestParam(value = "searchTestMethod", defaultValue = "") String searchTestMethod,
+			@RequestParam(value = "searchTestScreen", defaultValue = "") String searchTestScreen) {
+		Page<ResultDirectory> list = service.findResultDirectory(searchTestMethod, searchTestScreen, page, pageSize);
+		return new ResponseEntity<Page<ResultDirectory>>(list, HttpStatus.OK);
+	}
 	/**
 	 * Gets list of the test execution. If pageSize equals to zero, the default page size is used. If pageSize equals to
 	 * -1, the entire list is returned.

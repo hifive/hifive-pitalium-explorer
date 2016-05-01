@@ -4,11 +4,14 @@
 package com.htmlhifive.pitalium.explorer.io;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -26,6 +29,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.htmlhifive.pitalium.core.config.FilePersisterConfig;
 import com.htmlhifive.pitalium.core.io.FilePersister;
 import com.htmlhifive.pitalium.core.io.PersistMetadata;
@@ -44,6 +48,7 @@ import com.htmlhifive.pitalium.explorer.entity.TestEnvironment;
 import com.htmlhifive.pitalium.explorer.entity.TestExecution;
 import com.htmlhifive.pitalium.explorer.entity.TestExecutionAndEnvironment;
 import com.htmlhifive.pitalium.explorer.response.TestExecutionResult;
+import com.htmlhifive.pitalium.explorer.response.ResultDirectory;
 import com.htmlhifive.pitalium.explorer.service.ScreenshotIdService;
 import com.htmlhifive.pitalium.image.model.RectangleArea;
 
@@ -72,6 +77,95 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 		this.screenshotIdService = screenshotIdService;
 	}
 
+	@Override
+	public Page<ResultDirectory> findResultDirectory(String searchMethod, String searchTestScreen, int page, int pageSize){
+		File root = super.getResultDirectoryFile();
+		if (!root.exists() || !root.isDirectory()) {
+			log.error("Directory(" + root.getAbsolutePath() + ") Not Found.");
+			return new PageImpl<>(new ArrayList<ResultDirectory>());
+		}
+		LinkedList<ResultDirectory> resultDirectoriesList = new LinkedList<ResultDirectory>();
+
+		File[] subDirectories = root.listFiles(new FilenameFilter(){
+			@Override
+			public boolean accept(File dir, String name){
+				return new File(dir, name).isDirectory();
+			}
+		});
+
+		for(int i=0; i<subDirectories.length; i++){
+			File directory = subDirectories[i];
+
+			String name = directory.getName();
+			String[] splitted_name = name.split("_");
+
+			String timestamp = splitted_name[0];
+
+			String url = "";
+			if(splitted_name.length > 1){
+				for(int j=1; j<splitted_name.length; j++){
+					url = url.concat("_");
+					url = url.concat(splitted_name[j]);
+				}
+				url = url.substring(1);
+			}
+
+			File[] results = directory.listFiles(new FilenameFilter() {
+				@Override
+				public boolean accept(File dir, String name) {
+					return name.toLowerCase().endsWith(".json");
+				}
+			});
+			int numberOfResults = results.length;
+
+			File[] screenshots = directory.listFiles(new FilenameFilter() {
+				@Override
+				public boolean accept(File dir, String name) {
+					for(String extension : new String[]{".png", "jpg", ".jpeg"}){
+						if(name.toLowerCase().endsWith(extension)) return true;
+					}
+					return false;
+				}
+			});
+			int numberOfScreenshots = screenshots.length;
+
+			HashSet<String> browsers = new HashSet<String>();
+			for(File screenshot : screenshots){
+				if(screenshot.getName().toLowerCase().contains("chrome")) browsers.add("chrome");
+				else if(screenshot.getName().toLowerCase().contains("safari")) browsers.add("safari");
+				else if(screenshot.getName().toLowerCase().contains("firefox")) browsers.add("firefox");
+				else if(screenshot.getName().toLowerCase().contains("IE")) browsers.add("IE");
+				else browsers.add("unknown");
+			}
+			int numberOfBrowsers = browsers.size();
+
+			ResultDirectory resultDirectory = new ResultDirectory(i+1, name, timestamp, url,
+					numberOfResults, numberOfScreenshots, numberOfBrowsers);
+
+			resultDirectoriesList.add(resultDirectory);
+		}
+
+//		File resultDirectoryJson = new File(root, "resultDirectory.json");
+//		if(resultDirectoryJson.exists()) resultDirectoryJson.delete();
+//		try {
+//			System.out.println(mapper.writeValueAsString(resultDirectoriesList));
+//		} catch (JsonProcessingException e) {
+//			e.printStackTrace();
+//		}
+
+		int size = resultDirectoriesList.size();
+		if (pageSize == 0) {
+			pageSize = defaultPageSize;
+		} else if (pageSize == -1) {
+			pageSize = (int) Math.min(size, Integer.MAX_VALUE);
+		}
+
+		resultDirectoriesList.subList((page-1)*pageSize, Math.min(page*pageSize, size));
+
+		PageRequest pageable = new PageRequest(page - 1, pageSize);
+		return new PageImpl<ResultDirectory>(resultDirectoriesList, pageable, size);
+	}
+	
 	@Override
 	public Page<TestExecutionResult> findTestExecution(String searchTestMethod, String searchTestScreen, int page,
 			int pageSize) {
