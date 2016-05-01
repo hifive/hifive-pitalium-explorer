@@ -27,5 +27,6 @@
 		<nature>org.eclipse.wst.jsdt.core.jsNature</nature>
 		<nature>org.apache.ivyde.eclipse.ivynature</nature>
 		<nature>com.htmlhifive.tools.jslint.H5JSLintPlugin.JSLintPluginNature</nature>
+		<nature>net.sf.eclipse.tomcat.tomcatnature</nature>
 	</natures>
 </projectDescription>

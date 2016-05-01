@@ -1,0 +1,104 @@
+<!doctype html>
+<html>
+<head>
+	<!--Copyright (C) 2015 NS Solutions Corporation, All Rights Reserved.  -->
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+	<meta http-equiv="Pragma" content="no-cache">
+	<meta http-equiv="Cache-Control" content="no-cache">
+	<meta http-equiv="Expires" content="-1">
+
+	<title>Test results - Pitalium Explorer</title>
+	<link rel="shortcut icon" href="/pitalium-explorer/res/img/favicon.ico">
+	<link rel="stylesheet" href="/hifive-res/ext/bootstrap/3.3.5/css/bootstrap.min.css">
+	<link rel="stylesheet" href="/hifive-res/ext/bootstrap/3.3.5/css/bootstrap-theme.min.css">
+	<link rel="stylesheet" href="/hifive-res/fw/current/h5.css" data-h5-module="hifive">
+	<link rel="stylesheet" href="src/common/common.css">
+	<link rel="stylesheet" href="src/list/list.css">
+
+	<script src="/hifive-res/ext/jquery/jquery-2.js"></script>
+	<script src="/hifive-res/ext/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+	<script src="/hifive-res/fw/current/ejs-h5mod.js" data-h5-module="hifive:ejs"></script>
+	<script src="/hifive-res/fw/current/h5.js" data-h5-module="hifive"></script>
+
+	<script src="src/common/constant.js"></script>
+	<script src="src/common/util.js"></script>
+	
+	
+	
+
+	
+	</head>
+	<body>
+		<div class="background-pattern">
+			
+			<h2>Pitalium explorer</h2>
+			<p>The best explorer to analyze the results of Pitalium.</p>
+			
+		</div>
+		<!-- Navigation -->
+		<nav class="navbar navbar-fixed-top" style="display:none;">
+			<div class="container-fluid">
+				<div class="navbar-header">
+					<a class="navbar-brand" href="list.html">Pitalium explorer</a>
+					
+					<form id="searchTest" class="form-inline">
+					
+					<div class="form-group">
+						<label for="searchTestMethod">Test Method</label>
+						<input type="text" id="searchTestMethod" name="searchTestMethod" class="form-control" placeholder="Test method to search">
+					</div>
+					<div class="form-group">
+						<label for="searchTestScreen">Test Screen</label>
+						<input type="text" id="searchTestScreen" name="searchTestScreen" class="form-control" placeholder="Test screen to search">
+					</div>
+					<button type="submit" class="btn btn-default">Search</button>
+				</form>
+				</div>
+			</div>
+		</nav>
+		<!-- Navigation -->
+
+		<div class="container col-md-8 col-md-offset-2 margin-top">
+			<h4>Test results</h4>
+	
+
+			<div>
+			
+				<ul id="resultList">
+					<li><a href="#">March 15, 2016 www.naver.com (0/4)</a>
+						<table>
+							<tr>
+								<th>
+									Browser
+								</th>
+								
+							</tr>
+							
+							<tr>
+								<td>
+								
+								
+								</td>
+								
+							</tr>
+						
+						</table>
+					
+					</li>
+					
+				</ul>
+			
+			</div>
+
+		</div>
+		
+		
+		<div class="footer col-sm-12">
+			<p>Copyright (C) 2012-2016 NS Solutions Corporation, All Rights Reserved.</p>
+		
+		</div>
+		
+	</body>
+</html>

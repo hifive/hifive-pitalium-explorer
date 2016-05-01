@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <tomcatProjectProperties>
     <rootDir>/src/main/webapp</rootDir>
+    <workDir>/work</workDir>
     <exportSource>false</exportSource>
-    <reloadable>false</reloadable>
-    <redirectLogger>true</redirectLogger>
+    <reloadable>true</reloadable>
+    <redirectLogger>false</redirectLogger>
     <updateXml>true</updateXml>
     <warLocation></warLocation>
     <extraInfo></extraInfo>
-    <webPath>/pitalium-explorer</webPath>
+    <webPath>pitalium-explorer</webPath>
     <webClassPathEntries>
         <webClassPathEntry>/pitalium-explorer/lib/antlr-2.7.7.jar</webClassPathEntry>
         <webClassPathEntry>/pitalium-explorer/lib/aopalliance-1.0.jar</webClassPathEntry>
