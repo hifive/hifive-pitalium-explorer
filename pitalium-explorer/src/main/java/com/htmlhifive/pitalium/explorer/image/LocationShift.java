@@ -68,8 +68,25 @@ public class LocationShift {
 		if(minHeight > actualImage.getHeight())
 			minHeight = actualImage.getHeight();
 	}
+	
+	/**
+	 * @return the list of result ComparedRectangles
+	 */
+	public List<ComparedRectangle> getComparedRectangles () {
+		return ComparedRectangles;
+	}
 
+	/**
+	 * @return the similarity of entire area of two images
+	 */
+	public double getEntireSimilarity () {
+		return entireSimilarity;
+	}
 
+	/**
+	 * execute comparison for every rectangle area.
+	 * calculate entireSimilarity and build ComparedRectangles list.
+	 */
 	public void execute() {
 
 		// variables for similarity
@@ -132,7 +149,6 @@ public class LocationShift {
 		}
 	}
 
-
 	/**
 	 * Check if this rectangle is available
 	 * @param rectangle the rectangle checked
@@ -166,8 +182,6 @@ public class LocationShift {
 	
 		rectangle.setRect(x, y, width, height);
 	}
-
-
 
 	/**
 	 * Check the template is contained and shifted in this area
@@ -222,7 +236,6 @@ public class LocationShift {
 		}
 		return false;
 	}
-
 
 	/**
 	 * Transform given rectangle area into the template area
@@ -294,83 +307,12 @@ public class LocationShift {
 		return getSubImage(actualImage, getTemplateArea(rectangle));
 	}
 	
-
-	/**
-	 *	print the different rectangle information
-	 */
-	public void printDiffRectangles() {
-		for (Rectangle rect : rectangles) {
-			System.out.printf("x:%d, y:%d, w:%d, h:%d\n",(int)rect.getX(), (int)rect.getY(), (int)rect.getWidth(), (int)rect.getHeight());
-		}
-	}	
-
-	/**
-	 * print the shift rectangle information
- 	 */
-	public void printShiftRectangles() {
-		for (ComparedRectangle ComparedRect : ComparedRectangles) {
-			if (ComparedRect.isShifted()) {
-				Rectangle rect = ComparedRect.getRectangle();
-				System.out.printf("x:%d, y:%d, w:%d, h:%d => shifted x:%d, y:%d\n",(int)rect.getX(), (int)rect.getY(), (int)rect.getWidth(), (int)rect.getHeight(), ComparedRect.getXShift(), ComparedRect.getYShift());
-			}
-		}
-	}
-
-	/**
-	 * print the similar rectangle information
- 	 */
-	public void printSimilarRectangles() {
-		for (ComparedRectangle ComparedRect : ComparedRectangles) {
-			if (ComparedRect.isSimilar()) {
-				Rectangle rect = ComparedRect.getRectangle();
-				if(ComparedRect.checkAvailable(1))
-					System.out.printf("x:%d, y:%d, w:%d, h:%d => %.2f at x:%d, y:%d shifted (Difference Norm)\n",(int)rect.getX(), (int)rect.getY(), (int)rect.getWidth(), (int)rect.getHeight(), ComparedRect.getSimilarity(1), ComparedRect.getXSimilar(1), ComparedRect.getYSimilar(1));
-				if(ComparedRect.checkAvailable(2))
-				System.out.printf("x:%d, y:%d, w:%d, h:%d => %.2f at x:%d, y:%d shifted (Number of Diffs)\n",(int)rect.getX(), (int)rect.getY(), (int)rect.getWidth(), (int)rect.getHeight(), ComparedRect.getSimilarity(2), ComparedRect.getXSimilar(2), ComparedRect.getYSimilar(2));
-				if(ComparedRect.checkAvailable(3))
-				System.out.printf("x:%d, y:%d, w:%d, h:%d => %.2f at x:%d, y:%d shifted (Feature Matrix)\n",(int)rect.getX(), (int)rect.getY(), (int)rect.getWidth(), (int)rect.getHeight(), ComparedRect.getSimilarity(3), ComparedRect.getXSimilar(3), ComparedRect.getYSimilar(3));
-				System.out.println();
-			}
-		}
-		System.out.printf("entire similarity : %.2f\n", entireSimilarity);
-	
-	}
-
 	/**
 	 * @return TEMPLATE_MARGIN
 	 */
 	public static int getTemplateMargin() {
 		return TEMPLATE_MARGIN;
 	}
-
-	
-	/**
-	 * It stores the image marked with rectangles which represents different areas between two images.
-	 */
-	public void markedImage() {
-		
-		// Initialize output image.
-		BufferedImage resultImage = new BufferedImage(minWidth, minHeight, BufferedImage.TYPE_INT_ARGB);
-
-		// Set graphics.
-		Graphics2D graphics = resultImage.createGraphics();
-
-		// Draw rectangles.
-		for(ComparedRectangle ComparedRect : ComparedRectangles) {
-			Rectangle rect = ComparedRect.getRectangle();
-				graphics.fill(rect);
-		}
-		graphics.dispose();
-		
-		if (save) {
-			try {
-				ImageIO.write(resultImage, "png", new File("test_result.png"));
-			} catch (IOException e) {}
-		}
-	}
-	
-
-
 }
 
 
