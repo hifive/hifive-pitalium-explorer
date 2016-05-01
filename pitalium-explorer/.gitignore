@@ -15,3 +15,9 @@
 *.iml
 .idea
 .#webclasspath
+
+# comfigure
+.project
+.tomcatplugin
+/src/main/resources/persisterConfig.json
+

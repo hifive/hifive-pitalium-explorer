@@ -14,6 +14,7 @@ import com.htmlhifive.pitalium.core.io.Persister;
 import com.htmlhifive.pitalium.explorer.entity.Screenshot;
 import com.htmlhifive.pitalium.explorer.entity.Target;
 import com.htmlhifive.pitalium.explorer.entity.TestExecutionAndEnvironment;
+import com.htmlhifive.pitalium.explorer.response.ResultDirectory;
 import com.htmlhifive.pitalium.explorer.response.TestExecutionResult;
 
 public interface ExplorerPersister extends Persister {
@@ -21,6 +22,17 @@ public interface ExplorerPersister extends Persister {
 	int defaultPageSize = 20;
 
 	void setScreenshotIdService(ScreenshotIdService screenshotIdService);
+	
+	/**
+	 * Get the list of sub-directories under 'results' directory.
+	 * 
+	 * @param searchTestMethod
+	 * @param searchTestScreen
+	 * @param page
+	 * @param pageSize
+	 * @return
+	 */
+	Page<ResultDirectory> findResultDirectory(String searchTestMethod, String searchTestScreen, int page, int pageSize);
 
 	/**
 	 * TestExecutionのリストを取得する。 引数のメソッド名、スクリーンショットを含む（like検索）Screenshotを持つ TestExecutionのリストを取得する。
