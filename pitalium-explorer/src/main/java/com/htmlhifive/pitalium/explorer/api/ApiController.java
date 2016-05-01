@@ -28,6 +28,15 @@ public class ApiController {
 	private ExplorerService service;
 
 	
+	/**
+	 * Gets list of sub-directories under 'results' directory with the comparison results information.
+	 *
+	 * @param page
+	 * @param pageSize
+	 * @param searchTestMethod
+	 * @param searchTestScreen
+	 * @return
+	 */
 	@RequestMapping(value = "_results/list", method = RequestMethod.GET, produces="application/json;charset=utf-8")
 	@ResponseBody
 	public ResponseEntity<Page<ResultDirectory>> getList(

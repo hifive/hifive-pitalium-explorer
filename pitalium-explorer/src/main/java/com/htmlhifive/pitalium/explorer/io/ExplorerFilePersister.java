@@ -4,6 +4,7 @@
 package com.htmlhifive.pitalium.explorer.io;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.sql.Timestamp;
@@ -30,6 +31,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.htmlhifive.pitalium.common.util.JSONUtils;
 import com.htmlhifive.pitalium.core.config.FilePersisterConfig;
 import com.htmlhifive.pitalium.core.io.FilePersister;
 import com.htmlhifive.pitalium.core.io.PersistMetadata;
@@ -145,13 +147,15 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 			resultDirectoriesList.add(resultDirectory);
 		}
 
-//		File resultDirectoryJson = new File(root, "resultDirectory.json");
-//		if(resultDirectoryJson.exists()) resultDirectoryJson.delete();
-//		try {
-//			System.out.println(mapper.writeValueAsString(resultDirectoriesList));
-//		} catch (JsonProcessingException e) {
-//			e.printStackTrace();
-//		}
+		File resultDirectoryJson = new File(root, "resultDirectory.json");
+		if(resultDirectoryJson.exists()) resultDirectoryJson.delete();
+		try {
+			FileWriter fw = new FileWriter(resultDirectoryJson.getPath());
+			fw.write(JSONUtils.toStringWithIndent(resultDirectoriesList));
+			fw.close();
+		} catch (Exception e) {
+			log.error("file write error: can not write " + resultDirectoryJson.getPath());
+		}
 
 		int size = resultDirectoriesList.size();
 		if (pageSize == 0) {
