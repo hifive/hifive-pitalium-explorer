@@ -10,20 +10,26 @@
 	<meta http-equiv="Expires" content="-1">
 
 	<title>Test results - Pitalium Explorer</title>
-	<link rel="shortcut icon" href="/pitalium-explorer/res/img/favicon.ico">
-	<link rel="stylesheet" href="/hifive-res/ext/bootstrap/3.3.5/css/bootstrap.min.css">
-	<link rel="stylesheet" href="/hifive-res/ext/bootstrap/3.3.5/css/bootstrap-theme.min.css">
+	<link rel="shortcut icon" href="res/img/favicon.ico">
+	
+	
+	
+	<link rel="stylesheet" href="/hifive-res/ext/bootstrap/3.3.6/css/bootstrap.css">
+	
 	<link rel="stylesheet" href="/hifive-res/fw/current/h5.css" data-h5-module="hifive">
 	<link rel="stylesheet" href="src/common/common.css">
 	<link rel="stylesheet" href="src/list/list.css">
-
+	<link rel="stylesheet" href="lib/jquery-ui/jquery-ui.css">
 	<script src="/hifive-res/ext/jquery/jquery-2.js"></script>
-	<script src="/hifive-res/ext/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+	<script src="/hifive-res/ext/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+	<script src="lib/jquery-ui/jquery-ui.js"></script>
+	<script src="lib/jquery-kinetic/jquery.kinetic.js"></script>
 	<script src="/hifive-res/fw/current/ejs-h5mod.js" data-h5-module="hifive:ejs"></script>
 	<script src="/hifive-res/fw/current/h5.js" data-h5-module="hifive"></script>
 
 	<script src="src/common/constant.js"></script>
 	<script src="src/common/util.js"></script>
+	
 	
 	
 	
@@ -64,35 +70,91 @@
 			<h4>Test results</h4>
 	
 
-			<div>
-			
-				<ul id="resultList">
-					<li><a href="#">March 15, 2016 www.naver.com (0/4)</a>
-						<table>
+			<div class="col-md-12" style="margin-top:20px; ">
+				
+				<div class="result_list" style="border-bottom:1px solid #CFD8DC; padding:7px;">
+					<a  onclick="$('#sample_table').toggle();">March 15, 2016 www.naver.com (0/4)</a>
+						<table class="table " id="sample_table" style="display:none;">
 							<tr>
 								<th>
+									Platform
+								</th>
+								<th>
 									Browser
+								</th>
+								<th>
+									Version
+								</th>
+								<th>
+									Standard
+								</th>
+								<th>
+									Similarity
+								</th>
+								<th>
+									Detail
 								</th>
 								
 							</tr>
 							
 							<tr>
+								<td class="platform">
+									<img src="res/img/windows.svg" style="height:15px;"/>
+									<span style="display:none;">WINDOWS</span>
+								</td>
 								<td>
-								
-								
+									Internet Explorer
+								</td>
+								<td>
+									11
+								</td>
+								<td class="text-center">
+									<input type="radio">
+								</td>
+								<td>
+									NaN
+								</td>
+								<td>
+									<a href="#" data-toggle="modal" data-target="#diffDetail" class="btn-info btn"><span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span> Detail</a>
 								</td>
 								
 							</tr>
 						
 						</table>
 					
-					</li>
-					
-				</ul>
+					</div>
 			
 			</div>
 
 		</div>
+		
+		<div class="modal fade" id="diffDetail" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+		  <div class="modal-dialog modal-lg" role="document">
+		    <div class="modal-content">
+		      <div class="modal-header">
+		        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+		        <h4 class="modal-title" id="myModalLabel">Difference detail</h4>
+		      </div>
+		      
+		      <div class="modal-body">
+		      	<div id="result_box" >
+		      	 	<div id="test_result" style="position:relative;">
+		      	 	
+		      	 		<div class="diffDiv" >
+		      	 			<!-- <img src="res/img/pin.svg" style="width:30px; margin-top:-10px; margin-left: -10px;"/> -->
+		      	 			
+		      	 		</div>
+		        	
+		        
+		        	</div>
+		      	</div>
+		       
+		      </div>
+		      
+		    </div>
+		  </div>
+		</div>
+		
 		
 		
 		<div class="footer col-sm-12">
@@ -100,5 +162,86 @@
 		
 		</div>
 		
+		<div id="memobox">
+			<h5><i class="glyphicon glyphicon-move"></i> Shifted</h5>
+			<hr style="border-color:#8D6E63;">
+			<p>X: 10px<br>Y: 20px</p>
+		</div>
+		<script>
+		
+		var img = new Image();
+		img.onload = function() {
+			$("#test_result").height(this.height);
+			$("#test_result").width(this.width);
+			$("#test_result").css("background-image", 'url(' + this.src + ')');
+		}
+		img.src = '/pitalium-explorer/res/img/test_capture.png';
+		
+		$('#result_box').kinetic();
+		
+		$(document).on("mouseenter", ".diffDiv", function(){
+			
+			$("#memobox").show();
+			$(".diffDiv").css("opacity", "0.3");
+			$(this).css("opacity", "0.6");
+		});
+		
+		$(document).on("mouseleave", ".diffDiv", function(){
+			$("#memobox").hide();
+			$(this).css("opacity", "0.3");
+		});
+		
+		$(document).on('mousemove', function(e){
+		    $('#memobox').css({
+		       left:  e.pageX + 10,
+		       top:   e.pageY + 10
+		    });
+		});
+		$(document).on("mouseenter", ".platform", function(){
+			$(this).find("img").hide();
+			$(this).find("span").show();
+		});
+		$(document).on("mouseleave", ".platform", function(){
+			$(this).find("img").show();
+			$(this).find("span").hide();
+		});
+		</script>
+		
+		<style>
+		
+		.platform {
+			cursor:pointer;
+			min-width: 105px;
+		}
+		.platform:hover {
+			background-color:#C8E6C9;
+		}
+			.result_list > a {
+				color:#546E7A;
+				cursor: pointer;
+			}
+			
+			.table > tbody > tr > th {
+			background-color:#26A69A;
+			padding: 10px;
+			color: white;
+			text-align: center;
+			}
+			.table > tbody > tr > td
+			{
+				background-color: #F1F8E9;
+				border:none;
+				vertical-align: middle;
+				text-align: center;
+			}
+			
+			.table {
+				margin-top: 10px;
+				box-shadow: 0 2px 5px rgba(0,0,0,0.26);
+			}
+			
+			
+			
+		</style>
 	</body>
 </html>

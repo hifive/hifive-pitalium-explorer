@@ -63,7 +63,7 @@
 
 	width:100%;
 	box-shadow: 0 2px 7px rgba(0,0,0,0.26);
-	color: white;
+	
 	padding-left: 45px;
 	padding-top: 25px;
 	padding-bottom: 80px;
@@ -72,8 +72,69 @@
 	
 }
 .background-pattern h2 {
+	color: white;
 	margin-bottom: 2px;
 	font-weight:400px;
 
 	}
+.background-pattern p {
+	color:#B3E5FC;
+}
+.modal-content {
+	
+	border-radius:2px;
+}
 
+.modal-header {
+	border-bottom:none;
+	
+}
+
+#memobox {
+	
+	z-index: 1100;
+	padding: 15px;
+	display:none;
+	position:absolute;
+	background-color:#FFF9C4;
+	box-shadow: 0 2px 5px rgba(0,0,0,0.26);
+	color: #5D4037;
+	
+}
+
+	.modal-content {
+				padding-top:20px;
+				padding-left: 30px;
+				padding-right: 30px;
+				padding-bottom: 40px;
+			}
+			#result_box {
+				
+				overflow-x: scroll;
+				border: 3px solid #ef9a9a;
+				
+			}
+			.modal-content {
+				border: none;
+				background-color:#ffebee;
+			
+			}
+			.modal-header {
+				color:#ef5350;
+			}
+			.close {
+				color:#c62828;
+			}
+			.diffDiv {
+				cursor: pointer;
+				width:100px;
+				height:200px;
+				border-radius: 5px;
+				border: 1px solid #b71c1c;
+				background-color: #d32f2f;
+				left:40px;
+				top:30px;
+				position:absolute;
+				opacity:0.3;"
+			}
+			
