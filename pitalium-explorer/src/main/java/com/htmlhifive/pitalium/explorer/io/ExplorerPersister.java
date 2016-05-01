@@ -15,6 +15,7 @@ import com.htmlhifive.pitalium.explorer.entity.Screenshot;
 import com.htmlhifive.pitalium.explorer.entity.Target;
 import com.htmlhifive.pitalium.explorer.entity.TestExecutionAndEnvironment;
 import com.htmlhifive.pitalium.explorer.response.ResultDirectory;
+import com.htmlhifive.pitalium.explorer.response.ScreenshotFile;
 import com.htmlhifive.pitalium.explorer.response.TestExecutionResult;
 
 public interface ExplorerPersister extends Persister {
@@ -30,9 +31,17 @@ public interface ExplorerPersister extends Persister {
 	 * @param searchTestScreen
 	 * @param page
 	 * @param pageSize
-	 * @return
+	 * @return Directories under 'results' folder
 	 */
 	Page<ResultDirectory> findResultDirectory(String searchTestMethod, String searchTestScreen, int page, int pageSize);
+	
+	/**
+	 * Get the screenshot files under selected sub-directory of 'results' folder
+	 * 
+	 * @param id
+	 * @return Screenshot files under subdirectory of 'results' folder
+	 */
+	List<ScreenshotFile> findScreenshotFiles(int id);
 
 	/**
 	 * TestExecutionのリストを取得する。 引数のメソッド名、スクリーンショットを含む（like検索）Screenshotを持つ TestExecutionのリストを取得する。

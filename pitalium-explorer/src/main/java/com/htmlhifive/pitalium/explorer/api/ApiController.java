@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.htmlhifive.pitalium.explorer.entity.Screenshot;
 import com.htmlhifive.pitalium.explorer.entity.TestExecutionAndEnvironment;
 import com.htmlhifive.pitalium.explorer.response.ResultDirectory;
+import com.htmlhifive.pitalium.explorer.response.ScreenshotFile;
 import com.htmlhifive.pitalium.explorer.response.TestExecutionResult;
 import com.htmlhifive.pitalium.explorer.service.ExplorerService;
 
@@ -30,6 +31,7 @@ public class ApiController {
 	
 	/**
 	 * Gets list of sub-directories under 'results' directory with the comparison results information.
+	 * Parameters usage is same with listTestExecution API.
 	 *
 	 * @param page
 	 * @param pageSize
@@ -46,6 +48,18 @@ public class ApiController {
 			@RequestParam(value = "searchTestScreen", defaultValue = "") String searchTestScreen) {
 		Page<ResultDirectory> list = service.findResultDirectory(searchTestMethod, searchTestScreen, page, pageSize);
 		return new ResponseEntity<Page<ResultDirectory>>(list, HttpStatus.OK);
+	}
+	/**
+	 * 
+	 * @param id
+	 * @return
+	 */
+	@RequestMapping(value = "_screenshots/list", method = RequestMethod.GET, produces="application/json;charset=utf-8")
+	@ResponseBody
+	public ResponseEntity<List<ScreenshotFile>> getScreenshotFiles(
+			@RequestParam(value = "id", defaultValue = "0") int id){
+		List<ScreenshotFile> list = service.findScreenshotFiles(id);
+		return new ResponseEntity<List<ScreenshotFile>>(list, HttpStatus.OK);
 	}
 	/**
 	 * Gets list of the test execution. If pageSize equals to zero, the default page size is used. If pageSize equals to

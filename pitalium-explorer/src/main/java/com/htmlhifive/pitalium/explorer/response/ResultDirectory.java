@@ -14,6 +14,10 @@ public class ResultDirectory {
 	private Integer numberOfScreenshots;
 
 	private Integer numberOfBrowsers;
+	
+	public ResultDirectory(){
+		this(0, "", "", "", 0, 0, 0);
+	}
 
 	public ResultDirectory(Integer id, String name, String timestamp, String url, Integer numberOfResults, Integer numberOfScreenshots, Integer numberOfBrowsers) {
 		this.id = id;

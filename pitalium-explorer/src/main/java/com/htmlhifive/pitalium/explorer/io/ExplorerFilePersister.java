@@ -3,11 +3,15 @@
  */
 package com.htmlhifive.pitalium.explorer.io;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.sql.Date;
 import java.sql.Timestamp;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -16,6 +20,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.imageio.ImageIO;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
@@ -31,6 +39,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.htmlhifive.pitalium.common.util.JSONUtils;
 import com.htmlhifive.pitalium.core.config.FilePersisterConfig;
 import com.htmlhifive.pitalium.core.io.FilePersister;
@@ -51,6 +60,7 @@ import com.htmlhifive.pitalium.explorer.entity.TestExecution;
 import com.htmlhifive.pitalium.explorer.entity.TestExecutionAndEnvironment;
 import com.htmlhifive.pitalium.explorer.response.TestExecutionResult;
 import com.htmlhifive.pitalium.explorer.response.ResultDirectory;
+import com.htmlhifive.pitalium.explorer.response.ScreenshotFile;
 import com.htmlhifive.pitalium.explorer.service.ScreenshotIdService;
 import com.htmlhifive.pitalium.image.model.RectangleArea;
 
@@ -151,7 +161,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 		if(resultDirectoryJson.exists()) resultDirectoryJson.delete();
 		try {
 			FileWriter fw = new FileWriter(resultDirectoryJson.getPath());
-			fw.write(JSONUtils.toStringWithIndent(resultDirectoriesList));
+			fw.write(JSONUtils.toString(resultDirectoriesList));
 			fw.close();
 		} catch (Exception e) {
 			log.error("file write error: can not write " + resultDirectoryJson.getPath());
@@ -170,6 +180,101 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 		return new PageImpl<ResultDirectory>(resultDirectoriesList, pageable, size);
 	}
 	
+	@Override
+	public List<ScreenshotFile> findScreenshotFiles(int id){
+		File root = super.getResultDirectoryFile();
+		if (!root.exists() || !root.isDirectory()) {
+			log.error("Directory(" + root.getAbsolutePath() + ") Not Found.");
+			return new ArrayList<ScreenshotFile>();
+		}
+
+		File resultDirectoryJson = new File(root, "resultDirectory.json");
+		if(!resultDirectoryJson.exists()){
+			log.error("Directory(" + resultDirectoryJson.getAbsolutePath() + ") Not Found.");
+			return new ArrayList<ScreenshotFile>();
+		}
+
+		LinkedList<ResultDirectory> resultDirectoriesList = new LinkedList<ResultDirectory>();
+		try {
+			resultDirectoriesList = JSONUtils.readValue(resultDirectoryJson, new TypeReference<LinkedList<ResultDirectory>>(){});
+		} catch (Exception e) {
+			log.error("error while reading resultDirectory.json: " + e.getMessage());
+			return new ArrayList<ScreenshotFile>();
+		}
+	
+		ResultDirectory rd = null;
+		for(int i=0; i<resultDirectoriesList.size(); i++){
+			rd = resultDirectoriesList.get(i);
+			if(rd.getId() == id){
+				break;
+			}
+		}
+		if(rd == null){
+			log.error("error while finding selected directory");
+			return new ArrayList<ScreenshotFile>();
+		}
+		
+		File directory = new File(root, rd.getName());
+		File[] files = directory.listFiles(new FilenameFilter() {
+			@Override
+			public boolean accept(File dir, String name) {
+				for(String extension : new String[]{".png", "jpg", ".jpeg"}){
+					if(name.toLowerCase().endsWith(extension)) return true;
+				}
+				return false;
+			}
+		});
+		
+		LinkedList<ScreenshotFile> screenshotFilesList = new LinkedList<ScreenshotFile>();
+		for(int i=0; i<files.length; i++){
+			File file = files[i];
+			System.out.println(file.getAbsolutePath());
+			String name = file.getName();
+			Date date = new Date(file.lastModified());
+			String timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date);
+
+			String platform = "unknown";
+			if(name.toLowerCase().contains("window")) platform = "window";
+			else if(name.toLowerCase().contains("osx")) platform = "osx";
+			else if(name.toLowerCase().contains("linux")) platform = "linux";
+			else if(name.toLowerCase().contains("android")) platform = "android";
+			else if(name.toLowerCase().contains("ios")) platform = "ios";
+
+			String browser = "unknown";
+			if(name.toLowerCase().contains("chrome")) browser = "chrome";
+			else if(name.toLowerCase().contains("safari")) browser = "safari";
+			else if(name.toLowerCase().contains("firefox")) browser = "firefox";
+			else if(name.toLowerCase().contains("IE")) browser = "IE";
+			
+			String version = "";
+			// this regex has something problem. should be fixed later
+			Matcher m = Pattern.compile("v.?(\\d+(\\d|\\.)*+)").matcher(name);
+			if(m.find()){
+				version = m.group(1);
+			}
+
+			double size = ((double) file.length())/(1024*1024);
+			size = Double.valueOf(new DecimalFormat("#.##").format(size));
+			
+			BufferedImage bimg;
+			int width = 0;
+			int height = 0;
+			try {
+				bimg = ImageIO.read(file);
+				width = bimg.getWidth();
+				height = bimg.getHeight();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
+			ScreenshotFile screenshotFile = new ScreenshotFile(i+1, name, timestamp,
+															   platform, browser, version,
+															   size, width, height);
+			screenshotFilesList.add(screenshotFile);
+		}
+		return screenshotFilesList;
+	}
+
 	@Override
 	public Page<TestExecutionResult> findTestExecution(String searchTestMethod, String searchTestScreen, int page,
 			int pageSize) {

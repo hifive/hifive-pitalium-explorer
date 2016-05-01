@@ -34,6 +34,7 @@ import com.htmlhifive.pitalium.explorer.entity.TestExecutionRepository;
 import com.htmlhifive.pitalium.explorer.io.ExplorerDBPersister;
 import com.htmlhifive.pitalium.explorer.io.ExplorerPersister;
 import com.htmlhifive.pitalium.explorer.response.ResultDirectory;
+import com.htmlhifive.pitalium.explorer.response.ScreenshotFile;
 import com.htmlhifive.pitalium.explorer.response.TestExecutionResult;
 
 @Service("persisterService")
@@ -88,6 +89,10 @@ public class PersisterServiceImpl implements PersisterService {
 	public Page<ResultDirectory> findResultDirectory(String searchTestMethod, String searchTestScreen, int page,
 			int pageSize) {
 		return persister.findResultDirectory(searchTestMethod, searchTestScreen, page, pageSize);
+	}
+	@Override
+	public List<ScreenshotFile> findScreenshotFiles(int id){
+		return persister.findScreenshotFiles(id);
 	}
 
 	@Override

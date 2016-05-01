@@ -43,6 +43,7 @@ import com.htmlhifive.pitalium.explorer.entity.TestExecutionRepository;
 import com.htmlhifive.pitalium.explorer.image.EdgeDetector;
 import com.htmlhifive.pitalium.explorer.io.ExplorerPersister;
 import com.htmlhifive.pitalium.explorer.response.ResultDirectory;
+import com.htmlhifive.pitalium.explorer.response.ScreenshotFile;
 import com.htmlhifive.pitalium.explorer.response.TestExecutionResult;
 import com.htmlhifive.pitalium.image.model.DiffPoints;
 import com.htmlhifive.pitalium.image.util.ImageUtils;
@@ -86,6 +87,10 @@ public class ExplorerService implements Serializable {
 
 	public Page<ResultDirectory> findResultDirectory(String searchTestMethod, String searchTestScreen, int page, int pageSize){
 		return persisterService.findResultDirectory(searchTestMethod, searchTestScreen, page, pageSize);
+	}
+	
+	public List<ScreenshotFile> findScreenshotFiles(int id){
+		return persisterService.findScreenshotFiles(id);
 	}
 
 	public Page<TestExecutionResult> findTestExecution(String searchTestMethod, String searchTestScreen, int page,
