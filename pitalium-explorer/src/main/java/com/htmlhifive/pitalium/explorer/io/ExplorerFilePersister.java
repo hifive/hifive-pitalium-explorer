@@ -62,6 +62,7 @@ import com.htmlhifive.pitalium.explorer.image.ComparedRectangle;
 import com.htmlhifive.pitalium.explorer.image.ImagePair;
 import com.htmlhifive.pitalium.explorer.image.SimilarityUnit;
 import com.htmlhifive.pitalium.explorer.response.TestExecutionResult;
+import com.htmlhifive.pitalium.explorer.response.Result;
 import com.htmlhifive.pitalium.explorer.response.ResultDirectory;
 import com.htmlhifive.pitalium.explorer.response.ScreenshotFile;
 import com.htmlhifive.pitalium.explorer.service.ScreenshotIdService;
@@ -193,40 +194,13 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 	}
 	
 	@Override
-	public List<ScreenshotFile> findScreenshotFiles(String dir, boolean refresh){
+	public Map<String, List> findScreenshotFiles(String dir, boolean refresh){
 		File root = super.getResultDirectoryFile();
 		if (!root.exists() || !root.isDirectory()) {
 			log.error("Directory(" + root.getAbsolutePath() + ") Not Found.");
-			return new ArrayList<ScreenshotFile>();
+			return new HashMap<String, List>();
 		}
 
-//		File resultDirectoryJson = new File(root, "resultDirectory.json");
-//		if(!resultDirectoryJson.exists()){
-//			log.error("Directory(" + resultDirectoryJson.getAbsolutePath() + ") Not Found.");
-//			return new ArrayList<ScreenshotFile>();
-//		}
-//
-//		LinkedList<ResultDirectory> resultDirectoriesList = new LinkedList<ResultDirectory>();
-//		try {
-//			resultDirectoriesList = JSONUtils.readValue(resultDirectoryJson, new TypeReference<LinkedList<ResultDirectory>>(){});
-//		} catch (Exception e) {
-//			log.error("error while reading resultDirectory.json: " + e.getMessage());
-//			return new ArrayList<ScreenshotFile>();
-//		}
-//	
-//		ResultDirectory rd = null;
-//		for(int i=0; i<resultDirectoriesList.size(); i++){
-//			rd = resultDirectoriesList.get(i);
-//			if(rd.getId() == id){
-//				break;
-//			}
-//		}
-//		if(rd == null){
-//			log.error("error while finding selected directory");
-//			return new ArrayList<ScreenshotFile>();
-//		}
-//		
-//		File directory = new File(root, rd.getName());
 		File directory = new File(root, dir);
 		File[] files = directory.listFiles(new FilenameFilter() {
 			@Override
@@ -238,14 +212,14 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 			}
 		});
 
-		LinkedList<ScreenshotFile> screenshotFilesList = new LinkedList<ScreenshotFile>();
+		List<ScreenshotFile> screenshotFileList = new LinkedList<ScreenshotFile>();
 
 		File screenshotFileListJson= new File(directory, "screenshotFileList.json");
 		if (!refresh){
 			if(!screenshotFileListJson.exists()){
-				return new LinkedList<ScreenshotFile>();
+				return new HashMap<String, List>();
 			}else{
-				screenshotFilesList = JSONUtils.readValue(screenshotFileListJson, new TypeReference<LinkedList<ScreenshotFile>>(){});
+				screenshotFileList = JSONUtils.readValue(screenshotFileListJson, new TypeReference<LinkedList<ScreenshotFile>>(){});
 			}
 		}else{
 			for(int i=0; i<files.length; i++){
@@ -291,37 +265,46 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 				ScreenshotFile screenshotFile = new ScreenshotFile(i+1, name, timestamp,
 						platform, browser, version,
 						size, width, height);
-				screenshotFilesList.add(screenshotFile);
+				screenshotFileList.add(screenshotFile);
 			}
 
 			if(screenshotFileListJson.exists()) screenshotFileListJson.delete();
 			try {
 				FileWriter fw = new FileWriter(screenshotFileListJson.getPath());
-				fw.write(JSONUtils.toString(screenshotFilesList));
+				fw.write(JSONUtils.toString(screenshotFileList));
 				fw.close();
 			} catch (Exception e) {
 				log.error("file write error: can not write " + screenshotFileListJson.getPath());
 			}
 		}
-		return screenshotFilesList;
+		File resultListJson = new File(directory, "comparisonResults/resultList.json");
+		List<Result> resultList;
+		if(resultListJson.exists()){
+			resultList = JSONUtils.readValue(resultListJson, new TypeReference<LinkedList<Result>>(){});
+		} else{
+			resultList = new LinkedList<Result>();
+		}
+
+		Map<String, List> ret = new HashMap<String, List>();
+		ret.put("screenshotFileList", screenshotFileList);
+		ret.put("resultList", resultList);
+		return ret;
 	}
 	
 	@Override
 //	public List<ComparedRectangle> executeComparing(String directoryName, String expectedFilename, String[] targetFilenames) {
-	public Boolean executeComparing(String directoryName, String expectedFilename, String[] targetFilenames) {
+	public List<Result> executeComparing(String directoryName, String expectedFilename, String[] targetFilenames) {
 //		File root = super.getResultDirectoryFile();
 		File root = new File("/Users/Sungmin/Documents/workspace-sts-3.7.3.RELEASE/hifive-pitalium-explorer/pitalium-explorer/results");
 		if (!root.exists() || !root.isDirectory()) {
 			log.error("Directory(" + root.getAbsolutePath() + ") Not Found.");
-//			return new ArrayList<ComparedRectangle>();
-			return false;
+			return new ArrayList<Result>();
 		}
 
 		File directory = new File(root, directoryName);
 		if(!directory.exists() || !directory.isDirectory()){
 			log.error("Directory(" + directory.getAbsolutePath() + ") Not Found.");
-//			return new ArrayList<ComparedRectangle>();
-			return false;
+			return new ArrayList<Result>();
 		}
 
 		File comparisonResultsDir = new File(directory, "comparisonResults");
@@ -329,21 +312,35 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 			comparisonResultsDir.mkdir();
 		}
 		
+		File resultListJson = new File(comparisonResultsDir, "resultList.json");
+		if(!resultListJson.exists()){
+			try {
+				resultListJson.createNewFile();
+			} catch (IOException e) {
+				log.error("Can not create " + resultListJson.getAbsolutePath());
+			}
+		}
+		List<Result> resultList;
+		try {
+			resultList = JSONUtils.readValue(resultListJson, new TypeReference<LinkedList<Result>>(){});
+		} catch (Exception e){
+			resultList = new LinkedList<Result>();
+		}
+		
 		File expectedFile = new File(directory, expectedFilename);
 		if(!expectedFile.exists()){ 
 			log.error("Directory(" + expectedFile.getAbsolutePath() + ") Not Found.");
-//			return new ArrayList<ComparedRectangle>();
-			return false;
+			return new ArrayList<Result>();
 		}
 		BufferedImage expectedImage;
 		try {
 			expectedImage = ImageIO.read(expectedFile);
 		} catch (IOException e) {
 			log.error("get buffered image error:: " + expectedFile.getAbsolutePath());
-//			return new ArrayList<ComparedRectangle>();
-			return false;
+			return new ArrayList<Result>();
 		}
-
+		
+		List<Result> newResultList = new LinkedList<Result>();
 		for(int i=0; i<targetFilenames.length; i++){
 			String targetFilename = targetFilenames[i];
 			List<ComparedRectangle> comparedRectangles;
@@ -351,7 +348,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 			String filenamePair = expectedFilename+"__"+targetFilename+".json";
 			File filenamePairJson = new File(comparisonResultsDir, filenamePair);
 			if(filenamePairJson.exists()){
-				log.error("%s is alread exists", filenamePair);
+				log.error("alread exists " + filenamePair);
 				continue;
 			}
 
@@ -372,6 +369,11 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 			ImagePair imagePair = new ImagePair(expectedImage, targetImage);
 			comparedRectangles = imagePair.getComparedRectangles();
 
+			double entireSimilarity = imagePair.getEntireSimilarity();
+			Result result = new Result(expectedFilename, targetFilename, entireSimilarity, comparedRectangles.size());
+			resultList.add(result);
+			newResultList.add(result);
+			
 			try {
 				FileWriter fw = new FileWriter(filenamePairJson.getPath());
 				fw.write(JSONUtils.toString(comparedRectangles));
@@ -380,8 +382,16 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 				log.error("file write error: can not write " + filenamePairJson.getPath());
 			}
 		}
-//		return new ArrayList<ComparedRectangle>();
-		return true;
+
+		try {
+			FileWriter fw = new FileWriter(resultListJson.getPath());
+			fw.write(JSONUtils.toString(resultList));
+			fw.close();
+		} catch (Exception e){
+			log.error("file write error: can not write " + resultListJson.getPath());
+		}
+
+		return newResultList;
 	}
 
 	@Override

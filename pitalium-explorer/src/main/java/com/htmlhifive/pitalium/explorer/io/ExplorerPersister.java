@@ -6,6 +6,7 @@ package com.htmlhifive.pitalium.explorer.io;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 import com.htmlhifive.pitalium.explorer.service.ScreenshotIdService;
 import org.springframework.data.domain.Page;
@@ -15,6 +16,7 @@ import com.htmlhifive.pitalium.core.io.Persister;
 import com.htmlhifive.pitalium.explorer.entity.Screenshot;
 import com.htmlhifive.pitalium.explorer.entity.Target;
 import com.htmlhifive.pitalium.explorer.entity.TestExecutionAndEnvironment;
+import com.htmlhifive.pitalium.explorer.response.Result;
 import com.htmlhifive.pitalium.explorer.response.ResultDirectory;
 import com.htmlhifive.pitalium.explorer.response.ScreenshotFile;
 import com.htmlhifive.pitalium.explorer.response.TestExecutionResult;
@@ -43,9 +45,9 @@ public interface ExplorerPersister extends Persister {
 	 * @param name
 	 * @return Screenshot files under subdirectory of 'results' folder
 	 */
-	List<ScreenshotFile> findScreenshotFiles(String name, boolean refresh);
+	Map<String, List> findScreenshotFiles(String name, boolean refresh);
 
-	Boolean executeComparing(String directoryName, String expectedFilename, String[] targetFilenames);
+	List<Result> executeComparing(String directoryName, String expectedFilename, String[] targetFilenames);
 
 	/**
 	 * TestExecutionのリストを取得する。 引数のメソッド名、スクリーンショットを含む（like検索）Screenshotを持つ TestExecutionのリストを取得する。

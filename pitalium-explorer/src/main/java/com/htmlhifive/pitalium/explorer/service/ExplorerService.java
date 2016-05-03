@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletResponse;
@@ -43,6 +44,7 @@ import com.htmlhifive.pitalium.explorer.entity.TestExecutionAndEnvironment;
 import com.htmlhifive.pitalium.explorer.entity.TestExecutionRepository;
 import com.htmlhifive.pitalium.explorer.image.EdgeDetector;
 import com.htmlhifive.pitalium.explorer.io.ExplorerPersister;
+import com.htmlhifive.pitalium.explorer.response.Result;
 import com.htmlhifive.pitalium.explorer.response.ResultDirectory;
 import com.htmlhifive.pitalium.explorer.response.ScreenshotFile;
 import com.htmlhifive.pitalium.explorer.response.TestExecutionResult;
@@ -90,11 +92,11 @@ public class ExplorerService implements Serializable {
 		return persisterService.findResultDirectory(searchTestMethod, searchTestScreen, page, pageSize, refresh);
 	}
 	
-	public List<ScreenshotFile> findScreenshotFiles(String name, boolean refresh){
+	public Map<String, List> findScreenshotFiles(String name, boolean refresh){
 		return persisterService.findScreenshotFiles(name, refresh);
 	}
 
-	public Boolean executeComparing(String directoryName, String expectedFilename, String[] targetFilenames) {
+	public List<Result> executeComparing(String directoryName, String expectedFilename, String[] targetFilenames) {
 		return persisterService.executeComparing(directoryName, expectedFilename, targetFilenames);
 	}
 
