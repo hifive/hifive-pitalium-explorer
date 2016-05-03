@@ -85,12 +85,12 @@ public class ExplorerService implements Serializable {
 		return persisterService;
 	}
 
-	public Page<ResultDirectory> findResultDirectory(String searchTestMethod, String searchTestScreen, int page, int pageSize){
-		return persisterService.findResultDirectory(searchTestMethod, searchTestScreen, page, pageSize);
+	public Page<ResultDirectory> findResultDirectory(String searchTestMethod, String searchTestScreen, int page, int pageSize, boolean refresh){
+		return persisterService.findResultDirectory(searchTestMethod, searchTestScreen, page, pageSize, refresh);
 	}
 	
-	public List<ScreenshotFile> findScreenshotFiles(int id){
-		return persisterService.findScreenshotFiles(id);
+	public List<ScreenshotFile> findScreenshotFiles(String name, boolean refresh){
+		return persisterService.findScreenshotFiles(name, refresh);
 	}
 
 	public Page<TestExecutionResult> findTestExecution(String searchTestMethod, String searchTestScreen, int page,

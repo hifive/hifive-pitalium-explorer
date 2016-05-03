@@ -45,8 +45,9 @@ public class ApiController {
 			@RequestParam(value = "page", defaultValue = "1") int page,
 			@RequestParam(value = "limit", defaultValue = "0") int pageSize,
 			@RequestParam(value = "searchTestMethod", defaultValue = "") String searchTestMethod,
-			@RequestParam(value = "searchTestScreen", defaultValue = "") String searchTestScreen) {
-		Page<ResultDirectory> list = service.findResultDirectory(searchTestMethod, searchTestScreen, page, pageSize);
+			@RequestParam(value = "searchTestScreen", defaultValue = "") String searchTestScreen,
+			@RequestParam(value = "refresh", defaultValue = "false") boolean refresh) {
+		Page<ResultDirectory> list = service.findResultDirectory(searchTestMethod, searchTestScreen, page, pageSize, refresh);
 		return new ResponseEntity<Page<ResultDirectory>>(list, HttpStatus.OK);
 	}
 	/**
@@ -57,8 +58,9 @@ public class ApiController {
 	@RequestMapping(value = "_screenshots/list", method = RequestMethod.GET, produces="application/json;charset=utf-8")
 	@ResponseBody
 	public ResponseEntity<List<ScreenshotFile>> getScreenshotFiles(
-			@RequestParam(value = "id", defaultValue = "0") int id){
-		List<ScreenshotFile> list = service.findScreenshotFiles(id);
+			@RequestParam(value = "name", defaultValue = "0") String name,
+			@RequestParam(value = "refresh", defaultValue = "false") boolean refresh){
+		List<ScreenshotFile> list = service.findScreenshotFiles(name, refresh);
 		return new ResponseEntity<List<ScreenshotFile>>(list, HttpStatus.OK);
 	}
 	/**

@@ -87,12 +87,12 @@ public class PersisterServiceImpl implements PersisterService {
 
 	@Override
 	public Page<ResultDirectory> findResultDirectory(String searchTestMethod, String searchTestScreen, int page,
-			int pageSize) {
-		return persister.findResultDirectory(searchTestMethod, searchTestScreen, page, pageSize);
+			int pageSize, boolean refresh) {
+		return persister.findResultDirectory(searchTestMethod, searchTestScreen, page, pageSize, refresh);
 	}
 	@Override
-	public List<ScreenshotFile> findScreenshotFiles(int id){
-		return persister.findScreenshotFiles(id);
+	public List<ScreenshotFile> findScreenshotFiles(String name, boolean refresh){
+		return persister.findScreenshotFiles(name, refresh);
 	}
 
 	@Override

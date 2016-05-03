@@ -90,81 +90,90 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 	}
 
 	@Override
-	public Page<ResultDirectory> findResultDirectory(String searchMethod, String searchTestScreen, int page, int pageSize){
+	public Page<ResultDirectory> findResultDirectory(String searchMethod, String searchTestScreen, int page, int pageSize, boolean refresh){
 		File root = super.getResultDirectoryFile();
 		if (!root.exists() || !root.isDirectory()) {
 			log.error("Directory(" + root.getAbsolutePath() + ") Not Found.");
 			return new PageImpl<>(new ArrayList<ResultDirectory>());
 		}
+
 		LinkedList<ResultDirectory> resultDirectoriesList = new LinkedList<ResultDirectory>();
 
-		File[] subDirectories = root.listFiles(new FilenameFilter(){
-			@Override
-			public boolean accept(File dir, String name){
-				return new File(dir, name).isDirectory();
-			}
-		});
-
-		for(int i=0; i<subDirectories.length; i++){
-			File directory = subDirectories[i];
-
-			String name = directory.getName();
-			String[] splitted_name = name.split("_");
-
-			String timestamp = splitted_name[0];
-
-			String url = "";
-			if(splitted_name.length > 1){
-				for(int j=1; j<splitted_name.length; j++){
-					url = url.concat("_");
-					url = url.concat(splitted_name[j]);
-				}
-				url = url.substring(1);
-			}
-
-			File[] results = directory.listFiles(new FilenameFilter() {
-				@Override
-				public boolean accept(File dir, String name) {
-					return name.toLowerCase().endsWith(".json");
-				}
-			});
-			int numberOfResults = results.length;
-
-			File[] screenshots = directory.listFiles(new FilenameFilter() {
-				@Override
-				public boolean accept(File dir, String name) {
-					for(String extension : new String[]{".png", "jpg", ".jpeg"}){
-						if(name.toLowerCase().endsWith(extension)) return true;
-					}
-					return false;
-				}
-			});
-			int numberOfScreenshots = screenshots.length;
-
-			HashSet<String> browsers = new HashSet<String>();
-			for(File screenshot : screenshots){
-				if(screenshot.getName().toLowerCase().contains("chrome")) browsers.add("chrome");
-				else if(screenshot.getName().toLowerCase().contains("safari")) browsers.add("safari");
-				else if(screenshot.getName().toLowerCase().contains("firefox")) browsers.add("firefox");
-				else if(screenshot.getName().toLowerCase().contains("IE")) browsers.add("IE");
-				else browsers.add("unknown");
-			}
-			int numberOfBrowsers = browsers.size();
-
-			ResultDirectory resultDirectory = new ResultDirectory(i+1, name, timestamp, url,
-					numberOfResults, numberOfScreenshots, numberOfBrowsers);
-
-			resultDirectoriesList.add(resultDirectory);
-		}
-
 		File resultDirectoryJson = new File(root, "resultDirectory.json");
-		if(resultDirectoryJson.exists()) resultDirectoryJson.delete();
-		try {
-			FileWriter fw = new FileWriter(resultDirectoryJson.getPath());
-			fw.write(JSONUtils.toString(resultDirectoriesList));
-			fw.close();
-		} catch (Exception e) {
-			log.error("file write error: can not write " + resultDirectoryJson.getPath());
+		if (!refresh){
+			if(!resultDirectoryJson.exists()){
+				return new PageImpl<>(new ArrayList<ResultDirectory>());
+			}else{
+				resultDirectoriesList = JSONUtils.readValue(resultDirectoryJson, new TypeReference<LinkedList<ResultDirectory>>(){});
+			}
+		}else{
+			File[] subDirectories = root.listFiles(new FilenameFilter(){
+				@Override
+				public boolean accept(File dir, String name){
+					return new File(dir, name).isDirectory();
+				}
+			});
+
+			for(int i=0; i<subDirectories.length; i++){
+				File directory = subDirectories[i];
+
+				String name = directory.getName();
+				String[] splitted_name = name.split("_");
+
+				String timestamp = splitted_name[0];
+
+				String url = "";
+				if(splitted_name.length > 1){
+					for(int j=1; j<splitted_name.length; j++){
+						url = url.concat("_");
+						url = url.concat(splitted_name[j]);
+					}
+					url = url.substring(1);
+				}
+
+				File[] results = directory.listFiles(new FilenameFilter() {
+					@Override
+					public boolean accept(File dir, String name) {
+						return name.toLowerCase().endsWith(".json");
+					}
+				});
+				int numberOfResults = results.length;
+
+				File[] screenshots = directory.listFiles(new FilenameFilter() {
+					@Override
+					public boolean accept(File dir, String name) {
+						for(String extension : new String[]{".png", "jpg", ".jpeg"}){
+							if(name.toLowerCase().endsWith(extension)) return true;
+						}
+						return false;
+					}
+				});
+				int numberOfScreenshots = screenshots.length;
+
+				HashSet<String> browsers = new HashSet<String>();
+				for(File screenshot : screenshots){
+					if(screenshot.getName().toLowerCase().contains("chrome")) browsers.add("chrome");
+					else if(screenshot.getName().toLowerCase().contains("safari")) browsers.add("safari");
+					else if(screenshot.getName().toLowerCase().contains("firefox")) browsers.add("firefox");
+					else if(screenshot.getName().toLowerCase().contains("IE")) browsers.add("IE");
+					else browsers.add("unknown");
+				}
+				int numberOfBrowsers = browsers.size();
+
+				ResultDirectory resultDirectory = new ResultDirectory(i+1, name, timestamp, url,
+						numberOfResults, numberOfScreenshots, numberOfBrowsers);
+
+				resultDirectoriesList.add(resultDirectory);
+			}
+
+			if(resultDirectoryJson.exists()) resultDirectoryJson.delete();
+			try {
+				FileWriter fw = new FileWriter(resultDirectoryJson.getPath());
+				fw.write(JSONUtils.toString(resultDirectoriesList));
+				fw.close();
+			} catch (Exception e) {
+				log.error("file write error: can not write " + resultDirectoryJson.getPath());
+			}
 		}
 
 		int size = resultDirectoriesList.size();
@@ -181,40 +190,41 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 	}
 	
 	@Override
-	public List<ScreenshotFile> findScreenshotFiles(int id){
+	public List<ScreenshotFile> findScreenshotFiles(String dir, boolean refresh){
 		File root = super.getResultDirectoryFile();
 		if (!root.exists() || !root.isDirectory()) {
 			log.error("Directory(" + root.getAbsolutePath() + ") Not Found.");
 			return new ArrayList<ScreenshotFile>();
 		}
 
-		File resultDirectoryJson = new File(root, "resultDirectory.json");
-		if(!resultDirectoryJson.exists()){
-			log.error("Directory(" + resultDirectoryJson.getAbsolutePath() + ") Not Found.");
-			return new ArrayList<ScreenshotFile>();
-		}
-
-		LinkedList<ResultDirectory> resultDirectoriesList = new LinkedList<ResultDirectory>();
-		try {
-			resultDirectoriesList = JSONUtils.readValue(resultDirectoryJson, new TypeReference<LinkedList<ResultDirectory>>(){});
-		} catch (Exception e) {
-			log.error("error while reading resultDirectory.json: " + e.getMessage());
-			return new ArrayList<ScreenshotFile>();
-		}
-	
-		ResultDirectory rd = null;
-		for(int i=0; i<resultDirectoriesList.size(); i++){
-			rd = resultDirectoriesList.get(i);
-			if(rd.getId() == id){
-				break;
-			}
-		}
-		if(rd == null){
-			log.error("error while finding selected directory");
-			return new ArrayList<ScreenshotFile>();
-		}
-		
-		File directory = new File(root, rd.getName());
+//		File resultDirectoryJson = new File(root, "resultDirectory.json");
+//		if(!resultDirectoryJson.exists()){
+//			log.error("Directory(" + resultDirectoryJson.getAbsolutePath() + ") Not Found.");
+//			return new ArrayList<ScreenshotFile>();
+//		}
+//
+//		LinkedList<ResultDirectory> resultDirectoriesList = new LinkedList<ResultDirectory>();
+//		try {
+//			resultDirectoriesList = JSONUtils.readValue(resultDirectoryJson, new TypeReference<LinkedList<ResultDirectory>>(){});
+//		} catch (Exception e) {
+//			log.error("error while reading resultDirectory.json: " + e.getMessage());
+//			return new ArrayList<ScreenshotFile>();
+//		}
+//	
+//		ResultDirectory rd = null;
+//		for(int i=0; i<resultDirectoriesList.size(); i++){
+//			rd = resultDirectoriesList.get(i);
+//			if(rd.getId() == id){
+//				break;
+//			}
+//		}
+//		if(rd == null){
+//			log.error("error while finding selected directory");
+//			return new ArrayList<ScreenshotFile>();
+//		}
+//		
+//		File directory = new File(root, rd.getName());
+		File directory = new File(root, dir);
 		File[] files = directory.listFiles(new FilenameFilter() {
 			@Override
 			public boolean accept(File dir, String name) {
@@ -224,53 +234,71 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 				return false;
 			}
 		});
-		
+
 		LinkedList<ScreenshotFile> screenshotFilesList = new LinkedList<ScreenshotFile>();
-		for(int i=0; i<files.length; i++){
-			File file = files[i];
-			System.out.println(file.getAbsolutePath());
-			String name = file.getName();
-			Date date = new Date(file.lastModified());
-			String timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date);
 
-			String platform = "unknown";
-			if(name.toLowerCase().contains("window")) platform = "window";
-			else if(name.toLowerCase().contains("osx")) platform = "osx";
-			else if(name.toLowerCase().contains("linux")) platform = "linux";
-			else if(name.toLowerCase().contains("android")) platform = "android";
-			else if(name.toLowerCase().contains("ios")) platform = "ios";
+		File screenshotFileListJson= new File(directory, "screenshotFileList.json");
+		if (!refresh){
+			if(!screenshotFileListJson.exists()){
+				return new LinkedList<ScreenshotFile>();
+			}else{
+				screenshotFilesList = JSONUtils.readValue(screenshotFileListJson, new TypeReference<LinkedList<ScreenshotFile>>(){});
+			}
+		}else{
+			for(int i=0; i<files.length; i++){
+				File file = files[i];
+				String name = file.getName();
+				Date date = new Date(file.lastModified());
+				String timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date);
 
-			String browser = "unknown";
-			if(name.toLowerCase().contains("chrome")) browser = "chrome";
-			else if(name.toLowerCase().contains("safari")) browser = "safari";
-			else if(name.toLowerCase().contains("firefox")) browser = "firefox";
-			else if(name.toLowerCase().contains("IE")) browser = "IE";
-			
-			String version = "";
-			// this regex has something problem. should be fixed later
-			Matcher m = Pattern.compile("v.?(\\d+(\\d|\\.)*+)").matcher(name);
-			if(m.find()){
-				version = m.group(1);
+				String platform = "unknown";
+				if(name.toLowerCase().contains("window")) platform = "window";
+				else if(name.toLowerCase().contains("osx")) platform = "osx";
+				else if(name.toLowerCase().contains("linux")) platform = "linux";
+				else if(name.toLowerCase().contains("android")) platform = "android";
+				else if(name.toLowerCase().contains("ios")) platform = "ios";
+
+				String browser = "unknown";
+				if(name.toLowerCase().contains("chrome")) browser = "chrome";
+				else if(name.toLowerCase().contains("safari")) browser = "safari";
+				else if(name.toLowerCase().contains("firefox")) browser = "firefox";
+				else if(name.toLowerCase().contains("IE")) browser = "IE";
+
+				String version = "";
+				// this regex has something problem. should be fixed later
+				Matcher m = Pattern.compile("v.?(\\d+(\\d|\\.)*+)").matcher(name);
+				if(m.find()){
+					version = m.group(1);
+				}
+
+				double size = ((double) file.length())/(1024*1024);
+				size = Double.valueOf(new DecimalFormat("#.##").format(size));
+
+				BufferedImage bimg;
+				int width = 0;
+				int height = 0;
+				try {
+					bimg = ImageIO.read(file);
+					width = bimg.getWidth();
+					height = bimg.getHeight();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+
+				ScreenshotFile screenshotFile = new ScreenshotFile(i+1, name, timestamp,
+						platform, browser, version,
+						size, width, height);
+				screenshotFilesList.add(screenshotFile);
 			}
 
-			double size = ((double) file.length())/(1024*1024);
-			size = Double.valueOf(new DecimalFormat("#.##").format(size));
-			
-			BufferedImage bimg;
-			int width = 0;
-			int height = 0;
+			if(screenshotFileListJson.exists()) screenshotFileListJson.delete();
 			try {
-				bimg = ImageIO.read(file);
-				width = bimg.getWidth();
-				height = bimg.getHeight();
-			} catch (IOException e) {
-				e.printStackTrace();
+				FileWriter fw = new FileWriter(screenshotFileListJson.getPath());
+				fw.write(JSONUtils.toString(screenshotFilesList));
+				fw.close();
+			} catch (Exception e) {
+				log.error("file write error: can not write " + screenshotFileListJson.getPath());
 			}
-
-			ScreenshotFile screenshotFile = new ScreenshotFile(i+1, name, timestamp,
-															   platform, browser, version,
-															   size, width, height);
-			screenshotFilesList.add(screenshotFile);
 		}
 		return screenshotFilesList;
 	}

@@ -31,17 +31,18 @@ public interface ExplorerPersister extends Persister {
 	 * @param searchTestScreen
 	 * @param page
 	 * @param pageSize
+	 * @param refresh 
 	 * @return Directories under 'results' folder
 	 */
-	Page<ResultDirectory> findResultDirectory(String searchTestMethod, String searchTestScreen, int page, int pageSize);
+	Page<ResultDirectory> findResultDirectory(String searchTestMethod, String searchTestScreen, int page, int pageSize, boolean refresh);
 	
 	/**
 	 * Get the screenshot files under selected sub-directory of 'results' folder
 	 * 
-	 * @param id
+	 * @param name
 	 * @return Screenshot files under subdirectory of 'results' folder
 	 */
-	List<ScreenshotFile> findScreenshotFiles(int id);
+	List<ScreenshotFile> findScreenshotFiles(String name, boolean refresh);
 
 	/**
 	 * TestExecutionのリストを取得する。 引数のメソッド名、スクリーンショットを含む（like検索）Screenshotを持つ TestExecutionのリストを取得する。
