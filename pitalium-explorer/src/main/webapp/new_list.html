@@ -66,14 +66,15 @@
 		</nav>
 		<!-- Navigation -->
 
-		<div class="container col-md-8 col-md-offset-2 margin-top">
+		<div class="container col-md-8 col-md-offset-2 margin-top" id="container">
 			<h4>Test results</h4>
 	
 
-			<div class="col-md-12" style="margin-top:20px; ">
+			<div class="col-md-12" id="result_list" >
 				
-				<div class="result_list" style="border-bottom:1px solid #CFD8DC; padding:7px;">
-					<a  onclick="$('#sample_table').toggle();">March 15, 2016 www.naver.com (0/4)</a>
+				<div class="result_content">
+				
+					<a onclick="$('#sample_table').toggle();">March 15, 2016 www.naver.com (0/4)</a>
 						<table class="table " id="sample_table" style="display:none;">
 							<tr>
 								<th>
@@ -98,6 +99,8 @@
 							</tr>
 							
 							<tr>
+							
+							
 								<td class="platform">
 									<img src="res/img/windows.svg" style="height:15px;"/>
 									<span style="display:none;">WINDOWS</span>
@@ -205,43 +208,69 @@
 			$(this).find("img").show();
 			$(this).find("span").hide();
 		});
+		
+		
+		$(document).ready(function(){
+			
+			load_list();
+			
+		});
+		
+		
+		function load_list() {
+			var result_list_url = './_results/list.json';
+			
+			$.ajax({
+				url: result_list_url,
+				success: function(data){
+					
+					var content = data["content"];
+					var options = {
+						    weekday: "long", year: "numeric", month: "short",
+						    day: "numeric", hour: "2-digit", minute: "2-digit"
+						};
+					
+					var mycontroller = new Array;
+					
+					for (var i = 0; i < content.length; i++){
+					
+						var result_name = content[i]["name"];
+						var tString = content[i]["timestamp"];
+						
+						
+						var tStamp = new Date(tString.substr(0, 4), (parseInt(tString.substr(4,2)) - 1), tString.substr(6,2), tString.substr(8,2), tString.substr(10,2));
+						var mytimes = tStamp.toLocaleTimeString("en", options)
+						
+						var NofScreenshots = content[i]["numberOfScreenshots"];
+						var NofResult = content[i]["numberOfResults"];
+						
+						var data = {name: result_name, time: mytimes, screenshot: NofScreenshots, result: NofResult };
+						
+						h5.core.view.append("#result_list", "mylist", data);
+						
+						
+						
+					}
+					
+				}
+				
+			});
+		}
+		
+		
+		
 		</script>
 		
-		<style>
 		
-		.platform {
-			cursor:pointer;
-			min-width: 105px;
-		}
-		.platform:hover {
-			background-color:#C8E6C9;
-		}
-			.result_list > a {
-				color:#546E7A;
-				cursor: pointer;
-			}
-			
-			.table > tbody > tr > th {
-			background-color:#26A69A;
-			padding: 10px;
-			color: white;
-			text-align: center;
-			}
-			.table > tbody > tr > td
-			{
-				background-color: #F1F8E9;
-				border:none;
-				vertical-align: middle;
-				text-align: center;
-			}
-			
-			.table {
-				margin-top: 10px;
-				box-shadow: 0 2px 5px rgba(0,0,0,0.26);
-			}
-			
-			
-			
-		</style>
+		<script type="text/ejs" id="mylist">
+
+<div class="result_content">
+				
+					<a>[%=name%] ([%=time%]) ([%=result%]/[%=screenshot%])</a>
+</div>
+ 
+
+	</script>
+		
 	</body>
 </html>
