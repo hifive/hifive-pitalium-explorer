@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -91,6 +92,10 @@ public class ExplorerService implements Serializable {
 	
 	public List<ScreenshotFile> findScreenshotFiles(String name, boolean refresh){
 		return persisterService.findScreenshotFiles(name, refresh);
+	}
+
+	public Boolean executeComparing(String directoryName, String expectedFilename, String[] targetFilenames) {
+		return persisterService.executeComparing(directoryName, expectedFilename, targetFilenames);
 	}
 
 	public Page<TestExecutionResult> findTestExecution(String searchTestMethod, String searchTestScreen, int page,
@@ -389,4 +394,6 @@ public class ExplorerService implements Serializable {
 			response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
 		}
 	}
+
+	
 }

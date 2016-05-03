@@ -9,6 +9,7 @@ import java.util.List;
 
 import com.htmlhifive.pitalium.explorer.service.ScreenshotIdService;
 import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity;
 
 import com.htmlhifive.pitalium.core.io.Persister;
 import com.htmlhifive.pitalium.explorer.entity.Screenshot;
@@ -43,6 +44,8 @@ public interface ExplorerPersister extends Persister {
 	 * @return Screenshot files under subdirectory of 'results' folder
 	 */
 	List<ScreenshotFile> findScreenshotFiles(String name, boolean refresh);
+
+	Boolean executeComparing(String directoryName, String expectedFilename, String[] targetFilenames);
 
 	/**
 	 * TestExecutionのリストを取得する。 引数のメソッド名、スクリーンショットを含む（like検索）Screenshotを持つ TestExecutionのリストを取得する。
@@ -122,4 +125,6 @@ public interface ExplorerPersister extends Persister {
 	String getEdgeFileName(Integer screenshotId, String algorithm);
 
 	void saveProcessedImage(Integer screenshotId, String algorithm, String edgeFileName);
+
+	
 }

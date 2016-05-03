@@ -22,12 +22,18 @@ public class SimilarityUnit {
 		this.YSimilar = YSimilar;
 		this.similarity = similarity;
 	}
+	public SimilarityUnit(){
+		this(0, 0, 0);
+	}
 
 	/**
 	 * @return X-direction Similar at the best match with the highest similarity
 	 */
 	public int getXSimilar() {
 		return XSimilar;
+	}
+	public void setXSimilar(int XSimilar){
+		this.XSimilar = XSimilar;
 	}
 
 	/**
@@ -36,11 +42,17 @@ public class SimilarityUnit {
 	public int getYSimilar() {
 		return YSimilar;
 	}
+	public void setYSimilar(int YSimilar){
+		this.YSimilar = YSimilar;
+	}
 
 	/**
 	 * @return the highest similarity at the position of given X, Y-Similar
 	 */
 	public double getSimilarity() {
 		return similarity;
+	}
+	public void setSimilarity(double similarity){
+		this.similarity = similarity;
 	}
 }

@@ -58,6 +58,9 @@ import com.htmlhifive.pitalium.explorer.entity.Target;
 import com.htmlhifive.pitalium.explorer.entity.TestEnvironment;
 import com.htmlhifive.pitalium.explorer.entity.TestExecution;
 import com.htmlhifive.pitalium.explorer.entity.TestExecutionAndEnvironment;
+import com.htmlhifive.pitalium.explorer.image.ComparedRectangle;
+import com.htmlhifive.pitalium.explorer.image.ImagePair;
+import com.htmlhifive.pitalium.explorer.image.SimilarityUnit;
 import com.htmlhifive.pitalium.explorer.response.TestExecutionResult;
 import com.htmlhifive.pitalium.explorer.response.ResultDirectory;
 import com.htmlhifive.pitalium.explorer.response.ScreenshotFile;
@@ -301,6 +304,84 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 			}
 		}
 		return screenshotFilesList;
+	}
+	
+	@Override
+//	public List<ComparedRectangle> executeComparing(String directoryName, String expectedFilename, String[] targetFilenames) {
+	public Boolean executeComparing(String directoryName, String expectedFilename, String[] targetFilenames) {
+//		File root = super.getResultDirectoryFile();
+		File root = new File("/Users/Sungmin/Documents/workspace-sts-3.7.3.RELEASE/hifive-pitalium-explorer/pitalium-explorer/results");
+		if (!root.exists() || !root.isDirectory()) {
+			log.error("Directory(" + root.getAbsolutePath() + ") Not Found.");
+//			return new ArrayList<ComparedRectangle>();
+			return false;
+		}
+
+		File directory = new File(root, directoryName);
+		if(!directory.exists() || !directory.isDirectory()){
+			log.error("Directory(" + directory.getAbsolutePath() + ") Not Found.");
+//			return new ArrayList<ComparedRectangle>();
+			return false;
+		}
+
+		File comparisonResultsDir = new File(directory, "comparisonResults");
+		if(!comparisonResultsDir.exists() || !comparisonResultsDir.isDirectory()){
+			comparisonResultsDir.mkdir();
+		}
+		
+		File expectedFile = new File(directory, expectedFilename);
+		if(!expectedFile.exists()){ 
+			log.error("Directory(" + expectedFile.getAbsolutePath() + ") Not Found.");
+//			return new ArrayList<ComparedRectangle>();
+			return false;
+		}
+		BufferedImage expectedImage;
+		try {
+			expectedImage = ImageIO.read(expectedFile);
+		} catch (IOException e) {
+			log.error("get buffered image error:: " + expectedFile.getAbsolutePath());
+//			return new ArrayList<ComparedRectangle>();
+			return false;
+		}
+
+		for(int i=0; i<targetFilenames.length; i++){
+			String targetFilename = targetFilenames[i];
+			List<ComparedRectangle> comparedRectangles;
+			
+			String filenamePair = expectedFilename+"__"+targetFilename+".json";
+			File filenamePairJson = new File(comparisonResultsDir, filenamePair);
+			if(filenamePairJson.exists()){
+				log.error("%s is alread exists", filenamePair);
+				continue;
+			}
+
+			File targetFile = new File(directory, targetFilename);
+			if(!targetFile.exists()){ 
+				log.error("Directory(" + targetFile.getAbsolutePath() + ") Not Found.");
+				continue;
+			}
+
+			BufferedImage targetImage;
+			try {
+				targetImage = ImageIO.read(targetFile);
+			} catch (IOException e) {
+				log.error("get buffered image error:: " + targetFile.getAbsolutePath());
+				continue;
+			}
+			
+			ImagePair imagePair = new ImagePair(expectedImage, targetImage);
+			comparedRectangles = imagePair.getComparedRectangles();
+
+			try {
+				FileWriter fw = new FileWriter(filenamePairJson.getPath());
+				fw.write(JSONUtils.toString(comparedRectangles));
+				fw.close();
+			} catch (Exception e) {
+				log.error("file write error: can not write " + filenamePairJson.getPath());
+			}
+		}
+//		return new ArrayList<ComparedRectangle>();
+		return true;
 	}
 
 	@Override

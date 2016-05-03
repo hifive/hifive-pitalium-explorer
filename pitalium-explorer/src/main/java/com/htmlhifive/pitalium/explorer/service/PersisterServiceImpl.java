@@ -16,6 +16,7 @@ import javax.annotation.Resource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.htmlhifive.pitalium.core.io.PersistMetadata;
@@ -93,6 +94,10 @@ public class PersisterServiceImpl implements PersisterService {
 	@Override
 	public List<ScreenshotFile> findScreenshotFiles(String name, boolean refresh){
 		return persister.findScreenshotFiles(name, refresh);
+	}
+	@Override
+	public Boolean executeComparing(String directoryName, String expectedFilename, String[] targetFilenames) {
+		return persister.executeComparing(directoryName, expectedFilename, targetFilenames);
 	}
 
 	@Override

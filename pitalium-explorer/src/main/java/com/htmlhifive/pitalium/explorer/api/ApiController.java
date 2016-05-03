@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.htmlhifive.pitalium.explorer.entity.Screenshot;
 import com.htmlhifive.pitalium.explorer.entity.TestExecutionAndEnvironment;
+import com.htmlhifive.pitalium.explorer.image.ComparedRectangle;
+import com.htmlhifive.pitalium.explorer.io.ExplorerFilePersister;
 import com.htmlhifive.pitalium.explorer.response.ResultDirectory;
 import com.htmlhifive.pitalium.explorer.response.ScreenshotFile;
 import com.htmlhifive.pitalium.explorer.response.TestExecutionResult;
@@ -28,7 +30,6 @@ public class ApiController {
 	@Autowired
 	private ExplorerService service;
 
-	
 	/**
 	 * Gets list of sub-directories under 'results' directory with the comparison results information.
 	 * Parameters usage is same with listTestExecution API.
@@ -52,7 +53,8 @@ public class ApiController {
 	}
 	/**
 	 * 
-	 * @param id
+	 * @param name
+	 * @param refresh
 	 * @return
 	 */
 	@RequestMapping(value = "_screenshots/list", method = RequestMethod.GET, produces="application/json;charset=utf-8")
@@ -62,6 +64,23 @@ public class ApiController {
 			@RequestParam(value = "refresh", defaultValue = "false") boolean refresh){
 		List<ScreenshotFile> list = service.findScreenshotFiles(name, refresh);
 		return new ResponseEntity<List<ScreenshotFile>>(list, HttpStatus.OK);
+	}
+	/**
+	 * 
+	 * @param directoryName
+	 * @param expectedFilename
+	 * @param targetFilenames
+	 * @return
+	 */
+	@RequestMapping(value = "_screenshots/compare", method = RequestMethod.GET, produces="application/json;charset=utf-8")
+	@ResponseBody
+	public ResponseEntity<Boolean> executeComparing(
+			@RequestParam(value = "directory", defaultValue = "") String directoryName,
+			@RequestParam(value = "expected", defaultValue = "") String expectedFilename,
+			@RequestParam(value = "targets", defaultValue = "") String[] targetFilenames
+			){
+		Boolean ret = service.executeComparing(directoryName, expectedFilename, targetFilenames);
+		return new ResponseEntity<Boolean>(ret, HttpStatus.OK);
 	}
 	/**
 	 * Gets list of the test execution. If pageSize equals to zero, the default page size is used. If pageSize equals to

@@ -185,7 +185,8 @@ public class SimilarityUtils {
 		double similarity = 1-min;
 
 		// insert similarity information
-		similarRectangle.setSimilarity(3, bestX, bestY, similarity);
+//		similarRectangle.setSimilarity(3, bestX, bestY, similarity);
+		similarRectangle.setMethod3(new SimilarityUnit(bestX, bestY, similarity));
 
 		return similarity;
 	}
@@ -295,8 +296,10 @@ public class SimilarityUtils {
 		diffNumSimilarity = 1 - (double)diffMin/(actualWidth*actualHeight);
 
 		// insert similarity informations
-		similarRectangle.setSimilarity(1, bestX, bestY, similarity);
-		similarRectangle.setSimilarity(2, bestDiffX, bestDiffY, diffNumSimilarity);
+//		similarRectangle.setSimilarity(1, bestX, bestY, similarity);
+//		similarRectangle.setSimilarity(2, bestDiffX, bestDiffY, diffNumSimilarity);
+		similarRectangle.setMethod1(new SimilarityUnit(bestX, bestY, similarity));
+		similarRectangle.setMethod2(new SimilarityUnit(bestDiffX, bestDiffY, diffNumSimilarity));
 
 		return similarity;
 	}
