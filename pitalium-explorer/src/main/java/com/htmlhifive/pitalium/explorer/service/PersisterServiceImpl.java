@@ -34,6 +34,7 @@ import com.htmlhifive.pitalium.explorer.entity.TestExecutionAndEnvironment;
 import com.htmlhifive.pitalium.explorer.entity.TestExecutionRepository;
 import com.htmlhifive.pitalium.explorer.io.ExplorerDBPersister;
 import com.htmlhifive.pitalium.explorer.io.ExplorerPersister;
+import com.htmlhifive.pitalium.explorer.response.Result;
 import com.htmlhifive.pitalium.explorer.response.ResultDirectory;
 import com.htmlhifive.pitalium.explorer.response.ScreenshotFile;
 import com.htmlhifive.pitalium.explorer.response.TestExecutionResult;
@@ -92,11 +93,11 @@ public class PersisterServiceImpl implements PersisterService {
 		return persister.findResultDirectory(searchTestMethod, searchTestScreen, page, pageSize, refresh);
 	}
 	@Override
-	public List<ScreenshotFile> findScreenshotFiles(String name, boolean refresh){
+	public Map<String, List> findScreenshotFiles(String name, boolean refresh){
 		return persister.findScreenshotFiles(name, refresh);
 	}
 	@Override
-	public Boolean executeComparing(String directoryName, String expectedFilename, String[] targetFilenames) {
+	public List<Result> executeComparing(String directoryName, String expectedFilename, String[] targetFilenames) {
 		return persister.executeComparing(directoryName, expectedFilename, targetFilenames);
 	}
 
