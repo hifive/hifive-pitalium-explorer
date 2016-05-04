@@ -66,7 +66,7 @@ public class ApiController {
 	@ResponseBody
 	public ResponseEntity<Map<String, List>> getScreenshotFiles(
 			@RequestParam(value = "name", defaultValue = "0") String name,
-			@RequestParam(value = "refresh", defaultValue = "false") boolean refresh){
+			@RequestParam(value = "refresh", defaultValue = "true") boolean refresh){
 		Map<String, List> map = service.findScreenshotFiles(name, refresh);
 		return new ResponseEntity<Map<String, List>>(map, HttpStatus.OK);
 	}

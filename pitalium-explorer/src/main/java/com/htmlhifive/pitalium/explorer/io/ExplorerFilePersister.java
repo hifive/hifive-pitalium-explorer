@@ -289,11 +289,11 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 			}
 		}
 		File resultListJson = new File(directory, "comparisonResults/resultList.json");
-		List<Result> resultList;
+		List<ResultListOfExpected> resultList;
 		if(resultListJson.exists()){
-			resultList = JSONUtils.readValue(resultListJson, new TypeReference<LinkedList<Result>>(){});
+			resultList = JSONUtils.readValue(resultListJson, new TypeReference<LinkedList<ResultListOfExpected>>(){});
 		} else{
-			resultList = new LinkedList<Result>();
+			resultList = new LinkedList<ResultListOfExpected>();
 		}
 
 		Map<String, List> ret = new HashMap<String, List>();
