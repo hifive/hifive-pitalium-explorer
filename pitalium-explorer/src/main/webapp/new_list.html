@@ -88,10 +88,7 @@
 		      	<div id="result_box" >
 		      	 	<div id="test_result" style="position:relative;">
 		      	 	
-		      	 		<div class="diffDiv" >
-		      	 			<!-- <img src="res/img/pin.svg" style="width:30px; margin-top:-10px; margin-left: -10px;"/> -->
-		      	 			
-		      	 		</div>
+		      	 		
 		        	
 		        
 		        	</div>
@@ -202,6 +199,7 @@
 			var t_id = "#table_" + String(id);
 			var table_list = $("#table_list_" + String(id));
 			
+			
 			table_list.toggle();
 			
 			if (table_list.css("display") != "none"){
@@ -236,7 +234,8 @@
 									
 								resultList: result["resultList"],
 								expected: result["expectedFilename"],
-								timestamp: tStamp.toLocaleTimeString("en", options)
+								timestamp: tStamp.toLocaleTimeString("en", options),
+								directory: name
 								
 							}
 							h5.core.view.append($('#result_ul_' + String(id)), "result_info_table", my_data);
@@ -365,7 +364,7 @@
 		}
 		
 		
-		function wow(){
+		function imageCall(directory, expected, target){
 			
 			$("#diffDetail").modal("show");
 			$("#test_result").height("300");
@@ -376,9 +375,9 @@
 				url: "_screenshots/images.json",
 				type: "GET",
 				data: {
-					directory: "201605011435_www.naver.com",
-					target: "chrome.png",
-					expected: "chrome_edit.png"
+					directory: directory,
+					target: target,
+					expected: expected
 				},
 				success: function(data){
 					
@@ -387,11 +386,14 @@
 					img.onload = function() {
 						$("#test_result").height(this.height);
 						$("#test_result").width(this.width);
-						
 						$("#test_result").css("background", "url('" + this.src + "')");
 					}
 					
 					img.src = "data:image/png;base64," + data["targetImage"];
+					
+					drawRec(directory, expected, target);
+					
+					
 					
 				}
 			
@@ -402,16 +404,88 @@
 			
 		}
 		
+		function drawRec(directory, expected, target){
+			console.log(directory);
+			console.log(expected);
+			console.log(target);
+			
+			var my_directory = directory;
+			var my_expected = expected;
+			var my_target = target;
+			
+			$.ajax({
+				url: "_screenshots/result.json",
+				type: "GET",
+				data: {
+					directory: my_directory,
+					expected: my_expected,
+					target: my_target
+				},
+				success: function(data){
+					console.log(data);
+					
+				}
+					
+			
+			});
+		}
+		
+		
 		$(document).on("click", ".result_info", function(){
-			alert("wow");
+			
+			$(".info_table").toggle();
+			
 		});
 		
 		
 		</script>
 		
+		
+		
+		<script type="text/ejs" id="diffDiv">
+			<div class="diffDiv" >
+			
+		      	 			
+		     </div>
+
+		</script>
+		
+		
+		
 		<script type="text/ejs" id="result_info_table">
+
 			<a class="result_info"> [%=timestamp%] [%=expected%]</a>
-			<table>
+			<table class="info_table table" style="display:none;">
+				<tr>
+					<th>
+						Expected
+					</th>
+					<th>
+						Compare
+					</th>
+					<th>
+						Similarity
+					</th>
+					<th>
+						Diff points
+					</th>
+					<th>
+						Detail
+					</th>
+				</tr>
+
+
+				[%for (var i = 0; i < resultList.length; i++){ %]
+					<tr>
+						<td>[%=expected%]</td>
+						<td>[%=resultList[i]["targetFilename"]%]</td>
+						<td>[%=Math.round(resultList[i]["entireSimilarity"]*100)/100%]</td>
+						<td>[%=resultList[i]["numberOfDiffRec"]%]</td>
+						
+						<td><a  class="btn btn-danger" onclick="imageCall('[%=directory%]', '[%=expected%]', '[%=resultList[i]["targetFilename"]%]');"data-expected="[%=expected%]" data-target="[%=resultList[i]["targetFilename"]%]" data-directory="[%=directory%]" >Detail</a></td>
+					<tr>
+				[%}%]
+				
 				
 			</table>
 			

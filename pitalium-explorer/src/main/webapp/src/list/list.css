@@ -127,13 +127,11 @@
 			}
 			.diffDiv {
 				cursor: pointer;
-				width:100px;
-				height:200px;
+				
 				border-radius: 5px;
 				border: 1px solid #b71c1c;
 				background-color: #d32f2f;
-				left:40px;
-				top:30px;
+				
 				position:absolute;
 				opacity:0.3;"
 			}
@@ -159,18 +157,27 @@
 				padding:10px;
 			}
 			
-			.table > tbody > tr > th {
-			background-color:#26A69A;
-			padding: 10px;
-			color: white;
-			text-align: center;
+			.table > tbody > tr > th{
+				padding: 10px;
+				color: white;
+				text-align: center;
 			}
-			.table > tbody > tr > td
-			{
-				background-color: #F1F8E9;
+			.table_list > .table > tbody > tr > th {
+				background-color:#26A69A;
+			
+			}
+			.info_table > tbody> tr > th{
+				background-color:#FF8A65;
+			}
+			.table > tbody > tr > td {
 				border:none;
 				vertical-align: middle;
 				text-align: center;
+			}
+			.table_list > .table > tbody > tr > td
+			{
+				background-color: #F1F8E9;
+				border-bottom: 1px solid #fff;
 			}
 			
 			.table {
@@ -181,6 +188,8 @@
 			.btn-run {
 				
 			}
-			
+			a {
+				cursor:pointer;
+			}
 			
 			
