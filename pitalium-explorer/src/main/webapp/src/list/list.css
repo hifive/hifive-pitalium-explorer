@@ -138,3 +138,45 @@
 				opacity:0.3;"
 			}
 			
+			
+		.platform {
+			cursor:pointer;
+			min-width: 105px;
+		}
+		.platform:hover {
+			background-color:#C8E6C9;
+		}
+		
+		#result_list {
+			margin-top:20px;
+		}
+			.result_content > a {
+				color:#546E7A;
+				cursor: pointer;
+			}
+			.result_content {
+				border-bottom:1px solid #CFD8DC;
+				padding:10px;
+			}
+			
+			.table > tbody > tr > th {
+			background-color:#26A69A;
+			padding: 10px;
+			color: white;
+			text-align: center;
+			}
+			.table > tbody > tr > td
+			{
+				background-color: #F1F8E9;
+				border:none;
+				vertical-align: middle;
+				text-align: center;
+			}
+			
+			.table {
+				margin-top: 10px;
+				box-shadow: 0 2px 5px rgba(0,0,0,0.26);
+			}
+			
+			
+			
