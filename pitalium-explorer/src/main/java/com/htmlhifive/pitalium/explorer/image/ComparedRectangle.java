@@ -180,23 +180,23 @@ public class ComparedRectangle {
 	 * @return true if it's not null
 	 */
 
-	public boolean checkAvailable(int index) {
-		if (!isChecked())
-			return false;
-		else if (isShifted())
-			return false;
-		else
-			switch (index) {
-				case 1:
-					return method1 != null;
-				case 2:
-					return method2 != null;
-				case 3:
-					return method3 != null;
-				default:
-					return false;
-			}	
-	}
+//	public boolean checkAvailable(int index) {
+//		if (!isChecked())
+//			return false;
+//		else if (isShifted())
+//			return false;
+//		else
+//			switch (index) {
+//				case 1:
+//					return method1 != null;
+//				case 2:
+//					return method2 != null;
+//				case 3:
+//					return method3 != null;
+//				default:
+//					return false;
+//			}	
+//	}
 
 	/**
 	 * @return true if this rectangle is shifted

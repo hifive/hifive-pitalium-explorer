@@ -37,6 +37,7 @@ import com.htmlhifive.pitalium.explorer.io.ExplorerDBPersister;
 import com.htmlhifive.pitalium.explorer.io.ExplorerPersister;
 import com.htmlhifive.pitalium.explorer.response.Result;
 import com.htmlhifive.pitalium.explorer.response.ResultDirectory;
+import com.htmlhifive.pitalium.explorer.response.ResultListOfExpected;
 import com.htmlhifive.pitalium.explorer.response.ScreenshotFile;
 import com.htmlhifive.pitalium.explorer.response.TestExecutionResult;
 
@@ -98,7 +99,7 @@ public class PersisterServiceImpl implements PersisterService {
 		return persister.findScreenshotFiles(name, refresh);
 	}
 	@Override
-	public List<Result> executeComparing(String directoryName, String expectedFilename, String[] targetFilenames) {
+	public ResultListOfExpected executeComparing(String directoryName, String expectedFilename, String[] targetFilenames) {
 		return persister.executeComparing(directoryName, expectedFilename, targetFilenames);
 	}
 	@Override

@@ -24,6 +24,7 @@ import com.htmlhifive.pitalium.explorer.io.ExplorerFilePersister;
 import com.htmlhifive.pitalium.explorer.io.ExplorerPersister;
 import com.htmlhifive.pitalium.explorer.response.Result;
 import com.htmlhifive.pitalium.explorer.response.ResultDirectory;
+import com.htmlhifive.pitalium.explorer.response.ResultListOfExpected;
 import com.htmlhifive.pitalium.explorer.response.ScreenshotFile;
 import com.htmlhifive.pitalium.explorer.response.TestExecutionResult;
 import com.htmlhifive.pitalium.explorer.service.ExplorerService;
@@ -78,13 +79,13 @@ public class ApiController {
 	 */
 	@RequestMapping(value = "_screenshots/compare", method = RequestMethod.GET, produces="application/json;charset=utf-8")
 	@ResponseBody
-	public ResponseEntity<List<Result>> executeComparing(
+	public ResponseEntity<ResultListOfExpected> executeComparing(
 			@RequestParam(value = "directory", defaultValue = "") String directoryName,
 			@RequestParam(value = "expected", defaultValue = "") String expectedFilename,
 			@RequestParam(value = "targets", defaultValue = "") String[] targetFilenames
 			){
-		List<Result> list = service.executeComparing(directoryName, expectedFilename, targetFilenames);
-		return new ResponseEntity<List<Result>>(list, HttpStatus.OK);
+		ResultListOfExpected resultListOfExpected = service.executeComparing(directoryName, expectedFilename, targetFilenames);
+		return new ResponseEntity<ResultListOfExpected>(resultListOfExpected, HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "_screenshots/images", method = RequestMethod.GET, produces="application/json;charset=utf-8")
@@ -108,7 +109,6 @@ public class ApiController {
 		List<ComparedRectangle> list = service.getComparedResult(directoryName, expectedFilename, targetFilename);
 		return new ResponseEntity<List<ComparedRectangle>>(list, HttpStatus.OK);
 	}
-	
 	
 	/**
 	 * Gets list of the test execution. If pageSize equals to zero, the default page size is used. If pageSize equals to

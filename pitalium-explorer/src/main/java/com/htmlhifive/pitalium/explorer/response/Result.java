@@ -1,28 +1,37 @@
 package com.htmlhifive.pitalium.explorer.response;
 
 public class Result {
-	String expectedFilename;
+//	int id;
+//	String expectedFilename;
 	String targetFilename;
 	double entireSimilarity;
 	int numberOfDiffRec;
-	long executionTime;
+//	long executionTime;
 	
-	public Result(String expectedFilename, String targetFilename, double entireSimilarity, int numberOfDiffRec){
-		this.expectedFilename = expectedFilename;
+	public Result(String targetFilename, double entireSimilarity, int numberOfDiffRec){
+//		this.expectedFilename = expectedFilename;
 		this.targetFilename = targetFilename;
 		this.entireSimilarity = entireSimilarity;
 		this.numberOfDiffRec = numberOfDiffRec;
+//		this.executionTime = System.currentTimeMillis();
 	}
 	public Result(){
-		this("", "", 0, 0);
+//		this(0, "", "", 0, 0);
+		this("", 0, 0);
 	}
 
-	public String getExpectedFilename() {
-		return expectedFilename;
-	}
-	public void setExpectedFilename(String expectedFilename) {
-		this.expectedFilename = expectedFilename;
-	}
+//	public int getId(){
+//		return id;
+//	}
+//	public void setId(int id){
+//		this.id = id;
+//	}
+//	public String getExpectedFilename() {
+//		return expectedFilename;
+//	}
+//	public void setExpectedFilename(String expectedFilename) {
+//		this.expectedFilename = expectedFilename;
+//	}
 	public String getTargetFilename() {
 		return targetFilename;
 	}
@@ -41,10 +50,10 @@ public class Result {
 	public void setNumberOfDiffRec(int numberOfDiffRec) {
 		this.numberOfDiffRec = numberOfDiffRec;
 	}
-	public long getExecutionTime(){
-		return executionTime;
-	}
-	public void setExecutionTime(long executionTime){
-		this.executionTime = executionTime;
-	}
+//	public long getExecutionTime(){
+//		return executionTime;
+//	}
+//	public void setExecutionTime(long executionTime){
+//		this.executionTime = executionTime;
+//	}
 }

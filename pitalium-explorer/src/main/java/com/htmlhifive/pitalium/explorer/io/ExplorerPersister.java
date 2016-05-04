@@ -19,6 +19,7 @@ import com.htmlhifive.pitalium.explorer.entity.TestExecutionAndEnvironment;
 import com.htmlhifive.pitalium.explorer.image.ComparedRectangle;
 import com.htmlhifive.pitalium.explorer.response.Result;
 import com.htmlhifive.pitalium.explorer.response.ResultDirectory;
+import com.htmlhifive.pitalium.explorer.response.ResultListOfExpected;
 import com.htmlhifive.pitalium.explorer.response.ScreenshotFile;
 import com.htmlhifive.pitalium.explorer.response.TestExecutionResult;
 
@@ -48,7 +49,7 @@ public interface ExplorerPersister extends Persister {
 	 */
 	Map<String, List> findScreenshotFiles(String name, boolean refresh);
 
-	List<Result> executeComparing(String directoryName, String expectedFilename, String[] targetFilenames);
+	ResultListOfExpected executeComparing(String directoryName, String expectedFilename, String[] targetFilenames);
 	Map<String, byte[]> getImages(String directoryName, String expectedFilename, String targetFilename);
 	List<ComparedRectangle> getComparedResult(String directoryName, String expectedFilename, String targetFilename);
 

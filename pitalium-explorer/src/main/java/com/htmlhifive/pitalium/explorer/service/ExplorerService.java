@@ -47,6 +47,7 @@ import com.htmlhifive.pitalium.explorer.image.EdgeDetector;
 import com.htmlhifive.pitalium.explorer.io.ExplorerPersister;
 import com.htmlhifive.pitalium.explorer.response.Result;
 import com.htmlhifive.pitalium.explorer.response.ResultDirectory;
+import com.htmlhifive.pitalium.explorer.response.ResultListOfExpected;
 import com.htmlhifive.pitalium.explorer.response.ScreenshotFile;
 import com.htmlhifive.pitalium.explorer.response.TestExecutionResult;
 import com.htmlhifive.pitalium.image.model.DiffPoints;
@@ -92,12 +93,10 @@ public class ExplorerService implements Serializable {
 	public Page<ResultDirectory> findResultDirectory(String searchTestMethod, String searchTestScreen, int page, int pageSize, boolean refresh){
 		return persisterService.findResultDirectory(searchTestMethod, searchTestScreen, page, pageSize, refresh);
 	}
-	
 	public Map<String, List> findScreenshotFiles(String name, boolean refresh){
 		return persisterService.findScreenshotFiles(name, refresh);
 	}
-
-	public List<Result> executeComparing(String directoryName, String expectedFilename, String[] targetFilenames) {
+	public ResultListOfExpected executeComparing(String directoryName, String expectedFilename, String[] targetFilenames) {
 		return persisterService.executeComparing(directoryName, expectedFilename, targetFilenames);
 	}
 	public Map<String, byte[]> getImages(String directoryName, String expectedFilename, String targetFilename) {

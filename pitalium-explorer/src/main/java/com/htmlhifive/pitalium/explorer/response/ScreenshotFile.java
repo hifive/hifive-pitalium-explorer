@@ -5,7 +5,7 @@ public class ScreenshotFile {
 
 	private String name;
 
-	private String timestamp;
+	private long timestamp;
 	private String platform;
 	private String browser;
 	private String version;
@@ -15,11 +15,11 @@ public class ScreenshotFile {
 	private Integer height;
 	
 	public ScreenshotFile(){
-		this(0,"","","","","",0d,0,0);
+		this(0,"", 0,"","","",0d,0,0);
 	}
 	
 	public ScreenshotFile(Integer id, String name,
-						  String timestamp, String platform, String browser, String version,
+						  long timestamp, String platform, String browser, String version,
 						  Double size, Integer width, Integer height){
 		this.id = id;
 		this.name = name;
@@ -46,10 +46,10 @@ public class ScreenshotFile {
 		this.name = name;
 	}
 	
-	public String getTimestamp(){
+	public long getTimestamp(){
 		return timestamp;
 	}
-	public void setTimestamp(String timestamp){
+	public void setTimestamp(long timestamp){
 		this.timestamp = timestamp;
 	}
 	

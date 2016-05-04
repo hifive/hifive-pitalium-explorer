@@ -66,6 +66,7 @@ import com.htmlhifive.pitalium.explorer.image.SimilarityUnit;
 import com.htmlhifive.pitalium.explorer.response.TestExecutionResult;
 import com.htmlhifive.pitalium.explorer.response.Result;
 import com.htmlhifive.pitalium.explorer.response.ResultDirectory;
+import com.htmlhifive.pitalium.explorer.response.ResultListOfExpected;
 import com.htmlhifive.pitalium.explorer.response.ScreenshotFile;
 import com.htmlhifive.pitalium.explorer.service.ScreenshotIdService;
 import com.htmlhifive.pitalium.image.model.RectangleArea;
@@ -236,7 +237,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 				File file = files[i];
 				String name = file.getName();
 				Date date = new Date(file.lastModified());
-				String timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date);
+				long timestamp = date.getTime();
 
 				String platform = "unknown";
 				if(name.toLowerCase().contains("window")) platform = "window";
@@ -302,24 +303,41 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 	}
 	
 	@Override
-	public List<Result> executeComparing(String directoryName, String expectedFilename, String[] targetFilenames) {
+	public ResultListOfExpected executeComparing(String directoryName, String expectedFilename, String[] targetFilenames) {
 		File root = super.getResultDirectoryFile();
 		if (!root.exists() || !root.isDirectory()) {
 			log.error("Directory(" + root.getAbsolutePath() + ") Not Found.");
-			return new ArrayList<Result>();
+//			return new ArrayList<Result>();
+			return new ResultListOfExpected();
 		}
 
 		File directory = new File(root, directoryName);
 		if(!directory.exists() || !directory.isDirectory()){
 			log.error("Directory(" + directory.getAbsolutePath() + ") Not Found.");
-			return new ArrayList<Result>();
+//			return new ArrayList<Result>();
+			return new ResultListOfExpected();
 		}
 
 		File comparisonResultsDir = new File(directory, "comparisonResults");
 		if(!comparisonResultsDir.exists() || !comparisonResultsDir.isDirectory()){
 			comparisonResultsDir.mkdir();
 		}
-		
+				
+		File expectedFile = new File(directory, expectedFilename);
+		if(!expectedFile.exists()){ 
+			log.error("Directory(" + expectedFile.getAbsolutePath() + ") Not Found.");
+//			return new ArrayList<Result>();
+			return new ResultListOfExpected();
+		}
+		BufferedImage expectedImage;
+		try {
+			expectedImage = ImageIO.read(expectedFile);
+		} catch (IOException e) {
+			log.error("get buffered image error:: " + expectedFile.getAbsolutePath());
+//			return new ArrayList<Result>();
+			return new ResultListOfExpected();
+		}
+
 		File resultListJson = new File(comparisonResultsDir, "resultList.json");
 		if(!resultListJson.exists()){
 			try {
@@ -328,37 +346,28 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 				log.error("Can not create " + resultListJson.getAbsolutePath());
 			}
 		}
-		List<Result> resultList;
+		List<ResultListOfExpected> resultList;
 		try {
-			resultList = JSONUtils.readValue(resultListJson, new TypeReference<LinkedList<Result>>(){});
+			resultList = JSONUtils.readValue(resultListJson, new TypeReference<LinkedList<ResultListOfExpected>>(){});
 		} catch (Exception e){
-			resultList = new LinkedList<Result>();
+			resultList = new LinkedList<ResultListOfExpected>();
+		}
+		int id = 1;
+		if(resultList.size() != 0){
+			id = resultList.get(resultList.size()-1).getId()+1;
 		}
 		
-		File expectedFile = new File(directory, expectedFilename);
-		if(!expectedFile.exists()){ 
-			log.error("Directory(" + expectedFile.getAbsolutePath() + ") Not Found.");
-			return new ArrayList<Result>();
-		}
-		BufferedImage expectedImage;
-		try {
-			expectedImage = ImageIO.read(expectedFile);
-		} catch (IOException e) {
-			log.error("get buffered image error:: " + expectedFile.getAbsolutePath());
-			return new ArrayList<Result>();
-		}
-		
-		List<Result> newResultList = new LinkedList<Result>();
+		List<Result> pairResultList= new LinkedList<Result>();
 		for(int i=0; i<targetFilenames.length; i++){
 			String targetFilename = targetFilenames[i];
 			List<ComparedRectangle> comparedRectangles;
 			
-			String filenamePair = expectedFilename+"__"+targetFilename+".json";
+			String filenamePair = expectedFilename+"__"+targetFilename+ "__" + Integer.toString(id) + ".json";
 			File filenamePairJson = new File(comparisonResultsDir, filenamePair);
-			if(filenamePairJson.exists()){
-				log.error("alread exists " + filenamePair);
-				continue;
-			}
+//			if(filenamePairJson.exists() && !refresh){
+//				log.error("alread exists " + filenamePair);
+//				continue;
+//			}
 
 			File targetFile = new File(directory, targetFilename);
 			if(!targetFile.exists()){ 
@@ -378,9 +387,9 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 			comparedRectangles = imagePair.getComparedRectangles();
 
 			double entireSimilarity = imagePair.getEntireSimilarity();
-			Result result = new Result(expectedFilename, targetFilename, entireSimilarity, comparedRectangles.size());
-			resultList.add(result);
-			newResultList.add(result);
+//			Result result = new Result(expectedFilename, targetFilename, entireSimilarity, comparedRectangles.size());
+			Result result = new Result(targetFilename, entireSimilarity, comparedRectangles.size());
+			pairResultList.add(result);
 			
 			try {
 				FileWriter fw = new FileWriter(filenamePairJson.getPath());
@@ -390,6 +399,9 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 				log.error("file write error: can not write " + filenamePairJson.getPath());
 			}
 		}
+		ResultListOfExpected resultListOfExpected = new ResultListOfExpected(id, expectedFilename, pairResultList, System.currentTimeMillis());
+		
+		resultList.add(resultListOfExpected);
 
 		try {
 			FileWriter fw = new FileWriter(resultListJson.getPath());
@@ -399,7 +411,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 			log.error("file write error: can not write " + resultListJson.getPath());
 		}
 
-		return newResultList;
+		return resultListOfExpected;
 	}
 
 	public Map<String, byte[]> getImages(String directoryName, String expectedFilename, String targetFilename){
