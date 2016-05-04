@@ -1,11 +1,13 @@
 package com.htmlhifive.pitalium.explorer.response;
 
+import java.sql.Time;
+
 public class ResultDirectory {
 	private Integer id;
 
 	private String name;
 	
-	private String timestamp;
+	private long timestamp;
 	
 	private String url;
 
@@ -16,10 +18,10 @@ public class ResultDirectory {
 	private Integer numberOfBrowsers;
 	
 	public ResultDirectory(){
-		this(0, "", "", "", 0, 0, 0);
+		this(0, "", 0, "", 0, 0, 0);
 	}
 
-	public ResultDirectory(Integer id, String name, String timestamp, String url, Integer numberOfResults, Integer numberOfScreenshots, Integer numberOfBrowsers) {
+	public ResultDirectory(Integer id, String name, long timestamp, String url, Integer numberOfResults, Integer numberOfScreenshots, Integer numberOfBrowsers) {
 		this.id = id;
 		this.name = name;
 		this.timestamp = timestamp;
@@ -45,11 +47,11 @@ public class ResultDirectory {
 		this.name = name;
 	}
 	
-	public String getTimestamp() {
+	public long getTimestamp() {
 		return timestamp;
 	}
 	
-	public void setTimestamp(String timestamp) {
+	public void setTimestamp(long timestamp) {
 		this.timestamp = timestamp;
 	}
 	

@@ -21,6 +21,7 @@ import com.htmlhifive.pitalium.explorer.entity.Screenshot;
 import com.htmlhifive.pitalium.explorer.entity.TestExecutionAndEnvironment;
 import com.htmlhifive.pitalium.explorer.image.ComparedRectangle;
 import com.htmlhifive.pitalium.explorer.io.ExplorerFilePersister;
+import com.htmlhifive.pitalium.explorer.io.ExplorerPersister;
 import com.htmlhifive.pitalium.explorer.response.Result;
 import com.htmlhifive.pitalium.explorer.response.ResultDirectory;
 import com.htmlhifive.pitalium.explorer.response.ScreenshotFile;
@@ -65,8 +66,8 @@ public class ApiController {
 	public ResponseEntity<Map<String, List>> getScreenshotFiles(
 			@RequestParam(value = "name", defaultValue = "0") String name,
 			@RequestParam(value = "refresh", defaultValue = "false") boolean refresh){
-		Map<String, List> list = service.findScreenshotFiles(name, refresh);
-		return new ResponseEntity<Map<String, List>>(list, HttpStatus.OK);
+		Map<String, List> map = service.findScreenshotFiles(name, refresh);
+		return new ResponseEntity<Map<String, List>>(map, HttpStatus.OK);
 	}
 	/**
 	 * 
@@ -85,6 +86,30 @@ public class ApiController {
 		List<Result> list = service.executeComparing(directoryName, expectedFilename, targetFilenames);
 		return new ResponseEntity<List<Result>>(list, HttpStatus.OK);
 	}
+
+	@RequestMapping(value = "_screenshots/images", method = RequestMethod.GET, produces="application/json;charset=utf-8")
+	@ResponseBody
+	public ResponseEntity<Map<String, byte[]>> getImages(
+			@RequestParam(value = "directory", defaultValue = "") String directoryName,
+			@RequestParam(value = "expected", defaultValue = "") String expectedFilename,
+			@RequestParam(value = "target", defaultValue = "") String targetFilename
+			){
+		Map<String, byte[]> map = service.getImages(directoryName, expectedFilename, targetFilename);
+		return new ResponseEntity<Map<String, byte[]>>(map, HttpStatus.OK);
+	}
+
+	@RequestMapping(value = "_screenshots/result", method = RequestMethod.GET, produces="application/json;charset=utf-8")
+	@ResponseBody
+	public ResponseEntity<List<ComparedRectangle>> getComparedResult(
+			@RequestParam(value = "directory", defaultValue = "") String directoryName,
+			@RequestParam(value = "expected", defaultValue = "") String expectedFilename,
+			@RequestParam(value = "target", defaultValue = "") String targetFilename
+			){
+		List<ComparedRectangle> list = service.getComparedResult(directoryName, expectedFilename, targetFilename);
+		return new ResponseEntity<List<ComparedRectangle>>(list, HttpStatus.OK);
+	}
+	
+	
 	/**
 	 * Gets list of the test execution. If pageSize equals to zero, the default page size is used. If pageSize equals to
 	 * -1, the entire list is returned.

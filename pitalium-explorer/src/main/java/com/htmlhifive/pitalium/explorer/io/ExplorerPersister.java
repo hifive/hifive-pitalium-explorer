@@ -16,6 +16,7 @@ import com.htmlhifive.pitalium.core.io.Persister;
 import com.htmlhifive.pitalium.explorer.entity.Screenshot;
 import com.htmlhifive.pitalium.explorer.entity.Target;
 import com.htmlhifive.pitalium.explorer.entity.TestExecutionAndEnvironment;
+import com.htmlhifive.pitalium.explorer.image.ComparedRectangle;
 import com.htmlhifive.pitalium.explorer.response.Result;
 import com.htmlhifive.pitalium.explorer.response.ResultDirectory;
 import com.htmlhifive.pitalium.explorer.response.ScreenshotFile;
@@ -48,6 +49,8 @@ public interface ExplorerPersister extends Persister {
 	Map<String, List> findScreenshotFiles(String name, boolean refresh);
 
 	List<Result> executeComparing(String directoryName, String expectedFilename, String[] targetFilenames);
+	Map<String, byte[]> getImages(String directoryName, String expectedFilename, String targetFilename);
+	List<ComparedRectangle> getComparedResult(String directoryName, String expectedFilename, String targetFilename);
 
 	/**
 	 * TestExecutionのリストを取得する。 引数のメソッド名、スクリーンショットを含む（like検索）Screenshotを持つ TestExecutionのリストを取得する。
@@ -127,6 +130,8 @@ public interface ExplorerPersister extends Persister {
 	String getEdgeFileName(Integer screenshotId, String algorithm);
 
 	void saveProcessedImage(Integer screenshotId, String algorithm, String edgeFileName);
+
+
 
 	
 }

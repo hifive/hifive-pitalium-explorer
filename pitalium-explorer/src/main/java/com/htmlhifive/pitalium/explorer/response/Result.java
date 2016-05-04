@@ -5,6 +5,7 @@ public class Result {
 	String targetFilename;
 	double entireSimilarity;
 	int numberOfDiffRec;
+	long executionTime;
 	
 	public Result(String expectedFilename, String targetFilename, double entireSimilarity, int numberOfDiffRec){
 		this.expectedFilename = expectedFilename;
@@ -39,5 +40,11 @@ public class Result {
 	}
 	public void setNumberOfDiffRec(int numberOfDiffRec) {
 		this.numberOfDiffRec = numberOfDiffRec;
+	}
+	public long getExecutionTime(){
+		return executionTime;
+	}
+	public void setExecutionTime(long executionTime){
+		this.executionTime = executionTime;
 	}
 }

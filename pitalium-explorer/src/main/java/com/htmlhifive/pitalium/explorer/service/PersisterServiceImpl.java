@@ -32,6 +32,7 @@ import com.htmlhifive.pitalium.explorer.entity.Target;
 import com.htmlhifive.pitalium.explorer.entity.TargetRepository;
 import com.htmlhifive.pitalium.explorer.entity.TestExecutionAndEnvironment;
 import com.htmlhifive.pitalium.explorer.entity.TestExecutionRepository;
+import com.htmlhifive.pitalium.explorer.image.ComparedRectangle;
 import com.htmlhifive.pitalium.explorer.io.ExplorerDBPersister;
 import com.htmlhifive.pitalium.explorer.io.ExplorerPersister;
 import com.htmlhifive.pitalium.explorer.response.Result;
@@ -100,6 +101,13 @@ public class PersisterServiceImpl implements PersisterService {
 	public List<Result> executeComparing(String directoryName, String expectedFilename, String[] targetFilenames) {
 		return persister.executeComparing(directoryName, expectedFilename, targetFilenames);
 	}
+	@Override
+	public Map<String, byte[]> getImages(String directoryName, String expectedFilename, String targetFilename) {
+		return persister.getImages(directoryName, expectedFilename, targetFilename);
+	}
+	public List<ComparedRectangle> getComparedResult(String directoryName, String expectedFilename, String targetFilename){
+		return persister.getComparedResult(directoryName, expectedFilename, targetFilename);
+	};
 
 	@Override
 	public Page<TestExecutionResult> findTestExecution(String searchTestMethod, String searchTestScreen, int page,

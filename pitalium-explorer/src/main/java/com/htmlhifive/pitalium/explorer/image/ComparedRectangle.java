@@ -7,14 +7,14 @@ import java.awt.Rectangle;
  */
 public class ComparedRectangle {
 
-	private static enum RectType { UNCHECKED, SHIFT, SIMILAR }
+//	private static enum RectType { UNCHECKED, SHIFT, SIMILAR }
 
 	private int x;
 	private int y;
 	private int width;
 	private int height;
-
-	private RectType type = RectType.UNCHECKED;
+	private String type = "UNCHECKED";
+//	private RectType type = RectType.UNCHECKED;
 
 	/**
 	 * The negative value of xShift means the left side, the positive value of it means the right side,
@@ -42,7 +42,8 @@ public class ComparedRectangle {
 		this.y = (int) rectangle.getY();
 		this.width = (int) rectangle.getWidth();
 		this.height= (int) rectangle.getHeight();
-		this.type = RectType.SIMILAR;
+		this.type = "SIMILAR";
+//		this.type = RectType.SIMILAR;
 	}
 
 	/**
@@ -56,9 +57,10 @@ public class ComparedRectangle {
 		this(rectangle);
 		this.xShift = xShift;
 		this.yShift = yShift;
-		this.type = RectType.SHIFT;
+		this.type = "SHIFT";
+//		this.type = RectType.SHIFT;
 	}
-	public ComparedRectangle(int x, int y, int width, int height, RectType type, int xShift, int yShift,
+	public ComparedRectangle(int x, int y, int width, int height, String type, int xShift, int yShift,
 							 SimilarityUnit method1, SimilarityUnit method2, SimilarityUnit method3){
 		this.x = x;
 		this.y = y;
@@ -72,7 +74,7 @@ public class ComparedRectangle {
 		this.method3 = method3;
 	}
 	public ComparedRectangle(){
-		this(0, 0, 0, 0, RectType.UNCHECKED, 0, 0, null, null, null);
+		this(0, 0, 0, 0, "UNCHECKED", 0, 0, null, null, null);
 	}
 
 	
@@ -199,23 +201,26 @@ public class ComparedRectangle {
 	/**
 	 * @return true if this rectangle is shifted
 	 */
-	public boolean isShifted() {
-		return (type == RectType.SHIFT);
-	}
-
-	/**
-	 * @return true if this rectangle is not shifted but similar
-	 */
-	public boolean isSimilar() {
-		return (type == RectType.SIMILAR);
-	}
-	
-	/**
-	 * @return true if this rectangle is unchecked
-	 */
-	public boolean isChecked() {
-		return (type != RectType.UNCHECKED);
-	}
+//	public boolean isShifted() {
+////		return (type == RectType.SHIFT);
+//		return type.equals("SHIFT");
+//	}
+//
+//	/**
+//	 * @return true if this rectangle is not shifted but similar
+//	 */
+//	public boolean isSimilar() {
+////		return (type == RectType.SIMILAR);
+//		return type.equals("SIMILAR");
+//	}
+//	
+//	/**
+//	 * @return true if this rectangle is unchecked
+//	 */
+//	public boolean isChecked() {
+////		return (type != RectType.UNCHECKED);
+//		return type.equals("UNCHECKED");
+//	}
 
 	/**
 	 *	@return rectangle area
@@ -252,10 +257,10 @@ public class ComparedRectangle {
 		this.height = height;
 	}
 	
-	public RectType getType(){
+	public String getType(){
 		return type;
 	}
-	public void setType(RectType type){
+	public void setType(String type){
 		this.type = type;
 	}
 

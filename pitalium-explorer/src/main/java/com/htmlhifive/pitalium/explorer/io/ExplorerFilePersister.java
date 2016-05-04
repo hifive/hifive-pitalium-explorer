@@ -4,6 +4,7 @@
 package com.htmlhifive.pitalium.explorer.io;
 
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.FilenameFilter;
@@ -11,6 +12,7 @@ import java.io.IOException;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.text.DecimalFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -124,7 +126,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 				String name = directory.getName();
 				String[] splitted_name = name.split("_");
 
-				String timestamp = splitted_name[0];
+				String timestampString = splitted_name[0];
 
 				String url = "";
 				if(splitted_name.length > 1){
@@ -164,6 +166,14 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 				}
 				int numberOfBrowsers = browsers.size();
 
+				SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+				long timestamp;
+				try {
+					timestamp = sdf.parse(timestampString).getTime();
+				} catch (ParseException e) {
+					log.error("timestamp parsing error: " + timestampString);
+					timestamp = 0;
+				}
 				ResultDirectory resultDirectory = new ResultDirectory(i+1, name, timestamp, url,
 						numberOfResults, numberOfScreenshots, numberOfBrowsers);
 
@@ -292,10 +302,8 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 	}
 	
 	@Override
-//	public List<ComparedRectangle> executeComparing(String directoryName, String expectedFilename, String[] targetFilenames) {
 	public List<Result> executeComparing(String directoryName, String expectedFilename, String[] targetFilenames) {
-//		File root = super.getResultDirectoryFile();
-		File root = new File("/Users/Sungmin/Documents/workspace-sts-3.7.3.RELEASE/hifive-pitalium-explorer/pitalium-explorer/results");
+		File root = super.getResultDirectoryFile();
 		if (!root.exists() || !root.isDirectory()) {
 			log.error("Directory(" + root.getAbsolutePath() + ") Not Found.");
 			return new ArrayList<Result>();
@@ -393,6 +401,108 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 
 		return newResultList;
 	}
+
+	public Map<String, byte[]> getImages(String directoryName, String expectedFilename, String targetFilename){
+		File root = super.getResultDirectoryFile();
+		if (!root.exists() || !root.isDirectory()) {
+			log.error("Directory(" + root.getAbsolutePath() + ") Not Found.");
+			return new HashMap<String, byte[]>();
+		}
+
+		File directory = new File(root, directoryName);
+		if(!directory.exists() || !directory.isDirectory()){
+			log.error("Directory(" + directory.getAbsolutePath() + ") Not Found.");
+			return new HashMap<String, byte[]>();
+		}
+
+		File comparisonResultsDir = new File(directory, "comparisonResults");
+		if(!comparisonResultsDir.exists() || !comparisonResultsDir.isDirectory()){
+			log.error("Directory(" + comparisonResultsDir.getAbsolutePath() + ") Not Found.");
+			return new HashMap<String, byte[]>();
+		}
+
+		File expectedFile = new File(directory, expectedFilename);
+		if(!expectedFile.exists()){ 
+			log.error("Directory(" + expectedFile.getAbsolutePath() + ") Not Found.");
+			return new HashMap<String, byte[]>();
+		}
+
+		BufferedImage expectedImage;
+		try {
+			expectedImage = ImageIO.read(expectedFile);
+		} catch (IOException e) {
+			log.error("get buffered image error:: " + expectedFile.getAbsolutePath());
+			return new HashMap<String, byte[]>();
+		}
+
+		File targetFile = new File(directory, targetFilename);
+		if(!targetFile.exists()){ 
+			log.error("Directory(" + targetFile.getAbsolutePath() + ") Not Found.");
+			return new HashMap<String, byte[]>();
+		}
+
+		BufferedImage targetImage;
+		try {
+			targetImage = ImageIO.read(targetFile);
+		} catch (IOException e) {
+			log.error("get buffered image error:: " + targetFile.getAbsolutePath());
+			return new HashMap<String, byte[]>();
+		}
+		
+
+		ByteArrayOutputStream expectedBao= new ByteArrayOutputStream();
+		ByteArrayOutputStream targetBao= new ByteArrayOutputStream();
+		try {
+			ImageIO.write(expectedImage, "png", expectedBao);
+			ImageIO.write(targetImage, "png", targetBao);
+		} catch (IOException e) {
+			log.error("Change to bytearray Error");
+			return new HashMap<String, byte[]>();
+		}
+		
+		Map<String, byte[]> imageMap= new HashMap<String, byte[]>();
+		imageMap.put("expectedImage", expectedBao.toByteArray());
+		imageMap.put("targetImage", targetBao.toByteArray());
+		
+		return imageMap;
+	}
+	
+	public List<ComparedRectangle> getComparedResult(String directoryName, String expectedFilename, String targetFilename){
+		File root = super.getResultDirectoryFile();
+		if (!root.exists() || !root.isDirectory()) {
+			log.error("Directory(" + root.getAbsolutePath() + ") Not Found.");
+			return new ArrayList<ComparedRectangle>();
+		}
+
+		File directory = new File(root, directoryName);
+		if(!directory.exists() || !directory.isDirectory()){
+			log.error("Directory(" + directory.getAbsolutePath() + ") Not Found.");
+			return new ArrayList<ComparedRectangle>();
+		}
+
+		File comparisonResultsDir = new File(directory, "comparisonResults");
+		if(!comparisonResultsDir.exists() || !comparisonResultsDir.isDirectory()){
+			log.error("Directory(" + comparisonResultsDir.getAbsolutePath() + ") Not Found.");
+			return new ArrayList<ComparedRectangle>();
+		}
+
+		String filenamePair = expectedFilename + "__" + targetFilename + ".json";
+		File filenamePairJson = new File(comparisonResultsDir, filenamePair);
+		if(!filenamePairJson.exists()){ 
+			log.error("Directory(" + filenamePairJson.getAbsolutePath() + ") Not Found.");
+			return new ArrayList<ComparedRectangle>();
+		}
+		List<ComparedRectangle> resultList;
+		try{
+			resultList = JSONUtils.readValue(filenamePairJson, new TypeReference<ArrayList<ComparedRectangle>>(){});
+		} catch(Exception e){
+			log.error("Json to Object error: " + filenamePairJson.getAbsolutePath());
+			e.printStackTrace();
+			resultList = new ArrayList<ComparedRectangle>();
+		}
+		return resultList;
+	}
+
 
 	@Override
 	public Page<TestExecutionResult> findTestExecution(String searchTestMethod, String searchTestScreen, int page,

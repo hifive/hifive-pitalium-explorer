@@ -42,6 +42,7 @@ import com.htmlhifive.pitalium.explorer.entity.ScreenshotRepository;
 import com.htmlhifive.pitalium.explorer.entity.Target;
 import com.htmlhifive.pitalium.explorer.entity.TestExecutionAndEnvironment;
 import com.htmlhifive.pitalium.explorer.entity.TestExecutionRepository;
+import com.htmlhifive.pitalium.explorer.image.ComparedRectangle;
 import com.htmlhifive.pitalium.explorer.image.EdgeDetector;
 import com.htmlhifive.pitalium.explorer.io.ExplorerPersister;
 import com.htmlhifive.pitalium.explorer.response.Result;
@@ -99,6 +100,15 @@ public class ExplorerService implements Serializable {
 	public List<Result> executeComparing(String directoryName, String expectedFilename, String[] targetFilenames) {
 		return persisterService.executeComparing(directoryName, expectedFilename, targetFilenames);
 	}
+	public Map<String, byte[]> getImages(String directoryName, String expectedFilename, String targetFilename) {
+		return persisterService.getImages(directoryName, expectedFilename, targetFilename);
+	}
+	public List<ComparedRectangle> getComparedResult(String directoryName, String expectedFilename,
+			String targetFilename) {
+		return persisterService.getComparedResult(directoryName, expectedFilename, targetFilename);
+	}
+
+
 
 	public Page<TestExecutionResult> findTestExecution(String searchTestMethod, String searchTestScreen, int page,
 			int pageSize) {
@@ -396,6 +406,8 @@ public class ExplorerService implements Serializable {
 			response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
 		}
 	}
+
+
 
 	
 }

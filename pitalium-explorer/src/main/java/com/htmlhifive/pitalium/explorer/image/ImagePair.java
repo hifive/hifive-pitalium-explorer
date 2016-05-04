@@ -90,7 +90,7 @@ public class ImagePair {
  	 */
 	public void printShiftRectangles() {
 		for (ComparedRectangle ComparedRect : ComparedRectangles) {
-			if (ComparedRect.isShifted()) {
+			if (ComparedRect.getType().equals("SHIFT")) {
 				Rectangle rect = ComparedRect.rectangle();
 				System.out.printf("x:%d, y:%d, w:%d, h:%d => shifted x:%d, y:%d\n",(int)rect.getX(), (int)rect.getY(), (int)rect.getWidth(), (int)rect.getHeight(), ComparedRect.getXShift(), ComparedRect.getYShift());
 			}
@@ -102,7 +102,7 @@ public class ImagePair {
  	 */
 	public void printSimilarRectangles() {
 		for (ComparedRectangle ComparedRect : ComparedRectangles) {
-			if (ComparedRect.isSimilar()) {
+			if (ComparedRect.getType().equals("SIMILAR")) {
 				Rectangle rect = ComparedRect.rectangle();
 				if(ComparedRect.checkAvailable(1)){
 					SimilarityUnit method1 = ComparedRect.getMethod1();
