@@ -1,14 +1,15 @@
 package com.htmlhifive.pitalium.explorer.response;
 
 public class Result {
-//	int id;
+	int id;
 //	String expectedFilename;
 	String targetFilename;
 	double entireSimilarity;
 	int numberOfDiffRec;
 //	long executionTime;
 	
-	public Result(String targetFilename, double entireSimilarity, int numberOfDiffRec){
+	public Result(int id, String targetFilename, double entireSimilarity, int numberOfDiffRec){
+		this.id = id;
 //		this.expectedFilename = expectedFilename;
 		this.targetFilename = targetFilename;
 		this.entireSimilarity = entireSimilarity;
@@ -17,15 +18,15 @@ public class Result {
 	}
 	public Result(){
 //		this(0, "", "", 0, 0);
-		this("", 0, 0);
+		this(0, "", 0, 0);
 	}
 
-//	public int getId(){
-//		return id;
-//	}
-//	public void setId(int id){
-//		this.id = id;
-//	}
+	public int getId(){
+		return id;
+	}
+	public void setId(int id){
+		this.id = id;
+	}
 //	public String getExpectedFilename() {
 //		return expectedFilename;
 //	}

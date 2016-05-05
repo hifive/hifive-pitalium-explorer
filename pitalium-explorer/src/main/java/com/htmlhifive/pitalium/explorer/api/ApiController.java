@@ -103,10 +103,10 @@ public class ApiController {
 	@ResponseBody
 	public ResponseEntity<List<ComparedRectangle>> getComparedResult(
 			@RequestParam(value = "directory", defaultValue = "") String directoryName,
-			@RequestParam(value = "expected", defaultValue = "") String expectedFilename,
-			@RequestParam(value = "target", defaultValue = "") String targetFilename
+			@RequestParam(value = "resultListId", defaultValue = "") int resultListId,
+			@RequestParam(value = "targetResultId", defaultValue = "") int targetResultId
 			){
-		List<ComparedRectangle> list = service.getComparedResult(directoryName, expectedFilename, targetFilename);
+		List<ComparedRectangle> list = service.getComparedResult(directoryName, resultListId, targetResultId);
 		return new ResponseEntity<List<ComparedRectangle>>(list, HttpStatus.OK);
 	}
 	

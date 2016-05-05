@@ -106,8 +106,8 @@ public class PersisterServiceImpl implements PersisterService {
 	public Map<String, byte[]> getImages(String directoryName, String expectedFilename, String targetFilename) {
 		return persister.getImages(directoryName, expectedFilename, targetFilename);
 	}
-	public List<ComparedRectangle> getComparedResult(String directoryName, String expectedFilename, String targetFilename){
-		return persister.getComparedResult(directoryName, expectedFilename, targetFilename);
+	public List<ComparedRectangle> getComparedResult(String directoryName, int resultListId, int targetResultId){
+		return persister.getComparedResult(directoryName, resultListId, targetResultId);
 	};
 
 	@Override

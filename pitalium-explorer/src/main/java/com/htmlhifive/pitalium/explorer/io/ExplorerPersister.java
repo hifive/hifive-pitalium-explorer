@@ -51,7 +51,7 @@ public interface ExplorerPersister extends Persister {
 
 	ResultListOfExpected executeComparing(String directoryName, String expectedFilename, String[] targetFilenames);
 	Map<String, byte[]> getImages(String directoryName, String expectedFilename, String targetFilename);
-	List<ComparedRectangle> getComparedResult(String directoryName, String expectedFilename, String targetFilename);
+	List<ComparedRectangle> getComparedResult(String directoryName, int resultListId, int targetResultId);
 
 	/**
 	 * TestExecutionのリストを取得する。 引数のメソッド名、スクリーンショットを含む（like検索）Screenshotを持つ TestExecutionのリストを取得する。

@@ -100,31 +100,31 @@ public class ImagePair {
 	/**
 	 * print the similar rectangle information
  	 */
-	public void printSimilarRectangles() {
-		for (ComparedRectangle ComparedRect : ComparedRectangles) {
-			if (ComparedRect.getType().equals("SIMILAR")) {
-				Rectangle rect = ComparedRect.rectangle();
-				if(ComparedRect.checkAvailable(1)){
-					SimilarityUnit method1 = ComparedRect.getMethod1();
-					System.out.printf("x:%d, y:%d, w:%d, h:%d => %.2f at x:%d, y:%d shifted (Difference Norm)\n",
-							(int)rect.getX(), (int)rect.getY(), (int)rect.getWidth(), (int)rect.getHeight(), method1.getSimilarity(), method1.getXSimilar(), method1.getYSimilar());
-				}
-				if(ComparedRect.checkAvailable(2)){
-					SimilarityUnit method2 = ComparedRect.getMethod2();
-					System.out.printf("x:%d, y:%d, w:%d, h:%d => %.2f at x:%d, y:%d shifted (Number of Diffs)\n",
-							(int)rect.getX(), (int)rect.getY(), (int)rect.getWidth(), (int)rect.getHeight(), method2.getSimilarity(), method2.getXSimilar(), method2.getYSimilar());
-				}
-				if(ComparedRect.checkAvailable(3)){
-					SimilarityUnit method3 = ComparedRect.getMethod3();
-					System.out.printf("x:%d, y:%d, w:%d, h:%d => %.2f at x:%d, y:%d shifted (Feature Matrix)\n",
-							(int)rect.getX(), (int)rect.getY(), (int)rect.getWidth(), (int)rect.getHeight(), method3.getSimilarity(), method3.getXSimilar(), method3.getYSimilar());
-					System.out.println();
-				}
-			}
-		}
-		System.out.printf("entire similarity : %.2f\n", entireSimilarity);
-	
-	}
+//	public void printSimilarRectangles() {
+//		for (ComparedRectangle ComparedRect : ComparedRectangles) {
+//			if (ComparedRect.getType().equals("SIMILAR")) {
+//				Rectangle rect = ComparedRect.rectangle();
+//				if(ComparedRect.checkAvailable(1)){
+//					SimilarityUnit method1 = ComparedRect.getMethod1();
+//					System.out.printf("x:%d, y:%d, w:%d, h:%d => %.2f at x:%d, y:%d shifted (Difference Norm)\n",
+//							(int)rect.getX(), (int)rect.getY(), (int)rect.getWidth(), (int)rect.getHeight(), method1.getSimilarity(), method1.getXSimilar(), method1.getYSimilar());
+//				}
+//				if(ComparedRect.checkAvailable(2)){
+//					SimilarityUnit method2 = ComparedRect.getMethod2();
+//					System.out.printf("x:%d, y:%d, w:%d, h:%d => %.2f at x:%d, y:%d shifted (Number of Diffs)\n",
+//							(int)rect.getX(), (int)rect.getY(), (int)rect.getWidth(), (int)rect.getHeight(), method2.getSimilarity(), method2.getXSimilar(), method2.getYSimilar());
+//				}
+//				if(ComparedRect.checkAvailable(3)){
+//					SimilarityUnit method3 = ComparedRect.getMethod3();
+//					System.out.printf("x:%d, y:%d, w:%d, h:%d => %.2f at x:%d, y:%d shifted (Feature Matrix)\n",
+//							(int)rect.getX(), (int)rect.getY(), (int)rect.getWidth(), (int)rect.getHeight(), method3.getSimilarity(), method3.getXSimilar(), method3.getYSimilar());
+//					System.out.println();
+//				}
+//			}
+//		}
+//		System.out.printf("entire similarity : %.2f\n", entireSimilarity);
+//	
+//	}
 
 
 }

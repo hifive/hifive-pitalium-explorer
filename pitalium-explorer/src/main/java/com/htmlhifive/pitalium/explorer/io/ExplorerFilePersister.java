@@ -388,7 +388,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 
 			double entireSimilarity = imagePair.getEntireSimilarity();
 //			Result result = new Result(expectedFilename, targetFilename, entireSimilarity, comparedRectangles.size());
-			Result result = new Result(targetFilename, entireSimilarity, comparedRectangles.size());
+			Result result = new Result(i+1, targetFilename, entireSimilarity, comparedRectangles.size());
 			pairResultList.add(result);
 			
 			try {
@@ -479,7 +479,8 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 		return imageMap;
 	}
 	
-	public List<ComparedRectangle> getComparedResult(String directoryName, String expectedFilename, String targetFilename){
+//	public List<ComparedRectangle> getComparedResult(String directoryName, String expectedFilename, String targetFilename){
+	public List<ComparedRectangle> getComparedResult(String directoryName, int resultListId, int targetResultId){
 		File root = super.getResultDirectoryFile();
 		if (!root.exists() || !root.isDirectory()) {
 			log.error("Directory(" + root.getAbsolutePath() + ") Not Found.");
@@ -497,22 +498,50 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 			log.error("Directory(" + comparisonResultsDir.getAbsolutePath() + ") Not Found.");
 			return new ArrayList<ComparedRectangle>();
 		}
-
-		String filenamePair = expectedFilename + "__" + targetFilename + ".json";
+		
+		File resultListJson = new File(comparisonResultsDir, "resultList.json");
+		if(!resultListJson.exists()){
+			log.error("Directory(" + resultListJson.getAbsolutePath() + ") Not Found.");
+			return new ArrayList<ComparedRectangle>();
+		}
+		
+		
+		List<ResultListOfExpected> resultList;
+		try{
+			resultList = JSONUtils.readValue(resultListJson, new TypeReference<List<ResultListOfExpected>>(){});
+		}catch(Exception e){
+			log.error("json read value error: " + resultListJson.getAbsolutePath());
+			return new ArrayList<ComparedRectangle>();
+		}
+		
+		String expectedFilename = "";
+		String targetFilename = "";
+		for(ResultListOfExpected resultListOfExpected: resultList){
+			if(resultListOfExpected.getId() == resultListId){
+				expectedFilename = resultListOfExpected.getExpectedFilename();
+				for(Result targetResult: resultListOfExpected.getResultList()){
+					if(targetResult.getId() == targetResultId){
+						targetFilename = targetResult.getTargetFilename();
+					}
+				}
+			}
+		}
+		
+		String filenamePair = expectedFilename + "__" + targetFilename + "__" + Integer.toString(resultListId) + ".json";
 		File filenamePairJson = new File(comparisonResultsDir, filenamePair);
 		if(!filenamePairJson.exists()){ 
 			log.error("Directory(" + filenamePairJson.getAbsolutePath() + ") Not Found.");
 			return new ArrayList<ComparedRectangle>();
 		}
-		List<ComparedRectangle> resultList;
+		List<ComparedRectangle> comparedRectangleList;
 		try{
-			resultList = JSONUtils.readValue(filenamePairJson, new TypeReference<ArrayList<ComparedRectangle>>(){});
+			comparedRectangleList = JSONUtils.readValue(filenamePairJson, new TypeReference<ArrayList<ComparedRectangle>>(){});
 		} catch(Exception e){
 			log.error("Json to Object error: " + filenamePairJson.getAbsolutePath());
 			e.printStackTrace();
-			resultList = new ArrayList<ComparedRectangle>();
+			comparedRectangleList = new ArrayList<ComparedRectangle>();
 		}
-		return resultList;
+		return comparedRectangleList;
 	}
 
 

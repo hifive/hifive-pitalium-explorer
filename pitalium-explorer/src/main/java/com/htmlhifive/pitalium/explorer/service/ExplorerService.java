@@ -102,9 +102,9 @@ public class ExplorerService implements Serializable {
 	public Map<String, byte[]> getImages(String directoryName, String expectedFilename, String targetFilename) {
 		return persisterService.getImages(directoryName, expectedFilename, targetFilename);
 	}
-	public List<ComparedRectangle> getComparedResult(String directoryName, String expectedFilename,
-			String targetFilename) {
-		return persisterService.getComparedResult(directoryName, expectedFilename, targetFilename);
+	public List<ComparedRectangle> getComparedResult(String directoryName, int resultListId,
+			int targetResultId) {
+		return persisterService.getComparedResult(directoryName, resultListId, targetResultId);
 	}
 
 
