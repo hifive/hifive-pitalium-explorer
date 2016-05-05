@@ -77,7 +77,7 @@ public class ApiController {
 	 * @param targetFilenames
 	 * @return
 	 */
-	@RequestMapping(value = "_screenshots/compare", method = RequestMethod.GET, produces="application/json;charset=utf-8")
+	@RequestMapping(value = "_screenshots/compare", method = RequestMethod.POST, produces="application/json;charset=utf-8")
 	@ResponseBody
 	public ResponseEntity<ResultListOfExpected> executeComparing(
 			@RequestParam(value = "directory", defaultValue = "") String directoryName,
