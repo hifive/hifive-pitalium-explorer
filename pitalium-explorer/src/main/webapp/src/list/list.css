@@ -127,7 +127,6 @@
 			}
 			.diffDiv {
 				cursor: pointer;
-				
 				border-radius: 5px;
 				border: 1px solid #b71c1c;
 				background-color: #d32f2f;
@@ -191,5 +190,15 @@
 			a {
 				cursor:pointer;
 			}
+			.result_ul {
 			
+				
+			}
+			.result_info {
+				cursor:pointer;
+			}
+			
+			 .result_info:hover {
+				background-color:#ECEFF1;
+			}
 			

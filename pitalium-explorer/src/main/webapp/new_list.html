@@ -67,7 +67,8 @@
 		<!-- Navigation -->
 
 		<div class="container col-md-8 col-md-offset-2 margin-top" id="container">
-			<h4>Test results</h4>
+			<h4 style="color: #039BE5;">Test results</h4>
+		
 	
 
 			<div class="col-md-12" id="result_list" >
@@ -88,8 +89,6 @@
 		      	<div id="result_box" >
 		      	 	<div id="test_result" style="position:relative;">
 		      	 	
-		      	 		
-		        	
 		        
 		        	</div>
 		      	</div>
@@ -108,24 +107,44 @@
 		</div>
 		
 		<div id="memobox">
-			<h5><i class="glyphicon glyphicon-move"></i> Shifted</h5>
-			<hr style="border-color:#8D6E63;">
-			<p>X: 10px<br>Y: 20px</p>
+			
 		</div>
 		
 		
 		<script>
 		
-		
-		
 		$('#result_box').kinetic();
 		
 		$(document).on("mouseenter", ".diffDiv", function(){
+			var rectype = $(this).data("rectype");
+			var method1 = $(this).data("method1");
+			var method2 = $(this).data("method2");
 			
+			var method3 = $(this).data("method3");
+			var xshift = $(this).data("xshift");
+			var yshift = $(this).data("yshift");
+			
+			
+			var data1 = {
+					
+					type: rectype,
+					method1: method1,
+					method2: method2,
+					method3: method3,
+					xshift: xshift,
+					yshift: yshift
+					
+			};
+			
+			h5.core.view.update("#memobox", "memo_content", data1);
+			
+
 			$("#memobox").show();
 			$(".diffDiv").css("opacity", "0.3");
 			$(this).css("opacity", "0.6");
 		});
+		
+		
 		
 		$(document).on("mouseleave", ".diffDiv", function(){
 			$("#memobox").hide();
@@ -135,7 +154,7 @@
 		$(document).on('mousemove', function(e){
 		    $('#memobox').css({
 		       left:  e.pageX + 10,
-		       top:   e.pageY + 10
+		       top:   e.pageY - 20
 		    });
 		});
 		$(document).on("mouseenter", ".platform", function(){
@@ -193,16 +212,28 @@
 			});
 		}
 		
+		
+		$(document).on("click", ".appendTable", function(){
+			
+			var id = $(this).data("id");
+			var name = $(this).data("name");
+			
+			$("#table_list_" + id).toggle();
+			appendScreenshots(name,id);
+			
+		});
+		
+		
 		function appendScreenshots(name, id){
 			
 			var table = $("#table_" + String(id));
 			var t_id = "#table_" + String(id);
 			var table_list = $("#table_list_" + String(id));
+
 			
-			
-			table_list.toggle();
 			
 			if (table_list.css("display") != "none"){
+				
 				var screenshot_list_url = "./_screenshots/list.json";
 				$.ajax({
 					
@@ -215,31 +246,31 @@
 	
 						table.find(".tr").remove();
 						var resultList = data["resultList"];
-						
-						
-						console.log(resultList);
+
+						$(".result_ul").html("");
 						
 						for (var i = 0; i < resultList.length; i++){
 							
 							var result = resultList[i];
 							var tStamp = new Date(parseInt(result["executionTime"]));
-							console.log(result["executionTime"]);
+							
 							var options = {
 								    weekday: "long", year: "numeric", month: "short",
 								    day: "numeric", hour: "2-digit", minute: "2-digit"
 								};
 							
+							
 							$("#result_h_" + String(id)).show();
 							var my_data = {
-									
+								id: result["id"],
 								resultList: result["resultList"],
 								expected: result["expectedFilename"],
 								timestamp: tStamp.toLocaleTimeString("en", options),
 								directory: name
 								
 							}
-							h5.core.view.append($('#result_ul_' + String(id)), "result_info_table", my_data);
 							
+							h5.core.view.append($('#result_ul_' + String(id)), "result_info_table", my_data);
 							
 							
 						}
@@ -249,7 +280,7 @@
 							var tc = feedback[i];
 							
 							var my_data = {
-									id: tc["id"],
+									id: id,
 									name: tc["name"], 
 									timestamp: tc["timestamp"],
 									platform: tc["platform"],
@@ -303,6 +334,12 @@
 		$(document).on("click", ".btn-run", function(){
 			
 			var targets = new Array;
+			var run_btn = $(this);
+			run_btn.hide();
+			
+			var loading_img = $(this).parent().find("img");
+			loading_img.show();
+			
 			
 			$(".compare:checked").each(function(){
 				
@@ -314,10 +351,9 @@
 			var expected = $(this).data("target");
 			
 			
-			
 			$.ajax({
 				url: "_screenshots/compare.json",
-				type: "GET",
+				type: "POST",
 				data: {
 					directory: directory,
 					targets: String(targets),
@@ -327,6 +363,9 @@
 				success: function(data){
 					
 					console.log(data);
+					appendScreenshots(directory, run_btn.data("id"));
+					loading_img.hide();
+					run_btn.show();
 					
 				}
 				
@@ -363,13 +402,21 @@
 			
 		}
 		
-		
-		function imageCall(directory, expected, target){
+		$(document).on("click", ".btn-detail", function(){
+			
+			var directory = $(this).data("directory");
+			var target = $(this).data("target");
+			var expected = $(this).data("expected");
+			var resultListId = $(this).data("result_list_id");
+			var targetResultId = $(this).data("target_result_id");
+			
 			
 			$("#diffDetail").modal("show");
 			$("#test_result").height("300");
 			$("#test_result").width("100%");
-			$("#test_result").css("background", "#fff url('res/img/loading.gif') center no-repeat");
+			$("#test_result").css("background", "#fff url('res/img/big_loading.gif') center no-repeat");
+
+			$(".diffDiv").remove();
 			
 			$.ajax({
 				url: "_screenshots/images.json",
@@ -381,7 +428,7 @@
 				},
 				success: function(data){
 					
-					console.log(data);
+					
 					var img = new Image();
 					img.onload = function() {
 						$("#test_result").height(this.height);
@@ -391,38 +438,79 @@
 					
 					img.src = "data:image/png;base64," + data["targetImage"];
 					
-					drawRec(directory, expected, target);
-					
-					
+					drawRec(directory, resultListId, targetResultId);
 					
 				}
 			
 				
 			});
 			
-		
 			
-		}
-		
-		function drawRec(directory, expected, target){
-			console.log(directory);
-			console.log(expected);
-			console.log(target);
 			
-			var my_directory = directory;
-			var my_expected = expected;
-			var my_target = target;
+			
+		});
+		
+		
+		function drawRec(directory, resultId, targetResultId){
+			
 			
 			$.ajax({
 				url: "_screenshots/result.json",
 				type: "GET",
 				data: {
-					directory: my_directory,
-					expected: my_expected,
-					target: my_target
+					directory: directory,
+					resultListId: resultId,
+					targetResultId: targetResultId
 				},
 				success: function(data){
-					console.log(data);
+
+					
+					for (var i = 0; i < data.length; i++){
+						
+						var rec = data[i];
+						var my_data;
+						
+						if (rec["type"] == "SHIFT"){
+							my_data = {
+									
+									x: rec["x"],
+									y: rec["y"],
+									width: rec["width"],
+									height: rec["height"],
+									type: rec["type"],
+									method1: 0,
+									method2: 0,
+									method3: 0
+									
+							};
+						}else{
+							
+							console.log(rec);
+							
+							if (rec["method3"] == null){
+								method3 = "null";
+							}else{
+								
+								method3 = rec["method3"]["similarity"];
+							}
+							my_data = {
+									x: rec["x"],
+									y: rec["y"],
+									width: rec["width"],
+									height: rec["height"],
+									type: rec["type"],
+									method1: rec["method1"]["similarity"],
+									method2: rec["method2"]["similarity"],
+									method3: method3
+									
+							}
+						}
+						
+						h5.core.view.append("#test_result", "diffDiv", my_data);
+						
+						
+					}
+					
 					
 				}
 					
@@ -433,7 +521,7 @@
 		
 		$(document).on("click", ".result_info", function(){
 			
-			$(".info_table").toggle();
+			$(this).parent().find(".info_table").toggle();
 			
 		});
 		
@@ -443,10 +531,20 @@
 		
 		
 		<script type="text/ejs" id="diffDiv">
-			<div class="diffDiv" >
-			
+			<div class="diffDiv" style="left: [%=x%]px; top: [%=y%]px; width: [%=width%]px; height: [%=height%]px;"
+					data-rectype="[%=type%]"
+					[%if (type != "SHIFT"){%]
+						data-method1="[%=method1%]"
+						data-method2="[%=method2%]"
+						data-method3="[%=method3%]"
+					[%}else{%]
+						data-xshift="[%=xshift%]"
+						data-yshift="[%=yshift%]"
+					[%}%]
+					>
+
 		      	 			
-		     </div>
+		    </div>
 
 		</script>
 		
@@ -454,7 +552,24 @@
 		
 		<script type="text/ejs" id="result_info_table">
 
-			<a class="result_info"> [%=timestamp%] [%=expected%]</a>
+			<div class="col-sm-12 result_info_container" style="margin:0; padding:0;">
+			<div class="result_info col-sm-12 col-md-12"style="margin:0; padding:0; border-bottom: 1px solid #E0E0E0;">
+				<div class="col-sm-1 col-md-1"style="margin:0; ">
+
+					<div style="min-height:66px; padding-top: 15px; padding-bottom:15px;">
+						<i class="glyphicon glyphicon-ok-sign" style="font-size:25px; margin:0; color:#8BC34A;"></i></div>
+					</div>
+				<div class="col-sm-10 col-md-10" style="margin:0">
+					<div class="col-sm-12 col-md-12" style="margin:0">
+						<h4>[%=expected%]</h4>
+					</div>
+					<div class="col-sm-12 col-md-12" style="margin:0; color:#90A4AE">
+						<p>[%=timestamp%]</p>
+					</div>
+				</div>
+				
+			</div>
+			<div class="col-sm-12 col-md-12">
 			<table class="info_table table" style="display:none;">
 				<tr>
 					<th>
@@ -482,27 +597,31 @@
 						<td>[%=Math.round(resultList[i]["entireSimilarity"]*100)/100%]</td>
 						<td>[%=resultList[i]["numberOfDiffRec"]%]</td>
 						
-						<td><a  class="btn btn-danger" onclick="imageCall('[%=directory%]', '[%=expected%]', '[%=resultList[i]["targetFilename"]%]');"data-expected="[%=expected%]" data-target="[%=resultList[i]["targetFilename"]%]" data-directory="[%=directory%]" >Detail</a></td>
+						<td><a  class="btn btn-danger btn-detail" data-result_list_id="[%=id%]" data-target_result_id="[%=resultList[i]["id"]%]" data-expected="[%=expected%]" data-target="[%=resultList[i]["targetFilename"]%]" data-directory="[%=directory%]" >Detail</a></td>
 					<tr>
 				[%}%]
 				
 				
 			</table>
+			</div>
+			</div>
 			
 		</script>
 		
 		<script type="text/ejs" id="mylist">
 			<div class="result_content">
 				
-				<a onclick="appendScreenshots('[%=name%]', [%=id%]);">[%=name%] ([%=time%]) ([%=result%]/[%=screenshot%])</a>
+				<a class="appendTable" data-name="[%=name%]" data-id=[%=id%]>[%=name%] ([%=time%]) ([%=result%]/[%=screenshot%])</a>
 
 				<div class="table_list" id="table_list_[%=id%]" style="display:none;">
-					<h4 id="result_h_[%=id%]" style="display:none;">Result List</h4>
+					<h4 id="result_h_[%=id%]" style="display:none; color:#00897B;">Result List</h4>
+					<hr style="border-bottom: 1px solid #00897B;">
 
-					<ul id="result_ul_[%=id%]">
+					<div id="result_ul_[%=id%]" class="result_ul">
 						
-						
-					</ul>
+
+					</div>
+
 					<table class="table" id="table_[%=id%]" >
 							<tbody><tr class="th_tr">
 								<th>
@@ -561,13 +680,54 @@
 									<input type="checkbox" class="compare compare_checkbox" data-target="[%=name%]" data-directory="[%=directory%]" style="display:none;">
 								</td>
 								<td>
-									<a class="btn-info btn btn-run" style="display:none;" data-target="[%=name%]" data-directory="[%=directory%]">
+									<a class="btn-info btn btn-run" style="display:none;" data-id="[%=id%]" data-target="[%=name%]" data-directory="[%=directory%]">
 										<span class="glyphicon glyphicon-play-circle" aria-hidden="true"></span> Run
 									</a>
+									<img src="res/img/loading.gif" style="width:34px; display:none; margin-left: 20px; margin-right:20px;"/>
 								</td>
 			</tr>
 		</script>
 		
+		<script type="text/ejs" id="memo_content">
+			<h5>
+
+			[%if (type == "SHIFT"){%]
+				<i class="glyphicon glyphicon-move"></i> Shifted
+			[%}else{%]
+				<i class="glyphicon glyphicon-stats"></i> Similar
+				
+			[%}%]
+
+			</h5>
+			
+			<hr style="border-color:#8D6E63;">
+
+			[%if (type == "SHIFT"){%]
+				<p>x-shift: [%=xshift%]
+				</p>
+				<p>y-shift: [%=yshift%]
+				</p>
+			[%}else{%]
+				<h5>
+			Method 1
+			</h5>
+			<p>
+			Similarity: [%=method1%];
+			</p>
+			<h5>Method 2</h5>
+			<p>
+			Similarity: [%=method2%];
+			</p>
+
+			<h5>Method 3</h5>
+			<p>
+			Similarity: [%=method3%];
+			</p>
+
+			[%}%]
+			
+			
+		</script>
 		
 		
 	</body>
