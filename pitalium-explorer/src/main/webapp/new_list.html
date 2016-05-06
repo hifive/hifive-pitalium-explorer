@@ -218,7 +218,7 @@
 			var id = $(this).data("id");
 			var name = $(this).data("name");
 			
-			$("#table_list_" + id).toggle();
+			$("#table_list_" + id).slideToggle();
 			appendScreenshots(name,id);
 			
 		});
@@ -464,13 +464,16 @@
 				},
 				success: function(data){
 
-					
+					console.log(data);
 					for (var i = 0; i < data.length; i++){
 						
 						var rec = data[i];
 						var my_data;
 						
+						console.log(rec);
+						
 						if (rec["type"] == "SHIFT"){
+							
 							my_data = {
 									
 									x: rec["x"],
@@ -478,6 +481,8 @@
 									width: rec["width"],
 									height: rec["height"],
 									type: rec["type"],
+									xshift: rec["xshift"],
+									yshift: rec["yshift"],
 									method1: 0,
 									method2: 0,
 									method3: 0
@@ -485,7 +490,7 @@
 							};
 						}else{
 							
-							console.log(rec);
+							
 							
 							if (rec["method3"] == null){
 								method3 = "null";
@@ -521,7 +526,7 @@
 		
 		$(document).on("click", ".result_info", function(){
 			
-			$(this).parent().find(".info_table").toggle();
+			$(this).parent().find(".info_table").slideToggle();
 			
 		});
 		
@@ -712,16 +717,16 @@
 			Method 1
 			</h5>
 			<p>
-			Similarity: [%=method1%];
+			Similarity: [%=method1%]
 			</p>
 			<h5>Method 2</h5>
 			<p>
-			Similarity: [%=method2%];
+			Similarity: [%=method2%]
 			</p>
 
 			<h5>Method 3</h5>
 			<p>
-			Similarity: [%=method3%];
+			Similarity: [%=method3%]
 			</p>
 
 			[%}%]
