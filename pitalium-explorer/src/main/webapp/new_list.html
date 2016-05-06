@@ -219,6 +219,7 @@
 			var name = $(this).data("name");
 			
 			$("#table_list_" + id).slideToggle();
+			
 			appendScreenshots(name,id);
 			
 		});
@@ -247,7 +248,7 @@
 						table.find(".tr").remove();
 						var resultList = data["resultList"];
 
-						$(".result_ul").html("");
+						$("#result_ul_" + id).html("");
 						
 						for (var i = 0; i < resultList.length; i++){
 							
@@ -526,7 +527,7 @@
 		
 		$(document).on("click", ".result_info", function(){
 			
-			$(this).parent().find(".info_table").slideToggle();
+			$(this).parent().find(".info_table_div").slideToggle();
 			
 		});
 		
@@ -574,8 +575,8 @@
 				</div>
 				
 			</div>
-			<div class="col-sm-12 col-md-12">
-			<table class="info_table table" style="display:none;">
+			<div class="col-sm-12 col-md-12 info_table_div" style="display:none;">
+			<table class="info_table table" >
 				<tr>
 					<th>
 						Expected
