@@ -17,7 +17,14 @@ public class SimilarityUtils {
 	 */
 	private static int FeatureRow = 5;
 	private static int FeatureCol = 5;
-
+	
+	/**
+	 * Initial setting for categorization 
+	 */
+	private static double scalingDiffCriterion = 0.3;
+	private static double scalingFeatureCriterion = 0.85;
+	private static double missingDiffCriterion = 0.6;
+	
 	/*
 	 * Set the way to calculate norm.
 	 * if true, use the average of norm,
@@ -65,21 +72,16 @@ public class SimilarityUtils {
 		
 		/* Check scaling */
 
-		// initial setting
-		double scalingDiffCriterion = 0.3, scalingFeatureCriterion = 0.85;
 		double similarityThresDiff, similarityTotalDiff, similarityFeatureMatrix;
 		similarityThresDiff = similarityUnit.getSimilarityThresDiff();
 		similarityTotalDiff = similarityUnit.getSimilarityTotalDiff();
 		similarityFeatureMatrix = similarityUnit.getSimilarityFeatureMatrix();
-		System.out.println(similarityThresDiff - similarityTotalDiff);
-		System.out.println(similarityFeatureMatrix);
-		System.out.println(scalingDiffCriterion);
-		System.out.println(scalingFeatureCriterion);
 		if (similarityThresDiff - similarityTotalDiff >= scalingDiffCriterion && similarityFeatureMatrix >= scalingFeatureCriterion) {
 			return "SCALING";
 		}
+		
 		/* Check missing */
-		double missingDiffCriterion = 0.6;
+		
 		if (similarityTotalDiff < missingDiffCriterion) {
 			return "MISSING";
 		}
