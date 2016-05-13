@@ -17,7 +17,7 @@ public class SimilarityUtils {
 	 */
 	private static int FeatureRow = 5;
 	private static int FeatureCol = 5;
-				
+
 	/*
 	 * Set the way to calculate norm.
 	 * if true, use the average of norm,
@@ -34,6 +34,57 @@ public class SimilarityUtils {
 	 * Constructor
 	 */
 	public SimilarityUtils(){} 
+
+
+
+	public static double calcSimilarity(BufferedImage expectedSubImage,BufferedImage actualSubImage, Rectangle rectangle, ComparedRectangle similarRectangle) {
+		double similarityPixelByPixel, similarityFeatureMatrix=-1;
+		SimilarityUnit similarityUnit = new SimilarityUnit();
+		similarityPixelByPixel = calcSimilarityPixelByPixel(expectedSubImage, actualSubImage, rectangle, similarityUnit);
+
+
+		int TEMPLATE_MARGIN = LocationShift.getTemplateMargin();
+		/* calculate similarity using feature matrix. */
+		int comparedRectangleWidth = (int)rectangle.getWidth()-2*TEMPLATE_MARGIN, comparedRectangleHeight = (int)rectangle.getHeight()-2*TEMPLATE_MARGIN;
+
+		// execute this only when comparedRectangleWidth >= FeatureCol && comparedRectangleHeight >= FeatureRow
+		if (SimilarityUtils.checkFeatureSize(comparedRectangleWidth, comparedRectangleHeight)) {
+			similarityFeatureMatrix = calcSimilarityByFeatureMatrix(expectedSubImage, actualSubImage, rectangle);
+		}
+		similarityUnit.setSimilarityFeatureMatrix(similarityFeatureMatrix);
+
+		String category = categorize(similarityUnit);	
+
+		similarRectangle.setType(category);	
+		similarRectangle.setSimilarityUnit(similarityUnit);
+
+		return similarityPixelByPixel;
+	}
+
+	private static String categorize(SimilarityUnit similarityUnit) {
+		
+		/* Check scaling */
+
+		// initial setting
+		double scalingDiffCriterion = 0.3, scalingFeatureCriterion = 0.85;
+		double similarityThresDiff, similarityTotalDiff, similarityFeatureMatrix;
+		similarityThresDiff = similarityUnit.getSimilarityThresDiff();
+		similarityTotalDiff = similarityUnit.getSimilarityTotalDiff();
+		similarityFeatureMatrix = similarityUnit.getSimilarityFeatureMatrix();
+		System.out.println(similarityThresDiff - similarityTotalDiff);
+		System.out.println(similarityFeatureMatrix);
+		System.out.println(scalingDiffCriterion);
+		System.out.println(scalingFeatureCriterion);
+		if (similarityThresDiff - similarityTotalDiff >= scalingDiffCriterion && similarityFeatureMatrix >= scalingFeatureCriterion) {
+			return "SCALING";
+		}
+		/* Check missing */
+		double missingDiffCriterion = 0.6;
+		if (similarityTotalDiff < missingDiffCriterion) {
+			return "MISSING";
+		}
+		return "SIMILAR";
+	}
 
 	/**
 	 * Calculate the distance of two feature matrices.
@@ -76,8 +127,8 @@ public class SimilarityUtils {
 	 * @param rectangle The rectangle area where to compare.
 	 * @return the 'feature' similarity of given area between two images.
 	 */
-	public static double calcSimilarityByFeatureMatrix(BufferedImage expectedSubImage, BufferedImage actualSubImage, Rectangle rectangle, ComparedRectangle similarRectangle) {
-	
+	public static double calcSimilarityByFeatureMatrix(BufferedImage expectedSubImage, BufferedImage actualSubImage, Rectangle rectangle) {
+
 		// initialize subimage.
 		int expectedWidth = expectedSubImage.getWidth(), expectedHeight = expectedSubImage.getHeight();
 		int actualWidth = actualSubImage.getWidth(), actualHeight = actualSubImage.getHeight();
@@ -95,22 +146,22 @@ public class SimilarityUtils {
 		int[] actualRed = new int[actualColors.length];
 		int[] actualGreen = new int[actualColors.length];
 		int[] actualBlue = new int[actualColors.length];
-		
+
 		for (int i = 0; i < expectedColors.length; i++) {
 			Color expectedColor = new Color(expectedColors[i]);
 			expectedRed[i] = expectedColor.getRed();
 			expectedGreen[i] = expectedColor.getGreen();
 			expectedBlue[i] = expectedColor.getBlue();
 		}
-		
+
 		for (int i = 0; i < actualColors.length; i++) {
 			Color actualColor = new Color(actualColors[i]);
 			actualRed[i] = actualColor.getRed();
 			actualGreen[i] = actualColor.getGreen();
 			actualBlue[i] = actualColor.getBlue();
 		}
-		
-		
+
+
 		/* Calculate the feature matrix of actual subimage. */
 
 		// the size of grid.
@@ -120,7 +171,7 @@ public class SimilarityUtils {
 		Color[][] actualFeature = new Color[FeatureRow][FeatureCol];
 		for (int row=0; row<FeatureRow; row++) {
 			for (int col=0; col<FeatureCol; col++) {
-				
+
 				// Sum of Red, Green, and Blue.
 				int rSum=0, gSum=0, bSum=0;
 
@@ -132,7 +183,7 @@ public class SimilarityUtils {
 						bSum += actualBlue[actualWidth*(GridHeight*row + i) + (GridWidth*col + j)];
 					}
 				}
-				
+
 				actualFeature[row][col] = new Color((int)(rSum/GridArea), (int)(gSum/GridArea), (int)(bSum/GridArea));
 			}
 		}
@@ -140,20 +191,21 @@ public class SimilarityUtils {
 		/* Calculate the feature matrix of expected subimage.*/
 
 		Color[][] expectedFeature = new Color[FeatureRow][FeatureCol];
-	
-		int bestX=0, bestY=0;
+
+
+//		int bestX=0, bestY=0;
 		double dist=0, min=-1;
-		
+
 		int yMax = expectedHeight - actualHeight + 1;
 		int xMax = expectedWidth - actualWidth + 1;
-		
+
 		for (int y = 0; y < yMax; y++) {
 			for (int x = 0; x < xMax; x++) {
-				
+
 				// Calculate the distance between the expected feature matrix and the actual feature matrix shifhted (x, y).
 				for (int row=0; row<FeatureRow; row++) {
 					for (int col=0; col<FeatureCol; col++) {
-						
+
 						// Sum of Red, Green, and Blue.
 						int rSum=0, gSum=0, bSum=0;
 
@@ -176,17 +228,13 @@ public class SimilarityUtils {
 				if (dist < min || min==-1)
 				{
 					min = dist;
-					bestX = x - (expectedWidth - actualWidth)/2;
-					bestY = y - (expectedHeight - actualHeight)/2;
+//					bestX = x - (expectedWidth - actualWidth)/2;
+//					bestY = y - (expectedHeight - actualHeight)/2;
 				}
 			}
 		}
 
 		double similarity = 1-min;
-
-		// insert similarity information
-//		similarRectangle.setSimilarity(3, bestX, bestY, similarity);
-		similarRectangle.setMethod3(new SimilarityUnit(bestX, bestY, similarity));
 
 		return similarity;
 	}
@@ -200,7 +248,7 @@ public class SimilarityUtils {
 	 * @param rectangle The rectangle area where to compare.
 	 * @return the 'pixel by pixel' similarity of given area between two images.
 	 */
-	public static double calcSimilarityPixelByPixel(BufferedImage expectedSubImage,BufferedImage actualSubImage, Rectangle rectangle, ComparedRectangle similarRectangle) {
+	public static double calcSimilarityPixelByPixel(BufferedImage expectedSubImage,BufferedImage actualSubImage, Rectangle rectangle,	SimilarityUnit similarityUnit) {
 
 		// initialize subimage.
 		int expectedWidth = expectedSubImage.getWidth(), expectedHeight = expectedSubImage.getHeight();
@@ -219,27 +267,28 @@ public class SimilarityUtils {
 		int[] actualRed = new int[actualColors.length];
 		int[] actualGreen = new int[actualColors.length];
 		int[] actualBlue = new int[actualColors.length];
-		
+
 		for (int i = 0; i < expectedColors.length; i++) {
 			Color expectedColor = new Color(expectedColors[i]);
 			expectedRed[i] = expectedColor.getRed();
 			expectedGreen[i] = expectedColor.getGreen();
 			expectedBlue[i] = expectedColor.getBlue();
 		}
-		
+
 		for (int i = 0; i < actualColors.length; i++) {
 			Color actualColor = new Color(actualColors[i]);
 			actualRed[i] = actualColor.getRed();
 			actualGreen[i] = actualColor.getGreen();
 			actualBlue[i] = actualColor.getBlue();
 		}
-		
+
 		// the difference of Red, Green, and Blue, respectively.
 		int r, g, b, bestX=0, bestY=0;
 
 		// to count the number of different pixels.
-		int diffCnt, diffMin = -1, bestDiffX=0, bestDiffY=0;
-		double diffNumSimilarity;
+		int thresDiffCount, thresDiffMin = -1;	// difference from diffThreshold
+		int totalDiffCount, totalDiffMin = -1;	// differenece from 0
+		double similarityThresDiff, similarityTotalDiff;
 
 		double norm=0, min=-1;
 		// Fine the best match moving the subimage.
@@ -247,9 +296,10 @@ public class SimilarityUtils {
 		int xMax = expectedWidth - actualWidth + 1;
 		for (int y = 0; y < yMax; y++) {
 			for (int x = 0; x < xMax; x++) {
-				
+
 				// Calculate the similarity with the (x, y)-shifted subimage of actual image.
-				diffCnt = 0;	
+				thresDiffCount = 0;	
+				totalDiffCount = 0;
 				norm = 0;
 				for (int i = 0; i < actualHeight; i++) {
 					for (int j = 0; j < actualWidth; j++) {
@@ -262,7 +312,10 @@ public class SimilarityUtils {
 							norm += r*r + g*g + b*b;
 						}
 						if (r*r+g*g+b*b > 3*255*255*diffThreshold*diffThreshold)
-							diffCnt++;
+							thresDiffCount++;
+						if (r*r+g*g+b*b > 0)
+							totalDiffCount++;
+
 					}
 				}
 
@@ -273,13 +326,17 @@ public class SimilarityUtils {
 					bestX = x - (expectedWidth - actualWidth)/2;
 					bestY = y - (expectedHeight - actualHeight)/2;
 				}
-				
-				// Find the minimal number of different pixels.
-				if (diffCnt < diffMin || diffMin == -1)
+
+				// Find the minimal number of total different pixels.
+				if (totalDiffCount < totalDiffMin || totalDiffMin == -1)
 				{
-					diffMin = diffCnt;
-					bestDiffX = x - (expectedWidth - actualWidth)/2;
-					bestDiffY = y - (expectedHeight - actualHeight)/2;
+					totalDiffMin = totalDiffCount;
+				}
+
+				// Find the minimal number of threshold different pixels.
+				if (thresDiffCount < thresDiffMin || thresDiffMin == -1)
+				{
+					thresDiffMin = thresDiffCount;
 				}
 			}
 		}
@@ -293,16 +350,17 @@ public class SimilarityUtils {
 		}
 
 		// normalize the number of different pixels.
-		diffNumSimilarity = 1 - (double)diffMin/(actualWidth*actualHeight);
-
-		// insert similarity informations
-//		similarRectangle.setSimilarity(1, bestX, bestY, similarity);
-//		similarRectangle.setSimilarity(2, bestDiffX, bestDiffY, diffNumSimilarity);
-		similarRectangle.setMethod1(new SimilarityUnit(bestX, bestY, similarity));
-		similarRectangle.setMethod2(new SimilarityUnit(bestDiffX, bestDiffY, diffNumSimilarity));
+		similarityThresDiff = 1 - (double)thresDiffMin/(actualWidth*actualHeight);
+		similarityTotalDiff = 1 - (double)totalDiffMin/(actualWidth*actualHeight);
+		
+		similarityUnit.setXSimilar(bestX);
+		similarityUnit.setYSimilar(bestY);
+		similarityUnit.setSimilarityPixelByPixel(similarity);
+		similarityUnit.setSimilarityThresDiff(similarityThresDiff);
+		similarityUnit.setSimilarityTotalDiff(similarityTotalDiff);
 
 		return similarity;
 	}
 }
-	
-	
+
+
