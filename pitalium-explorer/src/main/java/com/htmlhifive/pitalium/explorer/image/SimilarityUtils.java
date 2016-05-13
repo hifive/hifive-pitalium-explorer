@@ -235,7 +235,10 @@ public class SimilarityUtils {
 		}
 
 		double similarity = 1-min;
-
+		
+		// round similarity to 2 decimal places.
+		similarity = (double)Math.round(similarity*100)/100;
+		
 		return similarity;
 	}
 
@@ -352,6 +355,11 @@ public class SimilarityUtils {
 		// normalize the number of different pixels.
 		similarityThresDiff = 1 - (double)thresDiffMin/(actualWidth*actualHeight);
 		similarityTotalDiff = 1 - (double)totalDiffMin/(actualWidth*actualHeight);
+		
+		// round similarities to 2 decimal place.
+		similarity = (double)Math.round(similarity*100)/100;
+		similarityThresDiff = (double)Math.round(similarityThresDiff*100)/100;
+		similarityTotalDiff = (double)Math.round(similarityTotalDiff*100)/100;
 		
 		similarityUnit.setXSimilar(bestX);
 		similarityUnit.setYSimilar(bestY);
