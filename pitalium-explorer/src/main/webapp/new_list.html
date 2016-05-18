@@ -195,11 +195,13 @@
 						
 						var tStamp = new Date(tString.substr(0, 4), (parseInt(tString.substr(4,2)) - 1), tString.substr(6,2), tString.substr(8,2), tString.substr(10,2));
 						var mytimes = tStamp.toLocaleTimeString("en", options)
+						var dir_timestamp = String(content[i]["dirTimestamp"]);
+						var path = dir_timestamp+"/"+result_name;
 						
 						var NofScreenshots = content[i]["numberOfScreenshots"];
 						var NofResult = content[i]["numberOfResults"];
 						
-						var data = {id: content[i]["id"], name: result_name, time: mytimes, screenshot: NofScreenshots, result: NofResult };
+						var data = {id: content[i]["id"], name: result_name, time: mytimes, screenshot: NofScreenshots, result: NofResult, path: path};
 						
 						h5.core.view.append("#result_list", "mylist", data);
 						
@@ -216,16 +218,16 @@
 		$(document).on("click", ".appendTable", function(){
 			
 			var id = $(this).data("id");
-			var name = $(this).data("name");
+			var path = $(this).data("path");
 			
 			$("#table_list_" + id).slideToggle();
 			
-			appendScreenshots(name,id);
+			appendScreenshots(path,id);
 			
 		});
 		
 		
-		function appendScreenshots(name, id){
+		function appendScreenshots(path, id){
 			
 			var table = $("#table_" + String(id));
 			var t_id = "#table_" + String(id);
@@ -240,7 +242,7 @@
 					
 					url: screenshot_list_url,
 					type: 'GET',
-					data: {name: name, refresh: "true"},
+					data: {path: path, refresh: "true"},
 					success: function(data){
 						
 						var feedback = data["screenshotFileList"];
@@ -267,8 +269,7 @@
 								resultList: result["resultList"],
 								expected: result["expectedFilename"],
 								timestamp: tStamp.toLocaleTimeString("en", options),
-								directory: name
-								
+								directory: path 
 							}
 							
 							h5.core.view.append($('#result_ul_' + String(id)), "result_info_table", my_data);
@@ -289,7 +290,7 @@
 									version: tc["version"],
 									width: tc["width"],
 									height: tc["height"],
-									directory: name,
+									directory: path,
 									results: resultList
 							};
 							
@@ -356,7 +357,7 @@
 				url: "_screenshots/compare.json",
 				type: "POST",
 				data: {
-					directory: directory,
+					path: directory,
 					targets: String(targets),
 					expected: expected
 				},
@@ -423,7 +424,7 @@
 				url: "_screenshots/images.json",
 				type: "GET",
 				data: {
-					directory: directory,
+					path: directory,
 					target: target,
 					expected: expected
 				},
@@ -459,7 +460,7 @@
 				url: "_screenshots/result.json",
 				type: "GET",
 				data: {
-					directory: directory,
+					path: directory,
 					resultListId: resultId,
 					targetResultId: targetResultId
 				},
@@ -617,7 +618,7 @@
 		<script type="text/ejs" id="mylist">
 			<div class="result_content">
 				
-				<a class="appendTable" data-name="[%=name%]" data-id=[%=id%]>[%=name%] ([%=time%]) ([%=result%]/[%=screenshot%])</a>
+				<a class="appendTable" data-path="[%=path%]" data-name="[%=name%]" data-id=[%=id%]>[%=name%] ([%=time%]) ([%=result%]/[%=screenshot%])</a>
 
 				<div class="table_list" id="table_list_[%=id%]" style="display:none;">
 					<h4 id="result_h_[%=id%]" style="display:none; color:#00897B;">Result List</h4>

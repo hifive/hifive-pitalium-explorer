@@ -93,18 +93,18 @@ public class ExplorerService implements Serializable {
 	public Page<ResultDirectory> findResultDirectory(String searchTestMethod, String searchTestScreen, int page, int pageSize, boolean refresh){
 		return persisterService.findResultDirectory(searchTestMethod, searchTestScreen, page, pageSize, refresh);
 	}
-	public Map<String, List> findScreenshotFiles(String name, boolean refresh){
-		return persisterService.findScreenshotFiles(name, refresh);
+	public Map<String, List> findScreenshotFiles(String path, boolean refresh){
+		return persisterService.findScreenshotFiles(path, refresh);
 	}
-	public ResultListOfExpected executeComparing(String directoryName, String expectedFilename, String[] targetFilenames) {
-		return persisterService.executeComparing(directoryName, expectedFilename, targetFilenames);
+	public ResultListOfExpected executeComparing(String path, String expectedFilename, String[] targetFilenames) {
+		return persisterService.executeComparing(path, expectedFilename, targetFilenames);
 	}
-	public Map<String, byte[]> getImages(String directoryName, String expectedFilename, String targetFilename) {
-		return persisterService.getImages(directoryName, expectedFilename, targetFilename);
+	public Map<String, byte[]> getImages(String path, String expectedFilename, String targetFilename) {
+		return persisterService.getImages(path, expectedFilename, targetFilename);
 	}
-	public List<ComparedRectangle> getComparedResult(String directoryName, int resultListId,
+	public List<ComparedRectangle> getComparedResult(String path, int resultListId,
 			int targetResultId) {
-		return persisterService.getComparedResult(directoryName, resultListId, targetResultId);
+		return persisterService.getComparedResult(path, resultListId, targetResultId);
 	}
 
 

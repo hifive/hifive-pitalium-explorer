@@ -6,6 +6,7 @@ package com.htmlhifive.pitalium.explorer.io;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -122,63 +123,98 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 			});
 
 			for(int i=0; i<subDirectories.length; i++){
-				File directory = subDirectories[i];
-
-				String name = directory.getName();
-				String[] splitted_name = name.split("_");
-
-				String timestampString = splitted_name[0];
-
-				String url = "";
-				if(splitted_name.length > 1){
-					for(int j=1; j<splitted_name.length; j++){
-						url = url.concat("_");
-						url = url.concat(splitted_name[j]);
-					}
-					url = url.substring(1);
-				}
-
-				File[] results = directory.listFiles(new FilenameFilter() {
-					@Override
-					public boolean accept(File dir, String name) {
-						return name.toLowerCase().endsWith(".json");
-					}
-				});
-				int numberOfResults = results.length;
-
-				File[] screenshots = directory.listFiles(new FilenameFilter() {
-					@Override
-					public boolean accept(File dir, String name) {
-						for(String extension : new String[]{".png", "jpg", ".jpeg"}){
-							if(name.toLowerCase().endsWith(extension)) return true;
-						}
-						return false;
-					}
-				});
-				int numberOfScreenshots = screenshots.length;
-
-				HashSet<String> browsers = new HashSet<String>();
-				for(File screenshot : screenshots){
-					if(screenshot.getName().toLowerCase().contains("chrome")) browsers.add("chrome");
-					else if(screenshot.getName().toLowerCase().contains("safari")) browsers.add("safari");
-					else if(screenshot.getName().toLowerCase().contains("firefox")) browsers.add("firefox");
-					else if(screenshot.getName().toLowerCase().contains("IE")) browsers.add("IE");
-					else browsers.add("unknown");
-				}
-				int numberOfBrowsers = browsers.size();
-
+				File timeDirectory = subDirectories[i];
+				String timestampString = timeDirectory.getName();
 				SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
 				long timestamp;
 				try {
-					timestamp = sdf.parse(timestampString).getTime();
+					timestamp = sdf.parse(timestampString.replace("_", "")).getTime();
 				} catch (ParseException e) {
 					log.error("timestamp parsing error: " + timestampString);
 					timestamp = 0;
 				}
-				ResultDirectory resultDirectory = new ResultDirectory(i+1, name, timestamp, url,
-						numberOfResults, numberOfScreenshots, numberOfBrowsers);
+				
+				File[] methodDirectories = timeDirectory.listFiles(new FileFilter(){
+					@Override
+					public boolean accept(File f){
+						return f.isDirectory();
+					}
+				});
+				
+				for(int j=0; j<methodDirectories.length; j++){
+					File directory = methodDirectories[j];
+					String methodName = directory.getName();
+					
+					File[] results = new File(directory, "comparisonResults").listFiles(new FilenameFilter(){
+						@Override
+						public boolean accept(File dir, String name) {
+							return name.toLowerCase().endsWith(".json");
+						}
+					});
+					int numberOfResults = 0;
+					if(results != null){
+						numberOfResults = results.length;
+					}
+					
+					File[] screenshots = directory.listFiles(new FilenameFilter() {
+						@Override
+						public boolean accept(File dir, String name) {
+							for(String extension : new String[]{".png", "jpg", ".jpeg"}){
+								if(name.toLowerCase().endsWith(extension)) return true;
+							}
+							return false;
+						}
+					});
+					int numberOfScreenshots = 0;
+					if(screenshots != null){
+						numberOfScreenshots = screenshots.length;
+					}
 
-				resultDirectoriesList.add(resultDirectory);
+					HashSet<String> browsers = new HashSet<String>();
+					for(File screenshot : screenshots){
+						if(screenshot.getName().toLowerCase().contains("chrome")) browsers.add("chrome");
+						else if(screenshot.getName().toLowerCase().contains("safari")) browsers.add("safari");
+						else if(screenshot.getName().toLowerCase().contains("firefox")) browsers.add("firefox");
+						else if(screenshot.getName().toLowerCase().contains("IE")) browsers.add("IE");
+						else browsers.add("unknown");
+					}
+					int numberOfBrowsers = browsers.size();
+					
+					ResultDirectory resultDirectory = new ResultDirectory(i+1, methodName, timestamp, timestampString,
+							numberOfResults, numberOfScreenshots, numberOfBrowsers);
+					resultDirectoriesList.add(resultDirectory);
+				}
+
+//				File[] results = directory.listFiles(new FilenameFilter() {
+//					@Override
+//					public boolean accept(File dir, String name) {
+//						return name.toLowerCase().endsWith(".json");
+//					}
+//				});
+//				int numberOfResults = results.length;
+//
+//				File[] screenshots = directory.listFiles(new FilenameFilter() {
+//					@Override
+//					public boolean accept(File dir, String name) {
+//						for(String extension : new String[]{".png", "jpg", ".jpeg"}){
+//							if(name.toLowerCase().endsWith(extension)) return true;
+//						}
+//						return false;
+//					}
+//				});
+//				int numberOfScreenshots = screenshots.length;
+
+//				HashSet<String> browsers = new HashSet<String>();
+//				for(File screenshot : screenshots){
+//					if(screenshot.getName().toLowerCase().contains("chrome")) browsers.add("chrome");
+//					else if(screenshot.getName().toLowerCase().contains("safari")) browsers.add("safari");
+//					else if(screenshot.getName().toLowerCase().contains("firefox")) browsers.add("firefox");
+//					else if(screenshot.getName().toLowerCase().contains("IE")) browsers.add("IE");
+//					else browsers.add("unknown");
+//				}
+//				int numberOfBrowsers = browsers.size();
+
+
 			}
 
 			if(resultDirectoryJson.exists()) resultDirectoryJson.delete();
@@ -205,14 +241,14 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 	}
 	
 	@Override
-	public Map<String, List> findScreenshotFiles(String dir, boolean refresh){
+	public Map<String, List> findScreenshotFiles(String path, boolean refresh){
 		File root = super.getResultDirectoryFile();
 		if (!root.exists() || !root.isDirectory()) {
 			log.error("Directory(" + root.getAbsolutePath() + ") Not Found.");
 			return new HashMap<String, List>();
 		}
 
-		File directory = new File(root, dir);
+		File directory = new File(root, path);
 		File[] files = directory.listFiles(new FilenameFilter() {
 			@Override
 			public boolean accept(File dir, String name) {
@@ -303,7 +339,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 	}
 	
 	@Override
-	public ResultListOfExpected executeComparing(String directoryName, String expectedFilename, String[] targetFilenames) {
+	public ResultListOfExpected executeComparing(String path, String expectedFilename, String[] targetFilenames) {
 		File root = super.getResultDirectoryFile();
 		if (!root.exists() || !root.isDirectory()) {
 			log.error("Directory(" + root.getAbsolutePath() + ") Not Found.");
@@ -311,7 +347,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 			return new ResultListOfExpected();
 		}
 
-		File directory = new File(root, directoryName);
+		File directory = new File(root, path);
 		if(!directory.exists() || !directory.isDirectory()){
 			log.error("Directory(" + directory.getAbsolutePath() + ") Not Found.");
 //			return new ArrayList<Result>();
@@ -414,14 +450,14 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 		return resultListOfExpected;
 	}
 
-	public Map<String, byte[]> getImages(String directoryName, String expectedFilename, String targetFilename){
+	public Map<String, byte[]> getImages(String path, String expectedFilename, String targetFilename){
 		File root = super.getResultDirectoryFile();
 		if (!root.exists() || !root.isDirectory()) {
 			log.error("Directory(" + root.getAbsolutePath() + ") Not Found.");
 			return new HashMap<String, byte[]>();
 		}
 
-		File directory = new File(root, directoryName);
+		File directory = new File(root, path);
 		if(!directory.exists() || !directory.isDirectory()){
 			log.error("Directory(" + directory.getAbsolutePath() + ") Not Found.");
 			return new HashMap<String, byte[]>();
@@ -480,14 +516,14 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 	}
 	
 //	public List<ComparedRectangle> getComparedResult(String directoryName, String expectedFilename, String targetFilename){
-	public List<ComparedRectangle> getComparedResult(String directoryName, int resultListId, int targetResultId){
+	public List<ComparedRectangle> getComparedResult(String path, int resultListId, int targetResultId){
 		File root = super.getResultDirectoryFile();
 		if (!root.exists() || !root.isDirectory()) {
 			log.error("Directory(" + root.getAbsolutePath() + ") Not Found.");
 			return new ArrayList<ComparedRectangle>();
 		}
 
-		File directory = new File(root, directoryName);
+		File directory = new File(root, path);
 		if(!directory.exists() || !directory.isDirectory()){
 			log.error("Directory(" + directory.getAbsolutePath() + ") Not Found.");
 			return new ArrayList<ComparedRectangle>();
