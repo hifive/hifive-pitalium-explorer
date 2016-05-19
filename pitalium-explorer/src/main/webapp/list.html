@@ -10,7 +10,6 @@
 	<meta http-equiv="Expires" content="-1">
 
 	<title>Test results - Pitalium Explorer</title>
-	<link rel="shortcut icon" href="/pitalium-explorer/res/img/favicon.ico">
 	<link rel="stylesheet" href="/hifive-res/ext/bootstrap/3.3.5/css/bootstrap.min.css">
 	<link rel="stylesheet" href="/hifive-res/ext/bootstrap/3.3.5/css/bootstrap-theme.min.css">
 	<link rel="stylesheet" href="/hifive-res/fw/current/h5.css" data-h5-module="hifive">
@@ -19,7 +18,6 @@
 
 	<script src="/hifive-res/ext/jquery/jquery-2.js"></script>
 	<script src="/hifive-res/ext/bootstrap/3.3.5/js/bootstrap.min.js"></script>
-	
 	<script src="/hifive-res/fw/current/ejs-h5mod.js" data-h5-module="hifive:ejs"></script>
 	<script src="/hifive-res/fw/current/h5.js" data-h5-module="hifive"></script>
 
@@ -161,23 +159,30 @@
 	</script>
 	</head>
 	<body>
-		<div class="background-pattern">
-			
-			<h2>Pitalium explorer</h2>
-			<p>The best explorer to analyze the results of Pitalium.</p>
-			
-		</div>
 		<!-- Navigation -->
-		<nav class="navbar navbar-fixed-top" style="display:none;">
+		<nav class="navbar navbar-default navbar-static-top">
 			<div class="container-fluid">
 				<div class="navbar-header">
-					<a class="navbar-brand" href="list.html">Pitalium explorer</a>
+					<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+						<span class="sr-only">Toggle navigation</span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+					</button>
+					<a class="navbar-brand" href="list.html">Pitalium Explorer</a>
 				</div>
+				<div id="navbar" class="navbar-collapse collapse">
+					<ul class="nav navbar-nav">
+						<li class="active"><a href="list.html">Original Explorer</a></li>
+						<li ><a href="new_list.html">Second Explorer</a></li>
+						<li><a href="fileDiff.html">Diff any images</a></li>
+					</ul>
+				</div><!--/.nav-collapse -->
 			</div>
 		</nav>
 		<!-- Navigation -->
 
-		<div class="container col-md-8 col-md-offset-2 margin-top">
+		<div  class="container">
 			<h4>Test results</h4>
 			<button id="toggleSearchPanel" class="btn btn-primary" type="button" data-toggle="collapse" data-target="#searchPanel" aria-expanded="false" aria-controls="searchPanel">
 				Open search
@@ -214,12 +219,5 @@
 				</div>
 			</div>
 		</div>
-		
-		
-		<div class="footer col-sm-12">
-			<p>Copyright (C) 2012-2016 NS Solutions Corporation, All Rights Reserved.</p>
-		
-		</div>
-		
 	</body>
 </html>
