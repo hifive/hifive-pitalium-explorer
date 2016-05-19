@@ -19,6 +19,7 @@
 	<link rel="stylesheet" href="src/common/common.css">
 	<link rel="stylesheet" href="src/list/list.css">
 	<link rel="stylesheet" href="lib/jquery-ui/jquery-ui.css">
+	<link rel="stylesheet" href="lib/rangeslider/rangeslider.css">
 	<script src="/hifive-res/ext/jquery/jquery-2.js"></script>
 	<script src="/hifive-res/ext/bootstrap/3.3.6/js/bootstrap.min.js"></script>
 	<script src="lib/jquery-ui/jquery-ui.js"></script>
@@ -28,8 +29,18 @@
 
 	<script src="src/common/constant.js"></script>
 	<script src="src/common/util.js"></script>
+	<script src="lib/rangeslider/rangeslider.js"></script>
 	
+	<script>
+    // Initialize a new plugin instance for all
+    // e.g. $('input[type="range"]') elements.
+	    $('input[type="range"]').rangeslider({onSlide: function(position, value) { opacity_control(value); }});
 	
+	    // Update all rangeslider instances for all
+	    // e.g. $('input[type="range"]') elements.
+	    // Usefull if you changed some attributes e.g. `min` or `max` etc.
+	   
+	</script>
 	
 	
 	</head>
@@ -83,6 +94,19 @@
 		      <div class="modal-header">
 		        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
 		        <h4 class="modal-title" id="myModalLabel">Difference detail</h4>
+		        
+		        <div>
+		        	<input type="checkbox"> Similarity
+		        	<input type="checkbox"> Shift
+		        	<input type="checkbox"> Missing
+		        	<input type="checkbox"> Similar
+		        	<div style="width:200px;">
+		        		Diff region opacity control
+		        		<input id="opacity_range" type="range" min="0" max="1" step="0.1" value="0.3">
+		        	</div>
+		        	
+		        </div>
+		        	
 		      </div>
 		      
 		      <div class="modal-body">
@@ -397,10 +421,8 @@
 					return $(document).find("a[data-directory='" + directory + "'][data-target='" + target + "']");
 				}
 			
-				
 			}
 					
-			
 		}
 		
 		$(document).on("click", ".btn-detail", function(){
@@ -531,7 +553,13 @@
 			
 		});
 		
-		
+		$(document).on("input change", "#opacity_range", function(){
+			
+			$(".diffDiv").css("opacity", $(this).val());
+			
+			
+			
+		});
 		</script>
 		
 		
