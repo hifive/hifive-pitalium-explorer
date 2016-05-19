@@ -95,19 +95,19 @@ public class PersisterServiceImpl implements PersisterService {
 		return persister.findResultDirectory(searchTestMethod, searchTestScreen, page, pageSize, refresh);
 	}
 	@Override
-	public Map<String, List> findScreenshotFiles(String name, boolean refresh){
-		return persister.findScreenshotFiles(name, refresh);
+	public Map<String, List> findScreenshotFiles(String path, boolean refresh){
+		return persister.findScreenshotFiles(path, refresh);
 	}
 	@Override
-	public ResultListOfExpected executeComparing(String directoryName, String expectedFilename, String[] targetFilenames) {
-		return persister.executeComparing(directoryName, expectedFilename, targetFilenames);
+	public ResultListOfExpected executeComparing(String path, String expectedFilename, String[] targetFilenames) {
+		return persister.executeComparing(path, expectedFilename, targetFilenames);
 	}
 	@Override
-	public Map<String, byte[]> getImages(String directoryName, String expectedFilename, String targetFilename) {
-		return persister.getImages(directoryName, expectedFilename, targetFilename);
+	public Map<String, byte[]> getImages(String path, String expectedFilename, String targetFilename) {
+		return persister.getImages(path, expectedFilename, targetFilename);
 	}
-	public List<ComparedRectangle> getComparedResult(String directoryName, int resultListId, int targetResultId){
-		return persister.getComparedResult(directoryName, resultListId, targetResultId);
+	public List<ComparedRectangle> getComparedResult(String path, int resultListId, int targetResultId){
+		return persister.getComparedResult(path, resultListId, targetResultId);
 	};
 
 	@Override

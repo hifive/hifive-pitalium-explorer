@@ -52,7 +52,7 @@ public class ApiController {
 			@RequestParam(value = "limit", defaultValue = "0") int pageSize,
 			@RequestParam(value = "searchTestMethod", defaultValue = "") String searchTestMethod,
 			@RequestParam(value = "searchTestScreen", defaultValue = "") String searchTestScreen,
-			@RequestParam(value = "refresh", defaultValue = "false") boolean refresh) {
+			@RequestParam(value = "refresh", defaultValue = "true") boolean refresh) {
 		Page<ResultDirectory> list = service.findResultDirectory(searchTestMethod, searchTestScreen, page, pageSize, refresh);
 		return new ResponseEntity<Page<ResultDirectory>>(list, HttpStatus.OK);
 	}
@@ -65,9 +65,9 @@ public class ApiController {
 	@RequestMapping(value = "_screenshots/list", method = RequestMethod.GET, produces="application/json;charset=utf-8")
 	@ResponseBody
 	public ResponseEntity<Map<String, List>> getScreenshotFiles(
-			@RequestParam(value = "name", defaultValue = "0") String name,
+			@RequestParam(value = "path", defaultValue = "0") String path,
 			@RequestParam(value = "refresh", defaultValue = "true") boolean refresh){
-		Map<String, List> map = service.findScreenshotFiles(name, refresh);
+		Map<String, List> map = service.findScreenshotFiles(path, refresh);
 		return new ResponseEntity<Map<String, List>>(map, HttpStatus.OK);
 	}
 	/**
@@ -80,33 +80,33 @@ public class ApiController {
 	@RequestMapping(value = "_screenshots/compare", method = RequestMethod.POST, produces="application/json;charset=utf-8")
 	@ResponseBody
 	public ResponseEntity<ResultListOfExpected> executeComparing(
-			@RequestParam(value = "directory", defaultValue = "") String directoryName,
+			@RequestParam(value = "path", defaultValue = "") String path,
 			@RequestParam(value = "expected", defaultValue = "") String expectedFilename,
 			@RequestParam(value = "targets", defaultValue = "") String[] targetFilenames
 			){
-		ResultListOfExpected resultListOfExpected = service.executeComparing(directoryName, expectedFilename, targetFilenames);
+		ResultListOfExpected resultListOfExpected = service.executeComparing(path, expectedFilename, targetFilenames);
 		return new ResponseEntity<ResultListOfExpected>(resultListOfExpected, HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "_screenshots/images", method = RequestMethod.GET, produces="application/json;charset=utf-8")
 	@ResponseBody
 	public ResponseEntity<Map<String, byte[]>> getImages(
-			@RequestParam(value = "directory", defaultValue = "") String directoryName,
+			@RequestParam(value = "path", defaultValue = "") String path,
 			@RequestParam(value = "expected", defaultValue = "") String expectedFilename,
 			@RequestParam(value = "target", defaultValue = "") String targetFilename
 			){
-		Map<String, byte[]> map = service.getImages(directoryName, expectedFilename, targetFilename);
+		Map<String, byte[]> map = service.getImages(path, expectedFilename, targetFilename);
 		return new ResponseEntity<Map<String, byte[]>>(map, HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "_screenshots/result", method = RequestMethod.GET, produces="application/json;charset=utf-8")
 	@ResponseBody
 	public ResponseEntity<List<ComparedRectangle>> getComparedResult(
-			@RequestParam(value = "directory", defaultValue = "") String directoryName,
+			@RequestParam(value = "path", defaultValue = "") String path,
 			@RequestParam(value = "resultListId", defaultValue = "") int resultListId,
 			@RequestParam(value = "targetResultId", defaultValue = "") int targetResultId
 			){
-		List<ComparedRectangle> list = service.getComparedResult(directoryName, resultListId, targetResultId);
+		List<ComparedRectangle> list = service.getComparedResult(path, resultListId, targetResultId);
 		return new ResponseEntity<List<ComparedRectangle>>(list, HttpStatus.OK);
 	}
 	

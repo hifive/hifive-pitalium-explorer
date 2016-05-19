@@ -9,7 +9,7 @@ public class ResultDirectory {
 	
 	private long timestamp;
 	
-	private String url;
+	private String dirTimestamp;
 
 	private Integer numberOfResults;
 
@@ -21,11 +21,11 @@ public class ResultDirectory {
 		this(0, "", 0, "", 0, 0, 0);
 	}
 
-	public ResultDirectory(Integer id, String name, long timestamp, String url, Integer numberOfResults, Integer numberOfScreenshots, Integer numberOfBrowsers) {
+	public ResultDirectory(Integer id, String name, long timestamp, String dirTimestamp, Integer numberOfResults, Integer numberOfScreenshots, Integer numberOfBrowsers) {
 		this.id = id;
 		this.name = name;
 		this.timestamp = timestamp;
-		this.url = url;
+		this.dirTimestamp = dirTimestamp;
 		this.numberOfResults = numberOfResults;
 		this.numberOfScreenshots = numberOfScreenshots;
 		this.numberOfBrowsers = numberOfBrowsers;
@@ -55,12 +55,12 @@ public class ResultDirectory {
 		this.timestamp = timestamp;
 	}
 	
-	public String getUrl() {
-		return url;
+	public String getDirTimestamp() {
+		return dirTimestamp;
 	}
 	
-	public void setUrl(String url){
-		this.url = url;
+	public void setDirTimestamp(String dirTimestamp){
+		this.dirTimestamp = dirTimestamp;
 	}
 
 	public Integer getNumberOfResults() {

@@ -44,14 +44,14 @@ public interface ExplorerPersister extends Persister {
 	/**
 	 * Get the screenshot files under selected sub-directory of 'results' folder
 	 * 
-	 * @param name
+	 * @param name2 
 	 * @return Screenshot files under subdirectory of 'results' folder
 	 */
-	Map<String, List> findScreenshotFiles(String name, boolean refresh);
+	Map<String, List> findScreenshotFiles(String path, boolean refresh);
 
-	ResultListOfExpected executeComparing(String directoryName, String expectedFilename, String[] targetFilenames);
-	Map<String, byte[]> getImages(String directoryName, String expectedFilename, String targetFilename);
-	List<ComparedRectangle> getComparedResult(String directoryName, int resultListId, int targetResultId);
+	ResultListOfExpected executeComparing(String path, String expectedFilename, String[] targetFilenames);
+	Map<String, byte[]> getImages(String path, String expectedFilename, String targetFilename);
+	List<ComparedRectangle> getComparedResult(String path, int resultListId, int targetResultId);
 
 	/**
 	 * TestExecutionのリストを取得する。 引数のメソッド名、スクリーンショットを含む（like検索）Screenshotを持つ TestExecutionのリストを取得する。

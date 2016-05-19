@@ -114,10 +114,9 @@ public class LocationShift {
 
 					// construct new similar rectangle
 					ComparedRectangle newSimilar = new ComparedRectangle(rectangle);
-
-
-					/* calculate similarity using average norm of RGB difference vector. */
-					similarityPixelByPixel = SimilarityUtils.calcSimilarityPixelByPixel(expectedSubImage, actualSubImage, rectangle, newSimilar);
+		
+					// implement all similarity calculations and categorization, and then build ComparedRectangle 
+					similarityPixelByPixel = SimilarityUtils.calcSimilarity(expectedSubImage, actualSubImage, rectangle, newSimilar);
 
 					// calculate the similarity of entire image using pixel by pixel method
 					int actualArea = actualSubImage.getWidth() * actualSubImage.getHeight();
@@ -126,14 +125,6 @@ public class LocationShift {
 						entireDifference += (1-similarityPixelByPixel)*actualArea;
 					} else {
 						entireDifference += (1-similarityPixelByPixel)*(1-similarityPixelByPixel)*actualArea;
-					}
-
-					/* calculate similarity using feature matrix. */
-					int comparedRectangleWidth = (int)rectangle.getWidth()-2*TEMPLATE_MARGIN, comparedRectangleHeight = (int)rectangle.getHeight()-2*TEMPLATE_MARGIN;
-
-					// execute this only when comparedRectangleWidth >= FeatureCol && comparedRectangleHeight >= FeatureRow
-					if (SimilarityUtils.checkFeatureSize(comparedRectangleWidth, comparedRectangleHeight)) {
-						similarityFeatureMatrix = SimilarityUtils.calcSimilarityByFeatureMatrix(expectedSubImage, actualSubImage, rectangle, newSimilar);
 					}
 
 					// insert the similar rectangle into the list of ComparedRectangles

@@ -24,17 +24,11 @@ public class ComparedRectangle {
 	private int yShift = 0;
 	
 	// difference norm method comparing Pixel by Pixel
-	private SimilarityUnit method1;
-
-	// the second method counting the number of different pixels
-	private SimilarityUnit method2;
-
-	// feature Matrix method
-	private SimilarityUnit method3;
+	private SimilarityUnit similarityUnit;
 
 	/**
 	 * Constructor
-	 * Set the smilarity information when the template image is not contained in the entire image.
+	 * Set the area information.
 	 * @param rectangle the rectangle area of template image
 	 */
 	public ComparedRectangle(Rectangle rectangle)  {
@@ -42,8 +36,6 @@ public class ComparedRectangle {
 		this.y = (int) rectangle.getY();
 		this.width = (int) rectangle.getWidth();
 		this.height= (int) rectangle.getHeight();
-		this.type = "SIMILAR";
-//		this.type = RectType.SIMILAR;
 	}
 
 	/**
@@ -58,10 +50,9 @@ public class ComparedRectangle {
 		this.xShift = xShift;
 		this.yShift = yShift;
 		this.type = "SHIFT";
-//		this.type = RectType.SHIFT;
 	}
 	public ComparedRectangle(int x, int y, int width, int height, String type, int xShift, int yShift,
-							 SimilarityUnit method1, SimilarityUnit method2, SimilarityUnit method3){
+							 SimilarityUnit similarityUnit){
 		this.x = x;
 		this.y = y;
 		this.width = width;
@@ -69,12 +60,10 @@ public class ComparedRectangle {
 		this.type = type;
 		this.xShift = xShift;
 		this.yShift = yShift;
-		this.method1 = method1;
-		this.method2 = method2;
-		this.method3 = method3;
+		this.similarityUnit = similarityUnit;
 	}
 	public ComparedRectangle(){
-		this(0, 0, 0, 0, "UNCHECKED", 0, 0, null, null, null);
+		this(0, 0, 0, 0, "UNCHECKED", 0, 0, null);
 	}
 
 	
@@ -278,23 +267,11 @@ public class ComparedRectangle {
 		this.yShift = yShift;
 	}
 	
-	public SimilarityUnit getMethod1(){
-		return method1;
+	public SimilarityUnit getSimilarityUnit(){
+		return similarityUnit;
 	}
-	public void setMethod1(SimilarityUnit method1){
-		this.method1 = method1;
-	}
-	public SimilarityUnit getMethod2(){
-		return method2;
-	}
-	public void setMethod2(SimilarityUnit method2){
-		this.method2 = method2;
-	}
-	public SimilarityUnit getMethod3(){
-		return method3;
-	}
-	public void setMethod3(SimilarityUnit method3){
-		this.method3 = method3;
+	public void setSimilarityUnit(SimilarityUnit similarityUnit){
+		this.similarityUnit = similarityUnit;
 	}
 }
 
