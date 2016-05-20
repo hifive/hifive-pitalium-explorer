@@ -21,7 +21,7 @@ public class ImagePair {
 	 * build ComparedRectangles list, and calculate entireSimilarity.
 	 */
 	public ImagePair(BufferedImage expectedImage, BufferedImage actualImage) {
-		
+
 		Rectangle rectangle1 = new Rectangle(expectedImage.getWidth(), expectedImage.getHeight());
 		Rectangle rectangle2 = new Rectangle(actualImage.getWidth(), actualImage.getHeight());
 
@@ -37,31 +37,65 @@ public class ImagePair {
 		ComparedRectangles = LS.getComparedRectangles();
 		entireSimilarity = LS.getEntireSimilarity ();
 	}
-	
+
+	/**
+	 * Convert DiffPoints to the list of Rectangle areas
+	 * @param DP Diffpoints
+	 * @return list of Rectangle areas
+	 */
 	public List<Rectangle> convertDiffPointsToAreas(DiffPoints DP){
 		List<Point> diffPoints = DP.getDiffPoints();
 		if (diffPoints == null || diffPoints.isEmpty()) {
 			return new ArrayList<Rectangle>();
 		}
 
+		int mergeFlag = 0;
 		List<MarkerGroup> diffGroups = new ArrayList<MarkerGroup>();
-		List<MarkerGroup> stack = new ArrayList<MarkerGroup>();
 
-		for (Point p : diffPoints){
-			MarkerGroup newGroup = new MarkerGroup(new Point(p.x, p.y));
-			for(MarkerGroup group : diffGroups){
-				if (group.canMarge(newGroup)){
-					stack.add(group);
+		// Merge diffPoints belongs to the same object into one markerGroup.
+		for (Point point : diffPoints) {
+			MarkerGroup markerGroup = new MarkerGroup(new Point(point.x, point.y));
+			for (MarkerGroup diffGroup : diffGroups) {
+				if (diffGroup.canMarge(markerGroup)) {
+					diffGroup.union(markerGroup);
+					mergeFlag = 1;
+					break;
 				}
 			}
-			for(MarkerGroup group : stack){
-				newGroup.union(group);
-				diffGroups.remove(group);
+			if (mergeFlag != 1) {
+				diffGroups.add(markerGroup);
 			}
-			stack.removeAll(stack);
-			diffGroups.add(newGroup);
+			mergeFlag = 0;
 		}
+		
+		// Count how many times merge occur for each case
+		int num = -1;
 
+		// loop until there is no merge
+		while (num != 0) {
+			num = 0;
+			for (MarkerGroup rectangleGroup : diffGroups) {
+				List<MarkerGroup> removeList = new ArrayList<MarkerGroup>();
+				for (MarkerGroup rectangleGroup2 : diffGroups) {
+					// Check if two distinct rectangles can be merged.
+					if (!rectangleGroup.equals(rectangleGroup2) && rectangleGroup.canMarge(rectangleGroup2)) {
+						rectangleGroup.union(rectangleGroup2);
+						num++;
+						// Record the rectangle which will be removed.
+						removeList.add(rectangleGroup2);
+					}
+				}
+				if (num > 0) {
+					// Remove the merged rectangle.
+					for (MarkerGroup removeModel : removeList) {
+						diffGroups.remove(removeModel);
+					}
+					break;
+				}
+			}
+		}
+		
+		// Create a list of the Rectangle from diffGroups
 		List<Rectangle> rectangles = new ArrayList<Rectangle>();
 
 		for (MarkerGroup markerGroup : diffGroups) {
@@ -87,7 +121,7 @@ public class ImagePair {
 
 	/**
 	 * print the shift rectangle information
- 	 */
+	 */
 	public void printShiftRectangles() {
 		for (ComparedRectangle ComparedRect : ComparedRectangles) {
 			if (ComparedRect.getType().equals("SHIFT")) {
@@ -96,35 +130,5 @@ public class ImagePair {
 			}
 		}
 	}
-
-	/**
-	 * print the similar rectangle information
- 	 */
-//	public void printSimilarRectangles() {
-//		for (ComparedRectangle ComparedRect : ComparedRectangles) {
-//			if (ComparedRect.getType().equals("SIMILAR")) {
-//				Rectangle rect = ComparedRect.rectangle();
-//				if(ComparedRect.checkAvailable(1)){
-//					SimilarityUnit method1 = ComparedRect.getMethod1();
-//					System.out.printf("x:%d, y:%d, w:%d, h:%d => %.2f at x:%d, y:%d shifted (Difference Norm)\n",
-//							(int)rect.getX(), (int)rect.getY(), (int)rect.getWidth(), (int)rect.getHeight(), method1.getSimilarity(), method1.getXSimilar(), method1.getYSimilar());
-//				}
-//				if(ComparedRect.checkAvailable(2)){
-//					SimilarityUnit method2 = ComparedRect.getMethod2();
-//					System.out.printf("x:%d, y:%d, w:%d, h:%d => %.2f at x:%d, y:%d shifted (Number of Diffs)\n",
-//							(int)rect.getX(), (int)rect.getY(), (int)rect.getWidth(), (int)rect.getHeight(), method2.getSimilarity(), method2.getXSimilar(), method2.getYSimilar());
-//				}
-//				if(ComparedRect.checkAvailable(3)){
-//					SimilarityUnit method3 = ComparedRect.getMethod3();
-//					System.out.printf("x:%d, y:%d, w:%d, h:%d => %.2f at x:%d, y:%d shifted (Feature Matrix)\n",
-//							(int)rect.getX(), (int)rect.getY(), (int)rect.getWidth(), (int)rect.getHeight(), method3.getSimilarity(), method3.getXSimilar(), method3.getYSimilar());
-//					System.out.println();
-//				}
-//			}
-//		}
-//		System.out.printf("entire similarity : %.2f\n", entireSimilarity);
-//	
-//	}
-
 
 }
