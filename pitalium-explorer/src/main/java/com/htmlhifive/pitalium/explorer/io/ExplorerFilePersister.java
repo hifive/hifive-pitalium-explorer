@@ -122,10 +122,11 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 				}
 			});
 
+			int id = 0;
 			for(int i=0; i<subDirectories.length; i++){
 				File timeDirectory = subDirectories[i];
 				String timestampString = timeDirectory.getName();
-				SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+				SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddhhmmss");
 				long timestamp;
 				try {
 					timestamp = sdf.parse(timestampString.replace("_", "")).getTime();
@@ -180,7 +181,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 					}
 					int numberOfBrowsers = browsers.size();
 					
-					ResultDirectory resultDirectory = new ResultDirectory(i+1, methodName, timestamp, timestampString,
+					ResultDirectory resultDirectory = new ResultDirectory(++id, methodName, timestamp, timestampString,
 							numberOfResults, numberOfScreenshots, numberOfBrowsers);
 					resultDirectoriesList.add(resultDirectory);
 				}
