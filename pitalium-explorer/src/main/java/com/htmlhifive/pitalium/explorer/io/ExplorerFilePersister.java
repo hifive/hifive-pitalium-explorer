@@ -146,16 +146,27 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 					File directory = methodDirectories[j];
 					String methodName = directory.getName();
 					
-					File[] results = new File(directory, "comparisonResults").listFiles(new FilenameFilter(){
-						@Override
-						public boolean accept(File dir, String name) {
-							return name.toLowerCase().endsWith(".json");
-						}
-					});
-					int numberOfResults = 0;
-					if(results != null){
-						numberOfResults = results.length;
+					File resultListOfExpectedJson = new File(new File(directory, "comparisonResults"), "resultList.json");
+					List<ResultListOfExpected> resultListOfExpectedList = null;
+					if (resultListOfExpectedJson.exists()){
+						resultListOfExpectedList = JSONUtils.readValue(resultListOfExpectedJson, new TypeReference<ArrayList<ResultListOfExpected>>(){});
 					}
+					int numberOfResults = 0;
+					if (resultListOfExpectedList != null){
+						numberOfResults = resultListOfExpectedList.size();
+					}
+
+					
+//					File[] results = new File(directory, "comparisonResults").listFiles(new FilenameFilter(){
+//						@Override
+//						public boolean accept(File dir, String name) {
+//							return name.toLowerCase().endsWith(".json");
+//						}
+//					});
+//					int numberOfResults = 0;
+//					if(results != null){
+//						numberOfResults = results.length;
+//					}
 					
 					File[] screenshots = directory.listFiles(new FilenameFilter() {
 						@Override
