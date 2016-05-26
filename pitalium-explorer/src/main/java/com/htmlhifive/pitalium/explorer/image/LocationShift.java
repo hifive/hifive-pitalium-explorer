@@ -250,8 +250,6 @@ public class LocationShift {
 	 */
 	private static double[][] calcIntegralImage(BufferedImage source) {
 		double[][] integralImage = new double[source.getHeight()][source.getWidth()];
-		Raster raster = source.getRaster();
-		int[] pixel = new int[raster.getNumDataElements()];
 		double leftNum;
 		double upNum;
 		double leftUpNum;
@@ -260,7 +258,7 @@ public class LocationShift {
 				leftNum = (x == 0) ? 0 : integralImage[y][x - 1];
 				upNum = (y == 0) ? 0 : integralImage[y - 1][x];
 				leftUpNum = (x == 0 || y == 0) ? 0 : integralImage[y - 1][x - 1];
-				integralImage[y][x] = leftNum + upNum + raster.getPixel(x, y, pixel)[0] - leftUpNum;
+				integralImage[y][x] = leftNum + upNum + source.getRGB(x, y) - leftUpNum;
 			}
 		}
 		return integralImage;

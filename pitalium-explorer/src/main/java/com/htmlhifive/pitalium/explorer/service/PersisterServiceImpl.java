@@ -99,12 +99,12 @@ public class PersisterServiceImpl implements PersisterService {
 		return persister.findScreenshotFiles(path, refresh);
 	}
 	@Override
-	public ResultListOfExpected executeComparing(String path, String expectedFilename, String[] targetFilenames) {
-		return persister.executeComparing(path, expectedFilename, targetFilenames);
+	public ResultListOfExpected executeComparing(String expectedFilePath, String[] targetFilePaths) {
+		return persister.executeComparing(expectedFilePath, targetFilePaths);
 	}
 	@Override
-	public Map<String, byte[]> getImages(String path, String expectedFilename, String targetFilename) {
-		return persister.getImages(path, expectedFilename, targetFilename);
+	public Map<String, byte[]> getImages(String expectedFilePath, String targetFilePath) {
+		return persister.getImages(expectedFilePath, targetFilePath);
 	}
 	public List<ComparedRectangle> getComparedResult(String path, int resultListId, int targetResultId){
 		return persister.getComparedResult(path, resultListId, targetResultId);

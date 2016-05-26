@@ -80,22 +80,20 @@ public class ApiController {
 	@RequestMapping(value = "_screenshots/compare", method = RequestMethod.POST, produces="application/json;charset=utf-8")
 	@ResponseBody
 	public ResponseEntity<ResultListOfExpected> executeComparing(
-			@RequestParam(value = "path", defaultValue = "") String path,
-			@RequestParam(value = "expected", defaultValue = "") String expectedFilename,
-			@RequestParam(value = "targets", defaultValue = "") String[] targetFilenames
+			@RequestParam(value = "expected", defaultValue = "") String expectedFilePath,
+			@RequestParam(value = "targets", defaultValue = "") String[] targetFilePaths
 			){
-		ResultListOfExpected resultListOfExpected = service.executeComparing(path, expectedFilename, targetFilenames);
+		ResultListOfExpected resultListOfExpected = service.executeComparing(expectedFilePath, targetFilePaths);
 		return new ResponseEntity<ResultListOfExpected>(resultListOfExpected, HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "_screenshots/images", method = RequestMethod.GET, produces="application/json;charset=utf-8")
 	@ResponseBody
 	public ResponseEntity<Map<String, byte[]>> getImages(
-			@RequestParam(value = "path", defaultValue = "") String path,
-			@RequestParam(value = "expected", defaultValue = "") String expectedFilename,
-			@RequestParam(value = "target", defaultValue = "") String targetFilename
+			@RequestParam(value = "expected", defaultValue = "") String expectedFilePath,
+			@RequestParam(value = "target", defaultValue = "") String targetFilePath
 			){
-		Map<String, byte[]> map = service.getImages(path, expectedFilename, targetFilename);
+		Map<String, byte[]> map = service.getImages(expectedFilePath, targetFilePath);
 		return new ResponseEntity<Map<String, byte[]>>(map, HttpStatus.OK);
 	}
 
