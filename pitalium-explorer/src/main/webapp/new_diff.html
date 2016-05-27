@@ -34,7 +34,7 @@
 	<script>
     // Initialize a new plugin instance for all
     // e.g. $('input[type="range"]') elements.
-	    $('input[type="range"]').rangeslider({onSlide: function(position, value) { opacity_control(value); }});
+	    $('input[type="range"]').rangeslider();
 	
 	    // Update all rangeslider instances for all
 	    // e.g. $('input[type="range"]') elements.
@@ -46,84 +46,73 @@
 	</head>
 	<body>
 	
-	
-		
-		<div class="background-pattern">
-			
-			<h2>Pitalium explorer</h2>
-			<p>The best explorer to analyze the results of Pitalium.</p>
-			
-		</div>
+
 		<!-- Navigation -->
-		<nav class="navbar navbar-fixed-top" style="display:none;">
+		<nav class="navbar navbar-fixed-top" >
 			<div class="container-fluid">
 				<div class="navbar-header" style="width:100%;">
 					<a class="navbar-brand" href="list.html">Pitalium explorer</a>
 					
-					<form id="searchTest" class="form-inline">
-					
-					
-						<label for="searchTestMethod">Test Method</label>
-						<input type="text" id="searchTestMethod" name="searchTestMethod" class="form-control" placeholder="Test method to search">
-					
-					
-						<label for="searchTestScreen">Test Screen</label>
-						<input type="text" id="searchTestScreen" name="searchTestScreen" class="form-control" placeholder="Test screen to search">
-					
-					<button type="submit" class="btn btn-default">Search</button>
-				</form>
+		        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+		        <h4 class="modal-title" id="myModalLabel">Difference detail</h4>
+		        
+		        <div>
+		        	<div style="width:300px; float:left;">
+		        	<input type="checkbox" class="choice" id="checkbox_SHIFT" checked="checked" data-rectype="SHIFT"> Shift
+		        	<input type="checkbox" class="choice" id="checkbox_MISSING" checked="checked" data-rectype="MISSING"> Missing
+		        	<input type="checkbox" class="choice" id="checkbox_SCALING" checked="checked" data-rectype="SCALING"> Scale
+		        	<input type="checkbox" class="choice" id="checkbox_SIMILAR" checked="checked" data-rectype="SIMILAR"> Similar
+		        	</div>
+		        	<div style="width:200px; float:left">
+		        		Diff region opacity control
+		        		<input id="opacity_range" type="range" min="0" max="1" step="0.1" value="0.3">
+		        	</div>
+		        	<div style="width:200px; float:left; margin-left:20px;">
+		        		Image size control
+		        		<input id="img_size" type="range" min="0" max="1" step="0.1" value="1">
+		        	</div>
+		        	
+		        </div>
+		        	
+		      
 				</div>
 			</div>
 		</nav>
 		<!-- Navigation -->
 
-		<div class="container col-md-8 col-md-offset-2 margin-top" id="container">
-			<div class="title_div">
-				<h4 style="color: #039BE5;">Test results</h4>
-				<a href="/pitalium-explorer/list.html"><p style="float:right; margin-top: -25px; color:#9E9E9E;"> <i class="glyphicon glyphicon-share-alt"></i> Original explorer</p></a>
-			</div>
-	
+<div style="height:100px;">
 
-			<div class="col-md-12" id="result_list" >
-				
-			</div>
-
-		</div>
-		
-		<div class="modal fade" id="diffDetail" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-		  <div class="modal-dialog modal-lg" role="document">
-		    <div class="modal-content">
-		      <div class="modal-header">
-		        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-		        <h4 class="modal-title" id="myModalLabel">Difference detail</h4>
-		        
-		        <div>
-		        	
-		        	<input type="checkbox" class="choice" id="checkbox_SHIFT" checked="checked" data-rectype="SHIFT"> Shift
-		        	<input type="checkbox" class="choice" id="checkbox_MISSING" checked="checked" data-rectype="MISSING"> Missing
-		        	<input type="checkbox" class="choice" id="checkbox_SCALING" checked="checked" data-rectype="SCALING"> Scale
-		        	<input type="checkbox" class="choice" id="checkbox_SIMILAR" checked="checked" data-rectype="SIMILAR"> Similar
-		        	<div style="width:200px;">
-		        		Diff region opacity control
-		        		<input id="opacity_range" type="range" min="0" max="1" step="0.1" value="0.3">
-		        	</div>
-		        	
-		        </div>
-		        	
-		      </div>
 		      
-		      <div class="modal-body">
-		      	<div id="result_box" >
-		      	 	<div id="test_result" style="position:relative;">
+</div>
+		<div class="col-md-6 no-padding" id="container">
+			
+		      	<div class="result_box" id="expected_box" >
+		      	 	<div class="test_result screenshot" id="test_expected" style="position:relative;">
 		      	 	
 		        
 		        	</div>
 		      	</div>
 		       
-		      </div>
+
+		</div>
+		
+		<div class="col-md-6 no-padding" >
+			
 		      
-		    </div>
-		  </div>
+		     
+		      	<div class="result_box" id="result_box" >
+		      	 	<div class="test_result screenshot" id="test_result" style="position:relative;">
+		      	 	
+		        
+		        	</div>
+		      	</div>
+		       
+		 
+
+			<div class="col-md-12" >
+				
+			</div>
+
 		</div>
 		
 		
@@ -141,6 +130,8 @@
 		<script>
 		
 		$('#result_box').kinetic();
+
+		$('#expected_box').kinetic();
 		
 		$(document).on("mouseenter", ".diffDiv", function(){
 			var rectype = $(this).data("rectype");
@@ -168,17 +159,18 @@
 			
 			h5.core.view.update("#memobox", "memo_content", data1);
 			
-
+			var opacity =  $("#opacity_range").val();
+			var opacity_over = parseFloat($("#opacity_range").val()) + 0.3;
 			$("#memobox").show();
-			$(".diffDiv").css("opacity", "0.3");
-			$(this).css("opacity", "0.6");
+			$(".diffDiv").css("opacity", opacity);
+			$(this).css("opacity", opacity_over);
 		});
 		
 		
 		
 		$(document).on("mouseleave", ".diffDiv", function(){
 			$("#memobox").hide();
-			$(this).css("opacity", "0.3");
+			$(this).css("opacity", $("#opacity_range").val());
 		});
 		
 		$(document).on('mousemove', function(e){
@@ -234,7 +226,6 @@
 						var data = {id: content[i]["id"], name: result_name, time: mytimes, screenshot: NofScreenshots, result: NofResult, path: path};
 						
 						h5.core.view.append("#result_list", "mylist", data);
-						
 						
 						
 					}
@@ -339,6 +330,7 @@
 			
 		}
 		
+		
 		$(document).on("click", ".expected", function(){
 			var directory = $(this).data("directory");
 			var target = $(this).val();
@@ -434,19 +426,27 @@
 			}
 					
 		}
-		/*
-		$(document).on("click", ".btn-detail", function(){
+		
+		
+		
+		$(document).ready(function(){
 			
-			var directory = $(this).data("directory");
-			var target = $(this).data("target");
-			var expected = $(this).data("expected");
-			var resultListId = $(this).data("result_list_id");
-			var targetResultId = $(this).data("target_result_id");
+			var queryParams = hifive.pitalium.explorer.utils.getParameters();
 			
+			var expected = queryParams["expected"];
+			var target = queryParams["target"];
+			
+			var resultListId = queryParams["list_id"];
+			var targetResultId = queryParams["result_id"];
+			var directory = queryParams["directory"];
 			
 			$("#diffDetail").modal("show");
 			$("#test_result").height("300");
 			$("#test_result").width("100%");
+			$("#test_expected").height("300");
+			$("#test_expected").width("100%");
+
+			$("#test_expected").css("background", "#fff url('res/img/big_loading.gif') center no-repeat");
 			$("#test_result").css("background", "#fff url('res/img/big_loading.gif') center no-repeat");
 
 			$(".diffDiv").remove();
@@ -455,7 +455,7 @@
 				url: "_screenshots/images.json",
 				type: "GET",
 				data: {
-					path: directory,
+					
 					target: target,
 					expected: expected
 				},
@@ -466,10 +466,23 @@
 					img.onload = function() {
 						$("#test_result").height(this.height);
 						$("#test_result").width(this.width);
-						$("#test_result").css("background", "url('" + this.src + "')");
+						$("#test_result").data("width", this.width);
+						$("#test_result").data("height", this.height);
+						$("#test_result").css("background-image", "url('" + this.src + "')");
 					}
 					
 					img.src = "data:image/png;base64," + data["targetImage"];
+					
+					var expected = new Image();
+					expected.onload = function(){
+						$("#test_expected").height(this.height);
+						$("#test_expected").width(this.width);
+						$("#test_expected").data("width", this.width);
+						$("#test_expected").data("height", this.height);
+						$("#test_expected").css("background-image", "url('" + this.src + "')");
+						
+					}
+					expected.src = "data:image/png;base64," + data["expectedImage"];
 					
 					drawRec(directory, resultListId, targetResultId);
 					
@@ -478,11 +491,10 @@
 				
 			});
 			
-			
-			
+		
 			
 		});
-		*/
+		
 		
 		function drawRec(directory, resultId, targetResultId){
 			
@@ -567,9 +579,41 @@
 			
 			$(".diffDiv").css("opacity", $(this).val());
 			
+		});
+		
+		
+		$(document).on("input change", "#img_size", function(){
 			
+			var ratio = $(this).val();
+		
+			$(".screenshot").each(function(){
+				var this_height = $(this).data("height");
+				var this_width = $(this).data("width");
+				$(this).height(this_height*ratio);
+				$(this).width(this_width*ratio);
+				$(this).css("background-size", String(this_width*ratio)  + "px " + String(this_height*ratio) + "px");
+				
+			});
+			
+			$(".diffDiv").each(function(){
+				var this_width = $(this).data("width");
+				var this_height = $(this).data("height");
+				var this_x = $(this).data("x");
+				var this_y = $(this).data("y");
+				
+				$(this).height(this_height*ratio);
+				$(this).width(this_width*ratio);
+				
+				$(this).css("left", this_x*ratio);
+				$(this).css("top", this_y*ratio);
+				
+				
+				
+			});
 			
 		});
+		
+		
 		
 		$(document).on("change", ".choice", function(){
 			var rectype = $(this).data("rectype");
@@ -581,7 +625,7 @@
 		
 		
 		<script type="text/ejs" id="diffDiv">
-			<div class="diffDiv diff_[%=type%]" style="left: [%=x%]px; top: [%=y%]px; width: [%=width%]px; height: [%=height%]px;"
+			<div class="diffDiv diff_[%=type%]" style="left: [%=x%]px; top: [%=y%]px; width: [%=width%]px; height: [%=height%]px;" data-x="[%=x%]" data-y="[%=y%]" data-width="[%=width%]" data-height="[%=height%]"
 					data-rectype="[%=type%]" data-xshift="[%=xshift%]" data-yshift="[%=yshift%]"
 					data-featurematrix="[%=featureMatrix%]"
 					data-pixelbypixel = "[%=pixelByPixel%]"
@@ -642,7 +686,7 @@
 						<td>[%=Math.round(resultList[i]["entireSimilarity"]*100)/100%]</td>
 						<td>[%=resultList[i]["numberOfDiffRec"]%]</td>
 						
-						<td><a target="_blank" href="new_diff.html?list_id=[%=id%]&result_id=[%=resultList[i]['id']%]&directory=[%=directory%]&expected=[%=expected%]&target=[%=resultList[i]['targetFilename']%]" class="btn btn-danger btn-detail" data-result_list_id="[%=id%]" data-target_result_id="[%=resultList[i]["id"]%]" data-expected="[%=expected%]" data-target="[%=resultList[i]["targetFilename"]%]" data-directory="[%=directory%]" >Detail</a></td>
+						<td><a href="new_diff.html?list_id=[%=id%]&result_id=[%=resultList[i]['id']%]&expected=[%=expected%]&target=[%=resultList[i]['targetFilename']%]" class="btn btn-danger btn-detail" data-result_list_id="[%=id%]" data-target_result_id="[%=resultList[i]["id"]%]" data-expected="[%=expected%]" data-target="[%=resultList[i]["targetFilename"]%]" data-directory="[%=directory%]" >Detail</a></td>
 					<tr>
 				[%}%]
 				
@@ -782,34 +826,7 @@
 			
 			
 		</script>
-		
-<script>
-$(window).scroll(function () {
-	var height = $(document).scrollTop();
-	if (height > 80) {
-		
-		$(".navbar").fadeIn();
-		
-		
-	} else{
-		
-		$(".navbar").fadeOut();
-		
-	}
-	
-	if(height < 86){
-		
-		$(".background-pattern").fadeIn();
-		
-	}else{
-		$(".background-pattern").fadeOut();
-	}
-	
-	
-	
-});
-		
-</script>
+
 		
 	</body>
 </html>

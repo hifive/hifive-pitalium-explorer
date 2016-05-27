@@ -49,10 +49,10 @@ public interface ExplorerPersister extends Persister {
 	 */
 	Map<String, List> findScreenshotFiles(String path, boolean refresh);
 
-	ResultListOfExpected executeComparing(String path, String expectedFilename, String[] targetFilenames);
-	Map<String, byte[]> getImages(String path, String expectedFilename, String targetFilename);
+	ResultListOfExpected executeComparing(String expectedFilePath, String[] targetFilePaths);
+	Map<String, byte[]> getImages(String expectedFilePath, String targetFilePath);
 	List<ComparedRectangle> getComparedResult(String path, int resultListId, int targetResultId);
-
+	String deleteResults(String path, int resultListId);
 	/**
 	 * TestExecutionのリストを取得する。 引数のメソッド名、スクリーンショットを含む（like検索）Screenshotを持つ TestExecutionのリストを取得する。
 	 * 
@@ -131,6 +131,7 @@ public interface ExplorerPersister extends Persister {
 	String getEdgeFileName(Integer screenshotId, String algorithm);
 
 	void saveProcessedImage(Integer screenshotId, String algorithm, String edgeFileName);
+
 
 
 

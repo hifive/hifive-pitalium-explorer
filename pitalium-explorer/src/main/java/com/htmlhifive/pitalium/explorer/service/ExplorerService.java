@@ -96,16 +96,21 @@ public class ExplorerService implements Serializable {
 	public Map<String, List> findScreenshotFiles(String path, boolean refresh){
 		return persisterService.findScreenshotFiles(path, refresh);
 	}
-	public ResultListOfExpected executeComparing(String path, String expectedFilename, String[] targetFilenames) {
-		return persisterService.executeComparing(path, expectedFilename, targetFilenames);
+	public ResultListOfExpected executeComparing(String expectedFilePath, String[] targetFilePaths) {
+		return persisterService.executeComparing(expectedFilePath, targetFilePaths);
 	}
-	public Map<String, byte[]> getImages(String path, String expectedFilename, String targetFilename) {
-		return persisterService.getImages(path, expectedFilename, targetFilename);
+	public Map<String, byte[]> getImages(String expectedFilePath, String targetFilePath) {
+		return persisterService.getImages(expectedFilePath, targetFilePath);
 	}
 	public List<ComparedRectangle> getComparedResult(String path, int resultListId,
 			int targetResultId) {
 		return persisterService.getComparedResult(path, resultListId, targetResultId);
 	}
+	public String deleteResults(String path, int resultListId) {
+		return persisterService.deleteResults(path, resultListId);
+	}
+
+
 
 
 
@@ -405,7 +410,6 @@ public class ExplorerService implements Serializable {
 			response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
 		}
 	}
-
 
 
 	
