@@ -106,9 +106,14 @@ public class PersisterServiceImpl implements PersisterService {
 	public Map<String, byte[]> getImages(String expectedFilePath, String targetFilePath) {
 		return persister.getImages(expectedFilePath, targetFilePath);
 	}
+	@Override
 	public List<ComparedRectangle> getComparedResult(String path, int resultListId, int targetResultId){
 		return persister.getComparedResult(path, resultListId, targetResultId);
 	};
+	@Override
+	public String deleteResults(String path, int resultListId){
+		return persister.deleteResults(path, resultListId);
+	}
 
 	@Override
 	public Page<TestExecutionResult> findTestExecution(String searchTestMethod, String searchTestScreen, int page,

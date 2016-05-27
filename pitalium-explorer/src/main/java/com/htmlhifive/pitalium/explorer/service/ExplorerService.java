@@ -106,6 +106,11 @@ public class ExplorerService implements Serializable {
 			int targetResultId) {
 		return persisterService.getComparedResult(path, resultListId, targetResultId);
 	}
+	public String deleteResults(String path, int resultListId) {
+		return persisterService.deleteResults(path, resultListId);
+	}
+
+
 
 
 
@@ -405,7 +410,6 @@ public class ExplorerService implements Serializable {
 			response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
 		}
 	}
-
 
 
 	

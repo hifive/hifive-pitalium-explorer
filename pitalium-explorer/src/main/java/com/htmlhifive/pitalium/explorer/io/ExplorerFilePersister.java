@@ -558,6 +558,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 			log.error("File(" + filenamePairJson.getAbsolutePath() + ") Not Found.");
 			return new ArrayList<ComparedRectangle>();
 		}
+
 		List<ComparedRectangle> comparedRectangleList;
 		try{
 			comparedRectangleList = JSONUtils.readValue(filenamePairJson, new TypeReference<ArrayList<ComparedRectangle>>(){});
@@ -567,6 +568,82 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 			comparedRectangleList = new ArrayList<ComparedRectangle>();
 		}
 		return comparedRectangleList;
+	}
+	
+	@Override
+	public String deleteResults(String path, int resultListId){
+		File root = super.getResultDirectoryFile();
+		if (!root.exists() || !root.isDirectory()) {
+			log.error("Directory(" + root.getAbsolutePath() + ") Not Found.");
+			return "Fail";
+		}
+
+		File directory = new File(root, path);
+		if(!directory.exists() || !directory.isDirectory()){
+			log.error("Directory(" + directory.getAbsolutePath() + ") Not Found.");
+			return "Fail";
+		}
+
+		File comparisonResultsDir = new File(directory, "comparisonResults");
+		if(!comparisonResultsDir.exists() || !comparisonResultsDir.isDirectory()){
+			log.error("Directory(" + comparisonResultsDir.getAbsolutePath() + ") Not Found.");
+			return "Fail";
+		}
+		
+		File resultListJson = new File(comparisonResultsDir, "resultList.json");
+		if(!resultListJson.exists()){
+			log.error("Directory(" + resultListJson.getAbsolutePath() + ") Not Found.");
+			return "Fail";
+		}
+		List<ResultListOfExpected> resultList;
+		try{
+			resultList = JSONUtils.readValue(resultListJson, new TypeReference<List<ResultListOfExpected>>(){});
+		}catch(Exception e){
+			log.error("json read value error: " + resultListJson.getAbsolutePath());
+			return "Fail";
+		}
+		
+		String expectedFilePath = "";
+		List<String> targetFilePaths = new LinkedList<String>();
+//		for(int i = 0; i < resultList.size(); i++){
+//			ResultListOfExpected resultListOfExpected = resultList.get(i);
+//			if(resultListOfExpected.getId() == resultListId){
+//				expectedFilePath = resultListOfExpected.getExpectedFilename();
+//				for(Result targetResult: resultListOfExpected.getResultList()){
+//					targetFilePaths.add(targetResult.getTargetFilename());
+//				}
+//				break;
+//			}
+//		}
+		for(ResultListOfExpected resultListOfExpected: resultList){
+			if(resultListOfExpected.getId() == resultListId){
+				expectedFilePath = resultListOfExpected.getExpectedFilename();
+				for(Result targetResult: resultListOfExpected.getResultList()){
+					targetFilePaths.add(targetResult.getTargetFilename());
+				}
+				resultList.remove(resultListOfExpected);
+				break;
+			}
+		}
+
+		try {
+			FileWriter fw = new FileWriter(resultListJson.getPath());
+			fw.write(JSONUtils.toString(resultList));
+			fw.close();
+		} catch (Exception e) {
+			log.error("file write error: can not write " + resultListJson.getPath());
+		}
+		
+		for(String targetFilePath: targetFilePaths){
+			String filenamePair = FileUtility.getPairResultFilename(expectedFilePath, targetFilePath, resultListId);
+			File filenamePairJson = new File(comparisonResultsDir, filenamePair);
+			if(!filenamePairJson.exists()){ 
+				log.error("File(" + filenamePairJson.getAbsolutePath() + ") Not Found.");
+				return "Fail";
+			}
+			filenamePairJson.delete();
+		}
+		return "Success";
 	}
 
 

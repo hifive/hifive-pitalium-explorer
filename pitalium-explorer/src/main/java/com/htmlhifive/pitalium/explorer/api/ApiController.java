@@ -107,6 +107,17 @@ public class ApiController {
 		List<ComparedRectangle> list = service.getComparedResult(path, resultListId, targetResultId);
 		return new ResponseEntity<List<ComparedRectangle>>(list, HttpStatus.OK);
 	}
+
+	@RequestMapping(value = "_screenshots/results", method = RequestMethod.GET, produces="application/json;charset=utf-8")
+	@ResponseBody
+	public ResponseEntity<String> deleteResults(
+			@RequestParam(value = "path", defaultValue = "") String path,
+			@RequestParam(value = "resultListId", defaultValue = "") int resultListId
+			){
+		String result = service.deleteResults(path, resultListId);
+		return new ResponseEntity<String>(result, HttpStatus.OK);
+	}
+
 	
 	/**
 	 * Gets list of the test execution. If pageSize equals to zero, the default page size is used. If pageSize equals to
