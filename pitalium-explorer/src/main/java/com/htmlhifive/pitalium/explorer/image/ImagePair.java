@@ -11,7 +11,8 @@ import com.htmlhifive.pitalium.image.util.ImageUtils;
 
 public class ImagePair {
 
-
+	BufferedImage expectedImage;
+	BufferedImage actualImage;
 	private List<ComparedRectangle> ComparedRectangles;
 	private double entireSimilarity;
 	
@@ -22,43 +23,48 @@ public class ImagePair {
 	
 	/**
 	 * Constructor
-	 * Execute every comparison steps of two given images,
-	 * build ComparedRectangles list, and calculate entireSimilarity.
 	 */
 	public ImagePair(BufferedImage expectedImage, BufferedImage actualImage) {
+		this.expectedImage = expectedImage;
+		this.actualImage = actualImage;
 		
+		compareImagePair();
+	}
+	
+	/**
+	 * 	Execute every comparison steps of two given images,
+	 *  build ComparedRectangles list, and calculate entireSimilarity.
+	 */
+	private void compareImagePair () {
+
 		Rectangle expectedFrame = new Rectangle(expectedImage.getWidth(), expectedImage.getHeight());
 		Rectangle actualFrame = new Rectangle(actualImage.getWidth(), actualImage.getHeight());
 
+		// Do not use sizeDiffPoints and consider only intersection area 
+		Rectangle entireFrame = expectedFrame.intersection(actualFrame);
+		
 		// To check running time
-		long startTime, endTime;
-		boolean printRunningTime = false;
+		long startTime, endTime, totalTime = 0;
+		boolean printRunningTime = true;
 		
+		// build different areas
+		startTime = System.currentTimeMillis();
+		List<Rectangle> rectangles  = buildDiffAreas(entireFrame, 10);
+		endTime = System.currentTimeMillis();
+		if (printRunningTime) {
+			System.out.printf("DIFF AREA:%d ",endTime-startTime);
+			totalTime = totalTime + endTime-startTime;
+		}
 
-		// get different points
-		startTime = System.currentTimeMillis();
-		DiffPoints DP = ImageUtils.compare(expectedImage, expectedFrame, actualImage, actualFrame, null);
-		endTime = System.currentTimeMillis();
-		if (printRunningTime) {
-			System.out.printf("DP:%d ",endTime-startTime);
-		}
-		
-		// convert different points to rectangle areas
-		startTime = System.currentTimeMillis();
-		List<Rectangle> rectangles = this.convertDiffPointsToAreas(DP, 10);	
-		endTime = System.currentTimeMillis();
-		if (printRunningTime) {
-			System.out.printf("AREA:%d ",endTime-startTime);
-		}
-		
 		// split over-merged rectangles into smaller ones if possible
 		startTime = System.currentTimeMillis();
-		SplitRectangles (expectedImage, actualImage, rectangles, 5);
+		SplitRectangles (rectangles, 5);
 		endTime = System.currentTimeMillis();
 		if (printRunningTime) {
 			System.out.printf("SPLIT:%d ",endTime-startTime);
+			totalTime = totalTime + endTime-startTime;
 		}
-		
+
 		// compare two images using given rectangle areas
 		startTime = System.currentTimeMillis();
 		LocationShift LS = new LocationShift(expectedImage, actualImage, rectangles);
@@ -67,9 +73,106 @@ public class ImagePair {
 		entireSimilarity = LS.getEntireSimilarity ();
 		endTime = System.currentTimeMillis();
 		if (printRunningTime) {
-			System.out.printf("CMP:%d\n",endTime-startTime);
+			System.out.printf("CMP:%d ",endTime-startTime);
+			totalTime = totalTime + endTime-startTime;
+			System.out.printf("TOTAL:%d\n",totalTime);
 		}
+		
+	}
+	
+	/**
+	 * build different rectangles in the given frame area
+	 * @param frame boundary area to build rectangles
+	 * @param group_distance distance for grouping
+	 * @return list of rectangles representing different area
+	 */
+	private List<Rectangle> buildDiffAreas (Rectangle frame, int group_distance) {
+		List<ObjectGroup> objectGroups = buildObjectGroups(frame, group_distance);
+		List<Rectangle> rectangles = convertObjectGroupsToAreas(objectGroups);
+		
+		return rectangles;
+	}
+	
+	
+	/**
+	 * build object groups for different areas in the given frame area
+	 * @param frame	boundary area to build object
+	 * @param group_distance distance for grouping
+	 * @return list of object groups representing different area
+	 */
+	private List<ObjectGroup> buildObjectGroups (Rectangle frame, int group_distance) {
+		
+		// base case for recursive building
+		int base_bound = 50;
+		if (frame.getWidth() < base_bound || frame.getHeight() < base_bound) {
+			DiffPoints DP = ImageUtils.compare(expectedImage, frame, actualImage, frame, null);
+			return convertDiffPointsToObjectGroups(DP, group_distance);	
+		}
+		
+		// divide into 4 sub-frames
+		Rectangle nw, ne, sw, se;
+		int x = (int)frame.getX(), y = (int)frame.getY(), w = (int)frame.getWidth(), h = (int)frame.getHeight();
+		int subW = Math.round(w/2), subH = Math.round(h/2);
+		nw = new Rectangle(x,y,subW,subH);
+		ne = new Rectangle(x+subW,y,w-subW,subH);
+		sw = new Rectangle(x,y+subH,subW,h-subH);
+		se = new Rectangle(x+subW,y+subH,w-subW,h-subH);
+		
+		// list of object groups built in each sub-frame
+		List<ObjectGroup> NW, NE, SW, SE;		
+		NW = buildObjectGroups(nw, group_distance);
+		NE = buildObjectGroups(ne, group_distance);
+		SW = buildObjectGroups(sw, group_distance);
+		SE = buildObjectGroups(se, group_distance);
+		
+		// merge 4 sub-frames
+		List<ObjectGroup> mergeGroups = new ArrayList<ObjectGroup>();
+		mergeGroups.addAll(NW);
+		mergeGroups.addAll(NE);
+		mergeGroups.addAll(SW);
+		mergeGroups.addAll(SE);
+		
+		// merge all possible object groups
+		return mergeAllPossibleObjects(mergeGroups);	
+	}
+	
+	/**
+	 * merge all possible object groups
+	 * @param objectGroups list of object groups
+	 * @return	list of object groups which are completely merged 
+	 */
+	private List<ObjectGroup> mergeAllPossibleObjects (List<ObjectGroup> objectGroups) {
 
+		// Count how many times merge occur for each case
+		int num = -1;
+
+		// loop until there is no merge
+		while (num != 0) {
+			num = 0;
+			for (ObjectGroup object1 : objectGroups) {
+				List<ObjectGroup> removeList = new ArrayList<ObjectGroup>();
+				for (ObjectGroup object2 : objectGroups) {
+					
+					// Check if two distinct rectangles can be merged.
+					if (!object1.equals(object2) && object1.canMerge(object2)) {
+						object1.union(object2);
+						num++;
+						
+						// Record the rectangle which will be removed.
+						removeList.add(object2);
+					}
+				}
+				if (num > 0) {
+					// Remove the merged rectangle.
+					for (ObjectGroup removeModel : removeList) {
+						objectGroups.remove(removeModel);
+					}
+					break;
+				}
+			}
+		}
+		
+		return objectGroups;
 	}
 	
 	/**
@@ -90,7 +193,7 @@ public class ImagePair {
 	 * @param rectangles list of Rectangles
 	 * @param splitIteration Iteration number for split implementation
 	 */
-	public void SplitRectangles (BufferedImage expectedImage, BufferedImage actualImage, List<Rectangle> rectangles, int splitIteration) {
+	private void SplitRectangles (List<Rectangle> rectangles, int splitIteration) {
 		
 		// Terminate recursion after splitIteration-times
 		if (splitIteration < 1) {
@@ -115,16 +218,14 @@ public class ImagePair {
 				int subHeight = (int)rectangle.getHeight() - 2*sub_margin;
 				Rectangle subRectangle = new Rectangle(subX, subY, subWidth, subHeight);
 				
-				DiffPoints subDiffPoints = ImageUtils.compare(expectedImage, subRectangle, actualImage, subRectangle, null);
-				
 				// use smaller value to union Rectangle Area than what we used for the first different area recognition
-				List<Rectangle> splitRectangles = this.convertDiffPointsToAreas(subDiffPoints, 2);		
+				List<Rectangle> splitRectangles = buildDiffAreas(subRectangle, 2);
 								
 				// if split succeed
 				if (splitRectangles.size() != 1 || !subRectangle.equals(splitRectangles.get(0))) {
 					
 					// if there exists splitRectangle which is still over-merged, split it recursively
-					SplitRectangles (expectedImage, actualImage, splitRectangles, splitIteration-1);
+					SplitRectangles (splitRectangles, splitIteration-1);
 					
 					// Record the rectangles which will be removed and added 
 					for (Rectangle splitRectangle : splitRectangles) {
@@ -159,7 +260,7 @@ public class ImagePair {
 	 * @param splitRectangle Rectangle which is expanded
 	 * @param sub_margin how much border removed
 	 */
-	public void expand(Rectangle subRectangle, Rectangle splitRectangle, int sub_margin) {
+	private void expand(Rectangle subRectangle, Rectangle splitRectangle, int sub_margin) {
 		int subX = (int)subRectangle.getX(), subY = (int)subRectangle.getY();
 		int subWidth = (int)subRectangle.getWidth(), subHeight = (int)subRectangle.getHeight();
 		int splitX = (int)splitRectangle.getX(), splitY = (int) splitRectangle.getY();
@@ -190,16 +291,28 @@ public class ImagePair {
 		splitRectangle.setBounds(splitX, splitY, splitWidth, splitHeight);
 	}
 	
+
+	private List<Rectangle> convertObjectGroupsToAreas (List<ObjectGroup> objectGroups) {
+		// Create a list of the Rectangle from diffGroups
+		List<Rectangle> rectangles = new ArrayList<Rectangle>();
+
+		for (ObjectGroup objectGroup : objectGroups) {
+			rectangles.add(objectGroup.getRectangle());
+		}
+		
+		return rectangles;		
+	}
+		
 	/**
-	 * Convert DiffPoints to the list of Rectangle areas
-	 * @param DP Diffpoints
+	 * convert different points to the list of object groups which are completely merged
+	 * @param DP DiffPoints
 	 * @param group_distance distance for grouping
-	 * @return list of Rectangle areas
+	 * @return list of object groups which are completely merged
 	 */
-	public List<Rectangle> convertDiffPointsToAreas(DiffPoints DP, int group_distance){
+	private List<ObjectGroup> convertDiffPointsToObjectGroups(DiffPoints DP, int group_distance){
 		List<Point> diffPoints = DP.getDiffPoints();
 		if (diffPoints == null || diffPoints.isEmpty()) {
-			return new ArrayList<Rectangle>();
+			return new ArrayList<ObjectGroup>();
 		}
 
 		int mergeFlag = 0;
@@ -221,41 +334,8 @@ public class ImagePair {
 			mergeFlag = 0;
 		}
 		
-		// Count how many times merge occur for each case
-		int num = -1;
-
-		// loop until there is no merge
-		while (num != 0) {
-			num = 0;
-			for (ObjectGroup rectangleGroup : diffGroups) {
-				List<ObjectGroup> removeList = new ArrayList<ObjectGroup>();
-				for (ObjectGroup rectangleGroup2 : diffGroups) {
-					// Check if two distinct rectangles can be merged.
-					if (!rectangleGroup.equals(rectangleGroup2) && rectangleGroup.canMerge(rectangleGroup2)) {
-						rectangleGroup.union(rectangleGroup2);
-						num++;
-						// Record the rectangle which will be removed.
-						removeList.add(rectangleGroup2);
-					}
-				}
-				if (num > 0) {
-					// Remove the merged rectangle.
-					for (ObjectGroup removeModel : removeList) {
-						diffGroups.remove(removeModel);
-					}
-					break;
-				}
-			}
-		}
-		
-		// Create a list of the Rectangle from diffGroups
-		List<Rectangle> rectangles = new ArrayList<Rectangle>();
-
-		for (ObjectGroup objectGroup : diffGroups) {
-			rectangles.add(objectGroup.getRectangle());
-		}
-
-		return rectangles;
+		// merge all possible object groups
+		return mergeAllPossibleObjects(diffGroups);
 	}
 	
 	
