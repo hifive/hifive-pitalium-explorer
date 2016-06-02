@@ -231,7 +231,12 @@
 						var NofScreenshots = content[i]["numberOfScreenshots"];
 						var NofResult = content[i]["numberOfResults"];
 						
-						var data = {id: content[i]["id"], name: result_name, time: mytimes, screenshot: NofScreenshots, result: NofResult, path: path};
+						var data = {id: content[i]["id"],
+								name: result_name,
+								time: mytimes,
+								screenshot: NofScreenshots,
+								result: NofResult,
+								path: path};
 						
 						h5.core.view.append("#result_list", "mylist", data);
 						
@@ -323,8 +328,6 @@
 									directory: path,
 									results: resultList
 							};
-							
-							
 							
 							h5.core.view.append(table, "screenshot_list", my_data);
 							
@@ -434,183 +437,86 @@
 			}
 					
 		}
-		/*
-		$(document).on("click", ".btn-detail", function(){
-			
-			var directory = $(this).data("directory");
-			var target = $(this).data("target");
-			var expected = $(this).data("expected");
-			var resultListId = $(this).data("result_list_id");
-			var targetResultId = $(this).data("target_result_id");
-			
-			
-			$("#diffDetail").modal("show");
-			$("#test_result").height("300");
-			$("#test_result").width("100%");
-			$("#test_result").css("background", "#fff url('res/img/big_loading.gif') center no-repeat");
-
-			$(".diffDiv").remove();
-			
-			$.ajax({
-				url: "_screenshots/images.json",
-				type: "GET",
-				data: {
-					path: directory,
-					target: target,
-					expected: expected
-				},
-				success: function(data){
-					
-					
-					var img = new Image();
-					img.onload = function() {
-						$("#test_result").height(this.height);
-						$("#test_result").width(this.width);
-						$("#test_result").css("background", "url('" + this.src + "')");
-					}
-					
-					img.src = "data:image/png;base64," + data["targetImage"];
-					
-					drawRec(directory, resultListId, targetResultId);
-					
-				}
-			
-				
-			});
-			
-			
-			
-			
-		});
-		*/
-		
-		function drawRec(directory, resultId, targetResultId){
-			
-			
-			$.ajax({
-				url: "_screenshots/result.json",
-				type: "GET",
-				data: {
-					path: directory,
-					resultListId: resultId,
-					targetResultId: targetResultId
-				},
-				success: function(data){
-
-					console.log(data);
-					for (var i = 0; i < data.length; i++){
-						
-						var rec = data[i];
-						var my_data;
-						
-						console.log(rec);
-						
-						
-						s_unit = rec["similarityUnit"];
-						
-						if (rec["type"] == "SHIFT"){
-							my_data = {
-									x: rec["x"],
-									y: rec["y"],
-									width: rec["width"],
-									height: rec["height"],
-									type: rec["type"],
-									xshift: rec["xshift"],
-									yshift: rec["yshift"],
-									featureMatrix: "",
-									pixelByPixel: "",
-									thresDiff: "",
-									totalDiff: ""
-									
-									
-							};
-						
-						}else{
-							my_data = {
-									x: rec["x"],
-									y: rec["y"],
-									width: rec["width"],
-									height: rec["height"],
-									type: rec["type"],
-									xshift: rec["xshift"],
-									yshift: rec["yshift"],
-									featureMatrix: s_unit["similarityFeatureMatrix"],
-									pixelByPixel: s_unit["similarityPixelByPixel"],
-									thresDiff: s_unit["similarityThresDiff"],
-									totalDiff: s_unit["similarityTotalDiff"]
-									
-									
-							};
-							
-						}
-						
-						h5.core.view.append("#test_result", "diffDiv", my_data);
-						
-						
-					}
-					
-					
-				}
-					
-			
-			});
-		}
-		
 		
 		$(document).on("click", ".result_info", function(){
 			
-			$(this).parent().find(".info_table_div").slideToggle();
-			
-		});
-		
-		$(document).on("input change", "#opacity_range", function(){
-			
-			$(".diffDiv").css("opacity", $(this).val());
-			
-			
-			
-		});
-		
-		$(document).on("change", ".choice", function(){
-			var rectype = $(this).data("rectype");
-			
-			$(".diff_" + rectype).toggle();
-		});
-		</script>
-		
-		
-		
-		<script type="text/ejs" id="diffDiv">
-			<div class="diffDiv diff_[%=type%]" style="left: [%=x%]px; top: [%=y%]px; width: [%=width%]px; height: [%=height%]px;"
-					data-rectype="[%=type%]" data-xshift="[%=xshift%]" data-yshift="[%=yshift%]"
-					data-featurematrix="[%=featureMatrix%]"
-					data-pixelbypixel = "[%=pixelByPixel%]"
-					data-thres = "[%=thresDiff%]"
-					data-total="[%=totalDiff%]"
-					>
-	
-		    </div>
+			var info_table = $(this).parent().find(".info_table_div");
 
+			
+			info_table.slideToggle();
+			var result_icon = $(this).parent().find(".result_icon");
+			
+			if (info_table.data("hided") == "true"){
+				info_table.data("hided", "false");
+				result_icon.addClass("glyphicon-menu-right");		
+				result_icon.removeClass("glyphicon-menu-down");
+
+			}else{
+				info_table.data("hided", "true");
+				result_icon.addClass("glyphicon-menu-down");		
+				result_icon.removeClass("glyphicon-menu-right");
+
+				
+			}
+			
+			
+		});
+		
+		$(document).on("click",".delete-btn", function(){
+			
+			var directory = $(this).data("directory");
+			var id = $(this).data("resultid");
+			$("#result_info_" + id).remove();
+			alert("Results deleted!");
+			$.ajax({
+				
+				url: "_screenshots/delete",
+				type: "GET",
+				data: {
+					path: directory,
+					resultListId: id
+				},
+				
+				success: function(data){
+					
+					console.log("Result deleted!");
+					
+				}
+				
+				
+			});
+			
+		});
+		
 		</script>
+		
+		
+		
 		
 		
 		
 		<script type="text/ejs" id="result_info_table">
 
-			<div class="col-sm-12 result_info_container" style="margin:0; padding:0;">
+			<div class="col-sm-12 result_info_container" id="result_info_[%=id%]" style="margin:0; padding:0;">
 			<div class="result_info col-sm-12 col-md-12"style="margin:0; padding:0; border-bottom: 1px solid #E0E0E0;">
-				<div class="col-sm-1 col-md-1"style="margin:0; ">
+				<div class="col-sm-1 col-md-1"style="margin:0; padding-right:0px; width:7%; ">
 
 					<div style="min-height:66px; padding-top: 15px; padding-bottom:15px;">
-						<i class="glyphicon glyphicon-ok-sign" style="font-size:25px; margin:0; color:#8BC34A;"></i></div>
+						<i class="glyphicon glyphicon-menu-right result_icon" style="font-size:25px; margin:0; color:#8BC34A; padding-top:10px; padding-bottom:10px;"></i></div>
 					</div>
-				<div class="col-sm-10 col-md-10" style="margin:0">
-					<div class="col-sm-12 col-md-12" style="margin:0">
-						<h4>[%=expected%]</h4>
+				<div class="col-sm-10 col-md-10" style="margin:0px; padding-left:0px;">
+					<div class="col-sm-12 col-md-12" style="margin:0; word-break: break-all;">
+						<h5 style="font-size:16px;">[%=expected%]</h5>
 					</div>
 					<div class="col-sm-12 col-md-12" style="margin:0; color:#90A4AE">
 						<p>[%=timestamp%]</p>
 					</div>
+					
+				</div>
+				<div class="col-sm-1 col-md-1" >
+					<div style="min-height:66px;  padding-top:15px; padding-bottom:15px;"> 
+						<i class="glyphicon glyphicon-trash delete-btn" data-directory="[%=directory%]" data-resultid="[%=id%]" style="font-size:20px; padding-top:10px; padding-bottom:10px;"></i>
+					</div>	
 				</div>
 				
 			</div>
@@ -646,10 +552,9 @@
 					<tr>
 				[%}%]
 				
-				
 			</table>
 			</div>
-			</div>
+		</div>
 			
 		</script>
 		
@@ -731,56 +636,6 @@
 									<img src="res/img/loading.gif" style="width:34px; display:none; margin-left: 20px; margin-right:20px;"/>
 								</td>
 			</tr>
-		</script>
-		
-		<script type="text/ejs" id="memo_content">
-
-			<h5>
-			[% switch(type){
-				case "SHIFT":%]
-				<i class="glyphicon glyphicon-move"></i> Shifted
-			[%break; 
-				case "MISSING":%]
-				<i class="glyphicon glyphicon-question-sign"></i> Missing
-			[%break;
-				case "SCALING":%]
-				<i class="glyphicon glyphicon-resize-full"></i> Scaling
-
-			[%break;
-				default: %]
-				<i class="glyphicon glyphicon-stats"></i> Similar
-			[% } %]
-
-
-			</h5>
-			
-			<hr style="border-color:#8D6E63;">
-
-			[%if (type == "SHIFT"){%]
-				<p>x-shift: [%=xshift%]
-				</p>
-				<p>y-shift: [%=yshift%]
-				</p>
-			[%}else{%]
-			<p>
-			feature matrix: [%=featurematrix%]
-			</p>
-			
-			<p>
-			pixel by pixel: [%=pixelbypixel%]
-			</p>
-
-			<p>
-			threshold diff: [%=thres%]
-			</p>
-
-			<p>
-			total diff: [%=total%]
-			</p>
-		[%}%]
-
-			
-			
 		</script>
 		
 <script>

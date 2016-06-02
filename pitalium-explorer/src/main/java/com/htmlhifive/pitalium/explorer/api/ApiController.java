@@ -3,6 +3,7 @@
  */
 package com.htmlhifive.pitalium.explorer.api;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -108,14 +109,17 @@ public class ApiController {
 		return new ResponseEntity<List<ComparedRectangle>>(list, HttpStatus.OK);
 	}
 
-	@RequestMapping(value = "_screenshots/results", method = RequestMethod.GET, produces="application/json;charset=utf-8")
+	@RequestMapping(value = "_screenshots/delete", method = RequestMethod.GET, produces="application/json;charset=utf-8")
 	@ResponseBody
-	public ResponseEntity<String> deleteResults(
+	public ResponseEntity<List<String>> deleteResults(
 			@RequestParam(value = "path", defaultValue = "") String path,
 			@RequestParam(value = "resultListId", defaultValue = "") int resultListId
 			){
+		
 		String result = service.deleteResults(path, resultListId);
-		return new ResponseEntity<String>(result, HttpStatus.OK);
+		List<String> list = new ArrayList<String>();
+		list.add(result);
+		return new ResponseEntity<List<String>>(list, HttpStatus.OK);
 	}
 
 	
