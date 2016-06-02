@@ -54,7 +54,7 @@
 					<a class="navbar-brand" href="list.html">Pitalium explorer</a>
 					
 		        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-		        <h4 class="modal-title" id="myModalLabel">Difference detail</h4>
+		        <h4 style="color:#37474F;">Difference detail</h4>
 		        
 		        <div>
 		        	<div style="width:300px; float:left;">
@@ -80,7 +80,7 @@
 		</nav>
 		<!-- Navigation -->
 
-<div style="height:100px;">
+<div style="height:75px;">
 
 		      
 </div>
@@ -132,7 +132,14 @@
 		$('#result_box').kinetic();
 
 		$('#expected_box').kinetic();
-		
+		$('#result_box').on("scroll", function(){
+			$("#expected_box").scrollLeft($('#result_box').scrollLeft());
+			
+		});
+		$('#expected_box').on("scroll", function(){
+			$("#result_box").scrollLeft($('#expected_box').scrollLeft());
+			
+		});
 		$(document).on("mouseenter", ".diffDiv", function(){
 			var rectype = $(this).data("rectype");
 			
@@ -315,6 +322,8 @@
 							};
 							
 						}
+						
+						h5.core.view.append("#test_expected", "diffDiv", my_data);
 						
 						h5.core.view.append("#test_result", "diffDiv", my_data);
 						
