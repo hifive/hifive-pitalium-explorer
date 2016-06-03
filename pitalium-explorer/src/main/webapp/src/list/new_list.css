@@ -116,7 +116,7 @@ body {
 			.result_box {
 				
 				overflow-x: scroll;
-				border: 3px solid #ef9a9a;
+				border: 3px solid #03A9F4;
 				
 			}
 			.modal-content {
@@ -217,5 +217,13 @@ body {
 			.no-padding {
 				padding-left:0px;
 				padding-right:0px;
+			}
+			.delete-btn {
+				color: #BDBDBD;
+			
+			}
+			
+			.delete-btn:hover {
+				color: #546E7A;
 			}
 			
