@@ -20,13 +20,19 @@ public class ImagePair {
 	private static final int BORDER_WIDTH = 10;
 	private static final int OVERMERGED_WIDTH = 200;
 	private static final int OVERMERGED_HEIGHT = 300;
+		
+	// Dominant offset between two images
+	Offset offset;
 	
 	/**
 	 * Constructor
 	 */
 	public ImagePair(BufferedImage expectedImage, BufferedImage actualImage) {
-		this.expectedImage = expectedImage;
-		this.actualImage = actualImage;
+	
+		double diffThreshold = 0.1;
+		offset = ImageUtils2.findDominantOffset(expectedImage, actualImage, diffThreshold);
+		this.expectedImage = ImageUtils2.getDominantImage (expectedImage, actualImage, offset);
+		this.actualImage = ImageUtils2.getDominantImage (actualImage, expectedImage, offset);
 		
 		compareImagePair();
 	}
@@ -37,6 +43,9 @@ public class ImagePair {
 	 */
 	private void compareImagePair () {
 
+		// initial group distance
+		int group_distance = 10;
+		
 		Rectangle expectedFrame = new Rectangle(expectedImage.getWidth(), expectedImage.getHeight());
 		Rectangle actualFrame = new Rectangle(actualImage.getWidth(), actualImage.getHeight());
 
@@ -47,9 +56,21 @@ public class ImagePair {
 		long startTime, endTime, totalTime = 0;
 		boolean printRunningTime = true;
 		
+		// Find dominant offset
+		startTime = System.currentTimeMillis();
+		offset = ImageUtils2.findDominantOffset(expectedImage, actualImage, 0.1);
+		endTime = System.currentTimeMillis();
+		if (printRunningTime) {
+			System.out.printf("Dominant offset : x:%d y:%d\n", offset.getX(), offset.getY());
+			System.out.printf("OFFSET:%d ",endTime-startTime);
+			totalTime = totalTime + endTime-startTime;
+		}
+
+		
+		
 		// build different areas
 		startTime = System.currentTimeMillis();
-		List<Rectangle> rectangles  = buildDiffAreas(entireFrame, 10);
+		List<Rectangle> rectangles  = buildDiffAreas(entireFrame, group_distance);
 		endTime = System.currentTimeMillis();
 		if (printRunningTime) {
 			System.out.printf("DIFF AREA:%d ",endTime-startTime);
@@ -102,10 +123,14 @@ public class ImagePair {
 	 */
 	private List<ObjectGroup> buildObjectGroups (Rectangle frame, int group_distance) {
 		
+		// threshold for difference of color
+		// if you want to compare STRICTLY, you should set this value as 0.
+		double diffThreshold = 0.1;
+		
 		// base case for recursive building
 		int base_bound = 50;
 		if (frame.getWidth() < base_bound || frame.getHeight() < base_bound) {
-			DiffPoints DP = ImageUtils.compare(expectedImage, frame, actualImage, frame, null);
+			DiffPoints DP = ImageUtils2.compare(expectedImage, frame, actualImage, frame, diffThreshold);
 			return convertDiffPointsToObjectGroups(DP, group_distance);	
 		}
 		

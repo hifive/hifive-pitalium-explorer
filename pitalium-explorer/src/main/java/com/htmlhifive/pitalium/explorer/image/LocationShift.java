@@ -43,7 +43,7 @@ public class LocationShift {
 
 	// Q. After reshaping, what is minimum width and height of rectangle?
 	// Do we have to set this value?
-	public static double minLength = 3;
+	public static double minLength = 1;
 
 	// image save option
 	public boolean save = true;
@@ -60,13 +60,9 @@ public class LocationShift {
 		this.rectangles = rectangles;
 		this.ComparedRectangles = new ArrayList<ComparedRectangle>();
 
-		this.minWidth = expectedImage.getWidth();
-		if(minWidth > actualImage.getWidth())
-			minWidth = actualImage.getWidth();
+		this.minWidth  = Math.min(expectedImage.getWidth(),  actualImage.getWidth());
+		this.minHeight = Math.min(expectedImage.getHeight(), actualImage.getHeight());
 
-		this.minHeight = expectedImage.getHeight();
-		if(minHeight > actualImage.getHeight())
-			minHeight = actualImage.getHeight();
 	}
 	
 	/**
