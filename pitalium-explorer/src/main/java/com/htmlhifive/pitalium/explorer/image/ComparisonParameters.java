@@ -15,34 +15,50 @@ public class ComparisonParameters {
 	private static double scalingFeatureCriterion = 0.85;
 	private static double missingDiffCriterion = 0.6;
 	
+	// group distance for building different area
+	private static int defaultGroupDistance = 10;
+	private static int splitGroupDistance = 4;
+	
 	/**
 	 * Constructor
 	 */
 	public ComparisonParameters() {};
 
-	public void setDiffThreshold(double threshold) {
+	public static void setDiffThreshold(double threshold) {
 		diffThreshold = threshold;
 	}
 	public static double getDiffThreshold() {
 		return diffThreshold;
 	}
-	public void setScalingDiffCriterion (double criterion) {
+	public static void setScalingDiffCriterion (double criterion) {
 		scalingDiffCriterion = criterion;
 	}
 	public static double getScalingDiffCriterion () {
 		return scalingDiffCriterion;
 	}
-	public void setScalingFeatureCriterion (double criterion) {
+	public static void setScalingFeatureCriterion (double criterion) {
 		scalingFeatureCriterion = criterion;
 	}
 	public static double getScalingFeatureCriterion () {
 		return scalingFeatureCriterion;
 	}
-	public void setMissingDiffCriterion (double criterion) {
+	public static void setMissingDiffCriterion (double criterion) {
 		missingDiffCriterion = criterion;
 	}
 	public static double getMissingDiffCriterion () {
 		return missingDiffCriterion;
 	}	
-
+	public static void setDefaultGroupDistance(int group_distance) {
+		defaultGroupDistance = group_distance;
+	}
+	public static int getDefaultGroupDistance() {
+		return defaultGroupDistance;
+	}
+	public static void setSplitGroupDistance(int group_distance) {
+		splitGroupDistance = group_distance;
+	}
+	public static int getSplitGroupDistance() {
+		return splitGroupDistance;
+	}
+	
 }

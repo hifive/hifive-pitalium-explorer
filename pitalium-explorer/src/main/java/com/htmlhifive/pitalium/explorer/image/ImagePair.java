@@ -65,7 +65,7 @@ public class ImagePair {
 	private void compareImagePair () {
 
 		// initial group distance
-		int group_distance = 10;
+		int group_distance = ComparisonParameters.getDefaultGroupDistance();
 
 		// Do not use sizeDiffPoints and consider only intersection area 
 		Rectangle entireFrame = new Rectangle (width, height);
@@ -81,7 +81,7 @@ public class ImagePair {
 			System.out.printf("DIFF AREA:%d ",endTime-startTime);
 			totalTime = totalTime + endTime-startTime;
 		}
-
+		
 		// split over-merged rectangles into smaller ones if possible
 		startTime = System.currentTimeMillis();
 		SplitRectangles (rectangles, SPLIT_ITERATION, group_distance);
@@ -231,19 +231,23 @@ public class ImagePair {
 		if (splitIteration < 1) {
 			return;
 		}
-
+		
+		
 		int margin = (int)(group_distance/2);   // To extract ACTUAL different region
 		int sub_margin = margin + BORDER_WIDTH; // Remove border from actual different region
 		List<Rectangle> removeList = new ArrayList<Rectangle>();
 		List<Rectangle> addList = new ArrayList<Rectangle>();
-
+		
+		// for sub-rectangles, we apply split_group_distance instead of group_distance
+		int split_group_distance = ComparisonParameters.getSplitGroupDistance();
+		
 		// split implementation for each rectangle
 		for (Rectangle rectangle : rectangles) {
 
 			// check if this rectangle can be split
 			if (canSplit(rectangle)) {
 
-				/** split is divided into two parts : inside sub-rectangle, boundary rectnagle **/
+				/** split is divided into two parts : inside sub-rectangle, boundary rectan gle **/
 				
 				/* build inside rectangles */
 				
@@ -255,7 +259,7 @@ public class ImagePair {
 				Rectangle subRectangle = new Rectangle(subX, subY, subWidth, subHeight);
 
 				// use smaller group_distance to union Rectangle Area than what we used for the first different area recognition
-				List<Rectangle> splitRectangles = buildDiffAreas(subRectangle, 2);
+				List<Rectangle> splitRectangles = buildDiffAreas(subRectangle, split_group_distance);
 
 				
 				/* build boundary rectangles */
@@ -280,24 +284,24 @@ public class ImagePair {
 				ImageUtils2.reshapeRect(topBoundary, minWidth, minHeight);
 				ImageUtils2.reshapeRect(bottomBoundary, minWidth, minHeight);
 				List<Rectangle> boundaryList= new ArrayList<Rectangle>();
-				boundaryList.addAll(buildDiffAreas(leftBoundary, 2));
-				boundaryList.addAll(buildDiffAreas(rightBoundary, 2));
-				boundaryList.addAll(buildDiffAreas(topBoundary, 2));
-				boundaryList.addAll(buildDiffAreas(bottomBoundary, 2));
+				boundaryList.addAll(buildDiffAreas(leftBoundary, split_group_distance));
+				boundaryList.addAll(buildDiffAreas(rightBoundary, split_group_distance));
+				boundaryList.addAll(buildDiffAreas(topBoundary, split_group_distance));
+				boundaryList.addAll(buildDiffAreas(bottomBoundary, split_group_distance));
 
 				
 				// if split succeed
 				if (splitRectangles.size() != 1 || !subRectangle.equals(splitRectangles.get(0))) {
 
 					// if there exists splitRectangle which is still over-merged, split it recursively
-					SplitRectangles (splitRectangles, splitIteration-1, 2);
+					SplitRectangles (splitRectangles, splitIteration-1, split_group_distance);
 
 					// Record the rectangles which will be removed and added 
 					for (Rectangle splitRectangle : splitRectangles) {
 
 						// expand splitRectangle if it borders on subRectangle
 						expand(subRectangle, splitRectangle, sub_margin);
-						List<Rectangle> expansionRectangles = buildDiffAreas(splitRectangle,2);
+						List<Rectangle> expansionRectangles = buildDiffAreas(splitRectangle, split_group_distance);
 										
 						// remove overlapping rectangles after expansion
 						for (Rectangle boundaryRect : boundaryList) {
