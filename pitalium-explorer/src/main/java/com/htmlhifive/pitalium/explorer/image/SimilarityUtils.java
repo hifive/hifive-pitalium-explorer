@@ -1,5 +1,5 @@
 package com.htmlhifive.pitalium.explorer.image;
-import com.htmlhifive.pitalium.image.util.ImageUtils;
+
 import java.awt.image.BufferedImage;
 import java.awt.Rectangle;
 import java.awt.Color;
@@ -18,12 +18,6 @@ public class SimilarityUtils {
 	private static int FeatureRow = 5;
 	private static int FeatureCol = 5;
 	
-	/**
-	 * Initial setting for categorization 
-	 */
-	private static double scalingDiffCriterion = 0.3;
-	private static double scalingFeatureCriterion = 0.85;
-	private static double missingDiffCriterion = 0.6;
 	
 	/*
 	 * Set the way to calculate norm.
@@ -31,11 +25,6 @@ public class SimilarityUtils {
 	 * otherwise, use the norm of color distances.
 	 */
 	public static boolean averageNorm = false;
-
-	/**
-	 * Threshold to distungish the different pixel when counting the number of different pixels.
-	 */
-	private static double diffThreshold = 0.1;
 
 	/**
 	 * Constructor
@@ -73,6 +62,10 @@ public class SimilarityUtils {
 		/* Check scaling */
 
 		double similarityThresDiff, similarityTotalDiff, similarityFeatureMatrix;
+		double scalingDiffCriterion = ComparisonParameters.getScalingDiffCriterion();
+		double scalingFeatureCriterion = ComparisonParameters.getScalingFeatureCriterion();
+		double missingDiffCriterion = ComparisonParameters.getMissingDiffCriterion();
+		
 		similarityThresDiff = similarityUnit.getSimilarityThresDiff();
 		similarityTotalDiff = similarityUnit.getSimilarityTotalDiff();
 		similarityFeatureMatrix = similarityUnit.getSimilarityFeatureMatrix();
@@ -296,6 +289,7 @@ public class SimilarityUtils {
 		double similarityThresDiff, similarityTotalDiff;
 
 		double norm=0, min=-1;
+		double diffThreshold = ComparisonParameters.getDiffThreshold();
 		// Fine the best match moving the subimage.
 		int yMax = expectedHeight - actualHeight + 1;
 		int xMax = expectedWidth - actualWidth + 1;

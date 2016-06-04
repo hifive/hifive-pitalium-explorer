@@ -36,7 +36,7 @@ public class ImagePair {
 	 */
 	public ImagePair(BufferedImage expectedImage, BufferedImage actualImage) {
 
-		double diffThreshold = 0.1;
+		double diffThreshold = ComparisonParameters.getDiffThreshold();
 		long startTime, endTime;
 		totalTime = 0;
 
@@ -131,7 +131,7 @@ public class ImagePair {
 
 		// threshold for difference of color
 		// if you want to compare STRICTLY, you should set this value as 0.
-		double diffThreshold = 0.1;
+		double diffThreshold = ComparisonParameters.getDiffThreshold();
 
 		// base case for recursive building
 		int base_bound = 50;

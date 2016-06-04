@@ -6,11 +6,6 @@ import java.awt.Rectangle;
 import java.awt.image.Raster;
 import java.util.ArrayList;
 import java.util.List;
-import java.awt.Graphics2D;
-import java.awt.Color;
-import java.io.File;
-import java.io.IOException;
-import javax.imageio.ImageIO;
 import java.lang.Math;
 
 /**
@@ -60,9 +55,8 @@ public class LocationShift {
 		this.rectangles = rectangles;
 		this.ComparedRectangles = new ArrayList<ComparedRectangle>();
 
-		this.minWidth  = Math.min(expectedImage.getWidth(),  actualImage.getWidth());
-		this.minHeight = Math.min(expectedImage.getHeight(), actualImage.getHeight());
-
+		minWidth  = Math.min(expectedImage.getWidth(),  actualImage.getWidth());
+		minHeight = Math.min(expectedImage.getHeight(), actualImage.getHeight());
 	}
 	
 	/**
@@ -86,7 +80,7 @@ public class LocationShift {
 	public void execute() {
 
 		// variables for similarity
-		double similarityPixelByPixel, similarityFeatureMatrix;
+		double similarityPixelByPixel;
 		BufferedImage	expectedSubImage,	actualSubImage;
 		double entireDifference = 0;
 
@@ -154,7 +148,7 @@ public class LocationShift {
 	 * Check the template is contained and shifted in this area
 	 * if then, create ComparedRectangle with shift information and insert it into ComparedRectangles list.
 	 * @param rectangle One of the areas where two images are different.
-	 * @return true if thie rectangle is shifted
+	 * @return true if this rectangle is shifted
 	 */
 	private boolean CheckShift (Rectangle rectangle)
 	{
