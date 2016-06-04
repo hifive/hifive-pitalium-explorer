@@ -19,6 +19,9 @@ public class ComparisonParameters {
 	private static int defaultGroupDistance = 10;
 	private static int splitGroupDistance = 4;
 	
+	// maximum range for shift checking, similarity calculation
+	private static int maxShift = 10;
+	private static int maxMove = 1;		// moving range for similarity calculation
 	/**
 	 * Constructor
 	 */
@@ -59,6 +62,18 @@ public class ComparisonParameters {
 	}
 	public static int getSplitGroupDistance() {
 		return splitGroupDistance;
+	}
+	public static void setMaxShift(int max) {
+		maxShift = max;
+	}
+	public static int getMaxShift() {
+		return maxShift;
+	}
+	public static void setMaxMove(int max) {
+		maxMove = max;
+	}
+	public static int getMaxMove() {
+		return maxMove;
 	}
 	
 }

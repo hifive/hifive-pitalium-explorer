@@ -97,7 +97,7 @@ public final class ImageUtils2 {
 	 * @param rectangle 
 	 * @return subimage of given area
 	 */
-	private static BufferedImage getSubImage(BufferedImage image, Rectangle rectangle) {
+	public static BufferedImage getSubImage(BufferedImage image, Rectangle rectangle) {
 
 		// before getting subImage, reshape rectangle to avoid raster error 
 		reshapeRect(rectangle,image.getWidth(), image.getHeight());

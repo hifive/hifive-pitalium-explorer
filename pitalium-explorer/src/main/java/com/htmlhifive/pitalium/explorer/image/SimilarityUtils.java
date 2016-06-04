@@ -33,19 +33,20 @@ public class SimilarityUtils {
 
 
 
-	public static double calcSimilarity(BufferedImage expectedSubImage,BufferedImage actualSubImage, Rectangle rectangle, ComparedRectangle similarRectangle) {
+	public static double calcSimilarity(BufferedImage expectedImage,BufferedImage actualImage, Rectangle rectangle, ComparedRectangle similarRectangle) {
+		
+
 		double similarityPixelByPixel, similarityFeatureMatrix=-1;
 		SimilarityUnit similarityUnit = new SimilarityUnit();
-		similarityPixelByPixel = calcSimilarityPixelByPixel(expectedSubImage, actualSubImage, rectangle, similarityUnit);
+		similarityPixelByPixel = calcSimilarityPixelByPixel(expectedImage, actualImage, rectangle, similarityUnit);
 
 
-		int TEMPLATE_MARGIN = LocationShift.getTemplateMargin();
 		/* calculate similarity using feature matrix. */
-		int comparedRectangleWidth = (int)rectangle.getWidth()-2*TEMPLATE_MARGIN, comparedRectangleHeight = (int)rectangle.getHeight()-2*TEMPLATE_MARGIN;
+		int comparedRectangleWidth = (int)rectangle.getWidth(), comparedRectangleHeight = (int)rectangle.getHeight();
 
 		// execute this only when comparedRectangleWidth >= FeatureCol && comparedRectangleHeight >= FeatureRow
 		if (SimilarityUtils.checkFeatureSize(comparedRectangleWidth, comparedRectangleHeight)) {
-			similarityFeatureMatrix = calcSimilarityByFeatureMatrix(expectedSubImage, actualSubImage, rectangle);
+			similarityFeatureMatrix = calcSimilarityByFeatureMatrix(expectedImage, actualImage, rectangle);
 		}
 		similarityUnit.setSimilarityFeatureMatrix(similarityFeatureMatrix);
 
@@ -122,12 +123,27 @@ public class SimilarityUtils {
 	 * @param rectangle The rectangle area where to compare.
 	 * @return the 'feature' similarity of given area between two images.
 	 */
-	public static double calcSimilarityByFeatureMatrix(BufferedImage expectedSubImage, BufferedImage actualSubImage, Rectangle rectangle) {
+	public static double calcSimilarityByFeatureMatrix(BufferedImage expectedImage, BufferedImage actualImage, Rectangle rectangle) {
 
-		// initialize subimage.
-		int expectedWidth = expectedSubImage.getWidth(), expectedHeight = expectedSubImage.getHeight();
-		int actualWidth = actualSubImage.getWidth(), actualHeight = actualSubImage.getHeight();
 
+		// set range to be checked
+		int minWidth  = Math.min(expectedImage.getWidth(),  actualImage.getWidth()),
+			minHeight = Math.min(expectedImage.getHeight(), actualImage.getHeight());
+		int actualX = (int)rectangle.getX(), 		 actualY = (int)rectangle.getY(),
+			actualWidth = (int)rectangle.getWidth(), actualHeight = (int) rectangle.getHeight();
+		int maxMove = ComparisonParameters.getMaxMove();
+		int leftMove = Math.min(maxMove, actualX-1),
+			rightMove = Math.min(maxMove, minWidth-(actualX+actualWidth)),
+			topMove = Math.min(maxMove, actualY-1),
+			downMove = Math.min(maxMove, minHeight-(actualY+actualHeight));
+		int expectedX = actualX-leftMove, expectedY = actualY-topMove,
+			expectedWidth = actualWidth+leftMove+rightMove, expectedHeight = actualHeight+topMove+downMove;
+		
+		// initialize sub-image.
+		Rectangle entireFrame = new Rectangle(expectedX, expectedY, expectedWidth, expectedHeight);
+		BufferedImage expectedSubImage = ImageUtils2.getSubImage(expectedImage, entireFrame);
+		BufferedImage actualSubImage = ImageUtils2.getSubImage(actualImage, rectangle);
+		
 		// initialize the color array.
 		int[] expectedColors = new int[expectedWidth * expectedHeight];
 		int[] actualColors = new int[actualWidth * actualHeight];
@@ -157,7 +173,7 @@ public class SimilarityUtils {
 		}
 
 
-		/* Calculate the feature matrix of actual subimage. */
+		/* Calculate the feature matrix of actual sub-image. */
 
 		// the size of grid.
 		int GridWidth = actualWidth/FeatureCol, GridHeight = actualHeight/FeatureRow;
@@ -191,11 +207,9 @@ public class SimilarityUtils {
 //		int bestX=0, bestY=0;
 		double dist=0, min=-1;
 
-		int yMax = expectedHeight - actualHeight + 1;
-		int xMax = expectedWidth - actualWidth + 1;
-
-		for (int y = 0; y < yMax; y++) {
-			for (int x = 0; x < xMax; x++) {
+		// Find the best match moving sub-image.
+		for (int y = 0; y <= topMove + downMove; y++) {
+			for (int x = 0; x <= leftMove + rightMove; x++) {
 
 				// Calculate the distance between the expected feature matrix and the actual feature matrix shifhted (x, y).
 				for (int row=0; row<FeatureRow; row++) {
@@ -223,8 +237,8 @@ public class SimilarityUtils {
 				if (dist < min || min==-1)
 				{
 					min = dist;
-//					bestX = x - (expectedWidth - actualWidth)/2;
-//					bestY = y - (expectedHeight - actualHeight)/2;
+//					bestX = x - leftMove;
+//					bestY = y - topMove;
 				}
 			}
 		}
@@ -246,12 +260,26 @@ public class SimilarityUtils {
 	 * @param rectangle The rectangle area where to compare.
 	 * @return the 'pixel by pixel' similarity of given area between two images.
 	 */
-	public static double calcSimilarityPixelByPixel(BufferedImage expectedSubImage,BufferedImage actualSubImage, Rectangle rectangle,	SimilarityUnit similarityUnit) {
+	public static double calcSimilarityPixelByPixel(BufferedImage expectedImage,BufferedImage actualImage, Rectangle rectangle,	SimilarityUnit similarityUnit) {
 
+		// set range to be checked
+		int minWidth  = Math.min(expectedImage.getWidth(),  actualImage.getWidth()),
+			minHeight = Math.min(expectedImage.getHeight(), actualImage.getHeight());
+		int actualX = (int)rectangle.getX(), 		 actualY = (int)rectangle.getY(),
+			actualWidth = (int)rectangle.getWidth(), actualHeight = (int) rectangle.getHeight();
+		int maxMove = ComparisonParameters.getMaxMove();
+		int leftMove = Math.min(maxMove, actualX-1),
+			rightMove = Math.min(maxMove, minWidth-(actualX+actualWidth)),
+			topMove = Math.min(maxMove, actualY-1),
+			downMove = Math.min(maxMove, minHeight-(actualY+actualHeight));
+		int expectedX = actualX-leftMove, expectedY = actualY-topMove,
+			expectedWidth = actualWidth+leftMove+rightMove, expectedHeight = actualHeight+topMove+downMove;
+		
 		// initialize subimage.
-		int expectedWidth = expectedSubImage.getWidth(), expectedHeight = expectedSubImage.getHeight();
-		int actualWidth = actualSubImage.getWidth(), actualHeight = actualSubImage.getHeight();
-
+		Rectangle entireFrame = new Rectangle(expectedX, expectedY, expectedWidth, expectedHeight);
+		BufferedImage expectedSubImage = ImageUtils2.getSubImage(expectedImage, entireFrame);
+		BufferedImage actualSubImage = ImageUtils2.getSubImage(actualImage, rectangle);
+	
 		// initialize the color array.
 		int[] expectedColors = new int[expectedWidth * expectedHeight];
 		int[] actualColors = new int[actualWidth * actualHeight];
@@ -285,18 +313,16 @@ public class SimilarityUtils {
 
 		// to count the number of different pixels.
 		int thresDiffCount, thresDiffMin = -1;	// difference from diffThreshold
-		int totalDiffCount, totalDiffMin = -1;	// differenece from 0
+		int totalDiffCount, totalDiffMin = -1;	// difference from 0
 		double similarityThresDiff, similarityTotalDiff;
-
 		double norm=0, min=-1;
 		double diffThreshold = ComparisonParameters.getDiffThreshold();
-		// Fine the best match moving the subimage.
-		int yMax = expectedHeight - actualHeight + 1;
-		int xMax = expectedWidth - actualWidth + 1;
-		for (int y = 0; y < yMax; y++) {
-			for (int x = 0; x < xMax; x++) {
+		
+		// Find the best match moving sub-image.
+		for (int y = 0; y <= topMove + downMove; y++) {
+			for (int x = 0; x <= leftMove + rightMove; x++) {
 
-				// Calculate the similarity with the (x, y)-shifted subimage of actual image.
+				// Calculate the similarity on the (x, y)-shifted sub-image of expectedImage.
 				thresDiffCount = 0;	
 				totalDiffCount = 0;
 				norm = 0;
@@ -314,7 +340,6 @@ public class SimilarityUtils {
 							thresDiffCount++;
 						if (r*r+g*g+b*b > 0)
 							totalDiffCount++;
-
 					}
 				}
 
@@ -322,8 +347,8 @@ public class SimilarityUtils {
 				if (norm < min || min == -1)
 				{
 					min = norm;
-					bestX = x - (expectedWidth - actualWidth)/2;
-					bestY = y - (expectedHeight - actualHeight)/2;
+					bestX = x - leftMove;
+					bestY = y - topMove;
 				}
 
 				// Find the minimal number of total different pixels.

@@ -10,17 +10,11 @@ import java.lang.Math;
 
 /**
  * For given two images which are expected and actual,
- * this class check whether subimage of actual image is shifted
+ * this class check whether sub-image of actual image is shifted
  * and matched at some position in expected image.
  * Then it stores ShiftRectangle which is the information of location shift of given area.
  */
 public class LocationShift {
-
-	/**
-	 * The maximal range of location shift.
-	 */
-	private static final int MAXIMUM_SHIFT = 5;
-	private static final int TEMPLATE_MARGIN = 5;
 
 	private BufferedImage expectedImage;
 	private BufferedImage actualImage;
@@ -35,13 +29,6 @@ public class LocationShift {
 	 */
 	private static int minWidth;
 	private static int minHeight;
-
-	// Q. After reshaping, what is minimum width and height of rectangle?
-	// Do we have to set this value?
-	public static double minLength = 1;
-
-	// image save option
-	public boolean save = true;
 
 	/**
 	 * Constructor
@@ -80,20 +67,13 @@ public class LocationShift {
 	public void execute() {
 
 		// variables for similarity
-		double similarityPixelByPixel;
-		BufferedImage	expectedSubImage,	actualSubImage;
-		double entireDifference = 0;
-
+		double similarityPixelByPixel, entireDifference = 0;;
+		
 		for (Rectangle rectangle : rectangles)
 		{
-			// if the rectangle is still useful after reshping, check shift.
+			// if the rectangle is still useful after reshaping, check shift.
 			ImageUtils2.reshapeRect(rectangle, minWidth, minHeight);
-			if (checkRect(rectangle) && checkRect(getTemplateArea(rectangle))) {
-
-				// get subImages
-				expectedSubImage = getExpectedSubImage(rectangle);
-				actualSubImage = getActualSubImage(rectangle);
-
+			if (checkRect(rectangle)) {
 
 				/** if this rectangle is shift, then process shift information in CheckShift method **/
 				if (CheckShift(rectangle))
@@ -106,10 +86,10 @@ public class LocationShift {
 					ComparedRectangle newSimilar = new ComparedRectangle(rectangle);
 		
 					// implement all similarity calculations and categorization, and then build ComparedRectangle 
-					similarityPixelByPixel = SimilarityUtils.calcSimilarity(expectedSubImage, actualSubImage, rectangle, newSimilar);
+					similarityPixelByPixel = SimilarityUtils.calcSimilarity(expectedImage, actualImage, rectangle, newSimilar);
 
 					// calculate the similarity of entire image using pixel by pixel method
-					int actualArea = actualSubImage.getWidth() * actualSubImage.getHeight();
+					int actualArea = (int)(rectangle.getWidth() * rectangle.getHeight());
 
 					if (SimilarityUtils.averageNorm) {
 						entireDifference += (1-similarityPixelByPixel)*actualArea;
@@ -121,15 +101,15 @@ public class LocationShift {
 					ComparedRectangles.add(newSimilar);
 				}
 			} else {
-				//System.out.printf("Dissapeared rectangle - x:%d y:%d w:%d h:%d\n", (int)rectangle.getX(), (int)rectangle.getY(), (int)rectangle.getWidth(), (int)rectangle.getHeight());
+				System.out.printf("Dissapeared rectangle - x:%d y:%d w:%d h:%d\n", (int)rectangle.getX(), (int)rectangle.getY(), (int)rectangle.getWidth(), (int)rectangle.getHeight());
 			}
 				
 		}
-
+		
 		if (SimilarityUtils.averageNorm) {
-			entireSimilarity = 1-entireDifference/((minWidth-2*MAXIMUM_SHIFT)*(minHeight-2*MAXIMUM_SHIFT));
+			entireSimilarity = 1-entireDifference/(minWidth*minHeight);
 		}	else {
-			entireSimilarity = 1-Math.sqrt(entireDifference/((minWidth-2*MAXIMUM_SHIFT)*(minHeight-2*MAXIMUM_SHIFT)));
+			entireSimilarity = 1-Math.sqrt(entireDifference/(minWidth*minHeight));
 		}
 	}
 
@@ -140,7 +120,8 @@ public class LocationShift {
 	 */
 	public static boolean checkRect(Rectangle rectangle)
 	{
-		return (rectangle.getX() < (minWidth-1) && rectangle.getY() < (minHeight-1) && rectangle.getWidth() >= minLength && rectangle.getHeight() >= minLength);
+		int minLength = 1;
+		return (rectangle.getX() < (minWidth-minLength) && rectangle.getY() < (minHeight-minLength) && rectangle.getWidth() >= minLength && rectangle.getHeight() >= minLength);
 	}
 
 
@@ -152,10 +133,18 @@ public class LocationShift {
 	 */
 	private boolean CheckShift (Rectangle rectangle)
 	{
-
-		BufferedImage entireImage = getSubImage(expectedImage, rectangle);
-		BufferedImage templateImage = getSubImage(actualImage, getTemplateArea(rectangle));
-		
+				
+		// set range to be checked
+		int x = (int)rectangle.getX(), y = (int)rectangle.getY(),
+			w = (int)rectangle.getWidth(), h = (int) rectangle.getHeight();
+		int maxShift = ComparisonParameters.getMaxShift();
+		int leftMove = Math.min(maxShift, x-1),
+			rightMove = Math.min(maxShift, minWidth-(x+w)),
+			topMove = Math.min(maxShift, y-1),
+			downMove = Math.min(maxShift, minHeight-(y+h));
+		Rectangle entireFrame = new Rectangle(x-leftMove,y-topMove,w+leftMove+rightMove,h+topMove+downMove);
+		BufferedImage entireImage = ImageUtils2.getSubImage(expectedImage, entireFrame);
+		BufferedImage templateImage = ImageUtils2.getSubImage(actualImage, rectangle);
 		
 		double[][] integralImage = calcIntegralImage(entireImage);
 
@@ -163,9 +152,9 @@ public class LocationShift {
 		Raster r = templateImage.getRaster();
 		
 		int[] dArray = new int[r.getNumDataElements()];
-		for (int x = 0; x < r.getWidth(); x++) {
-			for (int y = 0; y < r.getHeight(); y++) {
-				sumTemplate += r.getPixel(x, y, dArray)[0];
+		for (int i = 0; i < r.getWidth(); i++) {
+			for (int j = 0; j < r.getHeight(); j++) {
+				sumTemplate += r.getPixel(i, j, dArray)[0];
 			}
 		}
 
@@ -173,22 +162,21 @@ public class LocationShift {
 		int templateHeight = templateImage.getHeight();
 		double topLeft, topRight, bottomLeft, bottomRight;
 		double sumEntire;
-		int yMax = entireImage.getHeight() - templateImage.getHeight() + 1;
-		int xMax = entireImage.getWidth() - templateImage.getWidth() + 1;
-		for (int y = 0; y < yMax; y++) {
-			for (int x = 0; x < xMax; x++) {
-				bottomRight = integralImage[y + templateHeight - 1][x + templateWidth - 1];
-				bottomLeft = (x == 0) ? 0 : integralImage[y + templateHeight - 1][x - 1];
-				topRight = (y == 0) ? 0 : integralImage[y - 1][x + templateWidth - 1];
-				topLeft = (x == 0 || y == 0) ? 0 : integralImage[y - 1][x - 1];
+
+		for (int i = 0; i <= topMove + downMove; i++) {
+			for (int j = 0; j <= leftMove + rightMove; j++) {
+				bottomRight = integralImage[i + templateHeight - 1][j + templateWidth - 1];
+				bottomLeft = (j == 0) ? 0 : integralImage[i + templateHeight - 1][j - 1];
+				topRight = (i == 0) ? 0 : integralImage[i - 1][j + templateWidth - 1];
+				topLeft = (j == 0 || i == 0) ? 0 : integralImage[i - 1][j - 1];
 				sumEntire = bottomRight - bottomLeft - topRight + topLeft;
 
 				if (Double.compare(sumEntire, sumTemplate) == 0) {
-					BufferedImage cropEntire = entireImage.getSubimage(x, y, templateWidth, templateHeight);
+					BufferedImage cropEntire = entireImage.getSubimage(j, i, templateWidth, templateHeight);
 					
-					// If the template match at this position, create new ComparedRectangle and add it in the list
+					// If the template matches at this position, create new ComparedRectangle and add it in the list
 					if (ImageUtils.imageEquals(cropEntire, templateImage)) {
-						ComparedRectangle newMatch = new ComparedRectangle(rectangle, x-TEMPLATE_MARGIN, y-TEMPLATE_MARGIN);
+						ComparedRectangle newMatch = new ComparedRectangle(rectangle, j-leftMove, i-topMove);
 						ComparedRectangles.add(newMatch);
 						return true;
 					}
@@ -198,21 +186,6 @@ public class LocationShift {
 		return false;
 	}
 
-	/**
-	 * Transform given rectangle area into the template area
-	 * @param rectangle The different area of two images
-	 * @return the template area
-	 */
-	public static Rectangle getTemplateArea (Rectangle rectangle)
-	{
-		int x = (int) rectangle.getX() + TEMPLATE_MARGIN;
-		int y = (int) rectangle.getY() + TEMPLATE_MARGIN;
-		int w = (int) rectangle.getWidth() - 2*TEMPLATE_MARGIN;
-		int h = (int) rectangle.getHeight() - 2*TEMPLATE_MARGIN;
-		
-		return new Rectangle(x,y,w,h);
-	}
-	
 	/**
 	 * calculate integral value of given image
 	 * @param source source image
@@ -235,45 +208,6 @@ public class LocationShift {
 		}
 		return integralImage;
 	}	
-	
-	/**
-	 * get subimage from given image and rectangle
-	 * @param image
-	 * @param rectangle 
-	 * @return
-	 */
-	private BufferedImage getSubImage(BufferedImage image, Rectangle rectangle) {
-		// Initialize variables
-		int width= (int)rectangle.getWidth(), height = (int)rectangle.getHeight();
-		int x = (int)rectangle.getX(), y = (int)rectangle.getY();
-		
-		return image.getSubimage(x, y, width, height);
-	}
-
-	/**
-	 * return the subimage of the given rectangle area of expectedImage
-	 * @param rectangle rectangle area where expectedImage is taken
-	 * @return the subimage of expectedImage
-	 */
-	public BufferedImage getExpectedSubImage (Rectangle rectangle) {
-		return getSubImage(expectedImage, rectangle);
-	}
-
-	/**
-	 * return the subimage of the template size of given rectangle area of actualImage
-	 * @param rectangle rectangle area where actualImage is taken
-	 * @return the subimage of actualImage
-	 */
-	public BufferedImage getActualSubImage (Rectangle rectangle) {
-		return getSubImage(actualImage, getTemplateArea(rectangle));
-	}
-	
-	/**
-	 * @return TEMPLATE_MARGIN
-	 */
-	public static int getTemplateMargin() {
-		return TEMPLATE_MARGIN;
-	}
 }
 
 
