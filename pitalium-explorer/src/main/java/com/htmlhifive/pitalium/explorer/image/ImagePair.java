@@ -104,12 +104,37 @@ public class ImagePair {
 			ImageUtils2.reshapeRect(rectangle, width, height);
 			if (checkRect(rectangle)) {
 
+				if (ShiftUtils.checkMissing(expectedImage, actualImage, rectangle)) {
+					
+					// initialize compared rectangle
+					ComparedRectangle newMissing = new ComparedRectangle(rectangle);
+		
+					// implement all similarity calculations and categorization, and then build ComparedRectangle 
+					similarityPixelByPixel = SimilarityUtils.calcSimilarity(expectedImage, actualImage, rectangle, newMissing);
+
+					// calculate the similarity of entire image using pixel by pixel method
+					int actualArea = (int)(rectangle.getWidth() * rectangle.getHeight());
+
+					if (SimilarityUtils.averageNorm) {
+						entireDifference += (1-similarityPixelByPixel)*actualArea;
+					} else {
+						entireDifference += (1-similarityPixelByPixel)*(1-similarityPixelByPixel)*actualArea;
+					}
+					
+					// set type		
+					newMissing.setType("MISSING");
+					
+					// insert the similar rectangle into the list of ComparedRectangles
+					ComparedRectangles.add(newMissing);
+				
+					
 				/** if this rectangle is shift, then process shift information in CheckShift method **/
-				if (ShiftUtils.CheckShift(expectedImage, actualImage, ComparedRectangles, rectangle))
+				} else if (ShiftUtils.CheckShift(expectedImage, actualImage, ComparedRectangles, rectangle)) {
 					continue;
+								
 
 				/** else calculate similarity **/
-				else {
+				} else {
 
 					// construct new similar rectangle
 					ComparedRectangle newSimilar = new ComparedRectangle(rectangle);
@@ -149,8 +174,6 @@ public class ImagePair {
 		}
 	}
 	
-	
-
 	/**
 	 * build different rectangles in the given frame area
 	 * @param frame boundary area to build rectangles

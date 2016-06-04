@@ -1,6 +1,7 @@
 package com.htmlhifive.pitalium.explorer.image;
 
 import com.htmlhifive.pitalium.image.util.ImageUtils;
+
 import java.awt.image.BufferedImage;
 import java.awt.Rectangle;
 import java.awt.image.Raster;
@@ -87,6 +88,48 @@ public class ShiftUtils {
 		return false;
 	}
 
+	/**
+	 * Check whether the given area is different due to object missing 
+	 * @param expectedImage
+	 * @param actualImage
+	 * @param rectangle
+	 * @return	true if object missing occurs
+	 */
+	public static boolean checkMissing (BufferedImage expectedImage, BufferedImage actualImage, Rectangle rectangle) {
+		
+		// initialize sub-images
+		BufferedImage expectedSubImage = ImageUtils2.getSubImage(expectedImage, rectangle);
+		BufferedImage actualSubImage = ImageUtils2.getSubImage(actualImage, rectangle);
+		int width = (int)rectangle.getWidth(), height = (int)rectangle.getHeight();
+
+		// initialize the color array.
+		int[] expectedColors = new int[width * height];
+		int[] actualColors = new int[width * height];
+		expectedSubImage.getRGB(0, 0, width, height, expectedColors, 0, width);
+		actualSubImage.getRGB(0, 0, width, height, actualColors, 0, width);
+
+		int expectedColor = expectedColors[0];
+		int actualColor = actualColors[0];
+		
+		// check expected sub-image
+		int i=1, j=1, numPixels=expectedColors.length;
+		while (i < numPixels && expectedColor == expectedColors[i]) {
+			i=i+1;
+		}
+
+		// check actual sub-image 
+		while (j < numPixels && actualColor == actualColors[j]) {
+			j=j+1;
+		}
+		
+		// the case that one has the same colors for every pixel, and the other doesn't
+		if ((i == numPixels && j < numPixels) || (j == numPixels && i < numPixels)) {
+			return true;
+		} else {
+			return false;
+		}	
+	}
+	
 	/**
 	 * calculate integral value of given image
 	 * @param source source image

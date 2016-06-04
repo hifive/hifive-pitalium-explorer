@@ -64,20 +64,14 @@ public class SimilarityUtils {
 		double similarityThresDiff, similarityTotalDiff, similarityFeatureMatrix;
 		double scalingDiffCriterion = ComparisonParameters.getScalingDiffCriterion();
 		double scalingFeatureCriterion = ComparisonParameters.getScalingFeatureCriterion();
-		double missingDiffCriterion = ComparisonParameters.getMissingDiffCriterion();
-		
+				
 		similarityThresDiff = similarityUnit.getSimilarityThresDiff();
 		similarityTotalDiff = similarityUnit.getSimilarityTotalDiff();
 		similarityFeatureMatrix = similarityUnit.getSimilarityFeatureMatrix();
 		if (similarityThresDiff - similarityTotalDiff >= scalingDiffCriterion && similarityFeatureMatrix >= scalingFeatureCriterion) {
 			return "SCALING";
 		}
-		
-		/* Check missing */
-		
-		if (similarityTotalDiff < missingDiffCriterion) {
-			return "MISSING";
-		}
+
 		return "SIMILAR";
 	}
 
@@ -274,7 +268,7 @@ public class SimilarityUtils {
 		int expectedX = actualX-leftMove, expectedY = actualY-topMove,
 			expectedWidth = actualWidth+leftMove+rightMove, expectedHeight = actualHeight+topMove+downMove;
 		
-		// initialize subimage.
+		// initialize sub-image.
 		Rectangle entireFrame = new Rectangle(expectedX, expectedY, expectedWidth, expectedHeight);
 		BufferedImage expectedSubImage = ImageUtils2.getSubImage(expectedImage, entireFrame);
 		BufferedImage actualSubImage = ImageUtils2.getSubImage(actualImage, rectangle);

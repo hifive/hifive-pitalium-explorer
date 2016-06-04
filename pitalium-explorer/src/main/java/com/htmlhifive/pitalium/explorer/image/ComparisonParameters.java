@@ -13,8 +13,7 @@ public class ComparisonParameters {
 	// parameters for categorization
 	private static double scalingDiffCriterion = 0.3;
 	private static double scalingFeatureCriterion = 0.85;
-	private static double missingDiffCriterion = 0.6;
-	
+		
 	// group distance for building different area
 	private static int defaultGroupDistance = 10;
 	private static int splitGroupDistance = 4;
@@ -45,12 +44,6 @@ public class ComparisonParameters {
 	public static double getScalingFeatureCriterion () {
 		return scalingFeatureCriterion;
 	}
-	public static void setMissingDiffCriterion (double criterion) {
-		missingDiffCriterion = criterion;
-	}
-	public static double getMissingDiffCriterion () {
-		return missingDiffCriterion;
-	}	
 	public static void setDefaultGroupDistance(int group_distance) {
 		defaultGroupDistance = group_distance;
 	}
