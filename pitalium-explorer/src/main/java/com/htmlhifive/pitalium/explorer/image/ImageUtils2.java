@@ -400,7 +400,7 @@ public final class ImageUtils2 {
 	 * 			3 when the width of expectedImage is larger and the height of actualImage is larger.
 	 *			4 when the width of actualImage is larger and the height of expectedImage is larger.
 	 */
-	private static int getSizeRelationType (int expectedWidth, int expectedHeight, int actualWidth, int actualHeight){
+	public static int getSizeRelationType (int expectedWidth, int expectedHeight, int actualWidth, int actualHeight){
 		if (expectedWidth <= actualWidth && expectedHeight <= actualHeight) {
 			return 1;
 		} else if (expectedWidth >= actualWidth && expectedHeight >= actualHeight) {

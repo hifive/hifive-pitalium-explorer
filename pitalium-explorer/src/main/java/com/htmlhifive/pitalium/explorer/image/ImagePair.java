@@ -14,9 +14,10 @@ public class ImagePair {
 	BufferedImage expectedImage;
 	BufferedImage actualImage;
 	private int width, height;	// the size of intersection of two images
+	
+	int sizeRelationType;
 	Offset offset;				// Dominant offset between two images
-	
-	
+		
 	private List<ComparedRectangle> ComparedRectangles;
 	private double entireSimilarity;
 
@@ -41,6 +42,7 @@ public class ImagePair {
 
 		// Find dominant offset
 		startTime = System.currentTimeMillis();
+		sizeRelationType = ImageUtils2.getSizeRelationType (expectedImage.getWidth(), expectedImage.getHeight(), actualImage.getWidth(), actualImage.getHeight());
 		offset = ImageUtils2.findDominantOffset(expectedImage, actualImage, diffThreshold);
 		endTime = System.currentTimeMillis();
 		if (printRunningTime) {
@@ -431,6 +433,31 @@ public class ImagePair {
 		return entireSimilarity;
 	}
 
+	public Offset getDominantOffset () {
+		return offset;
+	}
+	
+	public boolean isExpectedMoved () {
+		switch (sizeRelationType) {
+			case 1:
+				return false;
+			case 2:
+				return true;
+			case 3:
+				if (offset.getX() > 0)
+					return true;
+				else
+					return false;
+			case 4:
+				if (offset.getX() > 0)
+					return false;
+				else
+					return true;
 
+			// never reach here
+			default:
+				return false;					
+		}
+	}
 
 }
