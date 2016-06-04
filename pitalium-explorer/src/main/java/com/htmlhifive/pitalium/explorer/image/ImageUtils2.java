@@ -23,7 +23,73 @@ public final class ImageUtils2 {
 	private ImageUtils2() {
 	}
 
+	
 
+	/**
+	 * Reshape rectangle in order to avoid raster error
+	 */
+	public static void reshapeRect(Rectangle rectangle, int minWidth, int minHeight)
+	{
+		double width= rectangle.getWidth(), height = rectangle.getHeight();
+		double x = rectangle.getX(), y = rectangle.getY();
+		
+		
+		if (x < 0) {
+			width += x;
+			x = 0;
+		}
+		if (y < 0) {
+			height += y;
+			y = 0;
+		}
+
+		if (x + width >= minWidth)
+			width = minWidth - x;
+		if (y + height >= minHeight)
+			height = minHeight - y;
+		
+		rectangle.setRect(x, y, Math.max(width,1), Math.max(height,1));
+	}
+
+	/**
+	 * remove overlapping rectangles for better UI
+	 * @param rectangles the list of rectangles which will be checker overlapping
+	 */
+	public static void removeOverlappingRectangles (List<Rectangle> rectangles) {
+		// ignore small difference
+		int smallDiff = 2;
+		List <Rectangle> removeList = new ArrayList<Rectangle>();
+		
+		// check containing relation and record what to remove
+		for (int i=0 ; i<rectangles.size(); i++) {
+			Rectangle rect1 = rectangles.get(i);
+			int xLeft1 = (int)rect1.getX(), xRight1 = (int)(rect1.getX()+rect1.getWidth());
+			int yTop1 = (int)rect1.getY(), yBottom1 = (int)(rect1.getY()+rect1.getHeight());
+			
+			for (int j=i+1; j<rectangles.size(); j++) {
+				Rectangle rect2 = rectangles.get(j);
+				int xLeft2 = (int)rect2.getX(), xRight2 = (int)(rect2.getX()+rect2.getWidth());
+				int yTop2 = (int)rect2.getY(), yBottom2 = (int)(rect2.getY()+rect2.getHeight());
+				
+				// check rect1 contains rect2
+				if (xLeft1-smallDiff<=xLeft2 && yTop1-smallDiff <= yTop2
+					&& xRight1+smallDiff >= xRight2 && yBottom1+smallDiff >= yBottom2) {
+					removeList.add(rect2);
+				} 
+				
+				// check rect2 contains rect1
+				else if (xLeft2-smallDiff<=xLeft1 && yTop2-smallDiff <= yTop1
+						&& xRight2+smallDiff >= xRight1 && yBottom2+smallDiff >= yBottom1) {
+					removeList.add(rect1);
+				}
+			}
+		}
+		
+		// remove recorded rectangles
+		for (Rectangle removeRect : removeList) {
+			rectangles.remove(removeRect);
+		}		
+	}
 
 	/**
 	 * get subimage from given image and rectangle
@@ -32,6 +98,10 @@ public final class ImageUtils2 {
 	 * @return subimage of given area
 	 */
 	private static BufferedImage getSubImage(BufferedImage image, Rectangle rectangle) {
+
+		// before getting subImage, reshape rectangle to avoid raster error 
+		reshapeRect(rectangle,image.getWidth(), image.getHeight());
+		
 		// Initialize variables
 		int width= (int)rectangle.getWidth(), height = (int)rectangle.getHeight();
 		int x = (int)rectangle.getX(), y = (int)rectangle.getY();
@@ -146,9 +216,12 @@ public final class ImageUtils2 {
 					thresDiffCount = 0;	
 					for (int i = 0; i < subHeight; i=i+STEP) {
 						for (int j = 0; j < subWidth; j=j+STEP) {
-							r = expectedRed[expectedWidth*(i+y*expectedYOffset)+(j+x*expectedXOffset)] - 	actualRed[actualWidth*(i+y*actualYOffset)+(j+x*actualXOffset)];
-							g = expectedGreen[expectedWidth*(i+y*expectedYOffset)+(j+x*expectedXOffset)]-	actualGreen[actualWidth*(i+y*actualYOffset)+(j+x*actualXOffset)];
-							b = expectedBlue[expectedWidth*(i+y*expectedYOffset)+(j+x*expectedXOffset)] - actualBlue[actualWidth*(i+y*actualYOffset)+(j+x*actualXOffset)];
+							r = expectedRed[expectedWidth*(i+y*expectedYOffset)+(j+x*expectedXOffset)]
+								-actualRed[actualWidth*(i+y*actualYOffset)+(j+x*actualXOffset)];
+							g = expectedGreen[expectedWidth*(i+y*expectedYOffset)+(j+x*expectedXOffset)]
+								-actualGreen[actualWidth*(i+y*actualYOffset)+(j+x*actualXOffset)];
+							b = expectedBlue[expectedWidth*(i+y*expectedYOffset)+(j+x*expectedXOffset)]
+								-actualBlue[actualWidth*(i+y*actualYOffset)+(j+x*actualXOffset)];
 							if (r*r+g*g+b*b > 3*255*255*diffThreshold*diffThreshold)
 								thresDiffCount++;
 						}
@@ -172,9 +245,12 @@ public final class ImageUtils2 {
 				thresDiffCount = 0;	
 				for (int i = 0; i < subHeight; i=i+STEP) {
 					for (int j = 0; j < subWidth; j=j+STEP) {
-						r = expectedRed[expectedWidth*(i+y*expectedYOffset)+(j+x*expectedXOffset)] - 	actualRed[actualWidth*(i+y*actualYOffset)+(j+x*actualXOffset)];
-						g = expectedGreen[expectedWidth*(i+y*expectedYOffset)+(j+x*expectedXOffset)]-	actualGreen[actualWidth*(i+y*actualYOffset)+(j+x*actualXOffset)];
-						b = expectedBlue[expectedWidth*(i+y*expectedYOffset)+(j+x*expectedXOffset)] - actualBlue[actualWidth*(i+y*actualYOffset)+(j+x*actualXOffset)];
+						r = expectedRed[expectedWidth*(i+y*expectedYOffset)+(j+x*expectedXOffset)]
+							-actualRed[actualWidth*(i+y*actualYOffset)+(j+x*actualXOffset)];
+						g = expectedGreen[expectedWidth*(i+y*expectedYOffset)+(j+x*expectedXOffset)]
+							-actualGreen[actualWidth*(i+y*actualYOffset)+(j+x*actualXOffset)];
+						b = expectedBlue[expectedWidth*(i+y*expectedYOffset)+(j+x*expectedXOffset)]
+							-actualBlue[actualWidth*(i+y*actualYOffset)+(j+x*actualXOffset)];
 						if (r*r+g*g+b*b > 3*255*255*diffThreshold*diffThreshold)
 							thresDiffCount++;
 					}
@@ -195,9 +271,12 @@ public final class ImageUtils2 {
 				thresDiffCount = 0;	
 				for (int i = 0; i < subHeight; i=i+STEP) {
 					for (int j = 0; j < subWidth; j=j+STEP) {
-						r = expectedRed[expectedWidth*(i+y*expectedYOffset)+(j+x*expectedXOffset)] - 	actualRed[actualWidth*(i+y*actualYOffset)+(j+x*actualXOffset)];
-						g = expectedGreen[expectedWidth*(i+y*expectedYOffset)+(j+x*expectedXOffset)]-	actualGreen[actualWidth*(i+y*actualYOffset)+(j+x*actualXOffset)];
-						b = expectedBlue[expectedWidth*(i+y*expectedYOffset)+(j+x*expectedXOffset)] - actualBlue[actualWidth*(i+y*actualYOffset)+(j+x*actualXOffset)];
+						r = expectedRed[expectedWidth*(i+y*expectedYOffset)+(j+x*expectedXOffset)]
+							-actualRed[actualWidth*(i+y*actualYOffset)+(j+x*actualXOffset)];
+						g = expectedGreen[expectedWidth*(i+y*expectedYOffset)+(j+x*expectedXOffset)]
+							-actualGreen[actualWidth*(i+y*actualYOffset)+(j+x*actualXOffset)];
+						b = expectedBlue[expectedWidth*(i+y*expectedYOffset)+(j+x*expectedXOffset)]
+							-actualBlue[actualWidth*(i+y*actualYOffset)+(j+x*actualXOffset)];
 						if (r*r+g*g+b*b > 3*255*255*diffThreshold*diffThreshold)
 							thresDiffCount++;
 					}

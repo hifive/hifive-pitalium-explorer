@@ -38,8 +38,8 @@ public class LocationShift {
 	/**
 	 *The size of result image is set as minimum width and height of given two images.
 	 */
-	public static int minWidth;
-	public static int minHeight;
+	private static int minWidth;
+	private static int minHeight;
 
 	// Q. After reshaping, what is minimum width and height of rectangle?
 	// Do we have to set this value?
@@ -93,7 +93,7 @@ public class LocationShift {
 		for (Rectangle rectangle : rectangles)
 		{
 			// if the rectangle is still useful after reshping, check shift.
-			reshapeRect(rectangle);
+			ImageUtils2.reshapeRect(rectangle, minWidth, minHeight);
 			if (checkRect(rectangle) && checkRect(getTemplateArea(rectangle))) {
 
 				// get subImages
@@ -126,7 +126,10 @@ public class LocationShift {
 					// insert the similar rectangle into the list of ComparedRectangles
 					ComparedRectangles.add(newSimilar);
 				}
+			} else {
+				//System.out.printf("Dissapeared rectangle - x:%d y:%d w:%d h:%d\n", (int)rectangle.getX(), (int)rectangle.getY(), (int)rectangle.getWidth(), (int)rectangle.getHeight());
 			}
+				
 		}
 
 		if (SimilarityUtils.averageNorm) {
@@ -146,29 +149,6 @@ public class LocationShift {
 		return (rectangle.getX() < (minWidth-1) && rectangle.getY() < (minHeight-1) && rectangle.getWidth() >= minLength && rectangle.getHeight() >= minLength);
 	}
 
-	/**
-	 * Reshape rectangle in order to avoid raster error
-	 */
-	private void reshapeRect(Rectangle rectangle)
-	{
-		double width= rectangle.getWidth(), height = rectangle.getHeight();
-		double x = rectangle.getX(), y = rectangle.getY();
-		
-		if (x < 0) {
-			width += x;
-			x = 0;
-		}
-		if (y < 0) {
-			height += y;
-			y = 0;
-		}
-		if (x + width >= minWidth - minLength)
-			width = minWidth - minLength - x;
-		if (y + height >= minHeight - minLength)
-			height = minHeight - minLength - y;
-	
-		rectangle.setRect(x, y, width, height);
-	}
 
 	/**
 	 * Check the template is contained and shifted in this area
