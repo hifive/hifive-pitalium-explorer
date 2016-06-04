@@ -1,7 +1,6 @@
 package com.htmlhifive.pitalium.explorer.image;
 
 import java.awt.image.BufferedImage;
-import java.awt.Point;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.List;
@@ -53,8 +52,10 @@ public class ImagePair {
 		// assign (sub) image with same size
 		this.expectedImage = ImageUtils2.getDominantImage (expectedImage, actualImage, offset);
 		this.actualImage = ImageUtils2.getDominantImage (actualImage, expectedImage, offset);
+		ComparedRectangles = new ArrayList<ComparedRectangle>();
 		width = Math.min(expectedImage.getWidth(), actualImage.getWidth());
 		height = Math.min(expectedImage.getHeight(), actualImage.getHeight());
+		entireSimilarity = 0;
 		compareImagePair();
 	}
 
@@ -94,18 +95,61 @@ public class ImagePair {
 		
 		// compare two images using given rectangle areas
 		startTime = System.currentTimeMillis();
-		LocationShift LS = new LocationShift(expectedImage, actualImage, rectangles);
-		LS.execute();
-		ComparedRectangles = LS.getComparedRectangles();
-		entireSimilarity = LS.getEntireSimilarity ();
+		
+		double similarityPixelByPixel, entireDifference = 0;;
+		
+		for (Rectangle rectangle : rectangles)
+		{
+			// if the rectangle is still useful after reshaping, check shift.
+			ImageUtils2.reshapeRect(rectangle, width, height);
+			if (checkRect(rectangle)) {
+
+				/** if this rectangle is shift, then process shift information in CheckShift method **/
+				if (ShiftUtils.CheckShift(expectedImage, actualImage, ComparedRectangles, rectangle))
+					continue;
+
+				/** else calculate similarity **/
+				else {
+
+					// construct new similar rectangle
+					ComparedRectangle newSimilar = new ComparedRectangle(rectangle);
+		
+					// implement all similarity calculations and categorization, and then build ComparedRectangle 
+					similarityPixelByPixel = SimilarityUtils.calcSimilarity(expectedImage, actualImage, rectangle, newSimilar);
+
+					// calculate the similarity of entire image using pixel by pixel method
+					int actualArea = (int)(rectangle.getWidth() * rectangle.getHeight());
+
+					if (SimilarityUtils.averageNorm) {
+						entireDifference += (1-similarityPixelByPixel)*actualArea;
+					} else {
+						entireDifference += (1-similarityPixelByPixel)*(1-similarityPixelByPixel)*actualArea;
+					}
+
+					// insert the similar rectangle into the list of ComparedRectangles
+					ComparedRectangles.add(newSimilar);
+				}
+			} else {
+				System.out.printf("Dissapeared rectangle - x:%d y:%d w:%d h:%d\n", (int)rectangle.getX(), (int)rectangle.getY(), (int)rectangle.getWidth(), (int)rectangle.getHeight());
+			}
+				
+		}
+		
+		if (SimilarityUtils.averageNorm) {
+			entireSimilarity = 1-entireDifference/(width*height);
+		}	else {
+			entireSimilarity = 1-Math.sqrt(entireDifference/(width*height));
+		}
+		
 		endTime = System.currentTimeMillis();
 		if (printRunningTime) {
 			System.out.printf("CMP:%d ",endTime-startTime);
 			totalTime = totalTime + endTime-startTime;
 			System.out.printf("TOTAL:%d\n",totalTime);
 		}
-
 	}
+	
+	
 
 	/**
 	 * build different rectangles in the given frame area
@@ -115,7 +159,7 @@ public class ImagePair {
 	 */
 	private List<Rectangle> buildDiffAreas (Rectangle frame, int group_distance) {
 		List<ObjectGroup> objectGroups = buildObjectGroups(frame, group_distance);
-		List<Rectangle> rectangles = convertObjectGroupsToAreas(objectGroups);
+		List<Rectangle> rectangles = ImageUtils2.convertObjectGroupsToAreas(objectGroups);
 
 		return rectangles;
 	}
@@ -137,7 +181,7 @@ public class ImagePair {
 		int base_bound = 50;
 		if (frame.getWidth() < base_bound || frame.getHeight() < base_bound) {
 			DiffPoints DP = ImageUtils2.compare(expectedImage, frame, actualImage, frame, diffThreshold);
-			return convertDiffPointsToObjectGroups(DP, group_distance);	
+			return ImageUtils2.convertDiffPointsToObjectGroups(DP, group_distance);	
 		}
 
 		// divide into 4 sub-frames
@@ -164,48 +208,21 @@ public class ImagePair {
 		mergeGroups.addAll(SE);
 
 		// merge all possible object groups
-		return mergeAllPossibleObjects(mergeGroups);	
+		return ObjectGroup.mergeAllPossibleObjects(mergeGroups);	
 	}
+
 
 	/**
-	 * merge all possible object groups
-	 * @param objectGroups list of object groups
-	 * @return	list of object groups which are completely merged 
+	 * Check if this rectangle is inside of image
+	 * @param rectangle the rectangle checked
+	 * @return true if this rectangle area is available
 	 */
-	private List<ObjectGroup> mergeAllPossibleObjects (List<ObjectGroup> objectGroups) {
-
-		// Count how many times merge occur for each case
-		int num = -1;
-
-		// loop until there is no merge
-		while (num != 0) {
-			num = 0;
-			for (ObjectGroup object1 : objectGroups) {
-				List<ObjectGroup> removeList = new ArrayList<ObjectGroup>();
-				for (ObjectGroup object2 : objectGroups) {
-
-					// Check if two distinct rectangles can be merged.
-					if (!object1.equals(object2) && object1.canMerge(object2)) {
-						object1.union(object2);
-						num++;
-
-						// Record the rectangle which will be removed.
-						removeList.add(object2);
-					}
-				}
-				if (num > 0) {
-					// Remove the merged rectangle.
-					for (ObjectGroup removeModel : removeList) {
-						objectGroups.remove(removeModel);
-					}
-					break;
-				}
-			}
-		}
-
-		return objectGroups;
+	public boolean checkRect(Rectangle rectangle)
+	{
+		int minLength = 1;
+		return (rectangle.getX() < (width-minLength) && rectangle.getY() < (height-minLength) && rectangle.getWidth() >= minLength && rectangle.getHeight() >= minLength);
 	}
-
+	
 	/**
 	 * Check if given rectangle is bigger than over-merged rectangle criteria
 	 * @param rectangle Rectangle
@@ -375,51 +392,6 @@ public class ImagePair {
 	}
 
 
-	private List<Rectangle> convertObjectGroupsToAreas (List<ObjectGroup> objectGroups) {
-		// Create a list of the Rectangle from diffGroups
-		List<Rectangle> rectangles = new ArrayList<Rectangle>();
-
-		for (ObjectGroup objectGroup : objectGroups) {
-			rectangles.add(objectGroup.getRectangle());
-		}
-
-		return rectangles;		
-	}
-
-	/**
-	 * convert different points to the list of object groups which are completely merged
-	 * @param DP DiffPoints
-	 * @param group_distance distance for grouping
-	 * @return list of object groups which are completely merged
-	 */
-	private List<ObjectGroup> convertDiffPointsToObjectGroups(DiffPoints DP, int group_distance){
-		List<Point> diffPoints = DP.getDiffPoints();
-		if (diffPoints == null || diffPoints.isEmpty()) {
-			return new ArrayList<ObjectGroup>();
-		}
-
-		int mergeFlag = 0;
-		List<ObjectGroup> diffGroups = new ArrayList<ObjectGroup>();
-
-		// Merge diffPoints belongs to the same object into one objectGroup.
-		for (Point point : diffPoints) {
-			ObjectGroup objectGroup = new ObjectGroup(new Point(point.x, point.y), group_distance);
-			for (ObjectGroup diffGroup : diffGroups) {
-				if (diffGroup.canMerge(objectGroup)) {
-					diffGroup.union(objectGroup);
-					mergeFlag = 1;
-					break;
-				}
-			}
-			if (mergeFlag != 1) {
-				diffGroups.add(objectGroup);
-			}
-			mergeFlag = 0;
-		}
-
-		// merge all possible object groups
-		return mergeAllPossibleObjects(diffGroups);
-	}
 
 
 	/**
@@ -436,16 +408,6 @@ public class ImagePair {
 		return entireSimilarity;
 	}
 
-	/**
-	 * print the shift rectangle information
-	 */
-	public void printShiftRectangles() {
-		for (ComparedRectangle ComparedRect : ComparedRectangles) {
-			if (ComparedRect.getType().equals("SHIFT")) {
-				Rectangle rect = ComparedRect.rectangle();
-				System.out.printf("x:%d, y:%d, w:%d, h:%d => shifted x:%d, y:%d\n",(int)rect.getX(), (int)rect.getY(), (int)rect.getWidth(), (int)rect.getHeight(), ComparedRect.getXShift(), ComparedRect.getYShift());
-			}
-		}
-	}
+
 
 }

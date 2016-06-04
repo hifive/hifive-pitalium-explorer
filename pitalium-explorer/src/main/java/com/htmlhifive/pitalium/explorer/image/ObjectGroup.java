@@ -2,6 +2,8 @@ package com.htmlhifive.pitalium.explorer.image;
 
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Class that represents ObjectGroup
@@ -74,6 +76,44 @@ public class ObjectGroup {
 		return false;
 	}
 
+	/**
+	 * merge all possible object groups
+	 * @param objectGroups list of object groups
+	 * @return	list of object groups which are completely merged 
+	 */
+	public static List<ObjectGroup> mergeAllPossibleObjects (List<ObjectGroup> objectGroups) {
+
+		// Count how many times merge occur for each case
+		int num = -1;
+
+		// loop until there is no merge
+		while (num != 0) {
+			num = 0;
+			for (ObjectGroup object1 : objectGroups) {
+				List<ObjectGroup> removeList = new ArrayList<ObjectGroup>();
+				for (ObjectGroup object2 : objectGroups) {
+
+					// Check if two distinct rectangles can be merged.
+					if (!object1.equals(object2) && object1.canMerge(object2)) {
+						object1.union(object2);
+						num++;
+
+						// Record the rectangle which will be removed.
+						removeList.add(object2);
+					}
+				}
+				if (num > 0) {
+					// Remove the merged rectangle.
+					for (ObjectGroup removeModel : removeList) {
+						objectGroups.remove(removeModel);
+					}
+					break;
+				}
+			}
+		}
+
+		return objectGroups;
+	}
 		
 	/**
 	 * Get the rectangle area of object

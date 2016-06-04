@@ -32,7 +32,6 @@ public class SimilarityUtils {
 	public SimilarityUtils(){} 
 
 
-
 	public static double calcSimilarity(BufferedImage expectedImage,BufferedImage actualImage, Rectangle rectangle, ComparedRectangle similarRectangle) {
 		
 
@@ -108,7 +107,7 @@ public class SimilarityUtils {
 	/** 
 	 * Check if the size of rectangle is large enough to use feature method.
 	 * @param width the width of compared rectangle
-	 * @param heigth the hieght of compared rectangle
+	 * @param heigth the height of compared rectangle
 	 * @return if the rectangle is large enough, return true.
 	 */
 	public static boolean checkFeatureSize (int width, int height) {
@@ -118,8 +117,8 @@ public class SimilarityUtils {
 	/**
 	 * Calculate the similarity using feature matrix and find the best match where it has the highest similarity
 	 * This method should be implemented only when the size of actualSubImage is greater than or equal to FeatureCol by FeatureRow.
-	 * @param expectedSubImage the subimage of given rectangle area of expected image
-	 * @param actualSubImage the subimage of given 'template' rectangle area of actual image. it is smaller than expectedSubImage. 
+	 * @param expectedSubImage the sub-image of given rectangle area of expected image
+	 * @param actualSubImage the sub-image of given 'template' rectangle area of actual image. it is smaller than expectedSubImage. 
 	 * @param rectangle The rectangle area where to compare.
 	 * @return the 'feature' similarity of given area between two images.
 	 */
@@ -255,8 +254,8 @@ public class SimilarityUtils {
 	 * Calculate the similarity by comparing two images pixel by pixel,
 	 * and find the best match where it has the highest similarity.
 	 * In this method, we count the number of different pixels as well.
-	 * @param expectedSubImage the subimage of given rectangle area of expected image
-	 * @param actualSubImage the subimage of given 'template' rectangle area of actual image. it is smaller than expectedSubImage. 
+	 * @param expectedSubImage the sub-image of given rectangle area of expected image
+	 * @param actualSubImage the sub-image of given 'template' rectangle area of actual image. it is smaller than expectedSubImage. 
 	 * @param rectangle The rectangle area where to compare.
 	 * @return the 'pixel by pixel' similarity of given area between two images.
 	 */

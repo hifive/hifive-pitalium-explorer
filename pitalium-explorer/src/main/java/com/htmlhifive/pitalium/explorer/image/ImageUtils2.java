@@ -13,6 +13,7 @@ import com.htmlhifive.pitalium.image.model.DiffPoints;
 
 
 /**
+ * image utils for image comparison.
  * In this class, I changed some methods in com.htmlhifive.pitalium.image.util
  */
 public final class ImageUtils2 {
@@ -24,11 +25,13 @@ public final class ImageUtils2 {
 	}
 
 	
-
 	/**
-	 * Reshape rectangle in order to avoid raster error
+	 * if the given rectangle may occur raster error, reshape it
+	 * @param rectangle	Rectangle which will be reshaped
+	 * @param xLimit	limit of x+width of given rectangle
+	 * @param yLimit	limit of y+height of given rectangle
 	 */
-	public static void reshapeRect(Rectangle rectangle, int minWidth, int minHeight)
+	public static void reshapeRect(Rectangle rectangle, int xLimit, int yLimit)
 	{
 		double width= rectangle.getWidth(), height = rectangle.getHeight();
 		double x = rectangle.getX(), y = rectangle.getY();
@@ -43,14 +46,15 @@ public final class ImageUtils2 {
 			y = 0;
 		}
 
-		if (x + width >= minWidth)
-			width = minWidth - x;
-		if (y + height >= minHeight)
-			height = minHeight - y;
+		if (x + width >= xLimit)
+			width = xLimit - x;
+		if (y + height >= yLimit)
+			height = yLimit - y;
 		
 		rectangle.setRect(x, y, Math.max(width,1), Math.max(height,1));
 	}
 
+	
 	/**
 	 * remove overlapping rectangles for better UI
 	 * @param rectangles the list of rectangles which will be checker overlapping
@@ -91,11 +95,59 @@ public final class ImageUtils2 {
 		}		
 	}
 
+
+	public static List<Rectangle> convertObjectGroupsToAreas (List<ObjectGroup> objectGroups) {
+		// Create a list of the Rectangle from diffGroups
+		List<Rectangle> rectangles = new ArrayList<Rectangle>();
+
+		for (ObjectGroup objectGroup : objectGroups) {
+			rectangles.add(objectGroup.getRectangle());
+		}
+
+		return rectangles;		
+	}
+
 	/**
-	 * get subimage from given image and rectangle
+	 * convert different points to the list of object groups which are completely merged
+	 * @param DP DiffPoints
+	 * @param group_distance distance for grouping
+	 * @return list of object groups which are completely merged
+	 */
+	public static List<ObjectGroup> convertDiffPointsToObjectGroups(DiffPoints DP, int group_distance){
+		List<Point> diffPoints = DP.getDiffPoints();
+		if (diffPoints == null || diffPoints.isEmpty()) {
+			return new ArrayList<ObjectGroup>();
+		}
+
+		int mergeFlag = 0;
+		List<ObjectGroup> diffGroups = new ArrayList<ObjectGroup>();
+
+		// Merge diffPoints belongs to the same object into one objectGroup.
+		for (Point point : diffPoints) {
+			ObjectGroup objectGroup = new ObjectGroup(new Point(point.x, point.y), group_distance);
+			for (ObjectGroup diffGroup : diffGroups) {
+				if (diffGroup.canMerge(objectGroup)) {
+					diffGroup.union(objectGroup);
+					mergeFlag = 1;
+					break;
+				}
+			}
+			if (mergeFlag != 1) {
+				diffGroups.add(objectGroup);
+			}
+			mergeFlag = 0;
+		}
+
+		// merge all possible object groups
+		return ObjectGroup.mergeAllPossibleObjects(diffGroups);
+	}
+	
+	
+	/**
+	 * get sub-image from given image and rectangle
 	 * @param image
 	 * @param rectangle 
-	 * @return subimage of given area
+	 * @return sub-image of given area
 	 */
 	public static BufferedImage getSubImage(BufferedImage image, Rectangle rectangle) {
 
@@ -110,7 +162,7 @@ public final class ImageUtils2 {
 	}
 
 	/**
-	 * find dominant offest between two images
+	 * find dominant offset between two images
 	 * @param expectedImage
 	 * @param actualImage
 	 * @param diffThreshold	threshold to ignore small difference
