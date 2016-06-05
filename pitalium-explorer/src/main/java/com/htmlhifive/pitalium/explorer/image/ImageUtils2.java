@@ -5,8 +5,16 @@ import java.awt.Color;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.imageio.ImageIO;
 
 import com.htmlhifive.pitalium.common.exception.TestRuntimeException;
 import com.htmlhifive.pitalium.image.model.DiffPoints;
@@ -22,6 +30,120 @@ public final class ImageUtils2 {
 	 * Constructor
 	 */
 	private ImageUtils2() {
+	}
+	
+	
+	public static int[] toARGB(int pixel){
+		int alpha = (pixel >> 24) & 0xff;
+		int red = (pixel >> 16) & 0xff;
+		int green = (pixel >> 8) & 0xff;
+		int blue = (pixel) & 0xff;
+		return new int[]{alpha, red, green, blue};
+	}
+	public static int toPixel(int[] argb){
+		int ret = 0;
+		ret |= (argb[0] << 24);
+		ret |= (argb[1] << 16);
+		ret |= (argb[2] << 8);
+		ret |= (argb[3]);
+		return ret;
+	}
+	public static int toPixel(int r, int g, int b){
+		return toPixel(new int[]{255, r, g, b});
+	}
+	public static int toPixel(int a, int r, int g, int b){
+		return toPixel(new int[]{a, r, g, b});
+	}
+	private static Set<Integer> colorSet(BufferedImage source){
+		Set<Integer> s = new HashSet<Integer>();
+		for (int y=0; y<source.getHeight(); y++){
+			for (int x=0; x<source.getWidth(); x++){
+				s.add(source.getRGB(x, y));
+			}
+		}
+		return s;
+	}
+
+	private static Map<Integer, Integer> colorCountMap(BufferedImage source){
+		Map<Integer, Integer> m = new HashMap<Integer, Integer>();
+		for (int y=0; y<source.getHeight(); y++){
+			for (int x=0; x<source.getWidth(); x++){
+				if(m.containsKey(source.getRGB(x, y))){
+					m.put(source.getRGB(x, y), m.get(source.getRGB(x, y))+1);
+				}
+				else{
+					m.put(source.getRGB(x, y), 1);
+				}
+			}
+		}
+		return m;
+	}
+	
+	public static int detectBackgroundColor(BufferedImage b){
+		Map<Integer, Integer> map = colorCountMap(b);
+		int max = 0;
+		int max_color = toPixel(255, 255, 255);
+		for(Integer color : map.keySet()){
+			if(map.get(color) > max){
+				max = map.get(color);
+				max_color = color;
+			}
+		}
+		return max_color;
+	}
+	
+	public static double norm(int[] argb1, int[] argb2){
+		double ret = 0;
+		for(int i=0; i<Math.min(argb1.length, argb2.length); i++){
+			ret += Math.pow(argb1[i] - argb2[i], 2);
+		}
+		return Math.sqrt(ret);
+	}
+	
+	public static double countSubpixel(BufferedImage bimage){
+		int width = bimage.getWidth();
+		int height = bimage.getHeight();
+
+		int bgColor = detectBackgroundColor(bimage);
+
+		int count = 0;
+		int total = 0;
+
+		boolean wasBackground = true;
+		boolean inside = false;
+
+		int[] previous = null;
+
+		for (int y=0; y<height; y++){
+			for(int x=0; x<width; x++){
+				int pixel = bimage.getRGB(x, y);
+				int[] argb = toARGB(pixel);
+				if (norm(toARGB(pixel), toARGB(bgColor)) < 5){
+					if(!wasBackground){
+						if(previous[1]>previous[2] || previous[2]>previous[3] || previous[1]==previous[3]){ // in-correct
+						}else{ // correct
+							if (inside){
+								count++;
+							}
+						}
+						inside = false;
+						total++;
+					}
+					wasBackground = true;
+				}else{
+					if(wasBackground){
+						if(argb[1]<argb[2] || argb[2]<argb[3] || argb[1]==argb[3]){ // in-correct
+						}else{ // correct
+							inside = true;
+						}
+					}
+					wasBackground = false;
+				}
+				previous = argb;
+			}
+		}
+//		System.out.print(String.format("%d\t/\t%d\t=\t%f\t", count, total, (double) count/total));
+		return (double)count/total;
 	}
 
 	
@@ -511,6 +633,5 @@ public final class ImageUtils2 {
 	private static int[] getRGB(BufferedImage image, int width, int height) {
 		return image.getRGB(0, 0, width, height, null, 0, width);
 	}
-
 }
 

@@ -22,6 +22,20 @@ public class ShiftUtils {
 	public ShiftUtils() {};
 	
 
+	public static boolean CheckSubpixel(BufferedImage expectedImage, BufferedImage actualImage, Rectangle rectangle){
+		int x = rectangle.x;
+		int y = rectangle.y;
+		int w = rectangle.width;
+		int h = rectangle.height;
+		BufferedImage subExpectedImage = expectedImage.getSubimage(x, y, w, h);
+		BufferedImage subActualImage = actualImage.getSubimage(x, y, w, h);
+		if (ImageUtils2.countSubpixel(subExpectedImage) > ComparisonParameters.getSubpixelThreshold() ||
+			ImageUtils2.countSubpixel(subActualImage) > ComparisonParameters.getSubpixelThreshold()){
+			return true;
+		}
+		return false;
+	}
+
 	/**
 	 * Check the sub-image of actualImage in the given rectangle area is contained in expectedImage at the same or nearby location
 	 * if then, create ComparedRectangle with shift information and insert it into ComparedRectangles list.

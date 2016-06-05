@@ -7,6 +7,9 @@ public class ComparisonParameters {
 
 	/* default setting for comparison parameters */
 	
+	// recognizing threshold for sub-pixel rendered font
+	private static double subpixelThreshold = 0.9;
+	
 	// difference threshold to ignore small differences
 	private static double diffThreshold = 0.1;
 	
@@ -26,6 +29,12 @@ public class ComparisonParameters {
 	 */
 	public ComparisonParameters() {};
 
+	public static double getSubpixelThreshold() {
+		return subpixelThreshold;
+	}
+	public static void setSubpixelThreshold(double subpixelThreshold) {
+		ComparisonParameters.subpixelThreshold = subpixelThreshold;
+	}
 	public static void setDiffThreshold(double threshold) {
 		diffThreshold = threshold;
 	}

@@ -128,12 +128,30 @@ public class ImagePair {
 					
 					// insert the similar rectangle into the list of ComparedRectangles
 					ComparedRectangles.add(newMissing);
-				
-					
+
 				/** if this rectangle is shift, then process shift information in CheckShift method **/
 				} else if (ShiftUtils.CheckShift(expectedImage, actualImage, ComparedRectangles, rectangle)) {
 					continue;
 								
+				/** if this rectangle is image of subpixel rendered text **/
+				} else if (ShiftUtils.CheckSubpixel(expectedImage, actualImage, rectangle)){
+					ComparedRectangle newText = new ComparedRectangle(rectangle);
+
+					// implement all similarity calculations and categorization, and then build ComparedRectangle 
+					similarityPixelByPixel = SimilarityUtils.calcSimilarity(expectedImage, actualImage, rectangle, newText);
+
+					// calculate the similarity of entire image using pixel by pixel method
+					int actualArea = (int)(rectangle.getWidth() * rectangle.getHeight());
+
+					if (SimilarityUtils.averageNorm) {
+						entireDifference += (1-similarityPixelByPixel)*actualArea;
+					} else {
+						entireDifference += (1-similarityPixelByPixel)*(1-similarityPixelByPixel)*actualArea;
+					}
+
+					newText.setType("TEXT");
+
+					ComparedRectangles.add(newText);
 
 				/** else calculate similarity **/
 				} else {
