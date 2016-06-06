@@ -29,8 +29,13 @@ public class ShiftUtils {
 		int h = rectangle.height;
 		BufferedImage subExpectedImage = expectedImage.getSubimage(x, y, w, h);
 		BufferedImage subActualImage = actualImage.getSubimage(x, y, w, h);
-		if (ImageUtils2.countSubpixel(subExpectedImage) > ComparisonParameters.getSubpixelThreshold() ||
-			ImageUtils2.countSubpixel(subActualImage) > ComparisonParameters.getSubpixelThreshold()){
+		double[] expectedIndicator = ImageUtils2.countSubpixel(subExpectedImage);
+		double[] actualIndicator = ImageUtils2.countSubpixel(subActualImage);
+		if ((expectedIndicator[0] > ComparisonParameters.getSubpixelRateThreshold() &&
+			 expectedIndicator[1] > ComparisonParameters.getSubpixelPerLineThreshold())
+				||
+			(actualIndicator[0] > ComparisonParameters.getSubpixelRateThreshold() &&
+			 actualIndicator[1] > ComparisonParameters.getSubpixelPerLineThreshold())){
 			return true;
 		}
 		return false;

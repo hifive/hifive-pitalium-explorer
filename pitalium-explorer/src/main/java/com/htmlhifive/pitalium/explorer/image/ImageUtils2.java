@@ -32,7 +32,11 @@ public final class ImageUtils2 {
 	private ImageUtils2() {
 	}
 	
-	
+	/**
+	 * integer pixel value to aRGB array
+	 * @param pixel
+	 * @return aRGB value array
+	 */
 	public static int[] toARGB(int pixel){
 		int alpha = (pixel >> 24) & 0xff;
 		int red = (pixel >> 16) & 0xff;
@@ -40,6 +44,13 @@ public final class ImageUtils2 {
 		int blue = (pixel) & 0xff;
 		return new int[]{alpha, red, green, blue};
 	}
+
+
+	/**
+	 * RGB array to integer pixel value
+	 * @param argb
+	 * @return integer pixel value
+	 */
 	public static int toPixel(int[] argb){
 		int ret = 0;
 		ret |= (argb[0] << 24);
@@ -48,22 +59,35 @@ public final class ImageUtils2 {
 		ret |= (argb[3]);
 		return ret;
 	}
+	
+	/**
+	 * RGB to integer pixel value (alpha is set as 255)
+	 * @param r
+	 * @param g
+	 * @param b
+	 * @return integer pixel value
+	 */
 	public static int toPixel(int r, int g, int b){
 		return toPixel(new int[]{255, r, g, b});
 	}
+	
+	/**
+	 * aRGB to integer pixel value 
+	 * @param a
+	 * @param r
+	 * @param g
+	 * @param b
+	 * @return integer pixel value
+	 */
 	public static int toPixel(int a, int r, int g, int b){
 		return toPixel(new int[]{a, r, g, b});
 	}
-	private static Set<Integer> colorSet(BufferedImage source){
-		Set<Integer> s = new HashSet<Integer>();
-		for (int y=0; y<source.getHeight(); y++){
-			for (int x=0; x<source.getWidth(); x++){
-				s.add(source.getRGB(x, y));
-			}
-		}
-		return s;
-	}
 
+	/**
+	 * get color - count map of image
+	 * @param source
+	 * @return map whose key is color and value is count
+	 */
 	private static Map<Integer, Integer> colorCountMap(BufferedImage source){
 		Map<Integer, Integer> m = new HashMap<Integer, Integer>();
 		for (int y=0; y<source.getHeight(); y++){
@@ -79,6 +103,11 @@ public final class ImageUtils2 {
 		return m;
 	}
 	
+	/**
+	 * get estimated background color
+	 * @param b
+	 * @return most frequent color.
+	 */
 	public static int detectBackgroundColor(BufferedImage b){
 		Map<Integer, Integer> map = colorCountMap(b);
 		int max = 0;
@@ -91,16 +120,32 @@ public final class ImageUtils2 {
 		}
 		return max_color;
 	}
-	
-	public static double norm(int[] argb1, int[] argb2){
-		double ret = 0;
-		for(int i=0; i<Math.min(argb1.length, argb2.length); i++){
-			ret += Math.pow(argb1[i] - argb2[i], 2);
-		}
-		return Math.sqrt(ret);
+
+	/**
+	 * L2 norm between two RGB pixel values
+	 * @param pixel1
+	 * @param pixel2
+	 * @return d(R)^2 + d(G)^2 + d(B)^2
+	 */
+	public static double norm(int pixel1, int pixel2){
+		int red1 = (pixel1 >> 16) & 0xff;
+		int green1 = (pixel1 >> 8) & 0xff;
+		int blue1 = (pixel1) & 0xff;
+		int red2 = (pixel2 >> 16) & 0xff;
+		int green2 = (pixel2 >> 8) & 0xff;
+		int blue2 = (pixel2) & 0xff;
+		int redDist = (red1-red2)*(red1-red2);
+		int greenDist = (green1-green2)*(green1-green2);
+		int blueDist = (blue1-blue2)*(blue1-blue2);
+		return redDist + greenDist + blueDist;
 	}
-	
-	public static double countSubpixel(BufferedImage bimage){
+
+	/**
+	 * calculate the features of sub-pixel rendered text image
+	 * @param bimage
+	 * @return smoothly rendered edges rate over all colored chunk and number of chunks per line.
+	 */
+	public static double[] countSubpixel(BufferedImage bimage){
 		int width = bimage.getWidth();
 		int height = bimage.getHeight();
 
@@ -113,12 +158,14 @@ public final class ImageUtils2 {
 		boolean inside = false;
 
 		int[] previous = null;
+		int[] countPerLine = new int[height];
 
 		for (int y=0; y<height; y++){
+			int numberOfUpdown = 0;
 			for(int x=0; x<width; x++){
 				int pixel = bimage.getRGB(x, y);
 				int[] argb = toARGB(pixel);
-				if (norm(toARGB(pixel), toARGB(bgColor)) < 5){
+				if (norm(pixel, bgColor) < 25){
 					if(!wasBackground){
 						if(previous[1]>previous[2] || previous[2]>previous[3] || previous[1]==previous[3]){ // in-correct
 						}else{ // correct
@@ -129,6 +176,7 @@ public final class ImageUtils2 {
 						inside = false;
 						total++;
 					}
+					numberOfUpdown++;
 					wasBackground = true;
 				}else{
 					if(wasBackground){
@@ -141,9 +189,20 @@ public final class ImageUtils2 {
 				}
 				previous = argb;
 			}
+			countPerLine[y] = numberOfUpdown;
 		}
-//		System.out.print(String.format("%d\t/\t%d\t=\t%f\t", count, total, (double) count/total));
-		return (double)count/total;
+		double rate = (double) count/total;
+
+		double avg = 0;
+		int countValid = 0;
+		for(int i=0; i<countPerLine.length; i++){
+			avg += (double) countPerLine[i];
+			if(countPerLine[i] != 0){
+				countValid++;
+			}
+		}
+		avg /= (double) countValid;
+		return new double[]{rate, avg};
 	}
 
 	
