@@ -57,12 +57,18 @@
 		        <h4 style="color:#37474F;">Difference detail</h4>
 		        
 		        <div>
-		        	<div style="width:300px; float:left;">
+		        	<div style="width:450px; float:left;">
 		        	<input type="checkbox" class="choice" id="checkbox_SHIFT" checked="checked" data-rectype="SHIFT"> Shift
 		        	<input type="checkbox" class="choice" id="checkbox_MISSING" checked="checked" data-rectype="MISSING"> Missing
 		        	<input type="checkbox" class="choice" id="checkbox_SCALING" checked="checked" data-rectype="SCALING"> Scale
 		        	<input type="checkbox" class="choice" id="checkbox_SIMILAR" checked="checked" data-rectype="SIMILAR"> Similar
 		        	<input type="checkbox" class="choice" id="checkbox_TEXT" checked="checked" data-rectype="TEXT"> Text
+		        	<br>
+		        	<input type="radio" class="choice" id="radio_none" value="none" name="method_opacity" data-rectype="none" checked> None        	
+		        	<input type="radio" class="choice" id="radio_feature" value="featurematrix"  name="method_opacity" data-rectype="feature"> Feature Matrix
+		        	<input type="radio" class="choice" id="radio_pixel" value="pixelbypixel"  name="method_opacity" data-rectype="pixel"> Pixel by Pixel
+		        	<input type="radio" class="choice" id="radio_threshold"  value="thres"  name="method_opacity" data-rectype="threshold"> Threshold
+		        	<input type="radio" class="choice" id="radio_total"  value="total"  name="method_opacity" data-rectype="total"> Total
 		        	</div>
 		        	<div style="width:200px; float:left">
 		        		Diff region opacity control
@@ -140,7 +146,10 @@
 			$("#result_box").scrollLeft($('#expected_box').scrollLeft());
 			
 		});
+		
+		
 		$(document).on("mouseenter", ".diffDiv", function(){
+			var mouse_div = $(this);
 			var rectype = $(this).data("rectype");
 			
 			var method3 = $(this).data("method3");
@@ -169,15 +178,30 @@
 			var opacity =  $("#opacity_range").val();
 			var opacity_over = parseFloat($("#opacity_range").val()) + 0.3;
 			$("#memobox").show();
-			$(".diffDiv").css("opacity", opacity);
-			$(this).css("opacity", opacity_over);
+			//$(".diffDiv").css("opacity", opacity);
+			
+			var opacity_radio = $('input[type=radio][name=method_opacity]:checked').val();
+			//alert(opacity_radio);
+			if (opacity_radio == "none"){
+				mouse_div.css("opacity", opacity_over);
+			}else{
+				var this_opacity = parseFloat(mouse_div.css("opacity"));
+				
+				mouse_div.css("opacity", (this_opacity + 0.3));
+			}
 		});
 		
 		
 		
 		$(document).on("mouseleave", ".diffDiv", function(){
 			$("#memobox").hide();
-			$(this).css("opacity", $("#opacity_range").val());
+			var opacity_radio = $('input[type=radio][name=method_opacity]:checked').val();
+			if (opacity_radio == "none"){
+				$(this).css("opacity", $("#opacity_range").val());
+			}else{
+				var this_opacity = parseFloat($(this).css("opacity")) ;
+				$(this).css("opacity", (this_opacity- 0.3));
+			}
 		});
 		
 		$(document).on('mousemove', function(e){
@@ -206,6 +230,8 @@
 			var resultListId = queryParams["list_id"];
 			var targetResultId = queryParams["result_id"];
 			var directory = queryParams["directory"];
+			var offsetx = 0 - parseInt(queryParams["offsetx"]);
+			var offsety = 0 - parseInt(queryParams["offsety"]);
 			
 			$("#diffDetail").modal("show");
 			$("#test_result").height("300");
@@ -228,14 +254,16 @@
 				},
 				success: function(data){
 					
-					
 					var img = new Image();
+					var offset_str = String(offsetx) + "px " + String(offsety) + "px";
+					//alert(offset_str);
 					img.onload = function() {
 						$("#test_result").height(this.height);
 						$("#test_result").width(this.width);
 						$("#test_result").data("width", this.width);
 						$("#test_result").data("height", this.height);
 						$("#test_result").css("background-image", "url('" + this.src + "')");
+						$("#test_result").css("background-position", offset_str);
 					}
 					
 					img.src = "data:image/png;base64," + data["targetImage"];
@@ -277,6 +305,7 @@
 				success: function(data){
 
 					console.log(data);
+					
 					for (var i = 0; i < data.length; i++){
 						
 						var rec = data[i];
@@ -346,7 +375,9 @@
 		
 		$(document).on("input change", "#opacity_range", function(){
 			
-			$(".diffDiv").css("opacity", $(this).val());
+			$(".diffDiv").css("opacity", $("#opacity_range").val());
+			
+			$("#radio_none").trigger("click");
 			
 		});
 		
@@ -388,6 +419,21 @@
 			var rectype = $(this).data("rectype");
 			
 			$(".diff_" + rectype).toggle();
+		});
+		
+		$('input[type=radio][name=method_opacity]').change(function(){
+			
+			var method = this.value;
+			
+			if (method == 'none'){
+				$(".diffDiv").css("opacity", $("#opacity_range").val());
+			}else{
+				$(".diffDiv").each(function(){
+					$(this).css("opacity", (1 - $(this).data(method)));
+				});
+				
+			}
+			
 		});
 		</script>
 		

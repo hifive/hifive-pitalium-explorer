@@ -13,6 +13,10 @@ public class ComparedRectangle {
 	private int y;
 	private int width;
 	private int height;
+	
+	private int offset_x;
+	private int offset_y;
+	
 	private String type = "UNCHECKED";
 //	private RectType type = RectType.UNCHECKED;
 
