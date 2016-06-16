@@ -48,34 +48,46 @@
 	
 
 		<!-- Navigation -->
-		<nav class="navbar navbar-fixed-top" >
+		<nav class="navbar navbar-fixed-top"  style="background-color:#00BCD4;">
 			<div class="container-fluid">
 				<div class="navbar-header" style="width:100%;">
 					<a class="navbar-brand" href="list.html">Pitalium explorer</a>
 					
-		        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-		        <h4 style="color:#37474F;">Difference detail</h4>
-		        
-		        <div>
-		        	<div style="width:450px; float:left;">
-		        	<input type="checkbox" class="choice" id="checkbox_SHIFT" checked="checked" data-rectype="SHIFT"> Shift
-		        	<input type="checkbox" class="choice" id="checkbox_MISSING" checked="checked" data-rectype="MISSING"> Missing
-		        	<input type="checkbox" class="choice" id="checkbox_SCALING" checked="checked" data-rectype="SCALING"> Scale
-		        	<input type="checkbox" class="choice" id="checkbox_FONT" checked="checked" data-rectype="FONT">Font
-		        	<input type="checkbox" class="choice" id="checkbox_SIMILAR" checked="checked" data-rectype="SIMILAR"> Similar
+		        	
+		        	<div style="width:300px; height:50px; float:left;">
+		        		<div class="dropdown" style="margin-top:8px; margin-left:20px;">
+					  <button class="btn btn-default dropdown-toggle" style="color:#009688;" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+					    Show differences by category
+					    <span class="caret"></span>
+					  </button>
+					  <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+					    <li><a><input type="checkbox" class="choice" id="checkbox_SHIFT" checked="checked" data-rectype="SHIFT"><span style="margin-left:10px;">Shift</span></a></li>
+					    <li><a><input type="checkbox" class="choice" id="checkbox_MISSING" checked="checked" data-rectype="MISSING"><span style="margin-left:10px;">Missing</span></a></li>
+					    <li><a><input type="checkbox" class="choice" id="checkbox_SCALING" checked="checked" data-rectype="SCALING"><span style="margin-left:10px;">Object size</span></a></li>
+					    <li><a><input type="checkbox" class="choice" id="checkbox_FONT" checked="checked" data-rectype="FONT"><span style="margin-left:10px;">Font style</span></a></li>
+					    <li><a><input type="checkbox" class="choice" id="checkbox_SIMILAR" checked="checked" data-rectype="SIMILAR"><span style="margin-left:10px;">Ambiguous</span></a></li>
+
+					  </ul>
+					
+
+					</div>
+		     
+		        	<!-- 
 		        	<br>
 		        	<input type="radio" class="choice" id="radio_none" value="none" name="method_opacity" data-rectype="none" checked> None        	
 		        	<input type="radio" class="choice" id="radio_feature" value="featurematrix"  name="method_opacity" data-rectype="feature"> Feature Matrix
 		        	<input type="radio" class="choice" id="radio_pixel" value="pixelbypixel"  name="method_opacity" data-rectype="pixel"> Pixel by Pixel
 		        	<input type="radio" class="choice" id="radio_threshold"  value="thres"  name="method_opacity" data-rectype="threshold"> Threshold
 		        	<input type="radio" class="choice" id="radio_total"  value="total"  name="method_opacity" data-rectype="total"> Total
+		        	
+		        	 -->
 		        	</div>
 		        	<div style="width:200px; float:left">
-		        		Diff region opacity control
+		        		<p style="margin-top:8px; margin-bottom:2px; color:#455A64;">Diff region opacity control</p>
 		        		<input id="opacity_range" type="range" min="0" max="1" step="0.1" value="0.3">
 		        	</div>
 		        	<div style="width:200px; float:left; margin-left:20px;">
-		        		Image size control
+		        		<p style="margin-top:8px; margin-bottom:2px; color:#455A64;">Image size control</p>
 		        		<input id="img_size" type="range" min="0" max="3" step="0.1" value="1">
 		        	</div>
 		        	
