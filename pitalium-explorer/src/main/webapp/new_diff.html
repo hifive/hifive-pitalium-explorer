@@ -54,7 +54,7 @@
 					<a class="navbar-brand" href="list.html">Pitalium explorer</a>
 					
 		        	
-		        	<div style="width:300px; height:50px; float:left;">
+		        	<div style="width:280px; height:50px; float:left;">
 		        		<div class="dropdown" style="margin-top:8px; margin-left:20px;">
 					  <button class="btn btn-default dropdown-toggle" style="color:#009688;" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
 					    Show differences by category
@@ -82,13 +82,17 @@
 		        	
 		        	 -->
 		        	</div>
-		        	<div style="width:200px; float:left">
+		        	<div style="width:180px; float:left">
 		        		<p style="margin-top:8px; margin-bottom:2px; color:#455A64;">Diff region opacity control</p>
 		        		<input id="opacity_range" type="range" min="0" max="1" step="0.1" value="0.3">
 		        	</div>
-		        	<div style="width:200px; float:left; margin-left:20px;">
+		        	<div style="width:180px; float:left; margin-left:20px;">
 		        		<p style="margin-top:8px; margin-bottom:2px; color:#455A64;">Image size control</p>
 		        		<input id="img_size" type="range" min="0" max="3" step="0.1" value="1">
+		        	</div>
+		        	<div style="width:180px; float:left; margin-left:20px;">
+		        		<p style="margin-top:8px; margin-bottom:2px; color:#455A64;">Importance control</p>
+		        		<input id="importance" type="range" min="0" max="1" step="0.01" value="1">
 		        	</div>
 		        	
 		        </div>
@@ -340,7 +344,8 @@
 									featureMatrix: "",
 									pixelByPixel: "",
 									thresDiff: "",
-									totalDiff: ""
+									totalDiff: "",
+									index: i
 									
 									
 							};
@@ -357,7 +362,8 @@
 									featureMatrix: s_unit["similarityFeatureMatrix"],
 									pixelByPixel: s_unit["similarityPixelByPixel"],
 									thresDiff: s_unit["similarityThresDiff"],
-									totalDiff: s_unit["similarityTotalDiff"]
+									totalDiff: s_unit["similarityTotalDiff"],
+									index: i
 									
 									
 							};
@@ -393,6 +399,24 @@
 			
 		});
 		
+		$(document).on("input change", "#importance", function(){
+			var value = $(this).val();
+			$(".diffDiv").each(function(){
+				
+				var thisDiv = $(this);
+				
+				if (thisDiv.data("pixelbypixel") > value){
+					
+					thisDiv.hide();
+					
+				}else{
+					thisDiv.show();
+				}
+				
+				
+			});
+			
+		});
 		
 		$(document).on("input change", "#img_size", function(){
 			
@@ -452,7 +476,7 @@
 		
 		
 		<script type="text/ejs" id="diffDiv">
-			<div class="diffDiv diff_[%=type%]" style="left: [%=x%]px; top: [%=y%]px; width: [%=width%]px; height: [%=height%]px;" data-x="[%=x%]" data-y="[%=y%]" data-width="[%=width%]" data-height="[%=height%]"
+			<div class="diffDiv diff_[%=type%] diff_index_[%=index%]" style="left: [%=x%]px; top: [%=y%]px; width: [%=width%]px; height: [%=height%]px;" data-x="[%=x%]" data-y="[%=y%]" data-width="[%=width%]" data-height="[%=height%]"
 					data-rectype="[%=type%]" data-xshift="[%=xshift%]" data-yshift="[%=yshift%]"
 					data-featurematrix="[%=featureMatrix%]"
 					data-pixelbypixel = "[%=pixelByPixel%]"
@@ -470,19 +494,19 @@
 			<h5>
 			[% switch(type){
 				case "SHIFT":%]
-				<i class="glyphicon glyphicon-move"></i> Shifted
+				<i class="glyphicon glyphicon-move"></i> Shift
 			[%break; 
 				case "MISSING":%]
 				<i class="glyphicon glyphicon-question-sign"></i> Missing
 			[%break;
 				case "SCALING":%]
-				<i class="glyphicon glyphicon-resize-full"></i> Scaling
+				<i class="glyphicon glyphicon-resize-full"></i> Object size
 			[%break;
 				case "FONT":%]
-				<i class="glyphicon glyphicon-text-size"></i> Font Style
+				<i class="glyphicon glyphicon-text-size"></i> Font style
 			[%break;
 				default: %]
-				<i class="glyphicon glyphicon-stats"></i> Similar
+				<i class="glyphicon glyphicon-stats"></i> Ambiguous
 			[% } %]
 
 

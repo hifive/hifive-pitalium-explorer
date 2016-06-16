@@ -355,7 +355,7 @@ public final class ImageUtils2 {
 		int STEP = 5;
 		
 		// we need to restrict the maximum offset to avoid redundant checking
-		int maxOffset = 0;
+		int maxOffset = 10;
 		
 		// initialize size
 		int expectedWidth = expectedImage.getWidth(), expectedHeight = expectedImage.getHeight();

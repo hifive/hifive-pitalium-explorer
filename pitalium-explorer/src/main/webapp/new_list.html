@@ -34,7 +34,7 @@
 	<script>
     // Initialize a new plugin instance for all
     // e.g. $('input[type="range"]') elements.
-	    $('input[type="range"]').rangeslider({onSlide: function(position, value) { opacity_control(value); }});
+	    //$('input[type="range"]').rangeslider({onSlide: function(position, value) { opacity_control(value); }});
 	
 	    // Update all rangeslider instances for all
 	    // e.g. $('input[type="range"]') elements.
@@ -188,6 +188,8 @@
 		       top:   e.pageY - 20
 		    });
 		});
+		
+		/*
 		$(document).on("mouseenter", ".platform", function(){
 			$(this).find("img").hide();
 			$(this).find("span").show();
@@ -196,7 +198,7 @@
 			$(this).find("img").show();
 			$(this).find("span").hide();
 		});
-		
+		*/
 		
 		$(document).ready(function(){
 			
@@ -604,8 +606,8 @@
 									[%=name%]
 								</td>
 								<td class="platform">
-									<img src="res/img/windows.svg" style="height: 15px; display: inline;">
-									<span style="display: none;">[%=platform%]</span>
+									
+									<span>[%=platform%]</span>
 								</td>
 								<td>
 									[%=browser%]
