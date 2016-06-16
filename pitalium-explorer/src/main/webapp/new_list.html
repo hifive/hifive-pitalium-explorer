@@ -519,9 +519,6 @@
 			<table class="info_table table" >
 				<tr>
 					<th>
-						Expected
-					</th>
-					<th>
 						Compare
 					</th>
 					<th>
@@ -538,7 +535,6 @@
 
 				[%for (var i = 0; i < resultList.length; i++){ %]
 					<tr>
-						<td>[%=expected%]</td>
 						<td>[%=resultList[i]["targetFilename"]%]</td>
 						<td>[%=Math.round(resultList[i]["entireSimilarity"]*100)/100%]</td>
 						<td>[%=resultList[i]["numberOfDiffRec"]%]</td>

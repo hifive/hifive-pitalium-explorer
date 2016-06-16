@@ -409,9 +409,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 
 			List<ComparedRectangle> comparedRectangles;
 			
-			log.error("asd");
 			String filenamePair = FileUtility.getPairResultFilename(expectedFilePath, targetFilePath, id);
-			log.error(filenamePair);
 			File filenamePairJson = new File(comparisonResultsDir, filenamePair);
 
 			BufferedImage targetImage;

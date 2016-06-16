@@ -61,8 +61,8 @@
 		        	<input type="checkbox" class="choice" id="checkbox_SHIFT" checked="checked" data-rectype="SHIFT"> Shift
 		        	<input type="checkbox" class="choice" id="checkbox_MISSING" checked="checked" data-rectype="MISSING"> Missing
 		        	<input type="checkbox" class="choice" id="checkbox_SCALING" checked="checked" data-rectype="SCALING"> Scale
+		        	<input type="checkbox" class="choice" id="checkbox_FONT" checked="checked" data-rectype="FONT">Font
 		        	<input type="checkbox" class="choice" id="checkbox_SIMILAR" checked="checked" data-rectype="SIMILAR"> Similar
-		        	<input type="checkbox" class="choice" id="checkbox_TEXT" checked="checked" data-rectype="TEXT"> Text
 		        	<br>
 		        	<input type="radio" class="choice" id="radio_none" value="none" name="method_opacity" data-rectype="none" checked> None        	
 		        	<input type="radio" class="choice" id="radio_feature" value="featurematrix"  name="method_opacity" data-rectype="feature"> Feature Matrix
@@ -466,7 +466,7 @@
 				case "SCALING":%]
 				<i class="glyphicon glyphicon-resize-full"></i> Scaling
 			[%break;
-				case "TEXT":%]
+				case "FONT":%]
 				<i class="glyphicon glyphicon-text-size"></i> Font Style
 			[%break;
 				default: %]

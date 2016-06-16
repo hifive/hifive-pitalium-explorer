@@ -149,7 +149,7 @@ public class ImagePair {
 						entireDifference += (1-similarityPixelByPixel)*(1-similarityPixelByPixel)*actualArea;
 					}
 
-					newText.setType("TEXT");
+					newText.setType("FONT");
 
 					ComparedRectangles.add(newText);
 
