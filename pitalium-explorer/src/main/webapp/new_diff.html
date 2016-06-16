@@ -196,28 +196,30 @@
 			$("#memobox").show();
 			//$(".diffDiv").css("opacity", opacity);
 			
-			var opacity_radio = $('input[type=radio][name=method_opacity]:checked').val();
+			//var opacity_radio = $('input[type=radio][name=method_opacity]:checked').val();
 			//alert(opacity_radio);
-			if (opacity_radio == "none"){
-				mouse_div.css("opacity", opacity_over);
-			}else{
-				var this_opacity = parseFloat(mouse_div.css("opacity"));
+			//if (opacity_radio == "none"){
+			//	mouse_div.css("opacity", opacity_over);
+			//}else{
 				
-				mouse_div.css("opacity", (this_opacity + 0.3));
-			}
+				var this_opacity = parseFloat(mouse_div.css("opacity"));
+				var index = $(this).data("index");
+				$(".diff_index_" + index).css("opacity", (this_opacity + 0.3));
+			//}
 		});
 		
 		
 		
 		$(document).on("mouseleave", ".diffDiv", function(){
 			$("#memobox").hide();
-			var opacity_radio = $('input[type=radio][name=method_opacity]:checked').val();
-			if (opacity_radio == "none"){
-				$(this).css("opacity", $("#opacity_range").val());
-			}else{
+			//var opacity_radio = $('input[type=radio][name=method_opacity]:checked').val();
+			//if (opacity_radio == "none"){
+			//	$(this).css("opacity", $("#opacity_range").val());
+			//}else{
 				var this_opacity = parseFloat($(this).css("opacity")) ;
-				$(this).css("opacity", (this_opacity- 0.3));
-			}
+				var index = $(this).data("index");
+				$(".diff_index_" + index).css("opacity", (this_opacity- 0.3));
+			//}
 		});
 		
 		$(document).on('mousemove', function(e){
@@ -481,7 +483,7 @@
 					data-featurematrix="[%=featureMatrix%]"
 					data-pixelbypixel = "[%=pixelByPixel%]"
 					data-thres = "[%=thresDiff%]"
-					data-total="[%=totalDiff%]"
+					data-total="[%=totalDiff%]" data-index="[%=index%]"
 					>
 	
 		    </div>
