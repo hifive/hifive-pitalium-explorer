@@ -289,8 +289,8 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 				long timestamp = date.getTime();
 
 				String platform = "unknown";
-				if(name.toLowerCase().contains("window")) platform = "window";
-				else if(name.toLowerCase().contains("osx")) platform = "osx";
+				if(name.toLowerCase().contains("windows")) platform = "WINDOWS";
+				else if(name.toLowerCase().contains("mac")) platform = "MAC";
 				else if(name.toLowerCase().contains("linux")) platform = "linux";
 				else if(name.toLowerCase().contains("android")) platform = "android";
 				else if(name.toLowerCase().contains("ios")) platform = "ios";
@@ -300,6 +300,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 				else if(name.toLowerCase().contains("safari")) browser = "safari";
 				else if(name.toLowerCase().contains("firefox")) browser = "firefox";
 				else if(name.toLowerCase().contains("IE")) browser = "IE";
+				else if(name.toLowerCase().contains("explorer")) browser = "IE";
 
 				String version = "";
 				// this regex has something problem. should be fixed later
@@ -424,12 +425,13 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 			comparedRectangles = imagePair.getComparedRectangles();
 
 			double entireSimilarity = imagePair.getEntireSimilarity();
+			double minSimilarity = imagePair.getMinSimilarity();
 			int offsetX = imagePair.getDominantOffset().getX();
 			int offsetY = imagePair.getDominantOffset().getY();
 			boolean moveExpected = imagePair.isExpectedMoved();
 			
 //			Result result = new Result(expectedFilename, targetFilename, entireSimilarity, comparedRectangles.size());
-			Result result = new Result(i+1, targetFilePath, entireSimilarity, comparedRectangles.size(), offsetX, offsetY, moveExpected);
+			Result result = new Result(i+1, targetFilePath, entireSimilarity, minSimilarity, comparedRectangles.size(), offsetX, offsetY, moveExpected);
 			pairResultList.add(result);
 			
 			try {

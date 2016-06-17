@@ -19,7 +19,7 @@ public class ImagePair {
 	Offset offset;				// Dominant offset between two images
 		
 	private List<ComparedRectangle> ComparedRectangles;
-	private double entireSimilarity;
+	private double entireSimilarity, minSimilarity;
 
 	// Default criteria to split over-merged rectangle
 	private static final int BORDER_WIDTH = 10;
@@ -98,7 +98,8 @@ public class ImagePair {
 		// compare two images using given rectangle areas
 		startTime = System.currentTimeMillis();
 		
-		double similarityPixelByPixel, entireDifference = 0;;
+		double similarityPixelByPixel, entireDifference = 0;
+		minSimilarity = 1;
 		
 		for (Rectangle rectangle : rectangles)
 		{
@@ -113,7 +114,10 @@ public class ImagePair {
 		
 					// implement all similarity calculations and categorization, and then build ComparedRectangle 
 					similarityPixelByPixel = SimilarityUtils.calcSimilarity(expectedImage, actualImage, rectangle, newMissing);
-
+					if (minSimilarity > similarityPixelByPixel) {
+						minSimilarity = similarityPixelByPixel;
+					}
+					
 					// calculate the similarity of entire image using pixel by pixel method
 					int actualArea = (int)(rectangle.getWidth() * rectangle.getHeight());
 
@@ -139,7 +143,10 @@ public class ImagePair {
 
 					// implement all similarity calculations and categorization, and then build ComparedRectangle 
 					similarityPixelByPixel = SimilarityUtils.calcSimilarity(expectedImage, actualImage, rectangle, newText);
-
+					if (minSimilarity > similarityPixelByPixel) {
+						minSimilarity = similarityPixelByPixel;
+					}
+					
 					// calculate the similarity of entire image using pixel by pixel method
 					int actualArea = (int)(rectangle.getWidth() * rectangle.getHeight());
 
@@ -161,7 +168,10 @@ public class ImagePair {
 		
 					// implement all similarity calculations and categorization, and then build ComparedRectangle 
 					similarityPixelByPixel = SimilarityUtils.calcSimilarity(expectedImage, actualImage, rectangle, newSimilar);
-
+					if (minSimilarity > similarityPixelByPixel) {
+						minSimilarity = similarityPixelByPixel;
+					}
+					
 					// calculate the similarity of entire image using pixel by pixel method
 					int actualArea = (int)(rectangle.getWidth() * rectangle.getHeight());
 
@@ -191,6 +201,7 @@ public class ImagePair {
 			System.out.printf("CMP:%d ",endTime-startTime);
 			totalTime = totalTime + endTime-startTime;
 			System.out.printf("TOTAL:%d\n",totalTime);
+			System.out.printf("minimum similarity :%.2f\n",minSimilarity);
 		}
 	}
 	
@@ -449,6 +460,13 @@ public class ImagePair {
 	 */
 	public double getEntireSimilarity () {
 		return entireSimilarity;
+	}
+
+	/**
+	 * @return the minimum similarity among all different area
+	 */
+	public double getMinSimilarity () {
+		return minSimilarity;
 	}
 
 	public Offset getDominantOffset () {

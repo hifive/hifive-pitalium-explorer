@@ -542,7 +542,7 @@
 						<td>[%=Math.round(resultList[i]["entireSimilarity"]*100)/100%]</td>
 						<td>[%=resultList[i]["numberOfDiffRec"]%]</td>
 						
-						<td><a target="_blank" href="new_diff.html?list_id=[%=id%]&result_id=[%=resultList[i]['id']%]&directory=[%=directory%]&expected=[%=expected%]&target=[%=resultList[i]['targetFilename']%]&offsetx=[%=resultList[i]['offsetX']%]&offsety=[%=resultList[i]['offsetY']%]" class="btn btn-danger btn-detail" data-result_list_id="[%=id%]" data-target_result_id="[%=resultList[i]["id"]%]" data-expected="[%=expected%]" data-target="[%=resultList[i]["targetFilename"]%]" data-directory="[%=directory%]" >Detail</a></td>
+						<td><a target="_blank" href="new_diff.html?list_id=[%=id%]&result_id=[%=resultList[i]['id']%]&directory=[%=directory%]&expected=[%=expected%]&target=[%=resultList[i]['targetFilename']%]&offsetx=[%=resultList[i]['offsetX']%]&offsety=[%=resultList[i]['offsetY']%]&minsimilarity=[%=resultList[i]['minSimilarity']%]" class="btn btn-danger btn-detail" data-result_list_id="[%=id%]" data-target_result_id="[%=resultList[i]["id"]%]" data-expected="[%=expected%]" data-target="[%=resultList[i]["targetFilename"]%]" data-directory="[%=directory%]" >Detail</a></td>
 					<tr>
 				[%}%]
 				
@@ -578,9 +578,6 @@
 									Browser
 								</th>
 								<th>
-									Version
-								</th>
-								<th>
 									Expected
 								</th>
 
@@ -611,9 +608,6 @@
 								</td>
 								<td>
 									[%=browser%]
-								</td>
-								<td>
-									11
 								</td>
 								<td class="text-center">
 									<input class="expected" name="expected" type="radio" value="[%=name%]" data-directory="[%=directory%]">
