@@ -5,17 +5,19 @@ public class Result {
 //	String expectedFilename;
 	String targetFilename;
 	double entireSimilarity;
+	double minSimilarity;
 	int numberOfDiffRec;
 	int offsetX;
 	int offsetY;
 	boolean moveExpected;
 //	long executionTime;
 	
-	public Result(int id, String targetFilename, double entireSimilarity, int numberOfDiffRec, int offsetX, int offsetY, boolean moveExpected){
+	public Result(int id, String targetFilename, double entireSimilarity, double minSimilarity, int numberOfDiffRec, int offsetX, int offsetY, boolean moveExpected){
 		this.id = id;
 //		this.expectedFilename = expectedFilename;
 		this.targetFilename = targetFilename;
 		this.entireSimilarity = entireSimilarity;
+		this.minSimilarity = minSimilarity;
 		this.numberOfDiffRec = numberOfDiffRec;
 		this.offsetX = offsetX;
 		this.offsetY = offsetY;
@@ -26,7 +28,7 @@ public class Result {
 	public Result() {
 	//int i, String targetFilePath, double entireSimilarity2, int j, int offsetX2, int offsetY2, boolean moveExpectedImage2){
 //		this(0, "", "", 0, 0);
-		this(0, "", 0, 0, 0, 0, false);
+		this(0, "", 0, 0, 0, 0, 0, false);
 	}
 
 	public int getId(){
@@ -52,6 +54,12 @@ public class Result {
 	}
 	public void setEntireSimilarity(double entireSimilarity) {
 		this.entireSimilarity = entireSimilarity;
+	}
+	public double getMinSimilarity() {
+		return minSimilarity;
+	}
+	public void setMinSimilarity(double minSimilarity) {
+		this.minSimilarity = minSimilarity;
 	}
 	public int getNumberOfDiffRec() {
 		return numberOfDiffRec;

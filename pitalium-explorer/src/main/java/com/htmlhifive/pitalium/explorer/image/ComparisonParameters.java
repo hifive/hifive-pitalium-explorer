@@ -15,7 +15,7 @@ public class ComparisonParameters {
 	private static double diffThreshold = 0.1;
 	
 	// parameters for categorization
-	private static double scalingDiffCriterion = 0.3;
+	private static double scalingDiffCriterion = 0.33;
 	private static double scalingFeatureCriterion = 0.85;
 		
 	// group distance for building different area

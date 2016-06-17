@@ -424,12 +424,13 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 			comparedRectangles = imagePair.getComparedRectangles();
 
 			double entireSimilarity = imagePair.getEntireSimilarity();
+			double minSimilarity = imagePair.getMinSimilarity();
 			int offsetX = imagePair.getDominantOffset().getX();
 			int offsetY = imagePair.getDominantOffset().getY();
 			boolean moveExpected = imagePair.isExpectedMoved();
 			
 //			Result result = new Result(expectedFilename, targetFilename, entireSimilarity, comparedRectangles.size());
-			Result result = new Result(i+1, targetFilePath, entireSimilarity, comparedRectangles.size(), offsetX, offsetY, moveExpected);
+			Result result = new Result(i+1, targetFilePath, entireSimilarity, minSimilarity, comparedRectangles.size(), offsetX, offsetY, moveExpected);
 			pairResultList.add(result);
 			
 			try {

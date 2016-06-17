@@ -250,6 +250,9 @@
 			var directory = queryParams["directory"];
 			var offsetx = 0 - parseInt(queryParams["offsetx"]);
 			var offsety = 0 - parseInt(queryParams["offsety"]);
+			var minsimilarity = parseFloat(queryParams["minsimilarity"]);
+			
+			$("#importance").data("min", minsimilarity);
 			
 			$("#diffDetail").modal("show");
 			$("#test_result").height("300");
