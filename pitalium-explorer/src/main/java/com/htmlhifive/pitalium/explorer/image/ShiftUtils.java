@@ -149,6 +149,33 @@ public class ShiftUtils {
 		}	
 	}
 	
+
+	/**
+	 * check scaling using object detection
+	 * TODO
+	 * @param expectedImage
+	 * @param actualImage
+	 * @param rectangle
+	 * @return true if two objects are same (or similar enough) and have different size
+	 */
+	public static boolean checkScaling (BufferedImage expectedImage, BufferedImage actualImage, Rectangle rectangle) {
+		int x = (int)rectangle.getX(), y = (int)rectangle.getY();
+		int width = (int)rectangle.getWidth(), height = (int)rectangle.getHeight();
+		
+		Rectangle expectedObject = new Rectangle(rectangle);
+		Rectangle actualObject = new Rectangle(rectangle);
+		
+		System.out.printf("\n original rectangle : x:%d y:%d w:%d h:%d\n",x,y,width,height);
+		if (ImageUtils2.getObjectRectangle(expectedImage, expectedObject)) {
+			System.out.printf("- expected object detection succeed : x:%d y:%d w:%d h:%d\n",expectedObject.x,expectedObject.y,expectedObject.width,expectedObject.height);
+		} 
+		if (ImageUtils2.getObjectRectangle(actualImage, actualObject)) {
+			System.out.printf("- actual object detection succeed : x:%d y:%d w:%d h:%d\n",actualObject.x,actualObject.y,actualObject.width,actualObject.height);
+		}
+		return true;
+	}
+		
+	
 	/**
 	 * calculate integral value of given image
 	 * @param source source image

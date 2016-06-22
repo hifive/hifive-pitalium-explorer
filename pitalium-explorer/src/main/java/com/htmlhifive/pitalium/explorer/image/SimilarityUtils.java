@@ -50,7 +50,13 @@ public class SimilarityUtils {
 		similarityUnit.setSimilarityFeatureMatrix(similarityFeatureMatrix);
 
 		String category = categorize(similarityUnit);	
-
+		
+		// check strict scaling
+		// TODO
+		if (category == "SCALING") {
+			boolean scale = ShiftUtils.checkScaling(expectedImage, actualImage, rectangle);
+		}
+		
 		similarRectangle.setType(category);	
 		similarRectangle.setSimilarityUnit(similarityUnit);
 

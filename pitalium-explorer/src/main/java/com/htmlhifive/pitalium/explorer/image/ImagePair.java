@@ -99,7 +99,7 @@ public class ImagePair {
 		startTime = System.currentTimeMillis();
 		
 		double similarityPixelByPixel, entireDifference = 0;
-		minSimilarity = 1;
+		minSimilarity = 1;	// assign dummy value to initialize
 		
 		for (Rectangle rectangle : rectangles)
 		{
@@ -107,6 +107,7 @@ public class ImagePair {
 			ImageUtils2.reshapeRect(rectangle, width, height);
 			if (checkRect(rectangle)) {
 
+				/** if this rectangle is missing, set category 'MISSING' and calculate similarity  **/
 				if (ShiftUtils.checkMissing(expectedImage, actualImage, rectangle)) {
 					
 					// initialize compared rectangle
@@ -185,11 +186,13 @@ public class ImagePair {
 					ComparedRectangles.add(newSimilar);
 				}
 			} else {
+				// if building rectangles step is correct, never reach here.
 				System.out.printf("Dissapeared rectangle - x:%d y:%d w:%d h:%d\n", (int)rectangle.getX(), (int)rectangle.getY(), (int)rectangle.getWidth(), (int)rectangle.getHeight());
 			}
 				
 		}
 		
+		// after calculating all similarities, calculate entire similarity of two images.
 		if (SimilarityUtils.averageNorm) {
 			entireSimilarity = 1-entireDifference/(width*height);
 		}	else {
