@@ -127,25 +127,42 @@ public final class ImageUtils2 {
 		
 		int maxMargin = 20;
 		int x = (int)rectangle.getX(), y = (int)rectangle.getY(),
-			width = (int)rectangle.getWidth(), height = (int)rectangle.getHeight();
-		BufferedImage subImage = image.getSubimage(x, y, width, height);
+			w = (int)rectangle.getWidth(), h = (int)rectangle.getHeight();
+		BufferedImage subImage = image.getSubimage(x, y, w, h);
 		
 		// if rectangle is not big enough, do not find object rectangle
-		// use 3*maxMargin here, in order to assume that object is bigger than margin by margin 
+		// use 3*maxMargin here, in order to assume that object is bigger than margin by margin
+		int width = w-2, height = h-2;	//	width and height of edge map
 		if (width<=3*maxMargin || height<=3*maxMargin) {
 			return false;
 		}
 		
-		// initialize different map
-		boolean[][] diffMap = new boolean[--height][--width];
-		for (int i=0; i<height; i++) {
-			for (int j=0; j<width; j++) {
+		// initialize edge map using 8-directional independent edge detection
+		boolean[][] edgeMap = new boolean[height][width];
+		for (int i=0; i<maxMargin; i++) {
+			// on the corner areas using diagonal filter.
+			for (int j=0; j<maxMargin; j++) {
 				// set true if different
-				diffMap[i][j] = subImage.getRGB(j,i) != subImage.getRGB(j+1,i+1);
+				edgeMap[i][j] = subImage.getRGB(j+1,i+1) != subImage.getRGB(j,i);												// NW corner
+				edgeMap[i][width-1-j] = subImage.getRGB(width-j,i+1) != subImage.getRGB(width-j+1,i);							// NE corner
+				edgeMap[height-1-i][j] = subImage.getRGB(j+1,height-i) != subImage.getRGB(j,height-i+1);						// SW corner
+				edgeMap[height-1-i][width-1-j] = subImage.getRGB(width-j,height-i) != subImage.getRGB(width-j+1,height-i+1);	// SE corner
+			}
+			
+			// on the top and bottom bridge areas using vertical filter.
+			for (int j=maxMargin; j<width-maxMargin; j++) {
+				edgeMap[i][j] = subImage.getRGB(j+1,i+1) != subImage.getRGB(j+1,i);							// top bridge area
+				edgeMap[height-1-i][j] = subImage.getRGB(j+1,height-i) != subImage.getRGB(j+1,height-i+1);	// bottom bridge area
+			}
+			
+			// on the left and right bridge areas using horizontal filter.
+			for (int j=maxMargin; j<height-maxMargin; j++) {
+				edgeMap[j][i] = subImage.getRGB(i+1,j+1) != subImage.getRGB(i,j+1);	// left bridge area
+				edgeMap[j][width-1-i] = subImage.getRGB(width-i,j+1) != subImage.getRGB(width-i+1,j+1);	// right bridge area
 			}
 		}
 		
-		// shrink diffMap down to (2*maxMargin+1) by (2*maxMargin+1) by using these bridges.
+		// shrink edgeMap down to (2*maxMargin+1) by (2*maxMargin+1) by using these bridges.
 		int shrinkLength = 2*maxMargin+1;
 		boolean[][] shrinkMap = new boolean[shrinkLength][shrinkLength],
 					verticalMap = new boolean[shrinkLength][shrinkLength],	// to check vertical direction
@@ -154,10 +171,10 @@ public final class ImageUtils2 {
 		// initialize shrink map
 		for (int i=0; i<maxMargin; i++) {
 			for (int j=0; j<maxMargin; j++) {
-				shrinkMap[i][j] = diffMap[i][j];
-				shrinkMap[i][shrinkLength-1-j] = diffMap[i][width-1-j];
-				shrinkMap[shrinkLength-1-i][j] = diffMap[height-1-i][j];
-				shrinkMap[shrinkLength-1-i][shrinkLength-1-j] = diffMap[height-1-i][width-1-j];
+				shrinkMap[i][j] = edgeMap[i][j];
+				shrinkMap[i][shrinkLength-1-j] = edgeMap[i][width-1-j];
+				shrinkMap[shrinkLength-1-i][j] = edgeMap[height-1-i][j];
+				shrinkMap[shrinkLength-1-i][shrinkLength-1-j] = edgeMap[height-1-i][width-1-j];
 			}
 		}
 		shrinkMap[maxMargin][maxMargin]=false; // center value never used.
@@ -167,15 +184,15 @@ public final class ImageUtils2 {
 			int leftIdx = maxMargin, rightIdx = maxMargin, topIdx = maxMargin, bottomIdx = maxMargin;
 			
 			// check left & right bridges
-			while(leftIdx<height-maxMargin && diffMap[leftIdx][i]) { leftIdx++; }
+			while(leftIdx<height-maxMargin && edgeMap[leftIdx][i]) { leftIdx++; }
 			shrinkMap[maxMargin][i] = (leftIdx == height-maxMargin);
-			while(rightIdx<height-maxMargin && diffMap[rightIdx][width-1-i]) { rightIdx++; }
+			while(rightIdx<height-maxMargin && edgeMap[rightIdx][width-1-i]) { rightIdx++; }
 			shrinkMap[maxMargin][shrinkLength-1-i] = (rightIdx == height-maxMargin);
 					
 			// check top & bottom bridges
-			while(topIdx<width-maxMargin && diffMap[i][topIdx]) { topIdx++; }
+			while(topIdx<width-maxMargin && edgeMap[i][topIdx]) { topIdx++; }
 			shrinkMap[i][maxMargin] = (topIdx == width-maxMargin);
-			while(bottomIdx<width-maxMargin && diffMap[height-1-i][bottomIdx]) { bottomIdx++; }
+			while(bottomIdx<width-maxMargin && edgeMap[height-1-i][bottomIdx]) { bottomIdx++; }
 			shrinkMap[shrinkLength-1-i][maxMargin] = (bottomIdx == width-maxMargin);	
 		}
 				
