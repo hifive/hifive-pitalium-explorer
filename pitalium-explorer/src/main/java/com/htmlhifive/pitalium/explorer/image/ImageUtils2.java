@@ -125,7 +125,7 @@ public final class ImageUtils2 {
 	 */
 	public static boolean getObjectRectangle (BufferedImage image, Rectangle rectangle) {
 		
-		int maxMargin = 20;
+		int maxMargin = ComparisonParameters.getDefaultGroupDistance();
 		int x = (int)rectangle.getX(), y = (int)rectangle.getY(),
 			w = (int)rectangle.getWidth(), h = (int)rectangle.getHeight();
 		BufferedImage subImage = image.getSubimage(x, y, w, h);

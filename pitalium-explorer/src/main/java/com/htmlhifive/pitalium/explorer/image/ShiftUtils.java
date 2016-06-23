@@ -97,7 +97,7 @@ public class ShiftUtils {
 					
 					// If the template matches at this position, create new ComparedRectangle and add it in the list
 					if (ImageUtils.imageEquals(cropEntire, templateImage)) {
-						ComparedRectangle newMatch = new ComparedRectangle(rectangle, j-leftMove, i-topMove);
+						ComparedRectangle newMatch = new ComparedRectangle(rectangle, leftMove-j, topMove-i);
 						ComparedRectangles.add(newMatch);
 						return true;
 					}
