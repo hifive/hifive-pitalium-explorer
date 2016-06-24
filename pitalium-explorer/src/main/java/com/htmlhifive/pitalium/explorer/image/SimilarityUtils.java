@@ -26,6 +26,7 @@ public class SimilarityUtils {
 
 	/**
 	 * calculate similarity of given rectangle area and offset
+	 * And then, build similarRectangle using similarity values.
 	 * @param expectedImage
 	 * @param actualImage
 	 * @param rectangle
@@ -33,12 +34,13 @@ public class SimilarityUtils {
 	 * @param offset
 	 * @return similarity using norm calculation pixel by pixel  
 	 */
-	public static double calcSimilarity(BufferedImage expectedImage,BufferedImage actualImage, Rectangle rectangle, ComparedRectangle similarRectangle, Offset offset) {
-		return calcSimilarity(expectedImage, actualImage, rectangle, similarRectangle, offset, -1);
+	public static void calcSimilarity(BufferedImage expectedImage,BufferedImage actualImage, Rectangle rectangle, ComparedRectangle similarRectangle, Offset offset) {
+		calcSimilarity(expectedImage, actualImage, rectangle, similarRectangle, offset, -1);
 	}
 	
 	/**
 	 * calculate similarity of given rectangle area and offset, but similarityFeatureMatrix is given.
+	 * And then, build similarRectangle using similarity values.
 	 * @param expectedImage
 	 * @param actualImage
 	 * @param rectangle
@@ -46,14 +48,12 @@ public class SimilarityUtils {
 	 * @param offset
 	 * @param similarityFeatureMatrix in the case of "SCALING", we use similarity already calculated.
 	 * 								  in the other cases, it has -1.
-	 * @return similarity using norm calculation pixel by pixel  
 	 */
-	public static double calcSimilarity(BufferedImage expectedImage,BufferedImage actualImage, Rectangle rectangle, ComparedRectangle similarRectangle, Offset offset, double similarityFeatureMatrix) {
+	public static void calcSimilarity(BufferedImage expectedImage,BufferedImage actualImage, Rectangle rectangle, ComparedRectangle similarRectangle, Offset offset, double similarityFeatureMatrix) {
 		
 		Offset featureOffset = offset;
-		double similarityPixelByPixel;
 		SimilarityUnit similarityUnit = new SimilarityUnit();
-		similarityPixelByPixel = calcSimilarityPixelByPixel(expectedImage, actualImage, rectangle, similarityUnit, offset);
+		calcSimilarityPixelByPixel(expectedImage, actualImage, rectangle, similarityUnit, offset);
 
 		/* calculate similarity using feature matrix. */
 		int comparedRectangleWidth = (int)rectangle.getWidth(), comparedRectangleHeight = (int)rectangle.getHeight();
@@ -67,8 +67,6 @@ public class SimilarityUtils {
 		if (similarRectangle.getType() == "UNCHECKED") 
 			similarRectangle.setType("SIMILAR");	
 		similarRectangle.setSimilarityUnit(similarityUnit);
-
-		return similarityPixelByPixel;
 	}
 
 	/**
@@ -345,16 +343,15 @@ public class SimilarityUtils {
 	
 	/**
 	 * Calculate the similarity by comparing two images pixel by pixel,
-	 * and find the best match where it has the highest similarity.
+	 * and find the best match where it has the highest similarity (when given offset is null).
 	 * In this method, we count the number of different pixels as well.
 	 * @param expectedSubImage the sub-image of given rectangle area of expected image
 	 * @param actualSubImage the sub-image of given 'template' rectangle area of actual image. it is smaller than expectedSubImage. 
 	 * @param rectangle The rectangle area where to compare.
 	 * @param similarityUnit
 	 * @param offset best match offset. If default offset is given, don't find the best match.
-	 * @return the 'pixel by pixel' similarity of given area between two images.
 	 */
-	public static double calcSimilarityPixelByPixel(BufferedImage expectedImage,BufferedImage actualImage, Rectangle rectangle,	SimilarityUnit similarityUnit, Offset offset) {
+	public static void calcSimilarityPixelByPixel(BufferedImage expectedImage,BufferedImage actualImage, Rectangle rectangle,	SimilarityUnit similarityUnit, Offset offset) {
 
 		// set range to be checked
 		int minWidth  = Math.min(expectedImage.getWidth(),  actualImage.getWidth()),
@@ -484,8 +481,6 @@ public class SimilarityUtils {
 		similarityUnit.setSimilarityPixelByPixel(similarity);
 		similarityUnit.setSimilarityThresDiff(similarityThresDiff);
 		similarityUnit.setSimilarityTotalDiff(similarityTotalDiff);
-
-		return similarity;
 	}
 }
 
