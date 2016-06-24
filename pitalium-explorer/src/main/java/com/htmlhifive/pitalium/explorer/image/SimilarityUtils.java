@@ -15,16 +15,9 @@ public class SimilarityUtils {
 	 * @param FeatureRow the row size of feature matrix
 	 * @param FeatureCol the column size of feature matrix
 	 */
-	private static int FeatureRow = 5;
-	private static int FeatureCol = 5;
+	private static final int FeatureRow = 5;
+	private static final int FeatureCol = 5;
 	
-	
-	/*
-	 * Set the way to calculate norm.
-	 * if true, use the average of norm,
-	 * otherwise, use the norm of color distances.
-	 */
-	public static boolean averageNorm = true;
 
 	/**
 	 * Constructor
@@ -438,11 +431,7 @@ public class SimilarityUtils {
 						r = expectedRed[expectedWidth*(i+y)+(j+x)] - actualRed[actualWidth*i+j];
 						g = expectedGreen[expectedWidth*(i+y)+(j+x)] - actualGreen[actualWidth*i+j];
 						b = expectedBlue[expectedWidth*(i+y)+(j+x)] - actualBlue[actualWidth*i+j];
-						if (averageNorm) {
-							norm += Math.sqrt(r*r + g*g + b*b);
-						}	else {
-							norm += r*r + g*g + b*b;
-						}
+						norm += Math.sqrt(r*r + g*g + b*b);
 						if (r*r+g*g+b*b > 3*255*255*diffThreshold*diffThreshold)
 							thresDiffCount++;
 						if (r*r+g*g+b*b > 0)
@@ -475,12 +464,8 @@ public class SimilarityUtils {
 		double similarity;
 
 		// normalize and calculate average.
-		if (averageNorm) {
-			similarity = 1-min/(Math.sqrt(3)*255*actualWidth*actualHeight);
-		}	else {
-			similarity = 1-Math.sqrt(min/(actualWidth*actualHeight))/(Math.sqrt(3)*255);
-		}
-
+		similarity = 1-min/(Math.sqrt(3)*255*actualWidth*actualHeight);
+		
 		// normalize the number of different pixels.
 		similarityThresDiff = 1 - (double)thresDiffMin/(actualWidth*actualHeight);
 		similarityTotalDiff = 1 - (double)totalDiffMin/(actualWidth*actualHeight);

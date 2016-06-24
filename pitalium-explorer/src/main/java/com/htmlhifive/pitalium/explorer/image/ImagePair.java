@@ -175,12 +175,8 @@ public class ImagePair {
 
 						// calculate the similarity of entire image using pixel by pixel method
 						int actualArea = (int)(rectangle.getWidth() * rectangle.getHeight());
-						if (SimilarityUtils.averageNorm) {
-							entireDifference += (1-similarityPixelByPixel)*actualArea;
-						} else {
-							entireDifference += (1-similarityPixelByPixel)*(1-similarityPixelByPixel)*actualArea;
-						}
-
+						entireDifference += (1-similarityPixelByPixel)*actualArea;
+				
 						// insert the result rectangle into the list of ComparedRectangles
 						ComparedRectangles.add(resultRectangle);
 						continue;
@@ -197,22 +193,14 @@ public class ImagePair {
 
 			// calculate the similarity of entire image using pixel by pixel method
 			int actualArea = (int)(rectangle.getWidth() * rectangle.getHeight());
-			if (SimilarityUtils.averageNorm) {
-				entireDifference += (1-similarityPixelByPixel)*actualArea;
-			} else {
-				entireDifference += (1-similarityPixelByPixel)*(1-similarityPixelByPixel)*actualArea;
-			}
-
+			entireDifference += (1-similarityPixelByPixel)*actualArea;
+			
 			// insert the result rectangle into the list of ComparedRectangles
 			ComparedRectangles.add(resultRectangle);
 		}
 
 		// after calculating all similarities, calculate entire similarity of two images.
-		if (SimilarityUtils.averageNorm) {
-			entireSimilarity = 1-entireDifference/(width*height);
-		}	else {
-			entireSimilarity = 1-Math.sqrt(entireDifference/(width*height));
-		}
+		entireSimilarity = 1-entireDifference/(width*height);
 	}
 
 	/**
