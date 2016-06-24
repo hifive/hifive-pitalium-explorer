@@ -41,53 +41,41 @@ public class SimilarityUtils {
 	 * @return similarity using norm calculation pixel by pixel  
 	 */
 	public static double calcSimilarity(BufferedImage expectedImage,BufferedImage actualImage, Rectangle rectangle, ComparedRectangle similarRectangle, Offset offset) {
+		return calcSimilarity(expectedImage, actualImage, rectangle, similarRectangle, offset, -1);
+	}
+	
+	/**
+	 * calculate similarity of given rectangle area and offset
+	 * @param expectedImage
+	 * @param actualImage
+	 * @param rectangle
+	 * @param similarRectangle
+	 * @param offset
+	 * @param featureSimilarity in the case of "SCALING", we use similarity already calculated.
+	 * 							in the other cases, it has -1.
+	 * @return similarity using norm calculation pixel by pixel  
+	 */
+	public static double calcSimilarity(BufferedImage expectedImage,BufferedImage actualImage, Rectangle rectangle, ComparedRectangle similarRectangle, Offset offset, double similarityFeatureMatrix) {
 		
 		Offset featureOffset = offset;
-		double similarityPixelByPixel, similarityFeatureMatrix=-1;
+		double similarityPixelByPixel;
 		SimilarityUnit similarityUnit = new SimilarityUnit();
 		similarityPixelByPixel = calcSimilarityPixelByPixel(expectedImage, actualImage, rectangle, similarityUnit, offset);
-
 
 		/* calculate similarity using feature matrix. */
 		int comparedRectangleWidth = (int)rectangle.getWidth(), comparedRectangleHeight = (int)rectangle.getHeight();
 
 		// execute this only when comparedRectangleWidth >= FeatureCol && comparedRectangleHeight >= FeatureRow
-		if (SimilarityUtils.checkFeatureSize(comparedRectangleWidth, comparedRectangleHeight)) {
+		if (similarityFeatureMatrix == -1 && SimilarityUtils.checkFeatureSize(comparedRectangleWidth, comparedRectangleHeight)) {
 			similarityFeatureMatrix = calcSimilarityByFeatureMatrix(expectedImage, actualImage, rectangle, featureOffset);
 		}
 		similarityUnit.setSimilarityFeatureMatrix(similarityFeatureMatrix);
 
-		String category = categorize(similarityUnit);	
-		
-		// check strict scaling
-		/* TODO
-		if (category == "SCALING") {
-			boolean scale = ShiftUtils.checkScaling(expectedImage, actualImage, rectangle);
-		}
-		*/
-		
-		similarRectangle.setType(category);	
+		if (similarRectangle.getType() == "UNCHECKED") 
+			similarRectangle.setType("SIMILAR");	
 		similarRectangle.setSimilarityUnit(similarityUnit);
 
 		return similarityPixelByPixel;
-	}
-
-	private static String categorize(SimilarityUnit similarityUnit) {
-		
-		/* Check scaling */
-
-		double similarityThresDiff, similarityTotalDiff, similarityFeatureMatrix;
-		double scalingDiffCriterion = ComparisonParameters.getScalingDiffCriterion();
-		double scalingFeatureCriterion = ComparisonParameters.getScalingFeatureCriterion();
-				
-		similarityThresDiff = similarityUnit.getSimilarityThresDiff();
-		similarityTotalDiff = similarityUnit.getSimilarityTotalDiff();
-		similarityFeatureMatrix = similarityUnit.getSimilarityFeatureMatrix();
-		if (similarityThresDiff - similarityTotalDiff >= scalingDiffCriterion && similarityFeatureMatrix >= scalingFeatureCriterion) {
-			return "SCALING";
-		}
-
-		return "SIMILAR";
 	}
 
 	/**
@@ -126,9 +114,9 @@ public class SimilarityUtils {
 	/**
 	 * Calculate the similarity using feature matrix and find the best match where it has the highest similarity
 	 * This method should be implemented only when the size of actualSubImage is greater than or equal to FeatureCol by FeatureRow.
-	 * @param expectedSubImage the sub-image of given rectangle area of expected image
-	 * @param actualSubImage the sub-image of given 'template' rectangle area of actual image. it is smaller than expectedSubImage. 
-	 * @param rectangle The rectangle area where to compare.
+	 * @param expectedImage 
+	 * @param actualImage  
+	 * @param rectangle The rectangle area to be compared of actual image.
 	 * @return the 'feature' similarity of given area between two images.
 	 */
 	public static double calcSimilarityByFeatureMatrix(BufferedImage expectedImage, BufferedImage actualImage, Rectangle rectangle, Offset offset) {
@@ -270,6 +258,98 @@ public class SimilarityUtils {
 		return similarity;
 	}
 
+	/**
+	 * Calculate the similarity using feature matrix using fixed frames of expected and actual images.
+	 * This method should be implemented only when the size of actualSubImage is greater than or equal to FeatureCol by FeatureRow.
+	 * @param expectedImage
+	 * @param actualImage
+	 * @param expectedFrame	the rectangle area to be extracted feature vector in expectedImage
+	 * @param actualFrame	the rectangle area to be extracted feature vector in actualImage
+	 * @return the 'feature' similarity of given area between two images.
+	 */
+	public static double calcSimilarityByFeatureMatrix(BufferedImage expectedImage, BufferedImage actualImage, Rectangle expectedFrame, Rectangle actualFrame) {
+
+		int expectedWidth = (int)expectedFrame.getWidth(), expectedHeight = (int)expectedFrame.getHeight(),
+			actualWidth = (int)actualFrame.getWidth(), actualHeight = (int)actualFrame.getHeight();
+		BufferedImage expectedSubImage = ImageUtils2.getSubImage(expectedImage, expectedFrame);
+		BufferedImage actualSubImage = ImageUtils2.getSubImage(actualImage, actualFrame);
+		
+		// initialize the color array.
+		int[] expectedColors = new int[expectedWidth * expectedHeight];
+		int[] actualColors = new int[actualWidth * actualHeight];
+
+		expectedSubImage.getRGB(0, 0, expectedWidth, expectedHeight, expectedColors, 0, expectedWidth);
+		actualSubImage.getRGB(0, 0, actualWidth, actualHeight, actualColors, 0, actualWidth);
+
+		int[] expectedRed = new int[expectedColors.length];
+		int[] expectedGreen = new int[expectedColors.length];
+		int[] expectedBlue = new int[expectedColors.length];
+		int[] actualRed = new int[actualColors.length];
+		int[] actualGreen = new int[actualColors.length];
+		int[] actualBlue = new int[actualColors.length];
+
+		for (int i = 0; i < expectedColors.length; i++) {
+			Color expectedColor = new Color(expectedColors[i]);
+			expectedRed[i] = expectedColor.getRed();
+			expectedGreen[i] = expectedColor.getGreen();
+			expectedBlue[i] = expectedColor.getBlue();
+		}
+
+		for (int i = 0; i < actualColors.length; i++) {
+			Color actualColor = new Color(actualColors[i]);
+			actualRed[i] = actualColor.getRed();
+			actualGreen[i] = actualColor.getGreen();
+			actualBlue[i] = actualColor.getBlue();
+		}
+
+
+		/* Calculate the feature matrix. */
+
+		// initialize the size of grid.
+		int expectedGridWidth = expectedWidth/FeatureCol, expectedGridHeight = expectedHeight/FeatureRow,
+			expectedGridArea = expectedGridWidth * expectedGridHeight,
+			actualGridWidth = actualWidth/FeatureCol, actualGridHeight = actualHeight/FeatureRow,
+			actualGridArea = actualGridWidth * actualGridHeight;
+		int rSum, gSum, bSum; // Sum of Red, Green, and Blue.
+		
+		Color[][] expectedFeature = new Color[FeatureRow][FeatureCol];
+		Color[][] actualFeature = new Color[FeatureRow][FeatureCol];
+		for (int row=0; row<FeatureRow; row++) {
+			for (int col=0; col<FeatureCol; col++) {
+
+				// Calculate the feature value expectedFeature[row][col].
+				rSum=0;	gSum=0;	bSum=0;
+				for (int i=0; i<expectedGridHeight; i++) {
+					for (int j=0; j<expectedGridWidth; j++) {
+						rSum += expectedRed[expectedWidth*(expectedGridHeight*row + i) + (expectedGridWidth*col + j)];
+						gSum += expectedGreen[expectedWidth*(expectedGridHeight*row + i) + (expectedGridWidth*col + j)];
+						bSum += expectedBlue[expectedWidth*(expectedGridHeight*row + i) + (expectedGridWidth*col + j)];
+					}
+				}
+				expectedFeature[row][col] = new Color((int)(rSum/expectedGridArea), (int)(gSum/expectedGridArea), (int)(bSum/expectedGridArea));
+
+				// Calculate the feature value actualFeature[row][col].
+				rSum=0;	gSum=0;	bSum=0;
+				for (int i=0; i<actualGridHeight; i++) {
+					for (int j=0; j<actualGridWidth; j++) {
+						rSum += actualRed[actualWidth*(actualGridHeight*row + i) + (actualGridWidth*col + j)];
+						gSum += actualGreen[actualWidth*(actualGridHeight*row + i) + (actualGridWidth*col + j)];
+						bSum += actualBlue[actualWidth*(actualGridHeight*row + i) + (actualGridWidth*col + j)];
+					}
+				}
+
+				actualFeature[row][col] = new Color((int)(rSum/actualGridArea), (int)(gSum/actualGridArea), (int)(bSum/actualGridArea));
+			}
+		}
+
+		double similarity = 1-calcFeatureDistance(expectedFeature, actualFeature);;
+		
+		// round similarity to 2 decimal places.
+		similarity = (double)Math.round(similarity*100)/100;
+		
+		return similarity;
+	}
+	
 	/**
 	 * Calculate the similarity by comparing two images pixel by pixel,
 	 * and find the best match where it has the highest similarity.

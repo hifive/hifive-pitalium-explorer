@@ -67,7 +67,7 @@ public class ShiftUtils {
 		BufferedImage entireImage = ImageUtils2.getSubImage(expectedImage, entireFrame);
 		BufferedImage templateImage = ImageUtils2.getSubImage(actualImage, rectangle);
 		
-		double[][] integralImage = calcIntegralImage(entireImage);
+		double[][] integralImage = ImageUtils2.calcIntegralImage(entireImage);
 
 		double sumTemplate = 0;
 		Raster r = templateImage.getRaster();
@@ -152,52 +152,32 @@ public class ShiftUtils {
 
 	/**
 	 * check scaling using object detection
-	 * TODO
 	 * @param expectedImage
 	 * @param actualImage
 	 * @param rectangle
 	 * @return true if two objects are same (or similar enough) and have different size
 	 */
-	public static boolean checkScaling (BufferedImage expectedImage, BufferedImage actualImage, Rectangle rectangle) {
-		int x = (int)rectangle.getX(), y = (int)rectangle.getY();
-		int width = (int)rectangle.getWidth(), height = (int)rectangle.getHeight();
+	public static boolean checkScaling (BufferedImage expectedImage, BufferedImage actualImage, Rectangle expectedObject, Rectangle actualObject) {
 		
-		Rectangle expectedObject = new Rectangle(rectangle);
-		Rectangle actualObject = new Rectangle(rectangle);
+		// check scale factor
+		double maximumScaleFactor = ComparisonParameters.getMaximumScaleFactor();
+		double expectedWidth = expectedObject.getWidth(), expectedHeight = expectedObject.getHeight(),
+				actualWidth = actualObject.getWidth(), actualHeight = actualObject.getHeight();	
+		if (expectedWidth > actualWidth*maximumScaleFactor 	 || actualWidth > expectedWidth*maximumScaleFactor ||
+			expectedHeight > actualHeight*maximumScaleFactor || actualHeight > expectedHeight*maximumScaleFactor)
+			return false;
 		
-		System.out.printf("\n original rectangle : x:%d y:%d w:%d h:%d\n",x,y,width,height);
-		if (ImageUtils2.getObjectRectangle(expectedImage, expectedObject)) {
-			System.out.printf("- expected object detection succeed : x:%d y:%d w:%d h:%d\n",expectedObject.x,expectedObject.y,expectedObject.width,expectedObject.height);
-		} 
-		if (ImageUtils2.getObjectRectangle(actualImage, actualObject)) {
-			System.out.printf("- actual object detection succeed : x:%d y:%d w:%d h:%d\n",actualObject.x,actualObject.y,actualObject.width,actualObject.height);
-		}
-		return true;
+		// check feature matrix similarity
+		double similarity = SimilarityUtils.calcSimilarityByFeatureMatrix(expectedImage, actualImage, expectedObject, actualObject);
+		
+		if (similarity > ComparisonParameters.getScalingFeatureCriterion())
+			return true;
+		else
+			return false;
 	}
 		
 	
-	/**
-	 * calculate integral value of given image
-	 * @param source source image
-	 * @return integral value of source image
-	 */
-	private static double[][] calcIntegralImage(BufferedImage source) {
-		double[][] integralImage = new double[source.getHeight()][source.getWidth()];
-		Raster raster = source.getRaster();
-		int[] pixel = new int[raster.getNumDataElements()];	
-		double leftNum;
-		double upNum;
-		double leftUpNum;
-		for (int y = 0; y < source.getHeight(); y++) {
-			for (int x = 0; x < source.getWidth(); x++) {
-				leftNum = (x == 0) ? 0 : integralImage[y][x - 1];
-				upNum = (y == 0) ? 0 : integralImage[y - 1][x];
-				leftUpNum = (x == 0 || y == 0) ? 0 : integralImage[y - 1][x - 1];
-				integralImage[y][x] = leftNum + upNum + raster.getPixel(x, y, pixel)[0] - leftUpNum;
-			}
-		}
-		return integralImage;
-	}	
+	
 }
 
 

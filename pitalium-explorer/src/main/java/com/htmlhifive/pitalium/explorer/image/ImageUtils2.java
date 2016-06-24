@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+import java.awt.image.Raster;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -733,11 +734,38 @@ public final class ImageUtils2 {
 		}
 	}
 	
+	
 	/***********************************************************************************/
 	/** The below methods are from pitalium, but I needed to modify some part of them **/
 	/** Before sending pull request, I use them here for the fast application 		  **/
 	/**												- 2016.06.04. Yeongjin - 		  **/
 	
+	
+	/***** com.htmlhifive.pitalium.image.util.ImageUtils *****/
+	
+	/**
+	 * 元画像の積分画像を生成します。
+	 * 
+	 * @param source 元画像
+	 * @return 積分結果の配列
+	 */
+	public static double[][] calcIntegralImage(BufferedImage source) {
+		double[][] integralImage = new double[source.getHeight()][source.getWidth()];
+		Raster raster = source.getRaster();
+		int[] pixel = new int[raster.getNumDataElements()];
+		double leftNum;
+		double upNum;
+		double leftUpNum;
+		for (int y = 0; y < source.getHeight(); y++) {
+			for (int x = 0; x < source.getWidth(); x++) {
+				leftNum = (x == 0) ? 0 : integralImage[y][x - 1];
+				upNum = (y == 0) ? 0 : integralImage[y - 1][x];
+				leftUpNum = (x == 0 || y == 0) ? 0 : integralImage[y - 1][x - 1];
+				integralImage[y][x] = leftNum + upNum + raster.getPixel(x, y, pixel)[0] - leftUpNum;
+			}
+		}
+		return integralImage;
+	}	
 	
 	/***** com.htmlhifive.pitalium.image.util.ImageComparator *****/
 
