@@ -24,7 +24,7 @@ public class SimilarityUtils {
 	 * if true, use the average of norm,
 	 * otherwise, use the norm of color distances.
 	 */
-	public static boolean averageNorm = false;
+	public static boolean averageNorm = true;
 
 	/**
 	 * Constructor
@@ -45,14 +45,14 @@ public class SimilarityUtils {
 	}
 	
 	/**
-	 * calculate similarity of given rectangle area and offset
+	 * calculate similarity of given rectangle area and offset, but similarityFeatureMatrix is given.
 	 * @param expectedImage
 	 * @param actualImage
 	 * @param rectangle
 	 * @param similarRectangle
 	 * @param offset
-	 * @param featureSimilarity in the case of "SCALING", we use similarity already calculated.
-	 * 							in the other cases, it has -1.
+	 * @param similarityFeatureMatrix in the case of "SCALING", we use similarity already calculated.
+	 * 								  in the other cases, it has -1.
 	 * @return similarity using norm calculation pixel by pixel  
 	 */
 	public static double calcSimilarity(BufferedImage expectedImage,BufferedImage actualImage, Rectangle rectangle, ComparedRectangle similarRectangle, Offset offset, double similarityFeatureMatrix) {

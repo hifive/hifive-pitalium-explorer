@@ -346,6 +346,30 @@ public final class ImageUtils2 {
 		return new double[]{rate, avg};
 	}
 
+	/**
+	 * remove redundant rectangles.
+	 * Each of them may occur raster error, or has smaller length than minLength.
+	 * @param rectangles list of rectangles
+	 * @param xLimit limit of x+width of given rectangle
+	 * @param yLimit limit of y+height of given rectangle
+	 */
+	public static void removeRedundantRectangles(List<Rectangle> rectangles, int xLimit, int yLimit)
+	{
+		int minLength = 1;
+		List <Rectangle> removeList = new ArrayList<Rectangle>();
+		for (Rectangle rectangle : rectangles) {
+			reshapeRect(rectangle, xLimit, yLimit);
+			if (rectangle.getX() >= (xLimit-minLength) || rectangle.getY() >= (yLimit-minLength) 
+				|| rectangle.getWidth() < minLength || rectangle.getHeight() < minLength) {
+				removeList.add(rectangle);
+			}			
+		}
+		
+		// remove recorded rectangles
+		for (Rectangle removeRect : removeList) {
+			rectangles.remove(removeRect);
+		}	
+	}
 	
 	/**
 	 * if the given rectangle may occur raster error, reshape it
