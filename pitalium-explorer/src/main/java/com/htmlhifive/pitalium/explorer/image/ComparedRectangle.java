@@ -81,8 +81,7 @@ public class ComparedRectangle {
 	public Rectangle rectangle(){
 		return new Rectangle(this.x, this.y, this.width, this.height);
 	}
-	
-	
+		
 	public int getX(){
 		return x;
 	}

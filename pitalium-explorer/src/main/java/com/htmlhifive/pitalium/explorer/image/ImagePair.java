@@ -122,6 +122,18 @@ public class ImagePair {
 					// case 2 : the same object size but different location
 					} else {
 						offset = new Offset(x2-x1,y2-y1);
+						SimilarityUtils.calcSimilarity(expectedImage, actualImage, rectangle, resultRectangle, offset);
+						double similarityThresDiff = resultRectangle.getSimilarityUnit().getSimilarityThresDiff();
+
+						// if so similar, regard them as the same objects with shifted location
+						if (similarityThresDiff > ComparisonParameters.getShiftSimilarityThreshold()) {
+							resultRectangle.setType("SHIFT");
+							resultRectangle.setXShift(x2-x1);
+							resultRectangle.setYShift(y2-y1);
+							resultRectangle.setSimilarityUnit(null);
+						}
+						ComparedRectangles.add(resultRectangle);
+						continue;
 					}
 
 				// case 3: different size

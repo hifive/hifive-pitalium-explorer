@@ -14,6 +14,10 @@ public class ComparisonParameters {
 	// difference threshold to ignore small differences
 	private static double diffThreshold = 0.1;
 	
+	// if similarityThresDiff is bigger than this threshold, categorize the object as "SHIFT"
+	// only applied to two rectangle objects.
+	private static double shiftSimilarityThreshold = 0.98; 
+	
 	// parameters for categorization of scaling
 	private static double maximumScaleFactor = 1.2;
 	private static double scalingFeatureCriterion = 0.9;
@@ -24,7 +28,7 @@ public class ComparisonParameters {
 	
 	// maximum range for shift checking, similarity calculation
 	private static int maxShift = 10;
-	private static int maxMove = 1;		// moving range for similarity calculation
+	private static int maxMove = 5;		// moving range for similarity calculation
 	
 	/**
 	 * Constructor
@@ -48,6 +52,12 @@ public class ComparisonParameters {
 	}
 	public static double getDiffThreshold() {
 		return diffThreshold;
+	}
+	public static void setShiftSimilarityThreshold(double threshold) {
+		shiftSimilarityThreshold = threshold;
+	}
+	public static double getShiftSimilarityThreshold() {
+		return shiftSimilarityThreshold;
 	}
 	public static void setMaximumScaleFactor (double scaleFactor) {
 		maximumScaleFactor = scaleFactor;

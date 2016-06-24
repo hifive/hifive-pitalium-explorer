@@ -1,7 +1,5 @@
 package com.htmlhifive.pitalium.explorer.image;
 
-import java.awt.Rectangle;
-
 /**
  * Similarity unit class contains information of the similarity calculated from each method.
  */
@@ -29,34 +27,6 @@ public class SimilarityUnit {
 		this(0, 0, 0, 0, 0, 0);
 	}
 
-
-	/**
-	 * @param XSimilar  X-direction shift at the best match with the highest similarity
-	 * @param YSimilar  Y-direction shift at the best match with the highest similarity
-	 * @param similarityPixelByPixel the highest similarity calculated using pixel by pixel mehtod at the position of given X, Y-Similar
-	 */
-/*	public setSimilarityPixelByPixel (int XSimilar, int YSimilar, double similarityPixelByPixel) {
-		this.XSimilar = XSimilar;
-		this.YSimilar = YSimilar;
-		this.similarityPixelByPixel = similarityPixelByPixel;
-	}
-*/
-	/**
-	 * @param similarityThresDiff similarity counting difference from thresold
-	 * @param similarityTotalDiff similarity counting difference from zero
- */
-/*	public setSimilarityDiff (double similarityThresDiff, double similarityTotalDiff) {
-		this.similarityThresDiff = similarityThresDiff;
-		this.similarityTotalDiff = similarityTotalDiff;
-	}
-*/	
-	/**
-	 * @param similarityFeatureMatrix similarity calculated using feature matrix
- 	 */
-/*	public setSimilarityFeatureMatrix (double similarityFeatureMatrix) {
-		this.similarityFeatureMatrix = similarityFeatureMatirx;
-	}
-*/
 	/**
 	 * @return X-direction Similar at the best match with the highest similarity
 	 */
@@ -79,7 +49,7 @@ public class SimilarityUnit {
 
 
 	/**
-	 * @return the highest similarity calculated using pixel by pixel mehtod at the position of given X, Y-Similar
+	 * @return the highest similarity calculated using pixel by pixel method at the position of given X, Y-Similar
 	 */
 	public double getSimilarityPixelByPixel() {
 		return similarityPixelByPixel;
@@ -99,7 +69,7 @@ public class SimilarityUnit {
 	}
 	
 	/**
-	 * @return similarity counting difference from thresold
+	 * @return similarity counting difference from threshold
 	 */
 	public double getSimilarityThresDiff() {
 		return similarityThresDiff;
