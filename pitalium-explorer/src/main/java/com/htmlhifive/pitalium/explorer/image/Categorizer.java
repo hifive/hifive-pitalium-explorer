@@ -14,12 +14,12 @@ import java.lang.Math;
  * and matched at some position in expected image.
  * Then it stores ShiftRectangle which is the information of location shift of given area.
  */
-public class ShiftUtils {
+public class Categorizer {
 
 	/**
 	 * Constructor
 	 */
-	public ShiftUtils() {};
+	public Categorizer() {};
 	
 
 	public static boolean CheckSubpixel(BufferedImage expectedImage, BufferedImage actualImage, Rectangle rectangle){

@@ -120,17 +120,17 @@ public class ImagePair {
 				Offset offset = null;	// null means that when we calculate similarity, we try to find best match by moving actual sub-image
 
 				/** if this rectangle is missing, set category 'MISSING' **/
-				if (ShiftUtils.checkMissing(expectedImage, actualImage, rectangle)) {
+				if (Categorizer.checkMissing(expectedImage, actualImage, rectangle)) {
 					resultRectangle.setType("MISSING");
 					offset = new Offset(0,0);	// we fix the position of actual sub-image.
 
 					/** if this rectangle is shift, then process shift information in CheckShift method **/
-				} else if (ShiftUtils.CheckShift(expectedImage, actualImage, ComparedRectangles, rectangle)) {
+				} else if (Categorizer.CheckShift(expectedImage, actualImage, ComparedRectangles, rectangle)) {
 					// if shift, skip similarity calculation.
 					continue;
 
 					/** if this rectangle is image of subpixel rendered text, set category 'FONT' **/
-				} else if (ShiftUtils.CheckSubpixel(expectedImage, actualImage, rectangle)){
+				} else if (Categorizer.CheckSubpixel(expectedImage, actualImage, rectangle)){
 					resultRectangle.setType("FONT");
 				}
 
@@ -162,7 +162,7 @@ public class ImagePair {
 						// case 3: different size
 					} else {
 						// check if two objects are the same but have different size
-						if (ShiftUtils.checkScaling (expectedImage, actualImage, expectedObject, actualObject)){
+						if (Categorizer.checkScaling (expectedImage, actualImage, expectedObject, actualObject)){
 							resultRectangle.setType("SCALING");	
 							double	similarityFeatureMatrix = SimilarityUtils.calcSimilarityByFeatureMatrix(expectedImage, actualImage, expectedObject, actualObject);
 							similarityPixelByPixel = SimilarityUtils.calcSimilarity(expectedImage, actualImage, rectangle, resultRectangle, offset, similarityFeatureMatrix);
