@@ -34,7 +34,7 @@
 	<script>
     // Initialize a new plugin instance for all
     // e.g. $('input[type="range"]') elements.
-	    $('input[type="range"]').rangeslider();
+	   
 	
 	    // Update all rangeslider instances for all
 	    // e.g. $('input[type="range"]') elements.
@@ -51,7 +51,7 @@
 		<nav class="navbar navbar-fixed-top"  style="background-color:#00BCD4;">
 			<div class="container-fluid">
 				<div class="navbar-header" style="width:100%;">
-					<a class="navbar-brand" href="list.html">Pitalium explorer</a>
+					<a class="navbar-brand" href="new_list.html">Pitalium explorer</a>
 					
 		        	
 		        	<div style="width:280px; height:50px; float:left;">
@@ -60,12 +60,12 @@
 					    Show differences by category
 					    <span class="caret"></span>
 					  </button>
-					  <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-					    <li><a><input type="checkbox" class="choice" id="checkbox_SHIFT" checked="checked" data-rectype="SHIFT"><span style="margin-left:10px;">Shift</span></a></li>
-					    <li><a><input type="checkbox" class="choice" id="checkbox_MISSING" checked="checked" data-rectype="MISSING"><span style="margin-left:10px;">Missing</span></a></li>
-					    <li><a><input type="checkbox" class="choice" id="checkbox_SCALING" checked="checked" data-rectype="SCALING"><span style="margin-left:10px;">Object size</span></a></li>
-					    <li><a><input type="checkbox" class="choice" id="checkbox_FONT" checked="checked" data-rectype="FONT"><span style="margin-left:10px;">Font style</span></a></li>
-					    <li><a><input type="checkbox" class="choice" id="checkbox_SIMILAR" checked="checked" data-rectype="SIMILAR"><span style="margin-left:10px;">Ambiguous</span></a></li>
+					  <ul class="dropdown-menu " aria-labelledby="dropdownMenu1">
+					    <li><a class="click_prevent"><input type="checkbox" class="choice" id="checkbox_SHIFT" checked="checked" data-rectype="SHIFT"><span style="margin-left:10px;">Shift</span></a></li>
+					    <li><a class="click_prevent"><input type="checkbox" class="choice" id="checkbox_MISSING" checked="checked" data-rectype="MISSING"><span style="margin-left:10px;">Missing</span></a></li>
+					    <li><a class="click_prevent"><input type="checkbox" class="choice" id="checkbox_SCALING" checked="checked" data-rectype="SCALING"><span style="margin-left:10px;">Object size</span></a></li>
+					    <li><a class="click_prevent"><input type="checkbox" class="choice" id="checkbox_FONT" checked="checked" data-rectype="FONT"><span style="margin-left:10px;">Font style</span></a></li>
+					    <li><a class="click_prevent"><input type="checkbox" class="choice" id="checkbox_SIMILAR" checked="checked" data-rectype="SIMILAR"><span style="margin-left:10px;">Ambiguous</span></a></li>
 
 					  </ul>
 					
@@ -250,9 +250,20 @@
 			var directory = queryParams["directory"];
 			var offsetx = 0 - parseInt(queryParams["offsetx"]);
 			var offsety = 0 - parseInt(queryParams["offsety"]);
+			
+			if (queryParams["offset_expected"].toLowerCase() == "true"){
+				var offset_expected = true;
+			}else{
+				var offset_expected = false;
+			}
+			
 			var minsimilarity = parseFloat(queryParams["minsimilarity"]);
 			
-			$("#importance").data("min", minsimilarity);
+			$("#importance").attr("min", minsimilarity);
+			 $('input[type="range"]').rangeslider();
+			 
+			//$("#importance").rangeslider('update', true);
+			//$('input[type="range"]').rangeslider('update', true);
 			
 			$("#diffDetail").modal("show");
 			$("#test_result").height("300");
@@ -276,7 +287,9 @@
 				success: function(data){
 					
 					var img = new Image();
+					
 					var offset_str = String(offsetx) + "px " + String(offsety) + "px";
+					
 					//alert(offset_str);
 					img.onload = function() {
 						$("#test_result").height(this.height);
@@ -284,7 +297,10 @@
 						$("#test_result").data("width", this.width);
 						$("#test_result").data("height", this.height);
 						$("#test_result").css("background-image", "url('" + this.src + "')");
-						$("#test_result").css("background-position", offset_str);
+						
+						if (!offset_expected){
+							$("#test_result").css("background-position", offset_str);
+						}
 					}
 					
 					img.src = "data:image/png;base64," + data["targetImage"];
@@ -296,6 +312,10 @@
 						$("#test_expected").data("width", this.width);
 						$("#test_expected").data("height", this.height);
 						$("#test_expected").css("background-image", "url('" + this.src + "')");
+						
+						if (offset_expected){
+							$("#test_expected").css("background-position", offset_str);
+						}
 						
 					}
 					expected.src = "data:image/png;base64," + data["expectedImage"];
@@ -347,7 +367,7 @@
 									xshift: rec["xshift"],
 									yshift: rec["yshift"],
 									featureMatrix: "",
-									pixelByPixel: "",
+									pixelByPixel: "1",
 									thresDiff: "",
 									totalDiff: "",
 									index: i
@@ -410,14 +430,16 @@
 				
 				var thisDiv = $(this);
 				
+					if ($("#checkbox_" + thisDiv.data("rectype")).is(":checked")){
+						if (thisDiv.data("pixelbypixel") > value){
+								thisDiv.hide();
+						}else{
+								thisDiv.show();
+						}
+					}
 				
-				if (thisDiv.data("pixelbypixel") > value){
-					
-					thisDiv.hide();
-					
-				}else{
-					thisDiv.show();
-				}
+				
+				
 				
 				
 			});
@@ -460,23 +482,26 @@
 		$(document).on("change", ".choice", function(){
 			var rectype = $(this).data("rectype");
 			
-			$(".diff_" + rectype).toggle();
+			
+			
+			$(".diff_" + rectype).each(function(){
+				
+				if (parseFloat($(this).data("pixelbypixel")) <= parseFloat($("#importance").val())) {
+					$(this).toggle();
+				}
+				
+			});
+				
+			
 		});
 		
-		$('input[type=radio][name=method_opacity]').change(function(){
+		$('.click_prevent').click(function(event){
 			
-			var method = this.value;
-			
-			if (method == 'none'){
-				$(".diffDiv").css("opacity", $("#opacity_range").val());
-			}else{
-				$(".diffDiv").each(function(){
-					$(this).css("opacity", (1 - $(this).data(method)));
-				});
-				
-			}
+			event.stopPropagation();
 			
 		});
+		
+	
 		</script>
 		
 		

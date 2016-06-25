@@ -59,20 +59,7 @@
 			<div class="container-fluid">
 				<div class="navbar-header" style="width:100%;">
 					<a class="navbar-brand" href="list.html">Pitalium explorer</a>
-					<!-- 
-					<form id="searchTest" class="form-inline">
 					
-					
-						<label for="searchTestMethod">Test Method</label>
-						<input type="text" id="searchTestMethod" name="searchTestMethod" class="form-control" placeholder="Test method to search">
-					
-					
-						<label for="searchTestScreen">Test Screen</label>
-						<input type="text" id="searchTestScreen" name="searchTestScreen" class="form-control" placeholder="Test screen to search">
-					
-					<button type="submit" class="btn btn-default">Search</button>
-				</form>
-				 -->
 				</div>
 			</div>
 		</nav>
@@ -81,7 +68,7 @@
 		<div class="container col-md-8 col-md-offset-2 margin-top" id="container">
 			<div class="title_div">
 				<h4 style="color: #039BE5;">Test results</h4>
-				<a href="/pitalium-explorer/list.html"><p style="float:right; margin-top: -25px; color:#9E9E9E;"> <i class="glyphicon glyphicon-share-alt"></i> One-to-one comparison explorer</p></a>
+				<a href="/pitalium-explorer/new_list.html"><p style="float:right; margin-top: -25px; color:#9E9E9E;"> <i class="glyphicon glyphicon-share-alt"></i> One-to-one comparison explorer</p></a>
 			</div>
 	
 
@@ -528,7 +515,7 @@
 						Similarity
 					</th>
 					<th>
-						Diff points
+						Diff areas
 					</th>
 					<th>
 						Detail
@@ -542,7 +529,7 @@
 						<td>[%=Math.round(resultList[i]["entireSimilarity"]*100)/100%]</td>
 						<td>[%=resultList[i]["numberOfDiffRec"]%]</td>
 						
-						<td><a target="_blank" href="new_diff.html?list_id=[%=id%]&result_id=[%=resultList[i]['id']%]&directory=[%=directory%]&expected=[%=expected%]&target=[%=resultList[i]['targetFilename']%]&offsetx=[%=resultList[i]['offsetX']%]&offsety=[%=resultList[i]['offsetY']%]&minsimilarity=[%=resultList[i]['minSimilarity']%]" class="btn btn-danger btn-detail" data-result_list_id="[%=id%]" data-target_result_id="[%=resultList[i]["id"]%]" data-expected="[%=expected%]" data-target="[%=resultList[i]["targetFilename"]%]" data-directory="[%=directory%]" >Detail</a></td>
+						<td><a target="_blank" href="new_diff.html?list_id=[%=id%]&result_id=[%=resultList[i]['id']%]&directory=[%=directory%]&expected=[%=expected%]&target=[%=resultList[i]['targetFilename']%]&offsetx=[%=resultList[i]['offsetX']%]&offsety=[%=resultList[i]['offsetY']%]&offset_expected=[%=resultList[i]['moveExpected']%]&minsimilarity=[%=resultList[i]['minSimilarity']%]" class="btn btn-danger btn-detail" data-result_list_id="[%=id%]" data-target_result_id="[%=resultList[i]["id"]%]" data-expected="[%=expected%]" data-target="[%=resultList[i]["targetFilename"]%]" data-directory="[%=directory%]" >Detail</a></td>
 					<tr>
 				[%}%]
 				
