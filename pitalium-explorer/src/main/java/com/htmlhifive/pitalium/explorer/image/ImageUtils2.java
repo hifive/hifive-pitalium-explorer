@@ -5,16 +5,11 @@ import java.awt.Color;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
+import java.awt.image.Raster;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-
-import javax.imageio.ImageIO;
 
 import com.htmlhifive.pitalium.common.exception.TestRuntimeException;
 import com.htmlhifive.pitalium.image.model.DiffPoints;
@@ -121,6 +116,152 @@ public final class ImageUtils2 {
 		return max_color;
 	}
 
+
+	/**
+	 * find object rectangle in given rectangle area
+	 * if find, replace given rectangle object with object rectangle
+	 * @param image	
+	 * @param rectangle
+	 * @return true if finding object rectangle succeeds
+	 */
+	public static boolean getObjectRectangle (BufferedImage image, Rectangle rectangle) {
+		
+		int maxMargin = ComparisonParameters.getDefaultGroupDistance();
+		int x = (int)rectangle.getX(), y = (int)rectangle.getY(),
+			w = (int)rectangle.getWidth(), h = (int)rectangle.getHeight();
+		BufferedImage subImage = image.getSubimage(x, y, w, h);
+		
+		// if rectangle is not big enough, do not find object rectangle
+		// use 3*maxMargin here, in order to assume that object is bigger than margin by margin
+		int width = w-2, height = h-2;	//	width and height of edge map
+		if (width<=3*maxMargin || height<=3*maxMargin) {
+			return false;
+		}
+		
+		// initialize edge map using 8-directional independent edge detection
+		boolean[][] edgeMap = new boolean[height][width];
+		for (int i=0; i<maxMargin; i++) {
+			// on the corner areas using diagonal filter.
+			for (int j=0; j<maxMargin; j++) {
+				// set true if different
+				edgeMap[i][j] = subImage.getRGB(j+1,i+1) != subImage.getRGB(j,i);												// NW corner
+				edgeMap[i][width-1-j] = subImage.getRGB(width-j,i+1) != subImage.getRGB(width-j+1,i);							// NE corner
+				edgeMap[height-1-i][j] = subImage.getRGB(j+1,height-i) != subImage.getRGB(j,height-i+1);						// SW corner
+				edgeMap[height-1-i][width-1-j] = subImage.getRGB(width-j,height-i) != subImage.getRGB(width-j+1,height-i+1);	// SE corner
+			}
+			
+			// on the top and bottom bridge areas using vertical filter.
+			for (int j=maxMargin; j<width-maxMargin; j++) {
+				edgeMap[i][j] = subImage.getRGB(j+1,i+1) != subImage.getRGB(j+1,i);							// top bridge area
+				edgeMap[height-1-i][j] = subImage.getRGB(j+1,height-i) != subImage.getRGB(j+1,height-i+1);	// bottom bridge area
+			}
+			
+			// on the left and right bridge areas using horizontal filter.
+			for (int j=maxMargin; j<height-maxMargin; j++) {
+				edgeMap[j][i] = subImage.getRGB(i+1,j+1) != subImage.getRGB(i,j+1);	// left bridge area
+				edgeMap[j][width-1-i] = subImage.getRGB(width-i,j+1) != subImage.getRGB(width-i+1,j+1);	// right bridge area
+			}
+		}
+		
+		// shrink edgeMap down to (2*maxMargin+1) by (2*maxMargin+1) by using these bridges.
+		int shrinkLength = 2*maxMargin+1;
+		boolean[][] shrinkMap = new boolean[shrinkLength][shrinkLength],
+					verticalMap = new boolean[shrinkLength][shrinkLength],	// to check vertical direction
+					horizontalMap = new boolean[shrinkLength][shrinkLength];	// to check horizontal direction
+
+		// initialize shrink map
+		for (int i=0; i<maxMargin; i++) {
+			for (int j=0; j<maxMargin; j++) {
+				shrinkMap[i][j] = edgeMap[i][j];
+				shrinkMap[i][shrinkLength-1-j] = edgeMap[i][width-1-j];
+				shrinkMap[shrinkLength-1-i][j] = edgeMap[height-1-i][j];
+				shrinkMap[shrinkLength-1-i][shrinkLength-1-j] = edgeMap[height-1-i][width-1-j];
+			}
+		}
+		shrinkMap[maxMargin][maxMargin]=false; // center value never used.
+		
+		// check if bridge exists
+		for (int i=0; i<maxMargin; i++) {
+			int leftIdx = maxMargin, rightIdx = maxMargin, topIdx = maxMargin, bottomIdx = maxMargin;
+			
+			// check left & right bridges
+			while(leftIdx<height-maxMargin && edgeMap[leftIdx][i]) { leftIdx++; }
+			shrinkMap[maxMargin][i] = (leftIdx == height-maxMargin);
+			while(rightIdx<height-maxMargin && edgeMap[rightIdx][width-1-i]) { rightIdx++; }
+			shrinkMap[maxMargin][shrinkLength-1-i] = (rightIdx == height-maxMargin);
+					
+			// check top & bottom bridges
+			while(topIdx<width-maxMargin && edgeMap[i][topIdx]) { topIdx++; }
+			shrinkMap[i][maxMargin] = (topIdx == width-maxMargin);
+			while(bottomIdx<width-maxMargin && edgeMap[height-1-i][bottomIdx]) { bottomIdx++; }
+			shrinkMap[shrinkLength-1-i][maxMargin] = (bottomIdx == width-maxMargin);	
+		}
+				
+		// initialize expansion map
+		for (int i=0; i<shrinkLength; i++) {
+			for (int j=0; j<shrinkLength; j++) {
+				verticalMap[i][j] = shrinkMap[i][j];
+				horizontalMap[i][j] = shrinkMap[i][j];
+			}
+		}
+		
+		// expand continuous points from bridge
+		for (int i=0; i<maxMargin; i++) {
+			for (int j=1; j<=maxMargin; j++){
+				// expand left
+				verticalMap[maxMargin-j][i] &= verticalMap[maxMargin-j+1][i];
+				verticalMap[maxMargin+j][i] &= verticalMap[maxMargin+j-1][i];
+				// expand right
+				verticalMap[maxMargin-j][shrinkLength-1-i] &= verticalMap[maxMargin-j+1][shrinkLength-1-i];
+				verticalMap[maxMargin+j][shrinkLength-1-i] &= verticalMap[maxMargin+j-1][shrinkLength-1-i];
+				// expand top
+				horizontalMap[i][maxMargin-j] &= horizontalMap[i][maxMargin-j+1];
+				horizontalMap[i][maxMargin+j] &= horizontalMap[i][maxMargin+j-1];
+				// expand bottom
+				horizontalMap[shrinkLength-1-i][maxMargin-j] &= horizontalMap[shrinkLength-1-i][maxMargin-j+1];
+				horizontalMap[shrinkLength-1-i][maxMargin+j] &= horizontalMap[shrinkLength-1-i][maxMargin+j-1];
+			}
+		}
+		
+		// find points continuous to bridge along both vertical and horizontal directions
+		for (int i=0; i<shrinkLength; i++) {
+			for (int j=0; j<shrinkLength; j++) {
+				shrinkMap[i][j] = verticalMap[i][j] & horizontalMap[i][j];				
+			}
+		}
+		
+		// find any rectangle 
+		int top, bottom, left, right; // how may pixels apart from top, bottom, left, right
+		for (top=0; top<maxMargin; top++) {
+			if (!shrinkMap[top][maxMargin])
+				continue;
+			for (left=0; left<maxMargin; left++) {
+				if (!shrinkMap[top][left])
+					continue;
+				for (bottom=0; bottom<maxMargin; bottom++) {
+					if(!shrinkMap[shrinkLength-1-bottom][left])
+						continue;
+					for (right=0; right<maxMargin; right++) {
+						if (shrinkMap[top][shrinkLength-1-right] && shrinkMap[shrinkLength-1-bottom][shrinkLength-1-right]) {
+							width -= left + right;
+							height -= top + bottom;
+							x += left;
+							y += top;
+							
+							// replace the given rectangle with object rectangle 
+							rectangle.setBounds(x, y, width, height);
+							return true;
+						}
+
+					}
+				}
+			}
+		}
+				
+		return false;
+	}
+	
+		
 	/**
 	 * L2 norm between two RGB pixel values
 	 * @param pixel1
@@ -205,6 +346,30 @@ public final class ImageUtils2 {
 		return new double[]{rate, avg};
 	}
 
+	/**
+	 * remove redundant rectangles.
+	 * Each of them may occur raster error, or has smaller length than minLength.
+	 * @param rectangles list of rectangles
+	 * @param xLimit limit of x+width of given rectangle
+	 * @param yLimit limit of y+height of given rectangle
+	 */
+	public static void removeRedundantRectangles(List<Rectangle> rectangles, int xLimit, int yLimit)
+	{
+		int minLength = 1;
+		List <Rectangle> removeList = new ArrayList<Rectangle>();
+		for (Rectangle rectangle : rectangles) {
+			reshapeRect(rectangle, xLimit, yLimit);
+			if (rectangle.getX() >= (xLimit-minLength) || rectangle.getY() >= (yLimit-minLength) 
+				|| rectangle.getWidth() < minLength || rectangle.getHeight() < minLength) {
+				removeList.add(rectangle);
+			}			
+		}
+		
+		// remove recorded rectangles
+		for (Rectangle removeRect : removeList) {
+			rectangles.remove(removeRect);
+		}	
+	}
 	
 	/**
 	 * if the given rectangle may occur raster error, reshape it
@@ -351,7 +516,7 @@ public final class ImageUtils2 {
 	 */
 	public static Offset findDominantOffset(BufferedImage expectedImage, BufferedImage actualImage, double diffThreshold) {
 		
-		// we don't need to check all elements, only check once at every STEP-st elements 
+		// we don't need to check all elements, only check one element in every STEP*STEP elements 
 		int STEP = 5;
 		
 		// we need to restrict the maximum offset to avoid redundant checking
@@ -593,11 +758,38 @@ public final class ImageUtils2 {
 		}
 	}
 	
+	
 	/***********************************************************************************/
 	/** The below methods are from pitalium, but I needed to modify some part of them **/
 	/** Before sending pull request, I use them here for the fast application 		  **/
 	/**												- 2016.06.04. Yeongjin - 		  **/
 	
+	
+	/***** com.htmlhifive.pitalium.image.util.ImageUtils *****/
+	
+	/**
+	 * 元画像の積分画像を生成します。
+	 * 
+	 * @param source 元画像
+	 * @return 積分結果の配列
+	 */
+	public static double[][] calcIntegralImage(BufferedImage source) {
+		double[][] integralImage = new double[source.getHeight()][source.getWidth()];
+		Raster raster = source.getRaster();
+		int[] pixel = new int[raster.getNumDataElements()];
+		double leftNum;
+		double upNum;
+		double leftUpNum;
+		for (int y = 0; y < source.getHeight(); y++) {
+			for (int x = 0; x < source.getWidth(); x++) {
+				leftNum = (x == 0) ? 0 : integralImage[y][x - 1];
+				upNum = (y == 0) ? 0 : integralImage[y - 1][x];
+				leftUpNum = (x == 0 || y == 0) ? 0 : integralImage[y - 1][x - 1];
+				integralImage[y][x] = leftNum + upNum + raster.getPixel(x, y, pixel)[0] - leftUpNum;
+			}
+		}
+		return integralImage;
+	}	
 	
 	/***** com.htmlhifive.pitalium.image.util.ImageComparator *****/
 

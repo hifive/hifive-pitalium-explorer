@@ -14,10 +14,10 @@ public class ImagePair {
 	BufferedImage expectedImage;
 	BufferedImage actualImage;
 	private int width, height;	// the size of intersection of two images
-	
+
 	int sizeRelationType;
 	Offset offset;				// Dominant offset between two images
-		
+
 	private List<ComparedRectangle> ComparedRectangles;
 	private double entireSimilarity, minSimilarity;
 
@@ -27,29 +27,18 @@ public class ImagePair {
 	private static final int OVERMERGED_HEIGHT = 300;
 	private static final int SPLIT_ITERATION = 10;
 
-	// temporal variable to estimate total running time
-	long totalTime;
-	boolean printRunningTime = true;
 
 	/**
 	 * Constructor
+	 * implement all comparison steps, so that we can use ComparedRectangles as results after constructor.
 	 */
 	public ImagePair(BufferedImage expectedImage, BufferedImage actualImage) {
 
 		double diffThreshold = ComparisonParameters.getDiffThreshold();
-		long startTime, endTime;
-		totalTime = 0;
-
+		
 		// Find dominant offset
-		startTime = System.currentTimeMillis();
 		sizeRelationType = ImageUtils2.getSizeRelationType (expectedImage.getWidth(), expectedImage.getHeight(), actualImage.getWidth(), actualImage.getHeight());
 		offset = ImageUtils2.findDominantOffset(expectedImage, actualImage, diffThreshold);
-		endTime = System.currentTimeMillis();
-		if (printRunningTime) {
-			System.out.printf("Dominant offset : x:%d y:%d\n", offset.getX(), offset.getY());
-			System.out.printf("OFFSET:%d ",endTime-startTime);
-			totalTime = totalTime + endTime-startTime;
-		}
 		
 		// assign (sub) image with same size
 		this.expectedImage = ImageUtils2.getDominantImage (expectedImage, actualImage, offset);
@@ -58,6 +47,7 @@ public class ImagePair {
 		width = Math.min(expectedImage.getWidth(), actualImage.getWidth());
 		height = Math.min(expectedImage.getHeight(), actualImage.getHeight());
 		entireSimilarity = 0;
+		minSimilarity = 1;	// assign dummy value to initialize
 		compareImagePair();
 	}
 
@@ -72,137 +62,119 @@ public class ImagePair {
 
 		// Do not use sizeDiffPoints and consider only intersection area 
 		Rectangle entireFrame = new Rectangle (width, height);
-		
-		// To check running time
-		long startTime, endTime, totalTime = 0;
 
 		// build different areas
-		startTime = System.currentTimeMillis();
 		List<Rectangle> rectangles  = buildDiffAreas(entireFrame, group_distance);
-		endTime = System.currentTimeMillis();
-		if (printRunningTime) {
-			System.out.printf("DIFF AREA:%d ",endTime-startTime);
-			totalTime = totalTime + endTime-startTime;
-		}
-		
+	
 		// split over-merged rectangles into smaller ones if possible
-		startTime = System.currentTimeMillis();
 		SplitRectangles (rectangles, SPLIT_ITERATION, group_distance);
 		ImageUtils2.removeOverlappingRectangles(rectangles);
-		endTime = System.currentTimeMillis();
-		if (printRunningTime) {
-			System.out.printf("SPLIT:%d ",endTime-startTime);
-			totalTime = totalTime + endTime-startTime;
-		}
+		ImageUtils2.removeRedundantRectangles(rectangles,width,height);
 		
-		// compare two images using given rectangle areas
-		startTime = System.currentTimeMillis();
-		
-		double similarityPixelByPixel, entireDifference = 0;
-		minSimilarity = 1;
-		
+		// compare two images using given rectangle areas and calculate all similarities
+		compareAllRectangles(rectangles);
+		calcEntireSimilarity();
+	}
+
+	private void compareAllRectangles(List<Rectangle> rectangles) {
+
 		for (Rectangle rectangle : rectangles)
 		{
-			// if the rectangle is still useful after reshaping, check shift.
-			ImageUtils2.reshapeRect(rectangle, width, height);
-			if (checkRect(rectangle)) {
+			// initialize result rectangle
+			ComparedRectangle resultRectangle = new ComparedRectangle(rectangle);
+			Offset offset = null;	// null means that when we calculate similarity, we try to find best match by moving actual sub-image
 
-				if (ShiftUtils.checkMissing(expectedImage, actualImage, rectangle)) {
-					
-					// initialize compared rectangle
-					ComparedRectangle newMissing = new ComparedRectangle(rectangle);
-		
-					// implement all similarity calculations and categorization, and then build ComparedRectangle 
-					similarityPixelByPixel = SimilarityUtils.calcSimilarity(expectedImage, actualImage, rectangle, newMissing);
-					if (minSimilarity > similarityPixelByPixel) {
-						minSimilarity = similarityPixelByPixel;
-					}
-					
-					// calculate the similarity of entire image using pixel by pixel method
-					int actualArea = (int)(rectangle.getWidth() * rectangle.getHeight());
-
-					if (SimilarityUtils.averageNorm) {
-						entireDifference += (1-similarityPixelByPixel)*actualArea;
-					} else {
-						entireDifference += (1-similarityPixelByPixel)*(1-similarityPixelByPixel)*actualArea;
-					}
-					
-					// set type		
-					newMissing.setType("MISSING");
-					
-					// insert the similar rectangle into the list of ComparedRectangles
-					ComparedRectangles.add(newMissing);
+			/** if this rectangle is missing, set category 'MISSING' **/
+			if (Categorizer.checkMissing(expectedImage, actualImage, rectangle)) {
+				resultRectangle.setType("MISSING");
+				offset = new Offset(0,0);	// we fix the position of actual sub-image.
 
 				/** if this rectangle is shift, then process shift information in CheckShift method **/
-				} else if (ShiftUtils.CheckShift(expectedImage, actualImage, ComparedRectangles, rectangle)) {
-					continue;
-								
-				/** if this rectangle is image of subpixel rendered text **/
-				} else if (ShiftUtils.CheckSubpixel(expectedImage, actualImage, rectangle)){
-					ComparedRectangle newText = new ComparedRectangle(rectangle);
+			} else if (Categorizer.CheckShift(expectedImage, actualImage, ComparedRectangles, rectangle)) {
+				// if shift, skip similarity calculation.
+				continue;
 
-					// implement all similarity calculations and categorization, and then build ComparedRectangle 
-					similarityPixelByPixel = SimilarityUtils.calcSimilarity(expectedImage, actualImage, rectangle, newText);
-					if (minSimilarity > similarityPixelByPixel) {
-						minSimilarity = similarityPixelByPixel;
-					}
-					
-					// calculate the similarity of entire image using pixel by pixel method
-					int actualArea = (int)(rectangle.getWidth() * rectangle.getHeight());
-
-					if (SimilarityUtils.averageNorm) {
-						entireDifference += (1-similarityPixelByPixel)*actualArea;
-					} else {
-						entireDifference += (1-similarityPixelByPixel)*(1-similarityPixelByPixel)*actualArea;
-					}
-
-					newText.setType("FONT");
-
-					ComparedRectangles.add(newText);
-
-				/** else calculate similarity **/
-				} else {
-
-					// construct new similar rectangle
-					ComparedRectangle newSimilar = new ComparedRectangle(rectangle);
-		
-					// implement all similarity calculations and categorization, and then build ComparedRectangle 
-					similarityPixelByPixel = SimilarityUtils.calcSimilarity(expectedImage, actualImage, rectangle, newSimilar);
-					if (minSimilarity > similarityPixelByPixel) {
-						minSimilarity = similarityPixelByPixel;
-					}
-					
-					// calculate the similarity of entire image using pixel by pixel method
-					int actualArea = (int)(rectangle.getWidth() * rectangle.getHeight());
-
-					if (SimilarityUtils.averageNorm) {
-						entireDifference += (1-similarityPixelByPixel)*actualArea;
-					} else {
-						entireDifference += (1-similarityPixelByPixel)*(1-similarityPixelByPixel)*actualArea;
-					}
-
-					// insert the similar rectangle into the list of ComparedRectangles
-					ComparedRectangles.add(newSimilar);
-				}
-			} else {
-				System.out.printf("Dissapeared rectangle - x:%d y:%d w:%d h:%d\n", (int)rectangle.getX(), (int)rectangle.getY(), (int)rectangle.getWidth(), (int)rectangle.getHeight());
+				/** if this rectangle is image of sub-pixel rendered text, set category 'FONT' **/
+			} else if (Categorizer.CheckSubpixel(expectedImage, actualImage, rectangle)){
+				resultRectangle.setType("FONT");
 			}
-				
+
+			/** calculate similarity **/
+
+			// try object detection for better performance
+			Rectangle expectedObject = new Rectangle(rectangle);
+			Rectangle actualObject = new Rectangle(rectangle);
+
+			// if object detection succeed for both images.
+			if (ImageUtils2.getObjectRectangle(expectedImage, expectedObject) 
+					&& ImageUtils2.getObjectRectangle(actualImage, actualObject)) {
+
+				int x1 = (int)expectedObject.getX(), y1 = (int)expectedObject.getY(),
+						w1 = (int)expectedObject.getWidth(), h1 = (int)expectedObject.getHeight(),
+						x2 = (int)actualObject.getX(), y2 = (int)actualObject.getY(),
+						w2 = (int)actualObject.getWidth(), h2 = (int)actualObject.getHeight();
+
+				if (w1 == w2 && h1 == h2) {
+					// case 1 : the same object size and the same location
+					if (x1 == x2 && y1 == y2) {
+						offset = new Offset(0,0);								
+
+					// case 2 : the same object size but different location
+					} else {
+						offset = new Offset(x2-x1,y2-y1);
+						SimilarityUtils.calcSimilarity(expectedImage, actualImage, rectangle, resultRectangle, offset);
+						double similarityThresDiff = resultRectangle.getSimilarityUnit().getSimilarityThresDiff();
+
+						// if so similar, regard them as the same objects with shifted location
+						if (similarityThresDiff > ComparisonParameters.getShiftSimilarityThreshold()) {
+							resultRectangle.setType("SHIFT");
+							resultRectangle.setXShift(x2-x1);
+							resultRectangle.setYShift(y2-y1);
+							resultRectangle.setSimilarityUnit(null);
+						}
+						ComparedRectangles.add(resultRectangle);
+						continue;
+					}
+
+				// case 3: different size
+				} else {
+					// check if two objects are the same but have different size
+					if (Categorizer.checkScaling (expectedImage, actualImage, expectedObject, actualObject)){
+						resultRectangle.setType("SCALING");	
+						double	similarityFeatureMatrix = SimilarityUtils.calcSimilarityByFeatureMatrix(expectedImage, actualImage, expectedObject, actualObject);
+						SimilarityUtils.calcSimilarity(expectedImage, actualImage, rectangle, resultRectangle, offset, similarityFeatureMatrix);
+
+						// insert the result rectangle into the list of ComparedRectangles
+						ComparedRectangles.add(resultRectangle);
+						continue;
+					}
+				}					
+			}
+
+			// implement all similarity calculations and categorization, and then build ComparedRectangle 
+			SimilarityUtils.calcSimilarity(expectedImage, actualImage, rectangle, resultRectangle, offset);
+
+			// insert the result rectangle into the list of ComparedRectangles
+			ComparedRectangles.add(resultRectangle);
 		}
-		
-		if (SimilarityUtils.averageNorm) {
-			entireSimilarity = 1-entireDifference/(width*height);
-		}	else {
-			entireSimilarity = 1-Math.sqrt(entireDifference/(width*height));
+	}
+
+	/**
+	 * calculate entireSimilarity between two images and find minimum similarity
+	 */
+	private void calcEntireSimilarity() {
+		double entireDifference = 0;
+		for (ComparedRectangle resultRectangle : ComparedRectangles) {
+			if (resultRectangle.getType() != "SHIFT" && resultRectangle.getType() != "UNCHECKED") {
+				double similarityPixelByPixel = resultRectangle.getSimilarityUnit().getSimilarityPixelByPixel();
+				if (minSimilarity > similarityPixelByPixel) {
+					minSimilarity = similarityPixelByPixel;
+				}	
+				int rectangleArea = (int)(resultRectangle.getWidth() * resultRectangle.getHeight());
+				entireDifference += (1-similarityPixelByPixel)*rectangleArea;
+			}
 		}
-		
-		endTime = System.currentTimeMillis();
-		if (printRunningTime) {
-			System.out.printf("CMP:%d ",endTime-startTime);
-			totalTime = totalTime + endTime-startTime;
-			System.out.printf("TOTAL:%d\n",totalTime);
-			System.out.printf("minimum similarity :%.2f\n",minSimilarity);
-		}
+		entireSimilarity = 1-entireDifference/(width*height);
 	}
 	
 	/**
@@ -212,7 +184,21 @@ public class ImagePair {
 	 * @return list of rectangles representing different area
 	 */
 	private List<Rectangle> buildDiffAreas (Rectangle frame, int group_distance) {
-		List<ObjectGroup> objectGroups = buildObjectGroups(frame, group_distance);
+		List<ObjectGroup> objectGroups = buildObjectGroups(frame, group_distance, null);
+		List<Rectangle> rectangles = ImageUtils2.convertObjectGroupsToAreas(objectGroups);
+
+		return rectangles;
+	}
+
+	/**
+	 * build different rectangles in the given frame area
+	 * @param frame boundary area to build rectangles
+	 * @param group_distance distance for grouping
+	 * @Param offset offset from expected frame to actual frame
+	 * @return list of rectangles representing different area
+	 */
+	private List<Rectangle> buildDiffAreas (Rectangle frame, int group_distance, Offset offset) {
+		List<ObjectGroup> objectGroups = buildObjectGroups(frame, group_distance,  offset);
 		List<Rectangle> rectangles = ImageUtils2.convertObjectGroupsToAreas(objectGroups);
 
 		return rectangles;
@@ -225,7 +211,7 @@ public class ImagePair {
 	 * @param group_distance distance for grouping
 	 * @return list of object groups representing different area
 	 */
-	private List<ObjectGroup> buildObjectGroups (Rectangle frame, int group_distance) {
+	private List<ObjectGroup> buildObjectGroups (Rectangle frame, int group_distance, Offset offset) {
 
 		// threshold for difference of color
 		// if you want to compare STRICTLY, you should set this value as 0.
@@ -234,7 +220,12 @@ public class ImagePair {
 		// base case for recursive building
 		int base_bound = 50;
 		if (frame.getWidth() < base_bound || frame.getHeight() < base_bound) {
-			DiffPoints DP = ImageUtils2.compare(expectedImage, frame, actualImage, frame, diffThreshold);
+			Rectangle actualFrame = frame;
+			if (offset != null) {
+				actualFrame.setLocation((int)frame.getX()+offset.getX(), (int)frame.getY()+offset.getY());
+			}
+
+			DiffPoints DP = ImageUtils2.compare(expectedImage, frame, actualImage, actualFrame, diffThreshold);
 			return ImageUtils2.convertDiffPointsToObjectGroups(DP, group_distance);	
 		}
 
@@ -249,10 +240,10 @@ public class ImagePair {
 
 		// list of object groups built in each sub-frame
 		List<ObjectGroup> NW, NE, SW, SE;		
-		NW = buildObjectGroups(nw, group_distance);
-		NE = buildObjectGroups(ne, group_distance);
-		SW = buildObjectGroups(sw, group_distance);
-		SE = buildObjectGroups(se, group_distance);
+		NW = buildObjectGroups(nw, group_distance, offset);
+		NE = buildObjectGroups(ne, group_distance, offset);
+		SW = buildObjectGroups(sw, group_distance, offset);
+		SE = buildObjectGroups(se, group_distance, offset);
 
 		// merge 4 sub-frames
 		List<ObjectGroup> mergeGroups = new ArrayList<ObjectGroup>();
@@ -265,18 +256,6 @@ public class ImagePair {
 		return ObjectGroup.mergeAllPossibleObjects(mergeGroups);	
 	}
 
-
-	/**
-	 * Check if this rectangle is inside of image
-	 * @param rectangle the rectangle checked
-	 * @return true if this rectangle area is available
-	 */
-	public boolean checkRect(Rectangle rectangle)
-	{
-		int minLength = 1;
-		return (rectangle.getX() < (width-minLength) && rectangle.getY() < (height-minLength) && rectangle.getWidth() >= minLength && rectangle.getHeight() >= minLength);
-	}
-	
 	/**
 	 * Check if given rectangle is bigger than over-merged rectangle criteria
 	 * @param rectangle Rectangle
@@ -302,16 +281,15 @@ public class ImagePair {
 		if (splitIteration < 1) {
 			return;
 		}
-		
-		
+
 		int margin = (int)(group_distance/2);   // To extract ACTUAL different region
 		int sub_margin = margin + BORDER_WIDTH; // Remove border from actual different region
 		List<Rectangle> removeList = new ArrayList<Rectangle>();
 		List<Rectangle> addList = new ArrayList<Rectangle>();
-		
+
 		// for sub-rectangles, we apply split_group_distance instead of group_distance
 		int split_group_distance = ComparisonParameters.getSplitGroupDistance();
-		
+
 		// split implementation for each rectangle
 		for (Rectangle rectangle : rectangles) {
 
@@ -319,9 +297,9 @@ public class ImagePair {
 			if (canSplit(rectangle)) {
 
 				/** split is divided into two parts : inside sub-rectangle, boundary rectan gle **/
-				
+
 				/* build inside rectangles */
-				
+
 				// get sub rectangle by subtracting border information 
 				int subX = (int)rectangle.getX() + sub_margin;
 				int subY = (int)rectangle.getY() + sub_margin;
@@ -332,9 +310,8 @@ public class ImagePair {
 				// use smaller group_distance to union Rectangle Area than what we used for the first different area recognition
 				List<Rectangle> splitRectangles = buildDiffAreas(subRectangle, split_group_distance);
 
-				
 				/* build boundary rectangles */
-				
+
 				// boundary area
 				int boundary_margin = 1;        //      margin of boundary rectangle
 				int padding = BORDER_WIDTH + 2*boundary_margin;
@@ -360,7 +337,6 @@ public class ImagePair {
 				boundaryList.addAll(buildDiffAreas(topBoundary, split_group_distance));
 				boundaryList.addAll(buildDiffAreas(bottomBoundary, split_group_distance));
 
-				
 				// if split succeed
 				if (splitRectangles.size() != 1 || !subRectangle.equals(splitRectangles.get(0))) {
 
@@ -373,7 +349,7 @@ public class ImagePair {
 						// expand splitRectangle if it borders on subRectangle
 						expand(subRectangle, splitRectangle, sub_margin);
 						List<Rectangle> expansionRectangles = buildDiffAreas(splitRectangle, split_group_distance);
-										
+
 						// remove overlapping rectangles after expansion
 						for (Rectangle boundaryRect : boundaryList) {
 							for (Rectangle expansionRect : expansionRectangles) {
@@ -389,9 +365,7 @@ public class ImagePair {
 						addList.addAll(expansionRectangles);
 					}
 					removeList.add(rectangle);
-				} else {
-					System.out.printf("split fails\nsubRectangle - x:%d y:%d w:%d h:%d size:%d", subRectangle.getX(), subRectangle.getY(), subRectangle.getWidth(), subRectangle.getHeight(), splitRectangles.size());
-				}
+				} 
 			}
 		}
 
@@ -472,7 +446,11 @@ public class ImagePair {
 	public Offset getDominantOffset () {
 		return offset;
 	}
-	
+
+	/**
+	 * we need to decide which image of expected and actual is applied dominant offset.
+	 * @return true if we need to apply dominant offset to expectedImage
+	 */
 	public boolean isExpectedMoved () {
 		switch (sizeRelationType) {
 			case 1:
@@ -490,10 +468,9 @@ public class ImagePair {
 				else
 					return true;
 
-			// never reach here
+				// never reach here
 			default:
 				return false;					
 		}
 	}
-
 }
