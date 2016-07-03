@@ -24,7 +24,7 @@ public class ComparisonParameters {
 		
 	// group distance for building different area
 	private static int defaultGroupDistance = 10;
-	private static int splitGroupDistance = 4;
+	private static int splitGroupDistance = 6;
 	
 	// maximum range for shift checking, similarity calculation
 	private static int maxShift = 10;

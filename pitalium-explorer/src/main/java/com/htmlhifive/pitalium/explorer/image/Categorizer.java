@@ -10,9 +10,7 @@ import java.lang.Math;
 
 /**
  * For given two images which are expected and actual,
- * this class check whether sub-image of actual image is shifted
- * and matched at some position in expected image.
- * Then it stores ShiftRectangle which is the information of location shift of given area.
+ * methods in this class check each category of difference.
  */
 public class Categorizer {
 
