@@ -26,7 +26,7 @@ public class ImagePair {
 	private static final int OVERMERGED_WIDTH = 200;
 	private static final int OVERMERGED_HEIGHT = 300;
 	private static final int SPLIT_ITERATION = 10;
-
+	private static final boolean boundary_option = false;
 
 	/**
 	 * Constructor
@@ -347,7 +347,9 @@ public class ImagePair {
 								}
 							}
 						}
-						addList.addAll(boundaryList);
+						if (boundary_option) {
+							addList.addAll(boundaryList);
+						}
 						boundaryList.clear();
 						addList.addAll(expansionRectangles);
 					}
