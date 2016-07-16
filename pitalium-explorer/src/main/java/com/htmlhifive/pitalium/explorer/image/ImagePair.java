@@ -26,7 +26,7 @@ public class ImagePair {
 	private static final int OVERMERGED_WIDTH = 200;
 	private static final int OVERMERGED_HEIGHT = 300;
 	private static final int SPLIT_ITERATION = 10;
-
+	private static final boolean boundary_option = false;
 
 	/**
 	 * Constructor
@@ -83,9 +83,10 @@ public class ImagePair {
 			// initialize result rectangle
 			ComparedRectangle resultRectangle = new ComparedRectangle(rectangle);
 			Offset offset = null;	// null means that when we calculate similarity, we try to find best match by moving actual sub-image
-
+			Rectangle tightDiffArea = ImageUtils2.getTightDiffArea(rectangle, width, height);
+			
 			/** if this rectangle is missing, set category 'MISSING' **/
-			if (Categorizer.checkMissing(expectedImage, actualImage, rectangle)) {
+			if (Categorizer.checkMissing(expectedImage, actualImage, tightDiffArea)) {
 				resultRectangle.setType("MISSING");
 				offset = new Offset(0,0);	// we fix the position of actual sub-image.
 
@@ -185,20 +186,6 @@ public class ImagePair {
 	 */
 	private List<Rectangle> buildDiffAreas (Rectangle frame, int group_distance) {
 		List<ObjectGroup> objectGroups = buildObjectGroups(frame, group_distance, null);
-		List<Rectangle> rectangles = ImageUtils2.convertObjectGroupsToAreas(objectGroups);
-
-		return rectangles;
-	}
-
-	/**
-	 * build different rectangles in the given frame area
-	 * @param frame boundary area to build rectangles
-	 * @param group_distance distance for grouping
-	 * @Param offset offset from expected frame to actual frame
-	 * @return list of rectangles representing different area
-	 */
-	private List<Rectangle> buildDiffAreas (Rectangle frame, int group_distance, Offset offset) {
-		List<ObjectGroup> objectGroups = buildObjectGroups(frame, group_distance,  offset);
 		List<Rectangle> rectangles = ImageUtils2.convertObjectGroupsToAreas(objectGroups);
 
 		return rectangles;
@@ -360,7 +347,10 @@ public class ImagePair {
 								}
 							}
 						}
-						// addList.addAll(boundaryList);
+
+						if (boundary_option) {
+							addList.addAll(boundaryList);
+						}
 						boundaryList.clear();
 						addList.addAll(expansionRectangles);
 					}

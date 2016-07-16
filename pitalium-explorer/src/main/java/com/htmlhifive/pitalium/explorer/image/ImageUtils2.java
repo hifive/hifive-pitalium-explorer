@@ -400,6 +400,28 @@ public final class ImageUtils2 {
 		rectangle.setRect(x, y, Math.max(width,1), Math.max(height,1));
 	}
 
+	public static Rectangle getTightDiffArea (Rectangle rectangle, int xLimit, int yLimit) {
+		int minMargin = Math.min(ComparisonParameters.getDefaultGroupDistance()/2, ComparisonParameters.getSplitGroupDistance()/2);
+		int x = (int)rectangle.getX(), y = (int)rectangle.getY(),
+			width = (int)rectangle.getWidth(), height = (int)rectangle.getHeight();
+		// check if the rectangle meets the boundary
+		if (x > 0) {
+			x += minMargin;
+			width -= minMargin;
+		}
+		if (y > 0) {
+			y += minMargin;
+			height -= minMargin;
+		}
+		if (x + width < xLimit) {
+			width -= minMargin;
+		}
+		if (y + height < yLimit) {
+			height -= minMargin;
+		}
+				
+		return new Rectangle(x, y, width, height);
+	}
 	
 	/**
 	 * remove overlapping rectangles for better UI
