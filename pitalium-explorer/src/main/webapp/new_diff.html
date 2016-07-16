@@ -30,19 +30,7 @@
 	<script src="src/common/constant.js"></script>
 	<script src="src/common/util.js"></script>
 	<script src="lib/rangeslider/rangeslider.js"></script>
-	
-	<script>
-    // Initialize a new plugin instance for all
-    // e.g. $('input[type="range"]') elements.
-	   
-	
-	    // Update all rangeslider instances for all
-	    // e.g. $('input[type="range"]') elements.
-	    // Usefull if you changed some attributes e.g. `min` or `max` etc.
-	   
-	</script>
-	
-	
+
 	</head>
 	<body>
 	
@@ -72,15 +60,7 @@
 
 					</div>
 		     
-		        	<!-- 
-		        	<br>
-		        	<input type="radio" class="choice" id="radio_none" value="none" name="method_opacity" data-rectype="none" checked> None        	
-		        	<input type="radio" class="choice" id="radio_feature" value="featurematrix"  name="method_opacity" data-rectype="feature"> Feature Matrix
-		        	<input type="radio" class="choice" id="radio_pixel" value="pixelbypixel"  name="method_opacity" data-rectype="pixel"> Pixel by Pixel
-		        	<input type="radio" class="choice" id="radio_threshold"  value="thres"  name="method_opacity" data-rectype="threshold"> Threshold
-		        	<input type="radio" class="choice" id="radio_total"  value="total"  name="method_opacity" data-rectype="total"> Total
 		        	
-		        	 -->
 		        	</div>
 		        	<div style="width:180px; float:left">
 		        		<p style="margin-top:8px; margin-bottom:2px; color:#455A64;">Diff region opacity control</p>
@@ -98,8 +78,8 @@
 		        </div>
 		        	
 		      
-				</div>
 			</div>
+			
 		</nav>
 		<!-- Navigation -->
 
@@ -107,7 +87,7 @@
 
 		      
 </div>
-		<div class="col-md-6 no-padding" id="container">
+		<div class="col-xs-6 col-sm-6 col-md-6 no-padding" id="container">
 			
 		      	<div class="result_box" id="expected_box" >
 		      	 	<div class="test_result screenshot" id="test_expected" style="position:relative;">
@@ -118,9 +98,8 @@
 
 		</div>
 		
-		<div class="col-md-6 no-padding" >
+		<div class="col-xs-6 col-sm-6 col-md-6 no-padding" >
 			
-		      
 		     
 		      	<div class="result_box" id="result_box" >
 		      	 	<div class="test_result screenshot" id="test_result" style="position:relative;">
@@ -140,6 +119,7 @@
 		
 		
 		<div class="footer col-sm-12">
+		
 			<p>Copyright (C) 2012-2016 NS Solutions Corporation, All Rights Reserved.</p>
 		
 		</div>
@@ -151,13 +131,16 @@
 		
 		<script>
 		
-		$('#result_box').kinetic();
+		$('#result_box').kinetic(); //you can drag images
 
-		$('#expected_box').kinetic();
+		$('#expected_box').kinetic(); //you can drag images
+		
+		
 		$('#result_box').on("scroll", function(){
 			$("#expected_box").scrollLeft($('#result_box').scrollLeft());
 			
 		});
+		
 		$('#expected_box').on("scroll", function(){
 			$("#result_box").scrollLeft($('#expected_box').scrollLeft());
 			
@@ -189,37 +172,28 @@
 					
 			};
 			
-			h5.core.view.update("#memobox", "memo_content", data1);
+			h5.core.view.update("#memobox", "memo_content", data1); //memo content update
 			
 			var opacity =  $("#opacity_range").val();
 			var opacity_over = parseFloat($("#opacity_range").val()) + 0.3;
 			$("#memobox").show();
-			//$(".diffDiv").css("opacity", opacity);
 			
-			//var opacity_radio = $('input[type=radio][name=method_opacity]:checked').val();
-			//alert(opacity_radio);
-			//if (opacity_radio == "none"){
-			//	mouse_div.css("opacity", opacity_over);
-			//}else{
 				
 				var this_opacity = parseFloat(mouse_div.css("opacity"));
 				var index = $(this).data("index");
-				$(".diff_index_" + index).css("opacity", (this_opacity + 0.3));
-			//}
+				$(".diff_index_" + index).css("opacity", (this_opacity + 0.3)); 
+			
 		});
 		
 		
 		
 		$(document).on("mouseleave", ".diffDiv", function(){
 			$("#memobox").hide();
-			//var opacity_radio = $('input[type=radio][name=method_opacity]:checked').val();
-			//if (opacity_radio == "none"){
-			//	$(this).css("opacity", $("#opacity_range").val());
-			//}else{
+			
 				var this_opacity = parseFloat($(this).css("opacity")) ;
 				var index = $(this).data("index");
 				$(".diff_index_" + index).css("opacity", (this_opacity- 0.3));
-			//}
+			
 		});
 		
 		$(document).on('mousemove', function(e){
@@ -240,30 +214,29 @@
 		
 		$(document).ready(function(){
 			
-			var queryParams = hifive.pitalium.explorer.utils.getParameters();
+			var queryParams = hifive.pitalium.explorer.utils.getParameters(); //get parameters
 			
-			var expected = queryParams["expected"];
-			var target = queryParams["target"];
+			var expected = queryParams["expected"]; //expected image path
+			var target = queryParams["target"]; //target image path
 			
-			var resultListId = queryParams["list_id"];
-			var targetResultId = queryParams["result_id"];
-			var directory = queryParams["directory"];
-			var offsetx = 0 - parseInt(queryParams["offsetx"]);
-			var offsety = 0 - parseInt(queryParams["offsety"]);
+			var resultListId = queryParams["list_id"]; //result list id
+			var targetResultId = queryParams["result_id"]; //result_id in result list
+			var directory = queryParams["directory"]; //result directory
+			var offsetx = 0 - parseInt(queryParams["offsetx"]); //dominant offset x
+			var offsety = 0 - parseInt(queryParams["offsety"]); //dominant offset y
 			
-			if (queryParams["offset_expected"].toLowerCase() == "true"){
+			if (queryParams["offset_expected"].toLowerCase() == "true"){ //if offset_expected == true, expected image should be moved. if false, compare image should be moved
 				var offset_expected = true;
 			}else{
 				var offset_expected = false;
 			}
 			
-			var minsimilarity = parseFloat(queryParams["minsimilarity"]);
+			var minsimilarity = parseFloat(queryParams["minsimilarity"]); //this is for Importance control bar. It decides the importance control's minimum value.
 			
 			$("#importance").attr("min", minsimilarity);
 			 $('input[type="range"]').rangeslider();
 			 
-			//$("#importance").rangeslider('update', true);
-			//$('input[type="range"]').rangeslider('update', true);
+		
 			
 			$("#diffDetail").modal("show");
 			$("#test_result").height("300");
@@ -290,7 +263,7 @@
 					
 					var offset_str = String(offsetx) + "px " + String(offsety) + "px";
 					
-					//alert(offset_str);
+					
 					img.onload = function() {
 						$("#test_result").height(this.height);
 						$("#test_result").width(this.width);
@@ -320,7 +293,7 @@
 					}
 					expected.src = "data:image/png;base64," + data["expectedImage"];
 					
-					drawRec(directory, resultListId, targetResultId);
+					drawRec(directory, resultListId, targetResultId); //this function draws all of red rectangles(divs)
 					
 				}
 			
@@ -332,7 +305,7 @@
 		});
 		
 		
-		function drawRec(directory, resultId, targetResultId){
+		function drawRec(directory, resultId, targetResultId){ //this function draws all of red rectangles(divs)
 			
 			
 			$.ajax({
@@ -446,7 +419,7 @@
 			
 		});
 		
-		$(document).on("input change", "#img_size", function(){
+		$(document).on("input change", "#img_size", function(){ //This is for the Image size control bar.
 			
 			var ratio = $(this).val();
 		
@@ -479,7 +452,7 @@
 		
 		
 		
-		$(document).on("change", ".choice", function(){
+		$(document).on("change", ".choice", function(){ //This is for "show differences by category checkboxes.
 			var rectype = $(this).data("rectype");
 			
 			
@@ -507,6 +480,7 @@
 		
 		
 		<script type="text/ejs" id="diffDiv">
+
 			<div class="diffDiv diff_[%=type%] diff_index_[%=index%]" style="left: [%=x%]px; top: [%=y%]px; width: [%=width%]px; height: [%=height%]px;" data-x="[%=x%]" data-y="[%=y%]" data-width="[%=width%]" data-height="[%=height%]"
 					data-rectype="[%=type%]" data-xshift="[%=xshift%]" data-yshift="[%=yshift%]"
 					data-featurematrix="[%=featureMatrix%]"
@@ -517,7 +491,7 @@
 	
 		    </div>
 
-		</script>
+		</script> <!-- Red divs -->
 		
 		
 		<script type="text/ejs" id="memo_content">

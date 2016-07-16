@@ -30,17 +30,7 @@
 	<script src="src/common/constant.js"></script>
 	<script src="src/common/util.js"></script>
 	<script src="lib/rangeslider/rangeslider.js"></script>
-	
-	<script>
-    // Initialize a new plugin instance for all
-    // e.g. $('input[type="range"]') elements.
-	    //$('input[type="range"]').rangeslider({onSlide: function(position, value) { opacity_control(value); }});
-	
-	    // Update all rangeslider instances for all
-	    // e.g. $('input[type="range"]') elements.
-	    // Usefull if you changed some attributes e.g. `min` or `max` etc.
-	   
-	</script>
+	<script src="src/new_list/new_list.js"></script>
 	
 	
 	</head>
@@ -121,71 +111,9 @@
 		
 		</div>
 		
-		<div id="memobox">
-			
-		</div>
-		
 		
 		<script>
-		
-		$('#result_box').kinetic();
-		
-		$(document).on("mouseenter", ".diffDiv", function(){
-			var rectype = $(this).data("rectype");
-			
-			var method3 = $(this).data("method3");
-			var xshift = $(this).data("xshift");
-			var yshift = $(this).data("yshift");
-			var featurematrix = $(this).data("featurematrix");
-			var pixelbypixel = $(this).data("pixelbypixel");
-			var thres = $(this).data("thres");
-			var total = $(this).data("total");
-			
-			var data1 = {
-					
-					type: rectype,
-					
-					xshift: xshift,
-					yshift: yshift,
-					featurematrix: featurematrix,
-					pixelbypixel: pixelbypixel,
-					thres: thres,
-					total: total
-					
-			};
-			
-			h5.core.view.update("#memobox", "memo_content", data1);
-			
 
-			$("#memobox").show();
-			$(".diffDiv").css("opacity", "0.3");
-			$(this).css("opacity", "0.6");
-		});
-		
-		
-		
-		$(document).on("mouseleave", ".diffDiv", function(){
-			$("#memobox").hide();
-			$(this).css("opacity", "0.3");
-		});
-		
-		$(document).on('mousemove', function(e){
-		    $('#memobox').css({
-		       left:  e.pageX + 10,
-		       top:   e.pageY - 20
-		    });
-		});
-		
-		/*
-		$(document).on("mouseenter", ".platform", function(){
-			$(this).find("img").hide();
-			$(this).find("span").show();
-		});
-		$(document).on("mouseleave", ".platform", function(){
-			$(this).find("img").show();
-			$(this).find("span").hide();
-		});
-		*/
 		
 		$(document).ready(function(){
 			
@@ -263,7 +191,7 @@
 			if (table_list.css("display") != "none"){
 				
 				var screenshot_list_url = "./_screenshots/list.json";
-				$.ajax({
+				$.ajax({ //to get screenshots list from API
 					
 					url: screenshot_list_url,
 					type: 'GET',
@@ -340,30 +268,35 @@
 			$(".btn-run").hide();
 			$(".expected").show();
 			
-			find_input(2, directory, target).show();
+			find_input(2, directory, target).show(); // To show 'Run-button' in expected element's row
 			
 			
-			$(".compare").show();
-			var this_checkbox = find_input(1, directory, target);
-			var all_checkbox = find_input(1, directory);
+			$(".compare").show()
+			var this_checkbox = find_input(1, directory, target);  //To find and hide [expected element's campare checkbox]
+			var all_checkbox = find_input(1, directory); //To find [compare elements checkboxes]
 			
-			all_checkbox.show();
+			all_checkbox.show();//To show [compare elements checkboxes]
+			
 			all_checkbox.prop("checked", true);
-			this_checkbox.hide();
+			
+			this_checkbox.hide();  //To hide [expected element's campare checkbox]
 			this_checkbox.removeAttr("checked");
 			
 			
 		});
 		
 		
-		$(document).on("click", ".btn-run", function(){
+		
+		
+		$(document).on("click", ".btn-run", function(){ //Run button click function
 			
 			var targets = new Array;
 			var run_btn = $(this);
 			run_btn.hide();
 			
 			var loading_img = $(this).parent().find("img");
-			loading_img.show();
+			
+			loading_img.show(); //loading-circle gif image show
 			
 			
 			$(".compare:checked").each(function(){
@@ -371,8 +304,6 @@
 				targets.push($(this).data("directory") + "/" + $(this).data("target"));
 				
 			});
-			
-			
 			
 			
 			var directory_expected = $(this).data("directory");
@@ -397,13 +328,16 @@
 					
 				}
 				
-		});
+			});
 			
 			
 		});
 		
 		function find_input(type, directory, target){
 			
+			//if type == 0, this function return the radio buttons in the expected-row
+			//if type == 1, this function return the checkboxes in the compare-row
+			//if type == 2, this function return the [Run] button in the selected column
 			
 			if (target == null){
 				switch (parseInt(type)) {
@@ -413,8 +347,8 @@
 					return $(document).find("input[type=checkbox][data-directory='" + directory + "']");
 				case 2:
 					return $(document).find("a[data-directory='" + directory + "']");
-				
 				}
+				
 			}else{
 				
 				switch (parseInt(type)) {
@@ -427,6 +361,7 @@
 			}
 					
 		}
+		
 		
 		$(document).on("click", ".result_info", function(){
 			
@@ -452,7 +387,8 @@
 			
 		});
 		
-		$(document).on("click",".delete-btn", function(){
+		
+		$(document).on("click",".delete-btn", function(){ //Result delete function
 			
 			var directory = $(this).data("directory");
 			var id = $(this).data("resultid");
@@ -479,6 +415,7 @@
 		});
 		
 		</script>
+		
 		
 		<script type="text/ejs" id="result_info_table">
 
@@ -538,6 +475,8 @@
 		</div>
 			
 		</script>
+		
+		
 		
 		<script type="text/ejs" id="mylist">
 			<div class="result_content">
@@ -613,33 +552,7 @@
 			</tr>
 		</script>
 		
-<script>
-$(window).scroll(function () {
-	var height = $(document).scrollTop();
-	if (height > 80) {
 		
-		$(".navbar").fadeIn();
-		
-		
-	} else{
-		
-		$(".navbar").fadeOut();
-		
-	}
-	
-	if(height < 86){
-		
-		$(".background-pattern").fadeIn();
-		
-	}else{
-		$(".background-pattern").fadeOut();
-	}
-	
-	
-	
-});
-		
-</script>
 		
 	</body>
 </html>
