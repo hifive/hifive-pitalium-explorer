@@ -360,7 +360,7 @@ public class ImagePair {
 								}
 							}
 						}
-						addList.addAll(boundaryList);
+						// addList.addAll(boundaryList);
 						boundaryList.clear();
 						addList.addAll(expansionRectangles);
 					}
