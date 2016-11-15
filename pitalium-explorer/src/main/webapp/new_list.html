@@ -1,7 +1,8 @@
 <!doctype html>
+<!--Copyright (C) 2015 NS Solutions Corporation, All Rights Reserved.  -->
 <html>
 <head>
-	<!--Copyright (C) 2015 NS Solutions Corporation, All Rights Reserved.  -->
+
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -10,549 +11,110 @@
 	<meta http-equiv="Expires" content="-1">
 
 	<title>Test results - Pitalium Explorer</title>
+
 	<link rel="shortcut icon" href="res/img/favicon.ico">
-	
-	
+
 	<link rel="stylesheet" href="/hifive-res/ext/bootstrap/3.3.6/css/bootstrap.css">
-	
 	<link rel="stylesheet" href="/hifive-res/fw/current/h5.css" data-h5-module="hifive">
 	<link rel="stylesheet" href="src/common/common.css">
 	<link rel="stylesheet" href="src/list/new_list.css">
 	<link rel="stylesheet" href="lib/jquery-ui/jquery-ui.css">
 	<link rel="stylesheet" href="lib/rangeslider/rangeslider.css">
-	<script src="/hifive-res/ext/jquery/jquery-2.js"></script>
-	<script src="/hifive-res/ext/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-	<script src="lib/jquery-ui/jquery-ui.js"></script>
-	<script src="lib/jquery-kinetic/jquery.kinetic.js"></script>
-	<script src="/hifive-res/fw/current/ejs-h5mod.js" data-h5-module="hifive:ejs"></script>
-	<script src="/hifive-res/fw/current/h5.js" data-h5-module="hifive"></script>
 
-	<script src="src/common/constant.js"></script>
-	<script src="src/common/util.js"></script>
-	<script src="lib/rangeslider/rangeslider.js"></script>
-	<script src="src/new_list/new_list.js"></script>
-	
-	
-	</head>
-	<body>
-	
-	
-		
-		<div class="background-pattern">
-			
-			<h2>Pitalium explorer</h2>
-			<p>The best explorer to analyze the results of Pitalium.</p>
-			
-		</div>
-		<!-- Navigation -->
-		<nav class="navbar navbar-fixed-top" style="display:none;">
-			<div class="container-fluid">
-				<div class="navbar-header" style="width:100%;">
-					<a class="navbar-brand" href="list.html">Pitalium explorer</a>
-					
-				</div>
-			</div>
-		</nav>
-		<!-- Navigation -->
+</head>
+<body>
 
-		<div class="container col-md-8 col-md-offset-2 margin-top" id="container">
-			<div class="title_div">
-				<h4 style="color: #039BE5;">Test results</h4>
-				<a href="/pitalium-explorer/new_list.html"><p style="float:right; margin-top: -25px; color:#9E9E9E;"> <i class="glyphicon glyphicon-share-alt"></i> One-to-one comparison explorer</p></a>
-			</div>
-	
+<div class="background-pattern">
+	<h2>Pitalium explorer</h2>
+	<p>The best explorer to analyze the results of Pitalium.</p>
+</div>
 
-			<div class="col-md-12" id="result_list" >
-				
-			</div>
+<!-- Navigation -->
+<nav class="navbar navbar-fixed-top" style="display:none;">
+	<div class="container-fluid">
+		<div class="navbar-header" style="width:100%;">
+			<a class="navbar-brand" href="list.html">Pitalium explorer</a>
 
 		</div>
-		
-		<div class="modal fade" id="diffDetail" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-		  <div class="modal-dialog modal-lg" role="document">
-		    <div class="modal-content">
-		      <div class="modal-header">
-		        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-		        <h4 class="modal-title" id="myModalLabel">Difference detail</h4>
-		        
-		        <div>
-		        	
-		        	<input type="checkbox" class="choice" id="checkbox_SHIFT" checked="checked" data-rectype="SHIFT"> Shift
-		        	<input type="checkbox" class="choice" id="checkbox_MISSING" checked="checked" data-rectype="MISSING"> Missing
-		        	<input type="checkbox" class="choice" id="checkbox_SCALING" checked="checked" data-rectype="SCALING"> Scale
-		        	<input type="checkbox" class="choice" id="checkbox_SIMILAR" checked="checked" data-rectype="SIMILAR"> Similar
-		        	<div style="width:200px;">
-		        		Diff region opacity control
-		        		<input id="opacity_range" type="range" min="0" max="1" step="0.1" value="0.3">
-		        	</div>
-		        	
-		        </div>
-		        	
-		      </div>
-		      
-		      <div class="modal-body">
-		      	<div id="result_box" >
-		      	 	<div id="test_result" style="position:relative;">
-		      	 	
-		        
-		        	</div>
-		      	</div>
-		       
-		      </div>
-		      
-		    </div>
-		  </div>
-		</div>
-		
-		
-		
-		<div class="footer col-sm-12">
-			<p>Copyright (C) 2012-2016 NS Solutions Corporation, All Rights Reserved.</p>
-		
-		</div>
-		
-		
-		<script>
+	</div>
+</nav>
+<!-- Navigation -->
 
-		
-		$(document).ready(function(){
-			
-			load_list();
-			
-		});
-		
-		
-		function load_list() {
-			var result_list_url = './_results/list.json';
-			
-			$.ajax({
-				url: result_list_url,
-				success: function(data){
-					
-					var content = data["content"];
-					var options = {
-						    weekday: "long", year: "numeric", month: "short",
-						    day: "numeric", hour: "2-digit", minute: "2-digit"
-						};
-					
-					
-					for (var i = 0; i < content.length; i++){
-					
-						var result_name = content[i]["name"];
-						var tString = String(content[i]["timestamp"]);
-						
-						var tStamp = new Date(parseInt(tString));
-						var mytimes = tStamp.toLocaleTimeString("en", options)
-						var dir_timestamp = String(content[i]["dirTimestamp"]);
-						var path = dir_timestamp+"/"+result_name;
-						
-						var NofScreenshots = content[i]["numberOfScreenshots"];
-						var NofResult = content[i]["numberOfResults"];
-						
-						var data = {id: content[i]["id"],
-								name: result_name,
-								time: mytimes,
-								screenshot: NofScreenshots,
-								result: NofResult,
-								path: path};
-						
-						h5.core.view.append("#result_list", "mylist", data);
-						
-						
-						
-					}
-					
-				}
-				
-			});
-		}
-		
-		
-		$(document).on("click", ".appendTable", function(){
-			
-			var id = $(this).data("id");
-			var path = $(this).data("path");
-			
-			$("#table_list_" + id).slideToggle();
-			
-			appendScreenshots(path,id);
-			
-		});
-		
-		
-		function appendScreenshots(path, id){
-			
-			var table = $("#table_" + String(id));
-			var t_id = "#table_" + String(id);
-			var table_list = $("#table_list_" + String(id));
+<div class="container col-md-8 col-md-offset-2 margin-top" id="container">
+	<div class="title_div">
+		<h4 style="color: #039BE5;">Test results</h4>
+		<a href="/pitalium-explorer/new_list.html">
+			<p style="float:right; margin-top: -25px; color:#9E9E9E;">
+				<i class="glyphicon glyphicon-share-alt"></i> One-to-one comparison explorer
+			</p>
+		</a>
+	</div>
 
-			
-			
-			if (table_list.css("display") != "none"){
-				
-				var screenshot_list_url = "./_screenshots/list.json";
-				$.ajax({ //to get screenshots list from API
-					
-					url: screenshot_list_url,
-					type: 'GET',
-					data: {path: path, refresh: "true"},
-					success: function(data){
-						console.log(data);
-						var feedback = data["screenshotFileList"];
-	
-						table.find(".tr").remove();
-						var resultList = data["resultList"];
+	<div class="col-md-12" id="result_list"></div>
 
-						$("#result_ul_" + id).html("");
-						
-						for (var i = 0; i < resultList.length; i++){
-							
-							var result = resultList[i];
-							var tStamp = new Date(parseInt(result["executionTime"]));
-							
-							var options = {
-								    weekday: "long", year: "numeric", month: "short",
-								    day: "numeric", hour: "2-digit", minute: "2-digit"
-								};
-							
-							
-							$("#result_h_" + String(id)).show();
-							var my_data = {
-								id: result["id"],
-								resultList: result["resultList"],
-								expected: result["expectedFilename"],
-								timestamp: tStamp.toLocaleTimeString("en", options),
-								directory: path 
-							}
-							
-							h5.core.view.append($('#result_ul_' + String(id)), "result_info_table", my_data);
-							
-							
-						}
-						
-						
-						for (var i = 0; i < feedback.length; i++){
-							var tc = feedback[i];
-							
-							var my_data = {
-									id: id,
-									name: tc["name"], 
-									timestamp: tc["timestamp"],
-									platform: tc["platform"],
-									browser: tc["browser"],
-									version: tc["version"],
-									width: tc["width"],
-									height: tc["height"],
-									directory: path,
-									results: resultList
-							};
-							
-							h5.core.view.append(table, "screenshot_list", my_data);
-							
-							
-						}
-						
-						
-					}
-					
-				});
-			}
-			
-		}
-		
-		$(document).on("click", ".expected", function(){
-			var directory = $(this).data("directory");
-			var target = $(this).val();
-			
-			
-			$(".btn-run").hide();
-			$(".expected").show();
-			
-			find_input(2, directory, target).show(); // To show 'Run-button' in expected element's row
-			
-			
-			$(".compare").show()
-			var this_checkbox = find_input(1, directory, target);  //To find and hide [expected element's campare checkbox]
-			var all_checkbox = find_input(1, directory); //To find [compare elements checkboxes]
-			
-			all_checkbox.show();//To show [compare elements checkboxes]
-			
-			all_checkbox.prop("checked", true);
-			
-			this_checkbox.hide();  //To hide [expected element's campare checkbox]
-			this_checkbox.removeAttr("checked");
-			
-			
-		});
-		
-		
-		
-		
-		$(document).on("click", ".btn-run", function(){ //Run button click function
-			
-			var targets = new Array;
-			var run_btn = $(this);
-			run_btn.hide();
-			
-			var loading_img = $(this).parent().find("img");
-			
-			loading_img.show(); //loading-circle gif image show
-			
-			
-			$(".compare:checked").each(function(){
-				
-				targets.push($(this).data("directory") + "/" + $(this).data("target"));
-				
-			});
-			
-			
-			var directory_expected = $(this).data("directory");
-			var expected = $(this).data("target");
-			
-			
-			$.ajax({
-				url: "_screenshots/compare.json",
-				type: "POST",
-				data: {
-					
-					targets: String(targets),
-					expected: directory_expected + "/" + expected
-				},
-				
-				success: function(data){
-					
-					console.log(data);
-					appendScreenshots(directory_expected, run_btn.data("id"));
-					loading_img.hide();
-					run_btn.show();
-					
-				}
-				
-			});
-			
-			
-		});
-		
-		function find_input(type, directory, target){
-			
-			//if type == 0, this function return the radio buttons in the expected-row
-			//if type == 1, this function return the checkboxes in the compare-row
-			//if type == 2, this function return the [Run] button in the selected column
-			
-			if (target == null){
-				switch (parseInt(type)) {
-				case 0: 
-					return $(document).find("input[type=radio][data-directory='" + directory + "']");
-				case 1:
-					return $(document).find("input[type=checkbox][data-directory='" + directory + "']");
-				case 2:
-					return $(document).find("a[data-directory='" + directory + "']");
-				}
-				
-			}else{
-				
-				switch (parseInt(type)) {
-				case 0: return $(document).find("input[type=radio][data-directory='" + directory + "'][data-target='" + target + "']");
-				case 1: return $(document).find("input[type=checkbox][data-directory='" + directory + "'][data-target='" + target + "']");
-				case 2:
-					return $(document).find("a[data-directory='" + directory + "'][data-target='" + target + "']");
-				}
-			
-			}
-					
-		}
-		
-		
-		$(document).on("click", ".result_info", function(){
-			
-			var info_table = $(this).parent().find(".info_table_div");
+</div>
 
-			
-			info_table.slideToggle();
-			var result_icon = $(this).parent().find(".result_icon");
-			
-			if (info_table.data("hided") == "true"){
-				info_table.data("hided", "false");
-				result_icon.addClass("glyphicon-menu-right");		
-				result_icon.removeClass("glyphicon-menu-down");
+<!--
+  -- Maybe not used
+  --
 
-			}else{
-				info_table.data("hided", "true");
-				result_icon.addClass("glyphicon-menu-down");		
-				result_icon.removeClass("glyphicon-menu-right");
+<div class="modal fade" id="diffDetail" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+	<div class="modal-dialog modal-lg" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+					aria-hidden="true">&times;</span></button>
+				<h4 class="modal-title" id="myModalLabel">Difference detail</h4>
 
-				
-			}
-			
-			
-		});
-		
-		
-		$(document).on("click",".delete-btn", function(){ //Result delete function
-			
-			var directory = $(this).data("directory");
-			var id = $(this).data("resultid");
-			$("#result_info_" + id).remove();
-			alert("Results deleted!");
-			$.ajax({
-				
-				url: "_screenshots/delete",
-				type: "GET",
-				data: {
-					path: directory,
-					resultListId: id
-				},
-				
-				success: function(data){
-					
-					console.log("Result deleted!");
-					
-				}
-				
-				
-			});
-			
-		});
-		
-		</script>
-		
-		
-		<script type="text/ejs" id="result_info_table">
+				<div>
 
-			<div class="col-sm-12 result_info_container" id="result_info_[%=id%]" style="margin:0; padding:0;">
-			<div class="result_info col-sm-12 col-md-12"style="margin:0; padding:0; border-bottom: 1px solid #E0E0E0;">
-				<div class="col-sm-1 col-md-1"style="margin:0; padding-right:0px; width:7%; ">
-
-					<div style="min-height:66px; padding-top: 15px; padding-bottom:15px;">
-						<i class="glyphicon glyphicon-menu-right result_icon" style="font-size:25px; margin:0; color:#8BC34A; padding-top:10px; padding-bottom:10px;"></i></div>
-					</div>
-				<div class="col-sm-10 col-md-10" style="margin:0px; padding-left:0px;">
-					<div class="col-sm-12 col-md-12" style="margin:0; word-break: break-all;">
-						<h5 style="font-size:16px;">[%=expected%]</h5>
-					</div>
-					<div class="col-sm-12 col-md-12" style="margin:0; color:#90A4AE">
-						<p>[%=timestamp%]</p>
-					</div>
-					
-				</div>
-				<div class="col-sm-1 col-md-1" >
-					<div style="min-height:66px;  padding-top:15px; padding-bottom:15px;"> 
-						<i class="glyphicon glyphicon-trash delete-btn" data-directory="[%=directory%]" data-resultid="[%=id%]" style="font-size:20px; padding-top:10px; padding-bottom:10px;"></i>
-					</div>	
-				</div>
-				
-			</div>
-			<div class="col-sm-12 col-md-12 info_table_div" style="display:none;">
-			<table class="info_table table" >
-				<tr>
-					<th>
-						Compare
-					</th>
-					<th>
-						Similarity
-					</th>
-					<th>
-						Diff areas
-					</th>
-					<th>
-						Detail
-					</th>
-				</tr>
-
-
-				[%for (var i = 0; i < resultList.length; i++){ %]
-					<tr>
-						<td>[%=resultList[i]["targetFilename"]%]</td>
-						<td>[%=Math.round(resultList[i]["entireSimilarity"]*100)/100%]</td>
-						<td>[%=resultList[i]["numberOfDiffRec"]%]</td>
-						
-						<td><a target="_blank" href="new_diff.html?list_id=[%=id%]&result_id=[%=resultList[i]['id']%]&directory=[%=directory%]&expected=[%=expected%]&target=[%=resultList[i]['targetFilename']%]&offsetx=[%=resultList[i]['offsetX']%]&offsety=[%=resultList[i]['offsetY']%]&offset_expected=[%=resultList[i]['moveExpected']%]&minsimilarity=[%=resultList[i]['minSimilarity']%]" class="btn btn-danger btn-detail" data-result_list_id="[%=id%]" data-target_result_id="[%=resultList[i]["id"]%]" data-expected="[%=expected%]" data-target="[%=resultList[i]["targetFilename"]%]" data-directory="[%=directory%]" >Detail</a></td>
-					<tr>
-				[%}%]
-				
-			</table>
-			</div>
-		</div>
-			
-		</script>
-		
-		
-		
-		<script type="text/ejs" id="mylist">
-			<div class="result_content">
-				
-				<a class="appendTable" data-path="[%=path%]" data-name="[%=name%]" data-id="[%=id%]">[%=name%] ([%=time%]) ([%=result%]/[%=screenshot%])</a>
-
-				<div class="table_list" id="table_list_[%=id%]" style="display:none;">
-					<h4 id="result_h_[%=id%]" style="display:none; color:#00897B;">Result List</h4>
-					<hr style="border-bottom: 1px solid #00897B;">
-
-					<div id="result_ul_[%=id%]" class="result_ul">
-						
-
+					<input type="checkbox" class="choice" id="checkbox_SHIFT" checked="checked" data-rectype="SHIFT"> Shift
+					<input type="checkbox" class="choice" id="checkbox_MISSING" checked="checked" data-rectype="MISSING"> Missing
+					<input type="checkbox" class="choice" id="checkbox_SCALING" checked="checked" data-rectype="SCALING"> Scale
+					<input type="checkbox" class="choice" id="checkbox_SIMILAR" checked="checked" data-rectype="SIMILAR"> Similar
+					<div style="width:200px;">
+						Diff region opacity control
+						<input id="opacity_range" type="range" min="0" max="1" step="0.1" value="0.3">
 					</div>
 
-					<table class="table" id="table_[%=id%]" >
-							<tbody><tr class="th_tr">
-								<th>
-									Name
-								</th>
-								<th>
-									Platform
-								</th>
-								<th>
-									Browser
-								</th>
-								<th>
-									Expected
-								</th>
-
-								<th>
-									Compare
-								</th>
-
-								<th>
-									Run
-								</th>
-								
-							</tr>
-					</table>
-				
 				</div>
 
 			</div>
-		</script>
-		
-		<script type="text/ejs" id="screenshot_list">
-			<tr class="tr">
-								<td>
-									[%=name%]
-								</td>
-								<td class="platform">
-									
-									<span>[%=platform%]</span>
-								</td>
-								<td>
-									[%=browser%]
-								</td>
-								<td class="text-center">
-									<input class="expected" name="expected" type="radio" value="[%=name%]" data-directory="[%=directory%]">
-									
-								</td>
-								<td>
-									
-									<input type="checkbox" class="compare compare_checkbox" data-target="[%=name%]" data-directory="[%=directory%]" style="display:none;">
-								</td>
-								<td>
-									<a class="btn-info btn btn-run" style="display:none;" data-id="[%=id%]" data-target="[%=name%]" data-directory="[%=directory%]">
-										<span class="glyphicon glyphicon-play-circle" aria-hidden="true"></span> Run
-									</a>
-									<img src="res/img/loading.gif" style="width:34px; display:none; margin-left: 20px; margin-right:20px;"/>
-								</td>
-			</tr>
-		</script>
-		
-		
-		
-	</body>
+
+			<div class="modal-body">
+				<div id="result_box">
+					<div id="test_result" style="position:relative;">
+					</div>
+				</div>
+			</div>
+
+		</div>
+	</div>
+</div>
+
+ --
+ --
+ -->
+
+<div class="footer col-sm-12">
+	<p>Copyright (C) 2012-2016 NS Solutions Corporation, All Rights Reserved.</p>
+</div>
+
+<!-- Load scripts -->
+<script src="/hifive-res/ext/jquery/jquery-2.js"></script>
+<script src="/hifive-res/ext/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+<script src="lib/jquery-ui/jquery-ui.js"></script>
+<script src="lib/jquery-kinetic/jquery.kinetic.js"></script>
+<script src="/hifive-res/fw/current/ejs-h5mod.js" data-h5-module="hifive:ejs"></script>
+<script src="/hifive-res/fw/current/h5.dev.js" data-h5-module="hifive"></script>
+
+<script src="src/common/constant.js"></script>
+<script src="src/common/util.js"></script>
+<script src="lib/rangeslider/rangeslider.js"></script>
+
+<script src="src/new_list/PageLogic.js"></script>
+<script src="src/new_list/PageController.js"></script>
+<script src="src/new_list/init.js"></script>
+
+</body>
 </html>
