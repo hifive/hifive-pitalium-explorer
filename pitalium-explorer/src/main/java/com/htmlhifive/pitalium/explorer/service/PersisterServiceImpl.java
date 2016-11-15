@@ -16,6 +16,7 @@ import javax.annotation.Resource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.htmlhifive.pitalium.core.io.PersistMetadata;
@@ -31,8 +32,13 @@ import com.htmlhifive.pitalium.explorer.entity.Target;
 import com.htmlhifive.pitalium.explorer.entity.TargetRepository;
 import com.htmlhifive.pitalium.explorer.entity.TestExecutionAndEnvironment;
 import com.htmlhifive.pitalium.explorer.entity.TestExecutionRepository;
+import com.htmlhifive.pitalium.explorer.image.ComparedRectangle;
 import com.htmlhifive.pitalium.explorer.io.ExplorerDBPersister;
 import com.htmlhifive.pitalium.explorer.io.ExplorerPersister;
+import com.htmlhifive.pitalium.explorer.response.Result;
+import com.htmlhifive.pitalium.explorer.response.ResultDirectory;
+import com.htmlhifive.pitalium.explorer.response.ResultListOfExpected;
+import com.htmlhifive.pitalium.explorer.response.ScreenshotFile;
 import com.htmlhifive.pitalium.explorer.response.TestExecutionResult;
 
 @Service("persisterService")
@@ -81,6 +87,32 @@ public class PersisterServiceImpl implements PersisterService {
 	@Override
 	public void setScreenshotIdService(ScreenshotIdService screenshotIdService) {
 		persister.setScreenshotIdService(screenshotIdService);
+	}
+
+	@Override
+	public Page<ResultDirectory> findResultDirectory(String searchTestMethod, String searchTestScreen, int page,
+			int pageSize, boolean refresh) {
+		return persister.findResultDirectory(searchTestMethod, searchTestScreen, page, pageSize, refresh);
+	}
+	@Override
+	public Map<String, List> findScreenshotFiles(String path, boolean refresh){
+		return persister.findScreenshotFiles(path, refresh);
+	}
+	@Override
+	public ResultListOfExpected executeComparing(String expectedFilePath, String[] targetFilePaths) {
+		return persister.executeComparing(expectedFilePath, targetFilePaths);
+	}
+	@Override
+	public Map<String, byte[]> getImages(String expectedFilePath, String targetFilePath) {
+		return persister.getImages(expectedFilePath, targetFilePath);
+	}
+	@Override
+	public List<ComparedRectangle> getComparedResult(String path, int resultListId, int targetResultId){
+		return persister.getComparedResult(path, resultListId, targetResultId);
+	};
+	@Override
+	public String deleteResults(String path, int resultListId){
+		return persister.deleteResults(path, resultListId);
 	}
 
 	@Override

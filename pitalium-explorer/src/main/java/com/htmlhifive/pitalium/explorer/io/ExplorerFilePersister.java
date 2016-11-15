@@ -3,15 +3,30 @@
  */
 package com.htmlhifive.pitalium.explorer.io;
 
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileFilter;
+import java.io.FileWriter;
+import java.io.FilenameFilter;
 import java.io.IOException;
+import java.sql.Date;
 import java.sql.Timestamp;
+import java.text.DecimalFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.imageio.ImageIO;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
@@ -26,6 +41,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.htmlhifive.pitalium.common.util.JSONUtils;
 import com.htmlhifive.pitalium.core.config.FilePersisterConfig;
 import com.htmlhifive.pitalium.core.io.FilePersister;
 import com.htmlhifive.pitalium.core.io.PersistMetadata;
@@ -43,7 +61,15 @@ import com.htmlhifive.pitalium.explorer.entity.Target;
 import com.htmlhifive.pitalium.explorer.entity.TestEnvironment;
 import com.htmlhifive.pitalium.explorer.entity.TestExecution;
 import com.htmlhifive.pitalium.explorer.entity.TestExecutionAndEnvironment;
+import com.htmlhifive.pitalium.explorer.file.FileUtility;
+import com.htmlhifive.pitalium.explorer.image.ComparedRectangle;
+import com.htmlhifive.pitalium.explorer.image.ImagePair;
+import com.htmlhifive.pitalium.explorer.image.SimilarityUnit;
 import com.htmlhifive.pitalium.explorer.response.TestExecutionResult;
+import com.htmlhifive.pitalium.explorer.response.Result;
+import com.htmlhifive.pitalium.explorer.response.ResultDirectory;
+import com.htmlhifive.pitalium.explorer.response.ResultListOfExpected;
+import com.htmlhifive.pitalium.explorer.response.ScreenshotFile;
 import com.htmlhifive.pitalium.explorer.service.ScreenshotIdService;
 import com.htmlhifive.pitalium.image.model.RectangleArea;
 
@@ -71,6 +97,559 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 	public void setScreenshotIdService(ScreenshotIdService screenshotIdService) {
 		this.screenshotIdService = screenshotIdService;
 	}
+
+	@Override
+	public Page<ResultDirectory> findResultDirectory(String searchMethod, String searchTestScreen, int page, int pageSize, boolean refresh){
+		File root = super.getResultDirectoryFile();
+		if (!root.exists() || !root.isDirectory()) {
+			log.error("Directory(" + root.getAbsolutePath() + ") Not Found.");
+			return new PageImpl<>(new ArrayList<ResultDirectory>());
+		}
+
+		LinkedList<ResultDirectory> resultDirectoriesList = new LinkedList<ResultDirectory>();
+
+		File resultDirectoryJson = new File(root, "resultDirectory.json");
+		if (!refresh){
+			if(!resultDirectoryJson.exists()){
+				return new PageImpl<>(new ArrayList<ResultDirectory>());
+			}else{
+				resultDirectoriesList = JSONUtils.readValue(resultDirectoryJson, new TypeReference<LinkedList<ResultDirectory>>(){});
+			}
+		}else{
+			File[] subDirectories = root.listFiles(new FilenameFilter(){
+				@Override
+				public boolean accept(File dir, String name){
+					return new File(dir, name).isDirectory();
+				}
+			});
+
+			int id = 0;
+			for(int i=0; i<subDirectories.length; i++){
+				File timeDirectory = subDirectories[i];
+				String timestampString = timeDirectory.getName();
+				SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddhhmmss");
+				long timestamp;
+				try {
+					timestamp = sdf.parse(timestampString.replace("_", "")).getTime();
+				} catch (ParseException e) {
+					log.error("timestamp parsing error: " + timestampString);
+					timestamp = 0;
+				}
+				
+				File[] methodDirectories = timeDirectory.listFiles(new FileFilter(){
+					@Override
+					public boolean accept(File f){
+						return f.isDirectory();
+					}
+				});
+				
+				for(int j=0; j<methodDirectories.length; j++){
+					File directory = methodDirectories[j];
+					String methodName = directory.getName();
+					
+					File resultListOfExpectedJson = new File(new File(directory, "comparisonResults"), "resultList.json");
+					List<ResultListOfExpected> resultListOfExpectedList = null;
+					if (resultListOfExpectedJson.exists()){
+						resultListOfExpectedList = JSONUtils.readValue(resultListOfExpectedJson, new TypeReference<ArrayList<ResultListOfExpected>>(){});
+					}
+					int numberOfResults = 0;
+					if (resultListOfExpectedList != null){
+						numberOfResults = resultListOfExpectedList.size();
+					}
+
+					
+//					File[] results = new File(directory, "comparisonResults").listFiles(new FilenameFilter(){
+//						@Override
+//						public boolean accept(File dir, String name) {
+//							return name.toLowerCase().endsWith(".json");
+//						}
+//					});
+//					int numberOfResults = 0;
+//					if(results != null){
+//						numberOfResults = results.length;
+//					}
+					
+					File[] screenshots = directory.listFiles(new FilenameFilter() {
+						@Override
+						public boolean accept(File dir, String name) {
+							for(String extension : new String[]{".png", "jpg", ".jpeg"}){
+								if(name.toLowerCase().endsWith(extension)) return true;
+							}
+							return false;
+						}
+					});
+					int numberOfScreenshots = 0;
+					if(screenshots != null){
+						numberOfScreenshots = screenshots.length;
+					}
+
+					HashSet<String> browsers = new HashSet<String>();
+					for(File screenshot : screenshots){
+						if(screenshot.getName().toLowerCase().contains("chrome")) browsers.add("chrome");
+						else if(screenshot.getName().toLowerCase().contains("safari")) browsers.add("safari");
+						else if(screenshot.getName().toLowerCase().contains("firefox")) browsers.add("firefox");
+						else if(screenshot.getName().toLowerCase().contains("IE")) browsers.add("IE");
+						else browsers.add("unknown");
+					}
+					int numberOfBrowsers = browsers.size();
+					
+					ResultDirectory resultDirectory = new ResultDirectory(++id, methodName, timestamp, timestampString,
+							numberOfResults, numberOfScreenshots, numberOfBrowsers);
+					resultDirectoriesList.add(resultDirectory);
+				}
+
+//				File[] results = directory.listFiles(new FilenameFilter() {
+//					@Override
+//					public boolean accept(File dir, String name) {
+//						return name.toLowerCase().endsWith(".json");
+//					}
+//				});
+//				int numberOfResults = results.length;
+//
+//				File[] screenshots = directory.listFiles(new FilenameFilter() {
+//					@Override
+//					public boolean accept(File dir, String name) {
+//						for(String extension : new String[]{".png", "jpg", ".jpeg"}){
+//							if(name.toLowerCase().endsWith(extension)) return true;
+//						}
+//						return false;
+//					}
+//				});
+//				int numberOfScreenshots = screenshots.length;
+
+//				HashSet<String> browsers = new HashSet<String>();
+//				for(File screenshot : screenshots){
+//					if(screenshot.getName().toLowerCase().contains("chrome")) browsers.add("chrome");
+//					else if(screenshot.getName().toLowerCase().contains("safari")) browsers.add("safari");
+//					else if(screenshot.getName().toLowerCase().contains("firefox")) browsers.add("firefox");
+//					else if(screenshot.getName().toLowerCase().contains("IE")) browsers.add("IE");
+//					else browsers.add("unknown");
+//				}
+//				int numberOfBrowsers = browsers.size();
+
+
+			}
+
+			if(resultDirectoryJson.exists()) resultDirectoryJson.delete();
+			try {
+				FileWriter fw = new FileWriter(resultDirectoryJson.getPath());
+				fw.write(JSONUtils.toString(resultDirectoriesList));
+				fw.close();
+			} catch (Exception e) {
+				log.error("file write error: can not write " + resultDirectoryJson.getPath());
+			}
+		}
+
+		int size = resultDirectoriesList.size();
+		if (pageSize == 0) {
+			pageSize = defaultPageSize;
+		} else if (pageSize == -1) {
+			pageSize = (int) Math.min(size, Integer.MAX_VALUE);
+		}
+
+		resultDirectoriesList.subList((page-1)*pageSize, Math.min(page*pageSize, size));
+
+		PageRequest pageable = new PageRequest(page - 1, pageSize);
+		return new PageImpl<ResultDirectory>(resultDirectoriesList, pageable, size);
+	}
+	
+	@Override
+	public Map<String, List> findScreenshotFiles(String path, boolean refresh){
+		File root = super.getResultDirectoryFile();
+		if (!root.exists() || !root.isDirectory()) {
+			log.error("Directory(" + root.getAbsolutePath() + ") Not Found.");
+			return new HashMap<String, List>();
+		}
+
+		File directory = new File(root, path);
+		File[] files = directory.listFiles(new FilenameFilter() {
+			@Override
+			public boolean accept(File dir, String name) {
+				for(String extension : new String[]{".png", "jpg", ".jpeg"}){
+					if(name.toLowerCase().endsWith(extension)) return true;
+				}
+				return false;
+			}
+		});
+
+		List<ScreenshotFile> screenshotFileList = new LinkedList<ScreenshotFile>();
+
+		File screenshotFileListJson= new File(directory, "screenshotFileList.json");
+		if (!refresh){
+			if(!screenshotFileListJson.exists()){
+				return new HashMap<String, List>();
+			}else{
+				screenshotFileList = JSONUtils.readValue(screenshotFileListJson, new TypeReference<LinkedList<ScreenshotFile>>(){});
+			}
+		}else{
+			for(int i=0; i<files.length; i++){
+				File file = files[i];
+				String name = file.getName();
+				Date date = new Date(file.lastModified());
+				long timestamp = date.getTime();
+
+				String platform = "unknown";
+				if(name.toLowerCase().contains("windows")) platform = "WINDOWS";
+				else if(name.toLowerCase().contains("mac")) platform = "MAC";
+				else if(name.toLowerCase().contains("linux")) platform = "linux";
+				else if(name.toLowerCase().contains("android")) platform = "android";
+				else if(name.toLowerCase().contains("ios")) platform = "ios";
+
+				String browser = "unknown";
+				if(name.toLowerCase().contains("chrome")) browser = "chrome";
+				else if(name.toLowerCase().contains("safari")) browser = "safari";
+				else if(name.toLowerCase().contains("firefox")) browser = "firefox";
+				else if(name.toLowerCase().contains("IE")) browser = "IE";
+				else if(name.toLowerCase().contains("explorer")) browser = "IE";
+
+				String version = "";
+				// this regex has something problem. should be fixed later
+				Matcher m = Pattern.compile("v.?(\\d+(\\d|\\.)*+)").matcher(name);
+				if(m.find()){
+					version = m.group(1);
+				}
+
+				double size = ((double) file.length())/(1024*1024);
+				size = Double.valueOf(new DecimalFormat("#.##").format(size));
+
+				BufferedImage bimg;
+				int width = 0;
+				int height = 0;
+				try {
+					bimg = ImageIO.read(file);
+					width = bimg.getWidth();
+					height = bimg.getHeight();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+
+				ScreenshotFile screenshotFile = new ScreenshotFile(i+1, name, timestamp,
+						platform, browser, version,
+						size, width, height);
+				screenshotFileList.add(screenshotFile);
+			}
+
+			if(screenshotFileListJson.exists()) screenshotFileListJson.delete();
+			try {
+				FileWriter fw = new FileWriter(screenshotFileListJson.getPath());
+				fw.write(JSONUtils.toString(screenshotFileList));
+				fw.close();
+			} catch (Exception e) {
+				log.error("file write error: can not write " + screenshotFileListJson.getPath());
+			}
+		}
+		File resultListJson = new File(directory, "comparisonResults/resultList.json");
+		List<ResultListOfExpected> resultList;
+		if(resultListJson.exists()){
+			resultList = JSONUtils.readValue(resultListJson, new TypeReference<LinkedList<ResultListOfExpected>>(){});
+		} else{
+			resultList = new LinkedList<ResultListOfExpected>();
+		}
+
+		Map<String, List> ret = new HashMap<String, List>();
+		ret.put("screenshotFileList", screenshotFileList);
+		ret.put("resultList", resultList);
+		return ret;
+	}
+	
+	@Override
+	public ResultListOfExpected executeComparing(String expectedFilePath, String[] targetFilePaths) {
+		File root = super.getResultDirectoryFile();
+		if (!root.exists() || !root.isDirectory()) {
+			log.error("Directory(" + root.getAbsolutePath() + ") Not Found.");
+//			return new ArrayList<Result>();
+			return new ResultListOfExpected();
+		}
+						
+		File expectedFile = new File(root, expectedFilePath);
+		if(!expectedFile.exists()){ 
+			log.error("File(" + expectedFile.getAbsolutePath() + ") Not Found.");
+//			return new ArrayList<Result>();
+			return new ResultListOfExpected();
+		}
+		BufferedImage expectedImage;
+		try {
+			expectedImage = ImageIO.read(expectedFile);
+		} catch (IOException e) {
+			log.error("get buffered image error:: " + expectedFile.getAbsolutePath());
+			return new ResultListOfExpected();
+		}
+
+		File comparisonResultsDir = new File (expectedFile.getParentFile(), "comparisonResults");
+		if(!comparisonResultsDir.exists() || !comparisonResultsDir.isDirectory()){
+			comparisonResultsDir.mkdir();
+		}
+
+		File resultListJson = new File(comparisonResultsDir, "resultList.json");
+		if(!resultListJson.exists()){
+			try {
+				resultListJson.createNewFile();
+			} catch (IOException e) {
+				log.error("Can not create " + resultListJson.getAbsolutePath());
+			}
+		}
+		List<ResultListOfExpected> resultList;
+		try {
+			resultList = JSONUtils.readValue(resultListJson, new TypeReference<LinkedList<ResultListOfExpected>>(){});
+		} catch (Exception e){
+			resultList = new LinkedList<ResultListOfExpected>();
+		}
+		int id = 1;
+		if(resultList.size() != 0){
+			id = resultList.get(resultList.size()-1).getId()+1;
+		}
+		
+		List<Result> pairResultList= new LinkedList<Result>();
+		for(int i=0; i<targetFilePaths.length; i++){
+			String targetFilePath = targetFilePaths[i];
+			File targetFile = new File(root, targetFilePath);
+			if(!targetFile.exists()){ 
+				log.error("Directory(" + targetFile.getAbsolutePath() + ") Not Found.");
+				continue;
+			}
+
+			List<ComparedRectangle> comparedRectangles;
+			
+			String filenamePair = FileUtility.getPairResultFilename(expectedFilePath, targetFilePath, id);
+			File filenamePairJson = new File(comparisonResultsDir, filenamePair);
+
+			BufferedImage targetImage;
+			try {
+				targetImage = ImageIO.read(targetFile);
+			} catch (IOException e) {
+				log.error("get buffered image error:: " + targetFile.getAbsolutePath());
+				continue;
+			}
+			
+			ImagePair imagePair = new ImagePair(expectedImage, targetImage);
+			comparedRectangles = imagePair.getComparedRectangles();
+
+			double entireSimilarity = imagePair.getEntireSimilarity();
+			double minSimilarity = imagePair.getMinSimilarity();
+			int offsetX = imagePair.getDominantOffset().getX();
+			int offsetY = imagePair.getDominantOffset().getY();
+			boolean moveExpected = imagePair.isExpectedMoved();
+			
+//			Result result = new Result(expectedFilename, targetFilename, entireSimilarity, comparedRectangles.size());
+			Result result = new Result(i+1, targetFilePath, entireSimilarity, minSimilarity, comparedRectangles.size(), offsetX, offsetY, moveExpected);
+			pairResultList.add(result);
+			
+			try {
+				FileWriter fw = new FileWriter(filenamePairJson.getPath());
+				fw.write(JSONUtils.toString(comparedRectangles));
+				fw.close();
+			} catch (Exception e) {
+				log.error("file write error: can not write " + filenamePairJson.getPath());
+			}
+		}
+		ResultListOfExpected resultListOfExpected = new ResultListOfExpected(id, expectedFilePath, pairResultList, System.currentTimeMillis());
+		
+		resultList.add(resultListOfExpected);
+
+		try {
+			FileWriter fw = new FileWriter(resultListJson.getPath());
+			fw.write(JSONUtils.toString(resultList));
+			fw.close();
+		} catch (Exception e){
+			log.error("file write error: can not write " + resultListJson.getPath());
+		}
+
+		return resultListOfExpected;
+	}
+
+	public Map<String, byte[]> getImages(String expectedFilePath, String targetFilePath){
+		File root = super.getResultDirectoryFile();
+		if (!root.exists() || !root.isDirectory()) {
+			log.error("Directory(" + root.getAbsolutePath() + ") Not Found.");
+			return new HashMap<String, byte[]>();
+		}
+
+		File expectedFile = new File(root, expectedFilePath);
+		if(!expectedFile.exists()){ 
+			log.error("Directory(" + expectedFile.getAbsolutePath() + ") Not Found.");
+			return new HashMap<String, byte[]>();
+		}
+
+		BufferedImage expectedImage;
+		try {
+			expectedImage = ImageIO.read(expectedFile);
+		} catch (IOException e) {
+			log.error("get buffered image error:: " + expectedFile.getAbsolutePath());
+			return new HashMap<String, byte[]>();
+		}
+
+		File targetFile = new File(root, targetFilePath);
+		if(!targetFile.exists()){ 
+			log.error("Directory(" + targetFile.getAbsolutePath() + ") Not Found.");
+			return new HashMap<String, byte[]>();
+		}
+
+		BufferedImage targetImage;
+		try {
+			targetImage = ImageIO.read(targetFile);
+		} catch (IOException e) {
+			log.error("get buffered image error:: " + targetFile.getAbsolutePath());
+			return new HashMap<String, byte[]>();
+		}
+		
+
+		ByteArrayOutputStream expectedBao= new ByteArrayOutputStream();
+		ByteArrayOutputStream targetBao= new ByteArrayOutputStream();
+		try {
+			ImageIO.write(expectedImage, "png", expectedBao);
+			ImageIO.write(targetImage, "png", targetBao);
+		} catch (IOException e) {
+			log.error("Change to bytearray Error");
+			return new HashMap<String, byte[]>();
+		}
+		
+		Map<String, byte[]> imageMap= new HashMap<String, byte[]>();
+		imageMap.put("expectedImage", expectedBao.toByteArray());
+		imageMap.put("targetImage", targetBao.toByteArray());
+		
+		return imageMap;
+	}
+	
+	public List<ComparedRectangle> getComparedResult(String path, int resultListId, int targetResultId){
+		File root = super.getResultDirectoryFile();
+		if (!root.exists() || !root.isDirectory()) {
+			log.error("Directory(" + root.getAbsolutePath() + ") Not Found.");
+			return new ArrayList<ComparedRectangle>();
+		}
+
+		File directory = new File(root, path);
+		if(!directory.exists() || !directory.isDirectory()){
+			log.error("Directory(" + directory.getAbsolutePath() + ") Not Found.");
+			return new ArrayList<ComparedRectangle>();
+		}
+
+		File comparisonResultsDir = new File(directory, "comparisonResults");
+		if(!comparisonResultsDir.exists() || !comparisonResultsDir.isDirectory()){
+			log.error("Directory(" + comparisonResultsDir.getAbsolutePath() + ") Not Found.");
+			return new ArrayList<ComparedRectangle>();
+		}
+		
+		File resultListJson = new File(comparisonResultsDir, "resultList.json");
+		if(!resultListJson.exists()){
+			log.error("Directory(" + resultListJson.getAbsolutePath() + ") Not Found.");
+			return new ArrayList<ComparedRectangle>();
+		}
+		
+		List<ResultListOfExpected> resultList;
+		try{
+			resultList = JSONUtils.readValue(resultListJson, new TypeReference<List<ResultListOfExpected>>(){});
+		}catch(Exception e){
+			log.error("json read value error: " + resultListJson.getAbsolutePath());
+			return new ArrayList<ComparedRectangle>();
+		}
+		
+		String expectedFilePath = "";
+		String targetFilePath = "";
+		for(ResultListOfExpected resultListOfExpected: resultList){
+			if(resultListOfExpected.getId() == resultListId){
+				expectedFilePath = resultListOfExpected.getExpectedFilename();
+				for(Result targetResult: resultListOfExpected.getResultList()){
+					if(targetResult.getId() == targetResultId){
+						targetFilePath = targetResult.getTargetFilename();
+					}
+				}
+			}
+		}
+		
+		String filenamePair = FileUtility.getPairResultFilename(expectedFilePath, targetFilePath, resultListId);
+		File filenamePairJson = new File(comparisonResultsDir, filenamePair);
+		if(!filenamePairJson.exists()){ 
+			log.error("File(" + filenamePairJson.getAbsolutePath() + ") Not Found.");
+			return new ArrayList<ComparedRectangle>();
+		}
+
+		List<ComparedRectangle> comparedRectangleList;
+		try{
+			comparedRectangleList = JSONUtils.readValue(filenamePairJson, new TypeReference<ArrayList<ComparedRectangle>>(){});
+		} catch(Exception e){
+			log.error("Json to Object error: " + filenamePairJson.getAbsolutePath());
+			e.printStackTrace();
+			comparedRectangleList = new ArrayList<ComparedRectangle>();
+		}
+		return comparedRectangleList;
+	}
+	
+	@Override
+	public String deleteResults(String path, int resultListId){
+		File root = super.getResultDirectoryFile();
+		if (!root.exists() || !root.isDirectory()) {
+			log.error("Directory(" + root.getAbsolutePath() + ") Not Found.");
+			return "Fail";
+		}
+
+		File directory = new File(root, path);
+		if(!directory.exists() || !directory.isDirectory()){
+			log.error("Directory(" + directory.getAbsolutePath() + ") Not Found.");
+			return "Fail";
+		}
+
+		File comparisonResultsDir = new File(directory, "comparisonResults");
+		if(!comparisonResultsDir.exists() || !comparisonResultsDir.isDirectory()){
+			log.error("Directory(" + comparisonResultsDir.getAbsolutePath() + ") Not Found.");
+			return "Fail";
+		}
+		
+		File resultListJson = new File(comparisonResultsDir, "resultList.json");
+		if(!resultListJson.exists()){
+			log.error("Directory(" + resultListJson.getAbsolutePath() + ") Not Found.");
+			return "Fail";
+		}
+		List<ResultListOfExpected> resultList;
+		try{
+			resultList = JSONUtils.readValue(resultListJson, new TypeReference<List<ResultListOfExpected>>(){});
+		}catch(Exception e){
+			log.error("json read value error: " + resultListJson.getAbsolutePath());
+			return "Fail";
+		}
+		
+		String expectedFilePath = "";
+		List<String> targetFilePaths = new LinkedList<String>();
+//		for(int i = 0; i < resultList.size(); i++){
+//			ResultListOfExpected resultListOfExpected = resultList.get(i);
+//			if(resultListOfExpected.getId() == resultListId){
+//				expectedFilePath = resultListOfExpected.getExpectedFilename();
+//				for(Result targetResult: resultListOfExpected.getResultList()){
+//					targetFilePaths.add(targetResult.getTargetFilename());
+//				}
+//				break;
+//			}
+//		}
+		for(ResultListOfExpected resultListOfExpected: resultList){
+			if(resultListOfExpected.getId() == resultListId){
+				expectedFilePath = resultListOfExpected.getExpectedFilename();
+				for(Result targetResult: resultListOfExpected.getResultList()){
+					targetFilePaths.add(targetResult.getTargetFilename());
+				}
+				resultList.remove(resultListOfExpected);
+				break;
+			}
+		}
+
+		try {
+			FileWriter fw = new FileWriter(resultListJson.getPath());
+			fw.write(JSONUtils.toString(resultList));
+			fw.close();
+		} catch (Exception e) {
+			log.error("file write error: can not write " + resultListJson.getPath());
+		}
+		
+		for(String targetFilePath: targetFilePaths){
+			String filenamePair = FileUtility.getPairResultFilename(expectedFilePath, targetFilePath, resultListId);
+			File filenamePairJson = new File(comparisonResultsDir, filenamePair);
+			if(!filenamePairJson.exists()){ 
+				log.error("File(" + filenamePairJson.getAbsolutePath() + ") Not Found.");
+				return "Fail";
+			}
+			filenamePairJson.delete();
+		}
+		return "Success";
+	}
+
 
 	@Override
 	public Page<TestExecutionResult> findTestExecution(String searchTestMethod, String searchTestScreen, int page,

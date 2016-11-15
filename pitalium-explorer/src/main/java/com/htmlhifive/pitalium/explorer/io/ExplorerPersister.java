@@ -6,14 +6,21 @@ package com.htmlhifive.pitalium.explorer.io;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 import com.htmlhifive.pitalium.explorer.service.ScreenshotIdService;
 import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity;
 
 import com.htmlhifive.pitalium.core.io.Persister;
 import com.htmlhifive.pitalium.explorer.entity.Screenshot;
 import com.htmlhifive.pitalium.explorer.entity.Target;
 import com.htmlhifive.pitalium.explorer.entity.TestExecutionAndEnvironment;
+import com.htmlhifive.pitalium.explorer.image.ComparedRectangle;
+import com.htmlhifive.pitalium.explorer.response.Result;
+import com.htmlhifive.pitalium.explorer.response.ResultDirectory;
+import com.htmlhifive.pitalium.explorer.response.ResultListOfExpected;
+import com.htmlhifive.pitalium.explorer.response.ScreenshotFile;
 import com.htmlhifive.pitalium.explorer.response.TestExecutionResult;
 
 public interface ExplorerPersister extends Persister {
@@ -21,7 +28,31 @@ public interface ExplorerPersister extends Persister {
 	int defaultPageSize = 20;
 
 	void setScreenshotIdService(ScreenshotIdService screenshotIdService);
+	
+	/**
+	 * Get the list of sub-directories under 'results' directory.
+	 * 
+	 * @param searchTestMethod
+	 * @param searchTestScreen
+	 * @param page
+	 * @param pageSize
+	 * @param refresh 
+	 * @return Directories under 'results' folder
+	 */
+	Page<ResultDirectory> findResultDirectory(String searchTestMethod, String searchTestScreen, int page, int pageSize, boolean refresh);
+	
+	/**
+	 * Get the screenshot files under selected sub-directory of 'results' folder
+	 * 
+	 * @param name2 
+	 * @return Screenshot files under subdirectory of 'results' folder
+	 */
+	Map<String, List> findScreenshotFiles(String path, boolean refresh);
 
+	ResultListOfExpected executeComparing(String expectedFilePath, String[] targetFilePaths);
+	Map<String, byte[]> getImages(String expectedFilePath, String targetFilePath);
+	List<ComparedRectangle> getComparedResult(String path, int resultListId, int targetResultId);
+	String deleteResults(String path, int resultListId);
 	/**
 	 * TestExecutionのリストを取得する。 引数のメソッド名、スクリーンショットを含む（like検索）Screenshotを持つ TestExecutionのリストを取得する。
 	 * 
@@ -100,4 +131,9 @@ public interface ExplorerPersister extends Persister {
 	String getEdgeFileName(Integer screenshotId, String algorithm);
 
 	void saveProcessedImage(Integer screenshotId, String algorithm, String edgeFileName);
+
+
+
+
+	
 }

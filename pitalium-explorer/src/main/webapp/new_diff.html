@@ -1,0 +1,551 @@
+<!doctype html>
+<html>
+<head>
+	<!--Copyright (C) 2015 NS Solutions Corporation, All Rights Reserved.  -->
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+	<meta http-equiv="Pragma" content="no-cache">
+	<meta http-equiv="Cache-Control" content="no-cache">
+	<meta http-equiv="Expires" content="-1">
+
+	<title>Test results - Pitalium Explorer</title>
+	<link rel="shortcut icon" href="res/img/favicon.ico">
+	
+	
+	<link rel="stylesheet" href="/hifive-res/ext/bootstrap/3.3.6/css/bootstrap.css">
+	
+	<link rel="stylesheet" href="/hifive-res/fw/current/h5.css" data-h5-module="hifive">
+	<link rel="stylesheet" href="src/common/common.css">
+	<link rel="stylesheet" href="src/list/new_list.css">
+	<link rel="stylesheet" href="lib/jquery-ui/jquery-ui.css">
+	<link rel="stylesheet" href="lib/rangeslider/rangeslider.css">
+	<script src="/hifive-res/ext/jquery/jquery-2.js"></script>
+	<script src="/hifive-res/ext/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+	<script src="lib/jquery-ui/jquery-ui.js"></script>
+	<script src="lib/jquery-kinetic/jquery.kinetic.js"></script>
+	<script src="/hifive-res/fw/current/ejs-h5mod.js" data-h5-module="hifive:ejs"></script>
+	<script src="/hifive-res/fw/current/h5.js" data-h5-module="hifive"></script>
+
+	<script src="src/common/constant.js"></script>
+	<script src="src/common/util.js"></script>
+	<script src="lib/rangeslider/rangeslider.js"></script>
+
+	</head>
+	<body>
+	
+
+		<!-- Navigation -->
+		<nav class="navbar navbar-fixed-top"  style="background-color:#00BCD4;">
+			<div class="container-fluid">
+				<div class="navbar-header" style="width:100%;">
+					<a class="navbar-brand" href="new_list.html">Pitalium explorer</a>
+					
+		        	
+		        	<div style="width:280px; height:50px; float:left;">
+		        		<div class="dropdown" style="margin-top:8px; margin-left:20px;">
+					  <button class="btn btn-default dropdown-toggle" style="color:#009688;" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+					    Show differences by category
+					    <span class="caret"></span>
+					  </button>
+					  <ul class="dropdown-menu " aria-labelledby="dropdownMenu1">
+					    <li><a class="click_prevent"><input type="checkbox" class="choice" id="checkbox_SHIFT" checked="checked" data-rectype="SHIFT"><span style="margin-left:10px;">Shift</span></a></li>
+					    <li><a class="click_prevent"><input type="checkbox" class="choice" id="checkbox_MISSING" checked="checked" data-rectype="MISSING"><span style="margin-left:10px;">Missing</span></a></li>
+					    <li><a class="click_prevent"><input type="checkbox" class="choice" id="checkbox_SCALING" checked="checked" data-rectype="SCALING"><span style="margin-left:10px;">Object size</span></a></li>
+					    <li><a class="click_prevent"><input type="checkbox" class="choice" id="checkbox_FONT" checked="checked" data-rectype="FONT"><span style="margin-left:10px;">Font style</span></a></li>
+					    <li><a class="click_prevent"><input type="checkbox" class="choice" id="checkbox_SIMILAR" checked="checked" data-rectype="SIMILAR"><span style="margin-left:10px;">Ambiguous</span></a></li>
+
+					  </ul>
+					
+
+					</div>
+		     
+		        	
+		        	</div>
+		        	<div style="width:180px; float:left">
+		        		<p style="margin-top:8px; margin-bottom:2px; color:#455A64;">Diff region opacity control</p>
+		        		<input id="opacity_range" type="range" min="0" max="1" step="0.1" value="0.3">
+		        	</div>
+		        	<div style="width:180px; float:left; margin-left:20px;">
+		        		<p style="margin-top:8px; margin-bottom:2px; color:#455A64;">Image size control</p>
+		        		<input id="img_size" type="range" min="0" max="3" step="0.1" value="1">
+		        	</div>
+		        	<div style="width:180px; float:left; margin-left:20px;">
+		        		<p style="margin-top:8px; margin-bottom:2px; color:#455A64;">Importance control</p>
+		        		<input id="importance" type="range" min="0" max="1" step="0.01" value="1">
+		        	</div>
+		        	
+		        </div>
+		        	
+		      
+			</div>
+			
+		</nav>
+		<!-- Navigation -->
+
+<div style="height:75px;">
+
+		      
+</div>
+		<div class="col-xs-6 col-sm-6 col-md-6 no-padding" id="container">
+			
+		      	<div class="result_box" id="expected_box" >
+		      	 	<div class="test_result screenshot" id="test_expected" style="position:relative;">
+		      	 	
+		        	</div>
+		      	</div>
+		       
+
+		</div>
+		
+		<div class="col-xs-6 col-sm-6 col-md-6 no-padding" >
+			
+		     
+		      	<div class="result_box" id="result_box" >
+		      	 	<div class="test_result screenshot" id="test_result" style="position:relative;">
+		      	 	
+		        
+		        	</div>
+		      	</div>
+		       
+		 
+
+			<div class="col-md-12" >
+				
+			</div>
+
+		</div>
+		
+		
+		
+		<div class="footer col-sm-12">
+		
+			<p>Copyright (C) 2012-2016 NS Solutions Corporation, All Rights Reserved.</p>
+		
+		</div>
+		
+		<div id="memobox">
+			
+		</div>
+		
+		
+		<script>
+		
+		$('#result_box').kinetic(); //you can drag images
+
+		$('#expected_box').kinetic(); //you can drag images
+		
+		
+		$('#result_box').on("scroll", function(){
+			$("#expected_box").scrollLeft($('#result_box').scrollLeft());
+			
+		});
+		
+		$('#expected_box').on("scroll", function(){
+			$("#result_box").scrollLeft($('#expected_box').scrollLeft());
+			
+		});
+		
+		
+		$(document).on("mouseenter", ".diffDiv", function(){
+			var mouse_div = $(this);
+			var rectype = $(this).data("rectype");
+			
+			var method3 = $(this).data("method3");
+			var xshift = $(this).data("xshift");
+			var yshift = $(this).data("yshift");
+			var featurematrix = $(this).data("featurematrix");
+			var pixelbypixel = $(this).data("pixelbypixel");
+			var thres = $(this).data("thres");
+			var total = $(this).data("total");
+			
+			var data1 = {
+					
+					type: rectype,
+					
+					xshift: xshift,
+					yshift: yshift,
+					featurematrix: featurematrix,
+					pixelbypixel: pixelbypixel,
+					thres: thres,
+					total: total
+					
+			};
+			
+			h5.core.view.update("#memobox", "memo_content", data1); //memo content update
+			
+			var opacity =  $("#opacity_range").val();
+			var opacity_over = parseFloat($("#opacity_range").val()) + 0.3;
+			$("#memobox").show();
+			
+				
+				var this_opacity = parseFloat(mouse_div.css("opacity"));
+				var index = $(this).data("index");
+				$(".diff_index_" + index).css("opacity", (this_opacity + 0.3)); 
+			
+		});
+		
+		
+		
+		$(document).on("mouseleave", ".diffDiv", function(){
+			$("#memobox").hide();
+			
+				var this_opacity = parseFloat($(this).css("opacity")) ;
+				var index = $(this).data("index");
+				$(".diff_index_" + index).css("opacity", (this_opacity- 0.3));
+			
+		});
+		
+		$(document).on('mousemove', function(e){
+		    $('#memobox').css({
+		       left:  e.pageX + 10,
+		       top:   e.pageY - 20
+		    });
+		});
+		$(document).on("mouseenter", ".platform", function(){
+			$(this).find("img").hide();
+			$(this).find("span").show();
+		});
+		$(document).on("mouseleave", ".platform", function(){
+			$(this).find("img").show();
+			$(this).find("span").hide();
+		});
+		
+		
+		$(document).ready(function(){
+			
+			var queryParams = hifive.pitalium.explorer.utils.getParameters(); //get parameters
+			
+			var expected = queryParams["expected"]; //expected image path
+			var target = queryParams["target"]; //target image path
+			
+			var resultListId = queryParams["list_id"]; //result list id
+			var targetResultId = queryParams["result_id"]; //result_id in result list
+			var directory = queryParams["directory"]; //result directory
+			var offsetx = 0 - parseInt(queryParams["offsetx"]); //dominant offset x
+			var offsety = 0 - parseInt(queryParams["offsety"]); //dominant offset y
+			
+			if (queryParams["offset_expected"].toLowerCase() == "true"){ //if offset_expected == true, expected image should be moved. if false, compare image should be moved
+				var offset_expected = true;
+			}else{
+				var offset_expected = false;
+			}
+			
+			var minsimilarity = parseFloat(queryParams["minsimilarity"]); //this is for Importance control bar. It decides the importance control's minimum value.
+			
+			$("#importance").attr("min", minsimilarity);
+			 $('input[type="range"]').rangeslider();
+			 
+		
+			
+			$("#diffDetail").modal("show");
+			$("#test_result").height("300");
+			$("#test_result").width("100%");
+			$("#test_expected").height("300");
+			$("#test_expected").width("100%");
+
+			$("#test_expected").css("background", "#fff url('res/img/big_loading.gif') center no-repeat");
+			$("#test_result").css("background", "#fff url('res/img/big_loading.gif') center no-repeat");
+
+			$(".diffDiv").remove();
+			
+			$.ajax({
+				url: "_screenshots/images.json",
+				type: "GET",
+				data: {
+					
+					target: target,
+					expected: expected
+				},
+				success: function(data){
+					
+					var img = new Image();
+					
+					var offset_str = String(offsetx) + "px " + String(offsety) + "px";
+					
+					
+					img.onload = function() {
+						$("#test_result").height(this.height);
+						$("#test_result").width(this.width);
+						$("#test_result").data("width", this.width);
+						$("#test_result").data("height", this.height);
+						$("#test_result").css("background-image", "url('" + this.src + "')");
+						
+						if (!offset_expected){
+							$("#test_result").css("background-position", offset_str);
+						}
+					}
+					
+					img.src = "data:image/png;base64," + data["targetImage"];
+					
+					var expected = new Image();
+					expected.onload = function(){
+						$("#test_expected").height(this.height);
+						$("#test_expected").width(this.width);
+						$("#test_expected").data("width", this.width);
+						$("#test_expected").data("height", this.height);
+						$("#test_expected").css("background-image", "url('" + this.src + "')");
+						
+						if (offset_expected){
+							$("#test_expected").css("background-position", offset_str);
+						}
+						
+					}
+					expected.src = "data:image/png;base64," + data["expectedImage"];
+					
+					drawRec(directory, resultListId, targetResultId); //this function draws all of red rectangles(divs)
+					
+				}
+			
+				
+			});
+			
+		
+			
+		});
+		
+		
+		function drawRec(directory, resultId, targetResultId){ //this function draws all of red rectangles(divs)
+			
+			
+			$.ajax({
+				url: "_screenshots/result.json",
+				type: "GET",
+				data: {
+					path: directory,
+					resultListId: resultId,
+					targetResultId: targetResultId
+				},
+				success: function(data){
+
+					console.log(data);
+					
+					for (var i = 0; i < data.length; i++){
+						
+						var rec = data[i];
+						var my_data;
+						
+						console.log(rec);
+						
+						
+						s_unit = rec["similarityUnit"];
+						
+						if (rec["type"] == "SHIFT"){
+							my_data = {
+									x: rec["x"],
+									y: rec["y"],
+									width: rec["width"],
+									height: rec["height"],
+									type: rec["type"],
+									xshift: rec["xshift"],
+									yshift: rec["yshift"],
+									featureMatrix: "",
+									pixelByPixel: "1",
+									thresDiff: "",
+									totalDiff: "",
+									index: i
+									
+									
+							};
+						
+						}else{
+							my_data = {
+									x: rec["x"],
+									y: rec["y"],
+									width: rec["width"],
+									height: rec["height"],
+									type: rec["type"],
+									xshift: rec["xshift"],
+									yshift: rec["yshift"],
+									featureMatrix: s_unit["similarityFeatureMatrix"],
+									pixelByPixel: s_unit["similarityPixelByPixel"],
+									thresDiff: s_unit["similarityThresDiff"],
+									totalDiff: s_unit["similarityTotalDiff"],
+									index: i
+									
+									
+							};
+							
+						}
+						
+						h5.core.view.append("#test_expected", "diffDiv", my_data);
+						
+						h5.core.view.append("#test_result", "diffDiv", my_data);
+						
+						
+					}
+					
+					
+				}
+					
+			
+			});
+		}
+		
+		
+		$(document).on("click", ".result_info", function(){
+			
+			$(this).parent().find(".info_table_div").slideToggle();
+			
+		});
+		
+		$(document).on("input change", "#opacity_range", function(){
+			
+			$(".diffDiv").css("opacity", $("#opacity_range").val());
+			
+			$("#radio_none").trigger("click");
+			
+		});
+		
+		$(document).on("input change", "#importance", function(){
+			var value = $(this).val();
+			$(".diffDiv").each(function(){
+				
+				var thisDiv = $(this);
+				
+					if ($("#checkbox_" + thisDiv.data("rectype")).is(":checked")){
+						if (thisDiv.data("pixelbypixel") > value){
+								thisDiv.hide();
+						}else{
+								thisDiv.show();
+						}
+					}
+				
+				
+				
+				
+				
+			});
+			
+		});
+		
+		$(document).on("input change", "#img_size", function(){ //This is for the Image size control bar.
+			
+			var ratio = $(this).val();
+		
+			$(".screenshot").each(function(){
+				var this_height = $(this).data("height");
+				var this_width = $(this).data("width");
+				$(this).height(this_height*ratio);
+				$(this).width(this_width*ratio);
+				$(this).css("background-size", String(this_width*ratio)  + "px " + String(this_height*ratio) + "px");
+				
+			});
+			
+			$(".diffDiv").each(function(){
+				var this_width = $(this).data("width");
+				var this_height = $(this).data("height");
+				var this_x = $(this).data("x");
+				var this_y = $(this).data("y");
+				
+				$(this).height(this_height*ratio);
+				$(this).width(this_width*ratio);
+				
+				$(this).css("left", this_x*ratio);
+				$(this).css("top", this_y*ratio);
+				
+				
+				
+			});
+			
+		});
+		
+		
+		
+		$(document).on("change", ".choice", function(){ //This is for "show differences by category checkboxes.
+			var rectype = $(this).data("rectype");
+			
+			
+			
+			$(".diff_" + rectype).each(function(){
+				
+				if (parseFloat($(this).data("pixelbypixel")) <= parseFloat($("#importance").val())) {
+					$(this).toggle();
+				}
+				
+			});
+				
+			
+		});
+		
+		$('.click_prevent').click(function(event){
+			
+			event.stopPropagation();
+			
+		});
+		
+	
+		</script>
+		
+		
+		
+		<script type="text/ejs" id="diffDiv">
+
+			<div class="diffDiv diff_[%=type%] diff_index_[%=index%]" style="left: [%=x%]px; top: [%=y%]px; width: [%=width%]px; height: [%=height%]px;" data-x="[%=x%]" data-y="[%=y%]" data-width="[%=width%]" data-height="[%=height%]"
+					data-rectype="[%=type%]" data-xshift="[%=xshift%]" data-yshift="[%=yshift%]"
+					data-featurematrix="[%=featureMatrix%]"
+					data-pixelbypixel = "[%=pixelByPixel%]"
+					data-thres = "[%=thresDiff%]"
+					data-total="[%=totalDiff%]" data-index="[%=index%]"
+					>
+	
+		    </div>
+
+		</script> <!-- Red divs -->
+		
+		
+		<script type="text/ejs" id="memo_content">
+
+			<h5>
+			[% switch(type){
+				case "SHIFT":%]
+				<i class="glyphicon glyphicon-move"></i> Shift
+			[%break; 
+				case "MISSING":%]
+				<i class="glyphicon glyphicon-question-sign"></i> Missing
+			[%break;
+				case "SCALING":%]
+				<i class="glyphicon glyphicon-resize-full"></i> Object size
+			[%break;
+				case "FONT":%]
+				<i class="glyphicon glyphicon-text-size"></i> Font style
+			[%break;
+				default: %]
+				<i class="glyphicon glyphicon-stats"></i> Ambiguous
+			[% } %]
+
+
+			</h5>
+			
+			<hr style="border-color:#8D6E63;">
+
+			[%if (type == "SHIFT"){%]
+				<p>x-shift: [%=xshift%]
+				</p>
+				<p>y-shift: [%=yshift%]
+				</p>
+			[%}else{%]
+			<p>
+			feature matrix: [%=featurematrix%]
+			</p>
+			
+			<p>
+			pixel by pixel: [%=pixelbypixel%]
+			</p>
+
+			<p>
+			threshold diff: [%=thres%]
+			</p>
+
+			<p>
+			total diff: [%=total%]
+			</p>
+		[%}%]
+
+			
+			
+		</script>
+
+		
+	</body>
+</html>
