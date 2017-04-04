@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.htmlhifive.pitalium.explorer.service.ScreenshotIdService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -27,10 +26,12 @@ import com.htmlhifive.pitalium.explorer.entity.Screenshot;
 import com.htmlhifive.pitalium.explorer.entity.ScreenshotRepository;
 import com.htmlhifive.pitalium.explorer.entity.Target;
 import com.htmlhifive.pitalium.explorer.entity.TargetRepository;
-import com.htmlhifive.pitalium.explorer.entity.TestExecutionRepository;
 import com.htmlhifive.pitalium.explorer.entity.TestExecutionAndEnvironment;
+import com.htmlhifive.pitalium.explorer.entity.TestExecutionRepository;
 import com.htmlhifive.pitalium.explorer.file.FileUtility;
+import com.htmlhifive.pitalium.explorer.request.ExecResultInputModel;
 import com.htmlhifive.pitalium.explorer.response.TestExecutionResult;
+import com.htmlhifive.pitalium.explorer.service.ScreenshotIdService;
 
 public class ExplorerDBPersister extends DBPersister implements ExplorerPersister {
 
@@ -243,6 +244,12 @@ public class ExplorerDBPersister extends DBPersister implements ExplorerPersiste
 		newEntry.setAlgorithm(algorithm);
 		newEntry.setFileName(edgeFileName);
 		processedImageRepo.saveAndFlush(newEntry);
+	}
+
+	@Override
+	public List<TestExecutionResult> updateExecResult(List<ExecResultInputModel> inputModelList) {
+		// TODO 自動生成されたメソッド・スタブ
+		throw new UnsupportedOperationException();
 	}
 
 }

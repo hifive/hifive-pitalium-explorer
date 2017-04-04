@@ -7,14 +7,15 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import com.htmlhifive.pitalium.explorer.service.ScreenshotIdService;
 import org.springframework.data.domain.Page;
 
 import com.htmlhifive.pitalium.core.io.Persister;
 import com.htmlhifive.pitalium.explorer.entity.Screenshot;
 import com.htmlhifive.pitalium.explorer.entity.Target;
 import com.htmlhifive.pitalium.explorer.entity.TestExecutionAndEnvironment;
+import com.htmlhifive.pitalium.explorer.request.ExecResultInputModel;
 import com.htmlhifive.pitalium.explorer.response.TestExecutionResult;
+import com.htmlhifive.pitalium.explorer.service.ScreenshotIdService;
 
 public interface ExplorerPersister extends Persister {
 
@@ -24,7 +25,7 @@ public interface ExplorerPersister extends Persister {
 
 	/**
 	 * TestExecutionのリストを取得する。 引数のメソッド名、スクリーンショットを含む（like検索）Screenshotを持つ TestExecutionのリストを取得する。
-	 * 
+	 *
 	 * @param searchTestMethod メソッド名
 	 * @param searchTestScreen スクリーンショット
 	 * @param page 表示ページ番号
@@ -36,7 +37,7 @@ public interface ExplorerPersister extends Persister {
 
 	/**
 	 * Screenshotのリストを取得する。 引数のメソッド名、スクリーンショットを含む（like検索）Screenshotのリストを取得する。
-	 * 
+	 *
 	 * @param testExecutionId テスト実行ID
 	 * @param searchTestMethod メソッド名
 	 * @param searchTestScreen スクリーンショット
@@ -46,7 +47,7 @@ public interface ExplorerPersister extends Persister {
 
 	/**
 	 * Screenshotを取得する。
-	 * 
+	 *
 	 * @param screenshotid スクリーンショットID
 	 * @return Screenshot
 	 */
@@ -54,7 +55,7 @@ public interface ExplorerPersister extends Persister {
 
 	/**
 	 * Targetを取得する。
-	 * 
+	 *
 	 * @param screenshotId スクリーンショットID
 	 * @param targetId 比較対象のID
 	 * @return Target
@@ -63,7 +64,7 @@ public interface ExplorerPersister extends Persister {
 
 	/**
 	 * 画像ファイルを取得する。
-	 * 
+	 *
 	 * @param screenshotId スクリーンショットID
 	 * @param targetId 比較対象のID
 	 * @return 画像ファイル
@@ -73,7 +74,7 @@ public interface ExplorerPersister extends Persister {
 
 	/**
 	 * Screenshotのリストを取得する。 引数のテスト実行ID、テスト環境IDと一致するScreenshotのリストを取得する。
-	 * 
+	 *
 	 * @param testExecutionId テスト実行ID
 	 * @param testEnvironmentId テスト環境ID
 	 * @param page 表示ページ番号
@@ -84,7 +85,7 @@ public interface ExplorerPersister extends Persister {
 
 	/**
 	 * TestExecutionAndEnvironmentのリストを取得する。
-	 * 
+	 *
 	 * @param page 表示ページ番号
 	 * @param pageSize 1ページあたりの表示数
 	 * @return TestExecutionAndEnviromentのリスト
@@ -100,4 +101,6 @@ public interface ExplorerPersister extends Persister {
 	String getEdgeFileName(Integer screenshotId, String algorithm);
 
 	void saveProcessedImage(Integer screenshotId, String algorithm, String edgeFileName);
+
+	List<TestExecutionResult> updateExecResult(List<ExecResultInputModel> inputModelList);
 }

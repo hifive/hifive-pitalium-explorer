@@ -33,6 +33,7 @@ import com.htmlhifive.pitalium.explorer.entity.TestExecutionAndEnvironment;
 import com.htmlhifive.pitalium.explorer.entity.TestExecutionRepository;
 import com.htmlhifive.pitalium.explorer.io.ExplorerDBPersister;
 import com.htmlhifive.pitalium.explorer.io.ExplorerPersister;
+import com.htmlhifive.pitalium.explorer.request.ExecResultInputModel;
 import com.htmlhifive.pitalium.explorer.response.TestExecutionResult;
 
 @Service("persisterService")
@@ -212,6 +213,11 @@ public class PersisterServiceImpl implements PersisterService {
 	@Override
 	public Map<String, Map<String, String>> loadExpectedIds() throws ResourceUnavailableException {
 		return persister.loadExpectedIds();
+	}
+
+	@Override
+	public List<TestExecutionResult> updateExecResult(List<ExecResultInputModel> inputModelList) {
+		return persister.updateExecResult(inputModelList);
 	}
 
 }

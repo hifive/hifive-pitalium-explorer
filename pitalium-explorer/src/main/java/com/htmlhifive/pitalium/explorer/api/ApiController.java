@@ -10,6 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -114,21 +115,27 @@ public class ApiController {
 		return new ResponseEntity<Page<TestExecutionAndEnvironment>>(testPage, HttpStatus.OK);
 	}
 
-	@RequestMapping(value = "executions/update", method = RequestMethod.POST)
+	@RequestMapping(value = "executions/update", method = RequestMethod.POST, consumes = "application/json;charset=utf-8",
+			produces = "application/json;charset=utf-8")
 	@ResponseBody
-	public ResponseEntity<String> updateExecResult(List<ExecResultInputModel> inputModelList) {
+	public ResponseEntity<List<TestExecutionResult>> updateExecResult(@RequestBody List<ExecResultInputModel> inputModelList) {
+		List<TestExecutionResult> testExecutionResultList = service.updateExecResult(inputModelList);
+		return new ResponseEntity<List<TestExecutionResult>>(testExecutionResultList, HttpStatus.OK);
+	}
+
+	@RequestMapping(value = "screenshots/update", method = RequestMethod.POST, consumes = "application/json;charset=utf-8",
+			produces = "application/json;charset=utf-8")
+	@ResponseBody
+	public ResponseEntity<String> updateScreenshotComparisonResult(@RequestBody List<ScreenshotResultInputModel> inputModelList) {
+		// TODO 未実装
 		return null;
 	}
 
-	@RequestMapping(value = "screenshots/update", method = RequestMethod.POST)
+	@RequestMapping(value = "targets/update", method = RequestMethod.POST, consumes = "application/json;charset=utf-8",
+			produces = "application/json;charset=utf-8")
 	@ResponseBody
-	public ResponseEntity<String> updateScreenshotComparisonResult(List<ScreenshotResultInputModel> inputModelList) {
-		return null;
-	}
-
-	@RequestMapping(value = "targets/update", method = RequestMethod.POST)
-	@ResponseBody
-	public ResponseEntity<String> updateTargetComparisonResult(List<TargetResultInputModel> inputModelList) {
+	public ResponseEntity<String> updateTargetComparisonResult(@RequestBody List<TargetResultInputModel> inputModelList) {
+		// TODO 未実装
 		return null;
 	}
 }
