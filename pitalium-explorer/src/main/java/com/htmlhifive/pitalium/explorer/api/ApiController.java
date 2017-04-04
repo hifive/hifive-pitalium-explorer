@@ -17,6 +17,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.htmlhifive.pitalium.explorer.entity.Screenshot;
 import com.htmlhifive.pitalium.explorer.entity.TestExecutionAndEnvironment;
+import com.htmlhifive.pitalium.explorer.request.ExecResultInputModel;
+import com.htmlhifive.pitalium.explorer.request.ScreenshotResultInputModel;
+import com.htmlhifive.pitalium.explorer.request.TargetResultInputModel;
 import com.htmlhifive.pitalium.explorer.response.TestExecutionResult;
 import com.htmlhifive.pitalium.explorer.service.ExplorerService;
 
@@ -111,4 +114,21 @@ public class ApiController {
 		return new ResponseEntity<Page<TestExecutionAndEnvironment>>(testPage, HttpStatus.OK);
 	}
 
+	@RequestMapping(value = "executions/update", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseEntity<String> updateExecResult(List<ExecResultInputModel> inputModelList) {
+		return null;
+	}
+
+	@RequestMapping(value = "screenshots/update", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseEntity<String> updateScreenshotComparisonResult(List<ScreenshotResultInputModel> inputModelList) {
+		return null;
+	}
+
+	@RequestMapping(value = "targets/update", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseEntity<String> updateTargetComparisonResult(List<TargetResultInputModel> inputModelList) {
+		return null;
+	}
 }
