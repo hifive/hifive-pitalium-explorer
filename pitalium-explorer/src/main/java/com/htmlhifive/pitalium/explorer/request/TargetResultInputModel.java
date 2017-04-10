@@ -5,7 +5,7 @@ import com.sun.istack.internal.NotNull;
 public class TargetResultInputModel {
 
 	@NotNull
-	private Integer screenshotscreenshotId;
+	private Integer screenshotId;
 
 	@NotNull
 	private Integer targetId;
@@ -15,12 +15,12 @@ public class TargetResultInputModel {
 
 	private String message;
 
-	public Integer getScreenshotscreenshotId() {
-		return screenshotscreenshotId;
+	public Integer getScreenshotId() {
+		return screenshotId;
 	}
 
-	public void setScreenshotscreenshotId(Integer screenshotscreenshotId) {
-		this.screenshotscreenshotId = screenshotscreenshotId;
+	public void setScreenshotId(Integer screenshotId) {
+		this.screenshotId = screenshotId;
 	}
 
 	public Integer getTargetId() {
