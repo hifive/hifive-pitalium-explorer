@@ -34,6 +34,7 @@ import com.htmlhifive.pitalium.explorer.entity.TestExecutionRepository;
 import com.htmlhifive.pitalium.explorer.io.ExplorerDBPersister;
 import com.htmlhifive.pitalium.explorer.io.ExplorerPersister;
 import com.htmlhifive.pitalium.explorer.request.ExecResultInputModel;
+import com.htmlhifive.pitalium.explorer.request.ScreenshotResultInputModel;
 import com.htmlhifive.pitalium.explorer.response.TestExecutionResult;
 
 @Service("persisterService")
@@ -218,6 +219,11 @@ public class PersisterServiceImpl implements PersisterService {
 	@Override
 	public List<TestExecutionResult> updateExecResult(List<ExecResultInputModel> inputModelList) {
 		return persister.updateExecResult(inputModelList);
+	}
+
+	@Override
+	public List<TestExecutionResult> updateScreenshotComparisonResult(List<ScreenshotResultInputModel> inputModelList) {
+		return persister.updateScreenshotComparisonResult(inputModelList);
 	}
 
 }

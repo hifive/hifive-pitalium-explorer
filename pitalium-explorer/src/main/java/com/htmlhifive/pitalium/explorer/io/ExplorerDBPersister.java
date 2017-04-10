@@ -30,6 +30,7 @@ import com.htmlhifive.pitalium.explorer.entity.TestExecutionAndEnvironment;
 import com.htmlhifive.pitalium.explorer.entity.TestExecutionRepository;
 import com.htmlhifive.pitalium.explorer.file.FileUtility;
 import com.htmlhifive.pitalium.explorer.request.ExecResultInputModel;
+import com.htmlhifive.pitalium.explorer.request.ScreenshotResultInputModel;
 import com.htmlhifive.pitalium.explorer.response.TestExecutionResult;
 import com.htmlhifive.pitalium.explorer.service.ScreenshotIdService;
 
@@ -248,7 +249,13 @@ public class ExplorerDBPersister extends DBPersister implements ExplorerPersiste
 
 	@Override
 	public List<TestExecutionResult> updateExecResult(List<ExecResultInputModel> inputModelList) {
-		// TODO 自動生成されたメソッド・スタブ
+		// FIXME
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public List<TestExecutionResult> updateScreenshotComparisonResult(List<ScreenshotResultInputModel> inputModelList) {
+		// FIXME
 		throw new UnsupportedOperationException();
 	}
 

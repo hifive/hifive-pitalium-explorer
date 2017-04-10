@@ -44,6 +44,7 @@ import com.htmlhifive.pitalium.explorer.entity.TestEnvironment;
 import com.htmlhifive.pitalium.explorer.entity.TestExecution;
 import com.htmlhifive.pitalium.explorer.entity.TestExecutionAndEnvironment;
 import com.htmlhifive.pitalium.explorer.request.ExecResultInputModel;
+import com.htmlhifive.pitalium.explorer.request.ScreenshotResultInputModel;
 import com.htmlhifive.pitalium.explorer.response.TestExecutionResult;
 import com.htmlhifive.pitalium.explorer.service.ScreenshotIdService;
 import com.htmlhifive.pitalium.image.model.RectangleArea;
@@ -60,7 +61,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 
 	// 更新処理のために保持
 	private Map<Integer, List<TestResult>> testResultMap;
-
+	private Map<ScreenshotResult, Integer> screenshotIdMap;
 
 	public ExplorerFilePersister() {
 		// FIXME 独自のConfigに差し替える必要があるかも
@@ -94,6 +95,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 		targetMap = new HashMap<>();
 
 		testResultMap = new HashMap<>();
+		screenshotIdMap = new HashMap<>();
 
 		// 後続のページング処理用
 		List<TestExecution> testExecutionList = new ArrayList<>();
@@ -281,6 +283,8 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 	}
 
 	private Screenshot createScreenshot(Integer screenshotId, ScreenshotResult screenshotResult) {
+		// 更新処理用にscreenshotResultとscreenshotResultをマッピングする。
+		screenshotIdMap.put(screenshotResult, screenshotId);
 		Screenshot screenshot = new Screenshot();
 		screenshot.setId(screenshotId);
 		screenshot.setScreenshotName(screenshotResult.getScreenshotId());
@@ -661,7 +665,9 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 			List<Screenshot> screenshotList = screenshotListMap.get(testExecutionId);
 			for (Screenshot s : screenshotList) {
 				Boolean comparisonResult = execResult == ExecResult.SUCCESS;
+				// screenshotのキャッシュ更新。
 				s.setComparisonResult(comparisonResult);
+
 				if (testExecution == null) {
 					testExecution = s.getTestExecution();
 					testExecution.setExecResult(execResult.name());
@@ -675,6 +681,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 
 				List<Target> targets = s.getTargets();
 				for (Target t : targets) {
+					// targetのキャッシュ更新。
 					t.setComparisonResult(comparisonResult);
 				}
 			}
@@ -684,6 +691,141 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 			testExecutionResultList.add(testExecutionResult);
 		}
 
+		return testExecutionResultList;
+	}
+
+	@Override
+	public List<TestExecutionResult> updateScreenshotComparisonResult(List<ScreenshotResultInputModel> inputModelList) {
+		Map<Integer, String> resultMap = new HashMap<>();
+		for (ScreenshotResultInputModel im : inputModelList) {
+			// キャッシュしているデータの更新
+			Integer screenshotId = im.getScreenshotId();
+			Screenshot s = screenshotMap.get(screenshotId);
+
+			ExecResult execResult = null;
+			// FIXME 外出ししたい箇所
+			switch (im.getResult()) {
+				case 0:
+					execResult = ExecResult.SUCCESS;
+					break;
+				case 1:
+					execResult = ExecResult.FAILURE;
+					break;
+				default:
+					// FIXME 入力チェックを行い、入らないようにする。
+					break;
+			}
+
+			Boolean comparisonResult = execResult == ExecResult.SUCCESS;
+			// screenshotのキャッシュ更新。
+			s.setComparisonResult(comparisonResult);
+
+			List<Target> targets = s.getTargets();
+			for (Target t : targets) {
+				// targetのキャッシュ更新。
+				t.setComparisonResult(comparisonResult);
+			}
+
+			// 全体結果のキャッシュを更新するか否か判定を行う。
+			Integer testExecutionId = s.getTestExecution().getId();
+			boolean whetherToUpdate = true;
+			List<Screenshot> screenshotList = screenshotListMap.get(testExecutionId);
+			for (Screenshot screenshot : screenshotList) {
+				// 1つでも一致しないものがあった場合は、更新を行わない。
+				if (comparisonResult != screenshot.getComparisonResult()) {
+					whetherToUpdate = false;
+					break;
+				}
+			}
+			if (whetherToUpdate) {
+				// 全体結果のキャッシュ更新。
+				s.getTestExecution().setExecResult(execResult.name());
+			}
+
+			resultMap.put(testExecutionId, s.getTestExecution().getExecResult());
+		}
+
+		List<TestExecutionResult> testExecutionResultList = new ArrayList<>();
+
+		for (Entry<Integer, String> entry : resultMap.entrySet()) {
+			Integer testExecutionId = entry.getKey();
+			// ファイルの更新
+			List<TestResult> testResultList = testResultMap.get(testExecutionId);
+
+			List<TestResult> newTestResultList = new ArrayList<>();
+			for (TestResult orgTestResult : testResultList) {
+				// スクリーンショットの結果を変更
+				List<ScreenshotResult> newScreenshotResultList = new ArrayList<>();
+				for (ScreenshotResult orgScreenshotResult : orgTestResult.getScreenshotResults()) {
+					// スクリーンショットの結果の値を取得
+					ExecResult ssExecResult = null;
+					Integer screenshotId = screenshotIdMap.get(orgScreenshotResult);
+					if (screenshotId != null) {
+						Boolean comparisonResult = screenshotMap.get(screenshotId).getComparisonResult();
+						if (comparisonResult != null) {
+							if (comparisonResult) {
+								ssExecResult = ExecResult.SUCCESS;
+							} else if (!comparisonResult) {
+								ssExecResult = ExecResult.FAILURE;
+							}
+						}
+					}
+
+					// 対象領域の結果を変更
+					List<TargetResult> newTargetResultList = new ArrayList<>();
+					for (TargetResult orgTargetResult : orgScreenshotResult.getTargetResults()) {
+						// スクリーンショットの結果の値がnullの場合は既存の結果の値を使用する。
+						ExecResult targetExecResult = ssExecResult != null ? ssExecResult : orgTargetResult.getResult();
+
+						TargetResult newTargetResult =
+								new TargetResult(targetExecResult, orgTargetResult.getTarget(), orgTargetResult.getExcludes(),
+										orgTargetResult.isMoveTarget(), orgTargetResult.getHiddenElementSelectors(),
+										orgTargetResult.getImage(), orgTargetResult.getOptions());
+						newTargetResultList.add(newTargetResult);
+					}
+
+					// nullの場合は既存の結果の値を使用する。
+					ssExecResult = ssExecResult != null ? ssExecResult : orgScreenshotResult.getResult();
+					ScreenshotResult newScreenshotResult =
+							new ScreenshotResult(orgScreenshotResult.getScreenshotId(), ssExecResult,
+									orgScreenshotResult.getExpectedId(), newTargetResultList,
+									orgScreenshotResult.getTestClass(), orgScreenshotResult.getTestMethod(),
+									orgScreenshotResult.getCapabilities(), orgScreenshotResult.getEntireScreenshotImage());
+					newScreenshotResultList.add(newScreenshotResult);
+				}
+
+				// テストクラス全体の結果を変更
+				ExecResult testExecResult = entry.getValue() != null ? ExecResult.valueOf(entry.getValue()) : null;
+				TestResult newTestResult =
+						new TestResult(orgTestResult.getResultId(), testExecResult, newScreenshotResultList);
+				newTestResultList.add(newTestResult);
+				PersistMetadata metadata =
+						new PersistMetadata(orgTestResult.getResultId(), orgTestResult.getScreenshotResults().get(0).getTestClass());
+				saveTestResult(metadata, newTestResult);
+			}
+
+			// 戻りのクラス作成
+			TestExecution testExecution = null;
+			int totalCount = 0;
+			int passedCount = 0;
+
+			List<Screenshot> screenshotList = screenshotListMap.get(testExecutionId);
+			for (Screenshot s : screenshotList) {
+				totalCount++;
+				if (s.getComparisonResult() == null || s.getComparisonResult().booleanValue()) {
+					// 成功時
+					passedCount++;
+				}
+
+				if (testExecution == null) {
+					testExecution = s.getTestExecution();
+				}
+			}
+
+			TestExecutionResult testExecutionResult =
+					new TestExecutionResult(testExecution, Long.valueOf(passedCount), Long.valueOf(totalCount));
+			testExecutionResultList.add(testExecutionResult);
+		}
 		return testExecutionResultList;
 	}
 

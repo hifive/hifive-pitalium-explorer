@@ -14,6 +14,7 @@ import com.htmlhifive.pitalium.explorer.entity.Screenshot;
 import com.htmlhifive.pitalium.explorer.entity.Target;
 import com.htmlhifive.pitalium.explorer.entity.TestExecutionAndEnvironment;
 import com.htmlhifive.pitalium.explorer.request.ExecResultInputModel;
+import com.htmlhifive.pitalium.explorer.request.ScreenshotResultInputModel;
 import com.htmlhifive.pitalium.explorer.response.TestExecutionResult;
 import com.htmlhifive.pitalium.explorer.service.ScreenshotIdService;
 
@@ -103,4 +104,6 @@ public interface ExplorerPersister extends Persister {
 	void saveProcessedImage(Integer screenshotId, String algorithm, String edgeFileName);
 
 	List<TestExecutionResult> updateExecResult(List<ExecResultInputModel> inputModelList);
+
+	List<TestExecutionResult> updateScreenshotComparisonResult(List<ScreenshotResultInputModel> inputModelList);
 }
