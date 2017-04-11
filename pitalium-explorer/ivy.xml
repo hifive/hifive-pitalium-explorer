@@ -46,6 +46,8 @@
 		<dependency org="dom4j" name="dom4j" rev="1.6.1" conf="default,test->default(*)" />
 		<dependency org="ch.qos.cal10n" name="cal10n-api" rev="0.8.1" conf="default,test->default(*)" />
 		<dependency org="org.jboss.logging" name="jboss-logging-annotations" rev="2.0.2.Final" conf="default,test->default(*)" />
+		<dependency org="javax.validation" name="validation-api" rev="1.1.0.Final" conf="default,test->default(*)" />
+
 		<!-- pitaliumに依存 -->
 		<dependency org="com.google.guava" name="guava" rev="21.0" conf="default,test->default(*)" />
 		<dependency org="org.seleniumhq.selenium" name="selenium-api" rev="3.3.1" conf="default,test->default(*)" />

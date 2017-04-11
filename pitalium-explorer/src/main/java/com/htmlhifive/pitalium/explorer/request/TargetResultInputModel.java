@@ -1,6 +1,6 @@
 package com.htmlhifive.pitalium.explorer.request;
 
-import com.sun.istack.internal.NotNull;
+import javax.validation.constraints.NotNull;
 
 public class TargetResultInputModel {
 

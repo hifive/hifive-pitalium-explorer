@@ -55,7 +55,8 @@
 	<classpathentry kind="lib" path="lib/selenium-remote-driver-3.3.1.jar"/>
 	<classpathentry kind="lib" path="lib/pitalium-1.1.2.jar" sourcepath="lib/sources/pitalium-1.1.2-sources.jar"/>
 	<classpathentry kind="lib" path="lib/commons-fileupload-1.3.2.jar"/>
-	<classpathentry kind="lib" path="lib/classmate-1.3.0.jar" />
-	<classpathentry kind="lib" path="lib/sqltool-2.3.4.jar" />
+	<classpathentry kind="lib" path="lib/classmate-1.3.0.jar"/>
+	<classpathentry kind="lib" path="lib/sqltool-2.3.4.jar"/>
+	<classpathentry kind="lib" path="lib/validation-api-1.1.0.Final.jar"/>
 	<classpathentry kind="output" path="src/main/webapp/WEB-INF/classes"/>
 </classpath>
