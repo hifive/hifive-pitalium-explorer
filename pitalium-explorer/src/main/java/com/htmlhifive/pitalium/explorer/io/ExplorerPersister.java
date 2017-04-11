@@ -15,6 +15,7 @@ import com.htmlhifive.pitalium.explorer.entity.Target;
 import com.htmlhifive.pitalium.explorer.entity.TestExecutionAndEnvironment;
 import com.htmlhifive.pitalium.explorer.request.ExecResultInputModel;
 import com.htmlhifive.pitalium.explorer.request.ScreenshotResultInputModel;
+import com.htmlhifive.pitalium.explorer.request.TargetResultInputModel;
 import com.htmlhifive.pitalium.explorer.response.TestExecutionResult;
 import com.htmlhifive.pitalium.explorer.service.ScreenshotIdService;
 
@@ -106,4 +107,6 @@ public interface ExplorerPersister extends Persister {
 	List<TestExecutionResult> updateExecResult(List<ExecResultInputModel> inputModelList);
 
 	List<TestExecutionResult> updateScreenshotComparisonResult(List<ScreenshotResultInputModel> inputModelList);
+
+	List<Screenshot> updateTargetComparisonResult(List<TargetResultInputModel> inputModelList);
 }

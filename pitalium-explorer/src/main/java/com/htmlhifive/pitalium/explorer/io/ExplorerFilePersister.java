@@ -9,9 +9,11 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
@@ -45,6 +47,7 @@ import com.htmlhifive.pitalium.explorer.entity.TestExecution;
 import com.htmlhifive.pitalium.explorer.entity.TestExecutionAndEnvironment;
 import com.htmlhifive.pitalium.explorer.request.ExecResultInputModel;
 import com.htmlhifive.pitalium.explorer.request.ScreenshotResultInputModel;
+import com.htmlhifive.pitalium.explorer.request.TargetResultInputModel;
 import com.htmlhifive.pitalium.explorer.response.TestExecutionResult;
 import com.htmlhifive.pitalium.explorer.service.ScreenshotIdService;
 import com.htmlhifive.pitalium.image.model.RectangleArea;
@@ -62,6 +65,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 	// 更新処理のために保持
 	private Map<Integer, List<TestResult>> testResultMap;
 	private Map<ScreenshotResult, Integer> screenshotIdMap;
+	private Map<TargetResult, Integer> targetIdMap;
 
 	public ExplorerFilePersister() {
 		// FIXME 独自のConfigに差し替える必要があるかも
@@ -96,6 +100,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 
 		testResultMap = new HashMap<>();
 		screenshotIdMap = new HashMap<>();
+		targetIdMap = new HashMap<>();
 
 		// 後続のページング処理用
 		List<TestExecution> testExecutionList = new ArrayList<>();
@@ -283,7 +288,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 	}
 
 	private Screenshot createScreenshot(Integer screenshotId, ScreenshotResult screenshotResult) {
-		// 更新処理用にscreenshotResultとscreenshotResultをマッピングする。
+		// 更新処理用にscreenshotResultとscreenshotIdをマッピングする。
 		screenshotIdMap.put(screenshotResult, screenshotId);
 		Screenshot screenshot = new Screenshot();
 		screenshot.setId(screenshotId);
@@ -330,6 +335,8 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 
 	private Target createTarget(Integer targetId, Integer screenshotId, TargetResult targetResult,
 			ScreenshotResult screenshotResult) {
+		// 更新処理用にtargetResultとtargetIdをマッピングする。
+		targetIdMap.put(targetResult, targetId);
 		Target target = new Target();
 		target.setTargetId(targetId);
 		target.setScreenshotId(screenshotId);
@@ -602,27 +609,14 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 	public List<TestExecutionResult> updateExecResult(List<ExecResultInputModel> inputModelList) {
 		List<TestExecutionResult> testExecutionResultList = new ArrayList<>();
 		for (ExecResultInputModel im : inputModelList) {
-			Integer testExecutionId = im.getTestExecutionId();
+			ExecResult execResult = convert(im.getResult());
 
 			// ファイルの更新
+			Integer testExecutionId = im.getTestExecutionId();
 			List<TestResult> testResultList = testResultMap.get(testExecutionId);
 
 			List<TestResult> newTestResultList = new ArrayList<>();
-			Integer resultCd = im.getResult();
-			ExecResult execResult = null;
 			for (TestResult orgTestResult : testResultList) {
-				// FIXME 外出ししたい箇所
-				switch (resultCd) {
-					case 0:
-						execResult = ExecResult.SUCCESS;
-						break;
-					case 1:
-						execResult = ExecResult.FAILURE;
-						break;
-					default:
-						// FIXME 入力チェックを行い、入らないようにする。
-						break;
-				}
 
 				// スクリーンショットの結果を変更
 				List<ScreenshotResult> newScreenshotResultList = new ArrayList<>();
@@ -631,26 +625,29 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 					// 対象領域の結果を変更
 					List<TargetResult> newTargetResultList = new ArrayList<>();
 					for (TargetResult orgTargetResult : orgScreenshotResult.getTargetResults()) {
-						TargetResult newTargetResult =
-								new TargetResult(execResult, orgTargetResult.getTarget(), orgTargetResult.getExcludes(),
-										orgTargetResult.isMoveTarget(), orgTargetResult.getHiddenElementSelectors(),
-										orgTargetResult.getImage(), orgTargetResult.getOptions());
+						TargetResult newTargetResult = createTargetResult(orgTargetResult, execResult);
 						newTargetResultList.add(newTargetResult);
+
+						// キャッシュしている対象領域の結果を置換
+						Integer targetId = targetIdMap.get(orgTargetResult);
+						targetIdMap.remove(orgTargetResult);
+						targetIdMap.put(newTargetResult, targetId);
 					}
 
 					ScreenshotResult newScreenshotResult =
-							new ScreenshotResult(orgScreenshotResult.getScreenshotId(), execResult,
-									orgScreenshotResult.getExpectedId(), newTargetResultList,
-									orgScreenshotResult.getTestClass(), orgScreenshotResult.getTestMethod(),
-									orgScreenshotResult.getCapabilities(), orgScreenshotResult.getEntireScreenshotImage());
+							createScreenshotResult(orgScreenshotResult, execResult, newTargetResultList);
 					newScreenshotResultList.add(newScreenshotResult);
+
+					// キャッシュしているスクリーンショットの結果を置換
+					Integer screenshotId = screenshotIdMap.get(orgScreenshotResult);
+					screenshotIdMap.remove(orgScreenshotResult);
+					screenshotIdMap.put(newScreenshotResult, screenshotId);
 				}
 
 				// テストクラス全体の結果を変更
-				TestResult newTestResult = new TestResult(orgTestResult.getResultId(), execResult, newScreenshotResultList);
+				TestResult newTestResult = createTestResult(orgTestResult, execResult, newScreenshotResultList);
 				newTestResultList.add(newTestResult);
-				PersistMetadata metadata =
-						new PersistMetadata(orgTestResult.getResultId(), orgTestResult.getScreenshotResults().get(0).getTestClass());
+				PersistMetadata metadata = createPersistMetadata(orgTestResult);
 				saveTestResult(metadata, newTestResult);
 			}
 
@@ -696,28 +693,15 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 
 	@Override
 	public List<TestExecutionResult> updateScreenshotComparisonResult(List<ScreenshotResultInputModel> inputModelList) {
-		Map<Integer, String> resultMap = new HashMap<>();
+		Map<Integer, ExecResult> resultMap = new HashMap<>();
 		for (ScreenshotResultInputModel im : inputModelList) {
 			// キャッシュしているデータの更新
+			ExecResult execResult = convert(im.getResult());
+			Boolean comparisonResult = execResult == ExecResult.SUCCESS;
+
+			// screenshotのキャッシュ更新。
 			Integer screenshotId = im.getScreenshotId();
 			Screenshot s = screenshotMap.get(screenshotId);
-
-			ExecResult execResult = null;
-			// FIXME 外出ししたい箇所
-			switch (im.getResult()) {
-				case 0:
-					execResult = ExecResult.SUCCESS;
-					break;
-				case 1:
-					execResult = ExecResult.FAILURE;
-					break;
-				default:
-					// FIXME 入力チェックを行い、入らないようにする。
-					break;
-			}
-
-			Boolean comparisonResult = execResult == ExecResult.SUCCESS;
-			// screenshotのキャッシュ更新。
 			s.setComparisonResult(comparisonResult);
 
 			List<Target> targets = s.getTargets();
@@ -726,28 +710,32 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 				t.setComparisonResult(comparisonResult);
 			}
 
-			// 全体結果のキャッシュを更新するか否か判定を行う。
+			// 全体結果のキャッシュを更新する。
 			Integer testExecutionId = s.getTestExecution().getId();
-			boolean whetherToUpdate = true;
+			boolean matchAll = true;
 			List<Screenshot> screenshotList = screenshotListMap.get(testExecutionId);
 			for (Screenshot screenshot : screenshotList) {
-				// 1つでも一致しないものがあった場合は、更新を行わない。
+				// 1つでも一致しないものがあった場合は、FAILUREにする。
 				if (comparisonResult != screenshot.getComparisonResult()) {
-					whetherToUpdate = false;
+					matchAll = false;
 					break;
 				}
 			}
-			if (whetherToUpdate) {
-				// 全体結果のキャッシュ更新。
+			if (matchAll) {
 				s.getTestExecution().setExecResult(execResult.name());
+			} else {
+				s.getTestExecution().setExecResult(ExecResult.FAILURE.name());
 			}
 
-			resultMap.put(testExecutionId, s.getTestExecution().getExecResult());
+			// ファイルに書き込む際に使用する情報を確保。
+			ExecResult execAllResult =
+					s.getTestExecution().getExecResult() != null ? ExecResult.valueOf(s.getTestExecution().getExecResult()) : null;
+			resultMap.put(testExecutionId, execAllResult);
 		}
 
 		List<TestExecutionResult> testExecutionResultList = new ArrayList<>();
 
-		for (Entry<Integer, String> entry : resultMap.entrySet()) {
+		for (Entry<Integer, ExecResult> entry : resultMap.entrySet()) {
 			Integer testExecutionId = entry.getKey();
 			// ファイルの更新
 			List<TestResult> testResultList = testResultMap.get(testExecutionId);
@@ -758,18 +746,9 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 				List<ScreenshotResult> newScreenshotResultList = new ArrayList<>();
 				for (ScreenshotResult orgScreenshotResult : orgTestResult.getScreenshotResults()) {
 					// スクリーンショットの結果の値を取得
-					ExecResult ssExecResult = null;
 					Integer screenshotId = screenshotIdMap.get(orgScreenshotResult);
-					if (screenshotId != null) {
-						Boolean comparisonResult = screenshotMap.get(screenshotId).getComparisonResult();
-						if (comparisonResult != null) {
-							if (comparisonResult) {
-								ssExecResult = ExecResult.SUCCESS;
-							} else if (!comparisonResult) {
-								ssExecResult = ExecResult.FAILURE;
-							}
-						}
-					}
+					Boolean comparisonResult = screenshotMap.get(screenshotId).getComparisonResult();
+					ExecResult ssExecResult  = convert(comparisonResult);
 
 					// 対象領域の結果を変更
 					List<TargetResult> newTargetResultList = new ArrayList<>();
@@ -777,32 +756,35 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 						// スクリーンショットの結果の値がnullの場合は既存の結果の値を使用する。
 						ExecResult targetExecResult = ssExecResult != null ? ssExecResult : orgTargetResult.getResult();
 
-						TargetResult newTargetResult =
-								new TargetResult(targetExecResult, orgTargetResult.getTarget(), orgTargetResult.getExcludes(),
-										orgTargetResult.isMoveTarget(), orgTargetResult.getHiddenElementSelectors(),
-										orgTargetResult.getImage(), orgTargetResult.getOptions());
+						TargetResult newTargetResult = createTargetResult(orgTargetResult, targetExecResult);
 						newTargetResultList.add(newTargetResult);
+
+						// キャッシュしている対象領域の結果を置換
+						Integer targetId = targetIdMap.get(orgTargetResult);
+						targetIdMap.remove(orgTargetResult);
+						targetIdMap.put(newTargetResult, targetId);
 					}
 
 					// nullの場合は既存の結果の値を使用する。
 					ssExecResult = ssExecResult != null ? ssExecResult : orgScreenshotResult.getResult();
 					ScreenshotResult newScreenshotResult =
-							new ScreenshotResult(orgScreenshotResult.getScreenshotId(), ssExecResult,
-									orgScreenshotResult.getExpectedId(), newTargetResultList,
-									orgScreenshotResult.getTestClass(), orgScreenshotResult.getTestMethod(),
-									orgScreenshotResult.getCapabilities(), orgScreenshotResult.getEntireScreenshotImage());
+							createScreenshotResult(orgScreenshotResult, ssExecResult, newTargetResultList);
 					newScreenshotResultList.add(newScreenshotResult);
+
+					// キャッシュしているスクリーンショットの結果を置換
+					screenshotIdMap.remove(orgScreenshotResult);
+					screenshotIdMap.put(newScreenshotResult, screenshotId);
 				}
 
 				// テストクラス全体の結果を変更
-				ExecResult testExecResult = entry.getValue() != null ? ExecResult.valueOf(entry.getValue()) : null;
-				TestResult newTestResult =
-						new TestResult(orgTestResult.getResultId(), testExecResult, newScreenshotResultList);
+				TestResult newTestResult = createTestResult(orgTestResult, entry.getValue(), newScreenshotResultList);
 				newTestResultList.add(newTestResult);
-				PersistMetadata metadata =
-						new PersistMetadata(orgTestResult.getResultId(), orgTestResult.getScreenshotResults().get(0).getTestClass());
+				PersistMetadata metadata = createPersistMetadata(orgTestResult);
 				saveTestResult(metadata, newTestResult);
 			}
+
+			// キャッシュしているテストクラス全体の結果を置換
+			testResultMap.put(testExecutionId, newTestResultList);
 
 			// 戻りのクラス作成
 			TestExecution testExecution = null;
@@ -829,4 +811,159 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 		return testExecutionResultList;
 	}
 
+	@Override
+	public List<Screenshot> updateTargetComparisonResult(List<TargetResultInputModel> inputModelList) {
+		Map<Integer, ExecResult> resultMap = new HashMap<>();
+		for (TargetResultInputModel im : inputModelList) {
+			// キャッシュしているデータの更新
+			ExecResult execResult = convert(im.getResult());
+			Boolean comparisonResult = execResult == ExecResult.SUCCESS;
+
+			// targetのキャッシュ更新。
+			Integer targetId = im.getTargetId();
+			Target t = targetMap.get(targetId);
+			t.setComparisonResult(comparisonResult);
+
+			Integer screenshotId = im.getScreenshotId();
+			boolean matchScreenshot = true;
+			Screenshot s = screenshotMap.get(screenshotId);
+
+			// スクリーンショットのキャッシュを更新する。
+			List<Target> targetList = s.getTargets();
+			for (Target target : targetList) {
+				// 1つでも一致しないものがあった場合は、falseにする。
+				if (comparisonResult != target.getComparisonResult()) {
+					matchScreenshot = false;
+					break;
+				}
+			}
+			if (matchScreenshot) {
+				s.setComparisonResult(comparisonResult);
+			} else {
+				s.setComparisonResult(false);
+			}
+
+			// 全体結果のキャッシュを更新する。
+			Integer testExecutionId = s.getTestExecution().getId();
+			boolean matchAll = true;
+			List<Screenshot> screenshotList = screenshotListMap.get(testExecutionId);
+			for (Screenshot screenshot : screenshotList) {
+				// 1つでも一致しないものがあった場合は、FAILUREにする。
+				if (comparisonResult != screenshot.getComparisonResult()) {
+					matchAll = false;
+					break;
+				}
+			}
+			if (matchAll) {
+				s.getTestExecution().setExecResult(execResult.name());
+			} else {
+				s.getTestExecution().setExecResult(ExecResult.FAILURE.name());
+			}
+
+			// ファイルに書き込む際に使用する情報を確保。
+			ExecResult execAllResult =
+					s.getTestExecution().getExecResult() != null ? ExecResult.valueOf(s.getTestExecution().getExecResult()) : null;
+			resultMap.put(testExecutionId, execAllResult);
+		}
+
+		for (Entry<Integer, ExecResult> entry : resultMap.entrySet()) {
+			Integer testExecutionId = entry.getKey();
+			// ファイルの更新
+			List<TestResult> testResultList = testResultMap.get(testExecutionId);
+
+			List<TestResult> newTestResultList = new ArrayList<>();
+			for (TestResult orgTestResult : testResultList) {
+				// スクリーンショットの結果を変更
+				List<ScreenshotResult> newScreenshotResultList = new ArrayList<>();
+				for (ScreenshotResult orgScreenshotResult : orgTestResult.getScreenshotResults()) {
+					// 対象領域の結果を変更
+					List<TargetResult> newTargetResultList = new ArrayList<>();
+					for (TargetResult orgTargetResult : orgScreenshotResult.getTargetResults()) {
+						// 対象領域の結果の値を取得
+						Integer targetId = targetIdMap.get(orgTargetResult);
+						Boolean comparisonResult = targetMap.get(targetId).getComparisonResult();
+						ExecResult targetExecResult = convert(comparisonResult);
+
+						TargetResult newTargetResult = createTargetResult(orgTargetResult, targetExecResult);
+						newTargetResultList.add(newTargetResult);
+
+						// キャッシュしている対象領域の結果を置換
+						targetIdMap.remove(orgTargetResult);
+						targetIdMap.put(newTargetResult, targetId);
+					}
+
+					// スクリーンショットの結果の値を取得
+					Integer screenshotId = screenshotIdMap.get(orgScreenshotResult);
+					Boolean comparisonResult = screenshotMap.get(screenshotId).getComparisonResult();
+					ExecResult ssExecResult  = convert(comparisonResult);
+
+					// nullの場合は既存の結果の値を使用する。
+					ssExecResult = ssExecResult != null ? ssExecResult : orgScreenshotResult.getResult();
+					ScreenshotResult newScreenshotResult =
+							createScreenshotResult(orgScreenshotResult, ssExecResult, newTargetResultList);
+					newScreenshotResultList.add(newScreenshotResult);
+
+					// キャッシュしているスクリーンショットの結果を置換
+					screenshotIdMap.remove(orgScreenshotResult);
+					screenshotIdMap.put(newScreenshotResult, screenshotId);
+				}
+
+				// テストクラス全体の結果を変更
+				TestResult newTestResult = createTestResult(orgTestResult, entry.getValue(), newScreenshotResultList);
+				newTestResultList.add(newTestResult);
+				PersistMetadata metadata = createPersistMetadata(orgTestResult);
+				saveTestResult(metadata, newTestResult);
+			}
+
+			// キャッシュしているテストクラス全体の結果を置換
+			testResultMap.put(testExecutionId, newTestResultList);
+		}
+
+		Set<Screenshot> screenshotSet = new HashSet<>();
+		for (TargetResultInputModel im : inputModelList) {
+			screenshotSet.add(screenshotMap.get(im.getScreenshotId()));
+		}
+
+		return new ArrayList<>(screenshotSet);
+	}
+
+	private ExecResult convert(Integer resultCd) {
+		switch (resultCd) {
+			case 0:
+				return ExecResult.SUCCESS;
+			case 1:
+				return ExecResult.FAILURE;
+			default:
+				return null;
+		}
+	}
+
+	private ExecResult convert(Boolean result) {
+		if (result == null) {
+			return null;
+		}
+		if (result) {
+			return ExecResult.SUCCESS;
+		} else {
+			return ExecResult.FAILURE;
+		}
+	}
+
+	private TargetResult createTargetResult(TargetResult original, ExecResult result) {
+		return new TargetResult( result, original.getTarget(), original.getExcludes(), original.isMoveTarget(),
+				original.getHiddenElementSelectors(), original.getImage(), original.getOptions());
+	}
+
+	private ScreenshotResult createScreenshotResult(ScreenshotResult original, ExecResult result, List<TargetResult> targetResultList) {
+		return new ScreenshotResult(original.getScreenshotId(), result, original.getExpectedId(), targetResultList,
+				original.getTestClass(), original.getTestMethod(), original.getCapabilities(), original.getEntireScreenshotImage());
+	}
+
+	private TestResult createTestResult(TestResult original, ExecResult result, List<ScreenshotResult> screenshotResultList) {
+		return new TestResult(original.getResultId(), result, screenshotResultList);
+	}
+
+	private PersistMetadata createPersistMetadata(TestResult result) {
+		return new PersistMetadata(result.getResultId(), result.getScreenshotResults().get(0).getTestClass());
+	}
 }

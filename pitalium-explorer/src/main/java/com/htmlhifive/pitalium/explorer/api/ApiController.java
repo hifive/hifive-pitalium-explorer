@@ -134,8 +134,8 @@ public class ApiController {
 	@RequestMapping(value = "targets/update", method = RequestMethod.POST, consumes = "application/json;charset=utf-8",
 			produces = "application/json;charset=utf-8")
 	@ResponseBody
-	public ResponseEntity<String> updateTargetComparisonResult(@RequestBody List<TargetResultInputModel> inputModelList) {
-		// TODO 未実装
-		return null;
+	public ResponseEntity<List<Screenshot>> updateTargetComparisonResult(@RequestBody List<TargetResultInputModel> inputModelList) {
+		List<Screenshot> screenshotList = service.updateTargetComparisonResult(inputModelList);
+		return new ResponseEntity<List<Screenshot>>(screenshotList, HttpStatus.OK);
 	}
 }

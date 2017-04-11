@@ -44,6 +44,7 @@ import com.htmlhifive.pitalium.explorer.image.EdgeDetector;
 import com.htmlhifive.pitalium.explorer.io.ExplorerPersister;
 import com.htmlhifive.pitalium.explorer.request.ExecResultInputModel;
 import com.htmlhifive.pitalium.explorer.request.ScreenshotResultInputModel;
+import com.htmlhifive.pitalium.explorer.request.TargetResultInputModel;
 import com.htmlhifive.pitalium.explorer.response.TestExecutionResult;
 import com.htmlhifive.pitalium.image.model.DiffPoints;
 import com.htmlhifive.pitalium.image.util.ImageUtils;
@@ -388,5 +389,9 @@ public class ExplorerService implements Serializable {
 
 	public List<TestExecutionResult> updateScreenshotComparisonResult(List<ScreenshotResultInputModel> inputModelList) {
 		return persisterService.updateScreenshotComparisonResult(inputModelList);
+	}
+
+	public List<Screenshot> updateTargetComparisonResult(List<TargetResultInputModel> inputModelList) {
+		return persisterService.updateTargetComparisonResult(inputModelList);
 	}
 }
