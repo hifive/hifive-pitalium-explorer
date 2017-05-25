@@ -42,9 +42,10 @@ import com.htmlhifive.pitalium.explorer.entity.TestExecutionAndEnvironment;
 import com.htmlhifive.pitalium.explorer.entity.TestExecutionRepository;
 import com.htmlhifive.pitalium.explorer.image.EdgeDetector;
 import com.htmlhifive.pitalium.explorer.io.ExplorerPersister;
-import com.htmlhifive.pitalium.explorer.request.ExecResultInputModel;
-import com.htmlhifive.pitalium.explorer.request.ScreenshotResultInputModel;
-import com.htmlhifive.pitalium.explorer.request.TargetResultInputModel;
+import com.htmlhifive.pitalium.explorer.log.ChangeRecord;
+import com.htmlhifive.pitalium.explorer.request.ExecResultChangeRequest;
+import com.htmlhifive.pitalium.explorer.request.ScreenshotResultChangeRequest;
+import com.htmlhifive.pitalium.explorer.request.TargetResultChangeRequest;
 import com.htmlhifive.pitalium.explorer.response.TestExecutionResult;
 import com.htmlhifive.pitalium.image.model.DiffPoints;
 import com.htmlhifive.pitalium.image.util.ImageUtils;
@@ -383,15 +384,15 @@ public class ExplorerService implements Serializable {
 		}
 	}
 
-	public List<TestExecutionResult> updateExecResult(List<ExecResultInputModel> inputModelList) {
+	public List<ChangeRecord> updateExecResult(List<ExecResultChangeRequest> inputModelList) {
 		return persisterService.updateExecResult(inputModelList);
 	}
 
-	public List<TestExecutionResult> updateScreenshotComparisonResult(List<ScreenshotResultInputModel> inputModelList) {
+	public List<ChangeRecord> updateScreenshotComparisonResult(List<ScreenshotResultChangeRequest> inputModelList) {
 		return persisterService.updateScreenshotComparisonResult(inputModelList);
 	}
 
-	public List<Screenshot> updateTargetComparisonResult(List<TargetResultInputModel> inputModelList) {
+	public List<ChangeRecord> updateTargetComparisonResult(List<TargetResultChangeRequest> inputModelList) {
 		return persisterService.updateTargetComparisonResult(inputModelList);
 	}
 }

@@ -13,9 +13,10 @@ import com.htmlhifive.pitalium.core.io.Persister;
 import com.htmlhifive.pitalium.explorer.entity.Screenshot;
 import com.htmlhifive.pitalium.explorer.entity.Target;
 import com.htmlhifive.pitalium.explorer.entity.TestExecutionAndEnvironment;
-import com.htmlhifive.pitalium.explorer.request.ExecResultInputModel;
-import com.htmlhifive.pitalium.explorer.request.ScreenshotResultInputModel;
-import com.htmlhifive.pitalium.explorer.request.TargetResultInputModel;
+import com.htmlhifive.pitalium.explorer.log.ChangeRecord;
+import com.htmlhifive.pitalium.explorer.request.ExecResultChangeRequest;
+import com.htmlhifive.pitalium.explorer.request.ScreenshotResultChangeRequest;
+import com.htmlhifive.pitalium.explorer.request.TargetResultChangeRequest;
 import com.htmlhifive.pitalium.explorer.response.TestExecutionResult;
 import com.htmlhifive.pitalium.explorer.service.ScreenshotIdService;
 
@@ -104,9 +105,9 @@ public interface ExplorerPersister extends Persister {
 
 	void saveProcessedImage(Integer screenshotId, String algorithm, String edgeFileName);
 
-	List<TestExecutionResult> updateExecResult(List<ExecResultInputModel> inputModelList);
+	List<ChangeRecord> updateExecResult(List<ExecResultChangeRequest> inputModelList);
 
-	List<TestExecutionResult> updateScreenshotComparisonResult(List<ScreenshotResultInputModel> inputModelList);
+	List<ChangeRecord> updateScreenshotComparisonResult(List<ScreenshotResultChangeRequest> inputModelList);
 
-	List<Screenshot> updateTargetComparisonResult(List<TargetResultInputModel> inputModelList);
+	List<ChangeRecord> updateTargetComparisonResult(List<TargetResultChangeRequest> inputModelList);
 }

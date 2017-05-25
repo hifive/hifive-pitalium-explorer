@@ -33,9 +33,10 @@ import com.htmlhifive.pitalium.explorer.entity.TestExecutionAndEnvironment;
 import com.htmlhifive.pitalium.explorer.entity.TestExecutionRepository;
 import com.htmlhifive.pitalium.explorer.io.ExplorerDBPersister;
 import com.htmlhifive.pitalium.explorer.io.ExplorerPersister;
-import com.htmlhifive.pitalium.explorer.request.ExecResultInputModel;
-import com.htmlhifive.pitalium.explorer.request.ScreenshotResultInputModel;
-import com.htmlhifive.pitalium.explorer.request.TargetResultInputModel;
+import com.htmlhifive.pitalium.explorer.log.ChangeRecord;
+import com.htmlhifive.pitalium.explorer.request.ExecResultChangeRequest;
+import com.htmlhifive.pitalium.explorer.request.ScreenshotResultChangeRequest;
+import com.htmlhifive.pitalium.explorer.request.TargetResultChangeRequest;
 import com.htmlhifive.pitalium.explorer.response.TestExecutionResult;
 
 @Service("persisterService")
@@ -218,17 +219,17 @@ public class PersisterServiceImpl implements PersisterService {
 	}
 
 	@Override
-	public List<TestExecutionResult> updateExecResult(List<ExecResultInputModel> inputModelList) {
+	public List<ChangeRecord> updateExecResult(List<ExecResultChangeRequest> inputModelList) {
 		return persister.updateExecResult(inputModelList);
 	}
 
 	@Override
-	public List<TestExecutionResult> updateScreenshotComparisonResult(List<ScreenshotResultInputModel> inputModelList) {
+	public List<ChangeRecord> updateScreenshotComparisonResult(List<ScreenshotResultChangeRequest> inputModelList) {
 		return persister.updateScreenshotComparisonResult(inputModelList);
 	}
 
 	@Override
-	public List<Screenshot> updateTargetComparisonResult(List<TargetResultInputModel> inputModelList) {
+	public List<ChangeRecord> updateTargetComparisonResult(List<TargetResultChangeRequest> inputModelList) {
 		return persister.updateTargetComparisonResult(inputModelList);
 	}
 }

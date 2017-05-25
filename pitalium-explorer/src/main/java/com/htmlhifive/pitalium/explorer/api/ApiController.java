@@ -18,9 +18,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.htmlhifive.pitalium.explorer.entity.Screenshot;
 import com.htmlhifive.pitalium.explorer.entity.TestExecutionAndEnvironment;
-import com.htmlhifive.pitalium.explorer.request.ExecResultInputModel;
-import com.htmlhifive.pitalium.explorer.request.ScreenshotResultInputModel;
-import com.htmlhifive.pitalium.explorer.request.TargetResultInputModel;
+import com.htmlhifive.pitalium.explorer.log.ChangeRecord;
+import com.htmlhifive.pitalium.explorer.request.ExecResultChangeRequest;
+import com.htmlhifive.pitalium.explorer.request.ScreenshotResultChangeRequest;
+import com.htmlhifive.pitalium.explorer.request.TargetResultChangeRequest;
 import com.htmlhifive.pitalium.explorer.response.TestExecutionResult;
 import com.htmlhifive.pitalium.explorer.service.ExplorerService;
 
@@ -118,24 +119,24 @@ public class ApiController {
 	@RequestMapping(value = "executions/update", method = RequestMethod.POST, consumes = "application/json;charset=utf-8",
 			produces = "application/json;charset=utf-8")
 	@ResponseBody
-	public ResponseEntity<List<TestExecutionResult>> updateExecResult(@RequestBody List<ExecResultInputModel> inputModelList) {
-		List<TestExecutionResult> testExecutionResultList = service.updateExecResult(inputModelList);
-		return new ResponseEntity<List<TestExecutionResult>>(testExecutionResultList, HttpStatus.OK);
+	public ResponseEntity<List<ChangeRecord>> updateExecResult(@RequestBody List<ExecResultChangeRequest> inputModelList) {
+		List<ChangeRecord> testExecutionResultList = service.updateExecResult(inputModelList);
+		return new ResponseEntity<List<ChangeRecord>>(testExecutionResultList, HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "screenshots/update", method = RequestMethod.POST, consumes = "application/json;charset=utf-8",
 			produces = "application/json;charset=utf-8")
 	@ResponseBody
-	public ResponseEntity<List<TestExecutionResult>> updateScreenshotComparisonResult(@RequestBody List<ScreenshotResultInputModel> inputModelList) {
-		List<TestExecutionResult> testExecutionResultList = service.updateScreenshotComparisonResult(inputModelList);
-		return new ResponseEntity<List<TestExecutionResult>>(testExecutionResultList, HttpStatus.OK);
+	public ResponseEntity<List<ChangeRecord>> updateScreenshotComparisonResult(@RequestBody List<ScreenshotResultChangeRequest> inputModelList) {
+		List<ChangeRecord> testExecutionResultList = service.updateScreenshotComparisonResult(inputModelList);
+		return new ResponseEntity<List<ChangeRecord>>(testExecutionResultList, HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "targets/update", method = RequestMethod.POST, consumes = "application/json;charset=utf-8",
 			produces = "application/json;charset=utf-8")
 	@ResponseBody
-	public ResponseEntity<List<Screenshot>> updateTargetComparisonResult(@RequestBody List<TargetResultInputModel> inputModelList) {
-		List<Screenshot> screenshotList = service.updateTargetComparisonResult(inputModelList);
-		return new ResponseEntity<List<Screenshot>>(screenshotList, HttpStatus.OK);
+	public ResponseEntity<List<ChangeRecord>> updateTargetComparisonResult(@RequestBody List<TargetResultChangeRequest> inputModelList) {
+		List<ChangeRecord> screenshotList = service.updateTargetComparisonResult(inputModelList);
+		return new ResponseEntity<List<ChangeRecord>>(screenshotList, HttpStatus.OK);
 	}
 }
