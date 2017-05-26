@@ -645,8 +645,10 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 			changeRecord.setResultId(resultId);
 			// スクリーンショット変更箇所格納用
 			List<ScreenshotResultChangePoint> screenshotResults = new ArrayList<>();
+			point.setScreenshotResults(screenshotResults);
 			// ターゲット変更箇所格納用
 			List<TargetResultChangePoint> targetResults = new ArrayList<>();
+			point.setTargetResults(targetResults);
 
 			// テストクラス全体の実行結果格納用
 			List<TestResult> newTestResultList = new ArrayList<>();
@@ -699,20 +701,11 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 				PersistMetadata metadata = createPersistMetadata(orgTestResult);
 				saveTestResult(metadata, newTestResult);
 			}
+			// 変更履歴をファイルに出力。
+			saveChangelog(resultId, fileOutputList);
 
 			// メモリにキャッシュしているテストクラス全体の結果を置換
 			testResultMap.put(testExecutionId, newTestResultList);
-
-			// 変更履歴をファイルに出力。
-			// 空リストの場合は設定しない。
-			if (!screenshotResults.isEmpty()) {
-				point.setScreenshotResults(screenshotResults);
-			}
-			// 空リストの場合は設定しない。
-			if (!targetResults.isEmpty()) {
-				point.setTargetResults(targetResults);
-			}
-			saveChangelog(resultId, fileOutputList);
 
 			// メモリにキャッシュしているテスト実行、スクリーンショット、対象領域を置換
 			List<Screenshot> screenshotList = screenshotListMap.get(testExecutionId);
@@ -804,8 +797,10 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 			changeRecord.setResultId(resultId);
 			// スクリーンショット変更箇所格納用
 			List<ScreenshotResultChangePoint> screenshotResults = new ArrayList<>();
+			point.setScreenshotResults(screenshotResults);
 			// ターゲット変更箇所格納用
 			List<TargetResultChangePoint> targetResults = new ArrayList<>();
+			point.setTargetResults(targetResults);
 
 			List<TestResult> testResultList = testResultMap.get(testExecutionId);
 
@@ -842,16 +837,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 					}
 				}
 			}
-
 			// 変更履歴をファイルに出力。
-			// 空リストの場合は設定しない。
-			if (!screenshotResults.isEmpty()) {
-				point.setScreenshotResults(screenshotResults);
-			}
-			// 空リストの場合は設定しない。
-			if (!targetResults.isEmpty()) {
-				point.setTargetResults(targetResults);
-			}
 			saveChangelog(resultId, fileOutputList);
 		}
 
@@ -1002,8 +988,10 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 			changeRecord.setResultId(resultId);
 			// スクリーンショット変更箇所格納用
 			List<ScreenshotResultChangePoint> screenshotResults = new ArrayList<>();
+			point.setScreenshotResults(screenshotResults);
 			// ターゲット変更箇所格納用
 			List<TargetResultChangePoint> targetResults = new ArrayList<>();
+			point.setTargetResults(targetResults);
 
 			List<TestResult> testResultList = testResultMap.get(testExecutionId);
 
@@ -1045,16 +1033,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 					}
 				}
 			}
-
 			// 変更履歴をファイルに出力。
-			// 空リストの場合は設定しない。
-			if (!screenshotResults.isEmpty()) {
-				point.setScreenshotResults(screenshotResults);
-			}
-			// 空リストの場合は設定しない。
-			if (!targetResults.isEmpty()) {
-				point.setTargetResults(targetResults);
-			}
 			saveChangelog(resultId, fileOutputList);
 		}
 

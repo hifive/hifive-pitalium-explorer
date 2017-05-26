@@ -4,13 +4,15 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ChangePoint {
 
+	@JsonInclude(JsonInclude.Include.NON_NULL)
 	private Boolean execResult;
 
+	@JsonInclude(JsonInclude.Include.NON_EMPTY)
 	private List<ScreenshotResultChangePoint> screenshotResults;
 
+	@JsonInclude(JsonInclude.Include.NON_EMPTY)
 	private List<TargetResultChangePoint> targetResults;
 
 	public Boolean getExecResult() {
