@@ -617,14 +617,11 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 	public List<ChangeRecord> updateExecResult(List<ExecResultChangeRequest> inputModelList) {
 
 		// result.jsの更新、およびexplorer-change-log.jsonの更新
-		// TODO 取り敢えずの実装。
-		// ファイル書き込み用と返却用のリストを分ける必要がある。
-		// ファイルを読み込んでリストを生成する必要がある。
 		Date updateTime = new Date();
-		List<ChangeRecord> changeRecordList = null;
+		// 返却用の変更記録リスト
+		List<ChangeRecord> changeRecordList = new ArrayList<>();
 
 		for (ExecResultChangeRequest im : inputModelList) {
-
 			ExecResult execResult = convert(im.getResult());
 
 			// ファイルの更新
@@ -634,10 +631,12 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 			String resultId = testResultList.get(0).getResultId();
 
 			// 変更履歴ファイルの読み込み。
-			changeRecordList = loadChangeLog(resultId);
+			List<ChangeRecord> fileOutputList = loadChangeLog(resultId);
 
 			// 変更記録の作成。
-			ChangeRecord changeRecord = createChangeRecord(changeRecordList.size() + 1,  im, updateTime);
+			ChangeRecord changeRecord = createChangeRecord(fileOutputList.size() + 1,  im, updateTime);
+			fileOutputList.add(changeRecord);
+			// 返却用の変更記録リストにも追加。
 			changeRecordList.add(changeRecord);
 
 			// 変更箇所
@@ -713,7 +712,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 			if (!targetResults.isEmpty()) {
 				point.setTargetResults(targetResults);
 			}
-			saveChangelog(resultId, changeRecordList);
+			saveChangelog(resultId, fileOutputList);
 
 			// メモリにキャッシュしているテスト実行、スクリーンショット、対象領域を置換
 			List<Screenshot> screenshotList = screenshotListMap.get(testExecutionId);
@@ -778,9 +777,8 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 		}
 
 		// explorer-change-log.jsonの更新
-		// TODO 取り敢えずの実装。
-		// ファイルを読み込んでリストを生成する必要がある。
 		Date updateTime = new Date();
+		// 返却用の変更記録リスト
 		List<ChangeRecord> changeRecordList = new ArrayList<>();
 
 		for (ScreenshotResultChangeRequest im : inputModelList) {
@@ -792,10 +790,12 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 			String resultId = testExecution.getTimeString();
 
 			// 変更履歴ファイルの読み込み。
-			changeRecordList = loadChangeLog(resultId);
+			List<ChangeRecord> fileOutputList = loadChangeLog(resultId);
 
 			// 変更記録の作成。
-			ChangeRecord changeRecord = createChangeRecord(changeRecordList.size() + 1,  im, updateTime);
+			ChangeRecord changeRecord = createChangeRecord(fileOutputList.size() + 1,  im, updateTime);
+			fileOutputList.add(changeRecord);
+			// 返却用の変更記録リストにも追加。
 			changeRecordList.add(changeRecord);
 
 			// 変更箇所
@@ -852,7 +852,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 			if (!targetResults.isEmpty()) {
 				point.setTargetResults(targetResults);
 			}
-			saveChangelog(resultId, changeRecordList);
+			saveChangelog(resultId, fileOutputList);
 		}
 
 		// result.jsの更新の更新
@@ -974,9 +974,8 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 		}
 
 		// explorer-change-log.jsonの更新
-		// TODO 取り敢えずの実装。
-		// ファイルを読み込んでリストを生成する必要がある。
 		Date updateTime = new Date();
+		// 返却用の変更記録リスト
 		List<ChangeRecord> changeRecordList = new ArrayList<>();
 
 		for (TargetResultChangeRequest im : inputModelList) {
@@ -989,10 +988,12 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 			String resultId = testExecution.getTimeString();
 
 			// 変更履歴ファイルの読み込み。
-			changeRecordList = loadChangeLog(resultId);
+			List<ChangeRecord> fileOutputList = loadChangeLog(resultId);
 
 			// 変更記録の作成。
-			ChangeRecord changeRecord = createChangeRecord(changeRecordList.size() + 1,  im, updateTime);
+			ChangeRecord changeRecord = createChangeRecord(fileOutputList.size() + 1,  im, updateTime);
+			fileOutputList.add(changeRecord);
+			// 返却用の変更記録リストにも追加。
 			changeRecordList.add(changeRecord);
 
 			// 変更箇所
@@ -1054,7 +1055,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 			if (!targetResults.isEmpty()) {
 				point.setTargetResults(targetResults);
 			}
-			saveChangelog(resultId, changeRecordList);
+			saveChangelog(resultId, fileOutputList);
 		}
 
 		// result.jsの更新の更新
@@ -1237,12 +1238,14 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 	}
 
 	private List<ChangeRecord> loadChangeLog(String resultId) {
-		List<ChangeRecord> changeRecordList = new ArrayList<>();
+		List<ChangeRecord> changeRecordList = null;
 		File dir = new File(PtlTestConfig.getInstance().getPersisterConfig().getFile().getResultDirectory(), resultId);
 		File file = new File(dir, "explorer-change-log.json");
 		if (!file.exists()) {
+			changeRecordList = new ArrayList<>();
 			return changeRecordList;
 		}
+
 		if (log.isDebugEnabled()) {
 			log.debug("[Load Changelog] ({})", file);
 		}
