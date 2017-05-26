@@ -2,6 +2,9 @@ package com.htmlhifive.pitalium.explorer.log;
 
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class ScreenshotResultChangePoint {
 
 	private final String screenshotId;
@@ -12,7 +15,17 @@ public class ScreenshotResultChangePoint {
 
 	private final Map<String, ?> capabilities;
 
-	public ScreenshotResultChangePoint(String screenshotId, String testClass, String testMethod, Map<String, ?> capabilities) {
+	/**
+	 *
+	 * @param screenshotId
+	 * @param testClass
+	 * @param testMethod
+	 * @param capabilities
+	 */
+	@JsonCreator
+	public ScreenshotResultChangePoint(@JsonProperty("screenshotId") String screenshotId,
+			@JsonProperty("testClass") String testClass, @JsonProperty("testMethod") String testMethod,
+			@JsonProperty("capabilities") Map<String, ?> capabilities) {
 		this.screenshotId = screenshotId;
 		this.testClass = testClass;
 		this.testMethod = testMethod;

@@ -28,6 +28,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.htmlhifive.pitalium.common.exception.JSONException;
 import com.htmlhifive.pitalium.common.util.JSONUtils;
 import com.htmlhifive.pitalium.core.config.FilePersisterConfig;
@@ -620,36 +621,37 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 		// ファイル書き込み用と返却用のリストを分ける必要がある。
 		// ファイルを読み込んでリストを生成する必要がある。
 		Date updateTime = new Date();
-		List<ChangeRecord> changeRecordList = new ArrayList<>();
+		List<ChangeRecord> changeRecordList = null;
 
 		for (ExecResultChangeRequest im : inputModelList) {
-
-			// 変更記録の作成。
-			ChangeRecord changeRecord = createChangeRecord(im, updateTime);
-			// 変更箇所
-			ChangePoint point = new ChangePoint();
-			changeRecord.setChangePoints(point);
-			changeRecordList.add(changeRecord);
-			// スクリーンショット変更箇所格納用
-			List<ScreenshotResultChangePoint> screenshotResults = new ArrayList<>();
-			// ターゲット変更箇所格納用
-			List<TargetResultChangePoint> targetResults = new ArrayList<>();
-			// 変更記録ファイルの格納先に使用する。
-			String resultId = null;
 
 			ExecResult execResult = convert(im.getResult());
 
 			// ファイルの更新
 			Integer testExecutionId = im.getTestExecutionId();
 			List<TestResult> testResultList = testResultMap.get(testExecutionId);
+			// 変更記録ファイルの格納先に使用する。
+			String resultId = testResultList.get(0).getResultId();
+
+			// 変更履歴ファイルの読み込み。
+			changeRecordList = loadChangeLog(resultId);
+
+			// 変更記録の作成。
+			ChangeRecord changeRecord = createChangeRecord(changeRecordList.size() + 1,  im, updateTime);
+			changeRecordList.add(changeRecord);
+
+			// 変更箇所
+			ChangePoint point = new ChangePoint();
+			changeRecord.setChangePoints(point);
+			changeRecord.setResultId(resultId);
+			// スクリーンショット変更箇所格納用
+			List<ScreenshotResultChangePoint> screenshotResults = new ArrayList<>();
+			// ターゲット変更箇所格納用
+			List<TargetResultChangePoint> targetResults = new ArrayList<>();
 
 			// テストクラス全体の実行結果格納用
 			List<TestResult> newTestResultList = new ArrayList<>();
 			for (TestResult orgTestResult : testResultList) {
-				if (resultId == null) {
-					resultId = orgTestResult.getResultId();
-					changeRecord.setResultId(resultId);
-				}
 				// 結果が一致しないものについては、変更個所として格納
 				if (orgTestResult.getResult() != execResult) {
 					point.setExecResult(Boolean.TRUE);
@@ -789,13 +791,17 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 			Integer testExecutionId = testExecution.getId();
 			String resultId = testExecution.getTimeString();
 
+			// 変更履歴ファイルの読み込み。
+			changeRecordList = loadChangeLog(resultId);
+
 			// 変更記録の作成。
-			ChangeRecord changeRecord = createChangeRecord(im, updateTime);
+			ChangeRecord changeRecord = createChangeRecord(changeRecordList.size() + 1,  im, updateTime);
+			changeRecordList.add(changeRecord);
+
 			// 変更箇所
 			ChangePoint point = new ChangePoint();
 			changeRecord.setChangePoints(point);
 			changeRecord.setResultId(resultId);
-			changeRecordList.add(changeRecord);
 			// スクリーンショット変更箇所格納用
 			List<ScreenshotResultChangePoint> screenshotResults = new ArrayList<>();
 			// ターゲット変更箇所格納用
@@ -982,13 +988,17 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 			Integer testExecutionId = testExecution.getId();
 			String resultId = testExecution.getTimeString();
 
+			// 変更履歴ファイルの読み込み。
+			changeRecordList = loadChangeLog(resultId);
+
 			// 変更記録の作成。
-			ChangeRecord changeRecord = createChangeRecord(im, updateTime);
+			ChangeRecord changeRecord = createChangeRecord(changeRecordList.size() + 1,  im, updateTime);
+			changeRecordList.add(changeRecord);
+
 			// 変更箇所
 			ChangePoint point = new ChangePoint();
 			changeRecord.setChangePoints(point);
 			changeRecord.setResultId(resultId);
-			changeRecordList.add(changeRecord);
 			// スクリーンショット変更箇所格納用
 			List<ScreenshotResultChangePoint> screenshotResults = new ArrayList<>();
 			// ターゲット変更箇所格納用
@@ -1144,30 +1154,31 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 		return new PersistMetadata(result.getResultId(), result.getScreenshotResults().get(0).getTestClass());
 	}
 
-	private ChangeRecord createChangeRecord(ExecResultChangeRequest request, Date updateTime) {
+	private ChangeRecord createChangeRecord(int index, ExecResultChangeRequest request, Date updateTime) {
 		Map<String, Object> requestParams = new TreeMap<>();	// キーを昇順の並びで出力
 		requestParams.put("testExecutionId", request.getTestExecutionId());
 		requestParams.put("execResult", convert(request.getResult()));
-		return createChangeRecord(requestParams, request.getComment(), updateTime);
+		return createChangeRecord(index, requestParams, request.getComment(), updateTime);
 	}
 
-	private ChangeRecord createChangeRecord(ScreenshotResultChangeRequest request, Date updateTime) {
+	private ChangeRecord createChangeRecord(int index, ScreenshotResultChangeRequest request, Date updateTime) {
 		Map<String, Object> requestParams = new TreeMap<>();	// キーを昇順の並びで出力
 		requestParams.put("screenshotId", request.getScreenshotId());
 		requestParams.put("execResult", convert(request.getResult()));
-		return createChangeRecord(requestParams, request.getComment(), updateTime);
+		return createChangeRecord(index, requestParams, request.getComment(), updateTime);
 	}
 
-	private ChangeRecord createChangeRecord(TargetResultChangeRequest request, Date updateTime) {
+	private ChangeRecord createChangeRecord(int index, TargetResultChangeRequest request, Date updateTime) {
 		Map<String, Object> requestParams = new TreeMap<>();	// キーを昇順の並びで出力
 		requestParams.put("screenshotId", request.getScreenshotId());
 		requestParams.put("targetId", request.getTargetId());
 		requestParams.put("execResult", convert(request.getResult()));
-		return createChangeRecord(requestParams, request.getComment(), updateTime);
+		return createChangeRecord(index, requestParams, request.getComment(), updateTime);
 	}
 
-	private ChangeRecord createChangeRecord(Map<String, Object> requestParams, String comment, Date updateTime) {
+	private ChangeRecord createChangeRecord(int index, Map<String, Object> requestParams, String comment, Date updateTime) {
 		ChangeRecord record = new ChangeRecord();
+		record.setId(index);
 		record.setRequestParams(requestParams);
 		record.setUpdateTime(updateTime);
 		record.setComment(comment);
@@ -1175,14 +1186,16 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 	}
 
 	private TargetResultChangePoint creatTargetResultChangePoint(TargetResult targetResult, ScreenshotResultChangePoint screenshotResultChangePoint) {
-		TargetResultChangePoint point = new TargetResultChangePoint(screenshotResultChangePoint, targetResult.getTarget());
+		TargetResultChangePoint point = new TargetResultChangePoint(screenshotResultChangePoint, targetResult.getTarget().getSelector());
 		return point;
 	}
 
 	private ScreenshotResultChangePoint createScreenshotResultChangePoint(ScreenshotResult screenshotResult) {
-		ScreenshotResultChangePoint point =
-				new ScreenshotResultChangePoint(screenshotResult.getScreenshotId(), screenshotResult.getTestClass(),
-						screenshotResult.getTestMethod(), screenshotResult.getCapabilities());
+		ScreenshotResultChangePoint point = new ScreenshotResultChangePoint(
+		screenshotResult.getScreenshotId()
+		,screenshotResult.getTestClass()
+		,screenshotResult.getTestMethod()
+		,screenshotResult.getCapabilities());
 		return point;
 	}
 
@@ -1223,10 +1236,31 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 		return true;
 	}
 
+	private List<ChangeRecord> loadChangeLog(String resultId) {
+		List<ChangeRecord> changeRecordList = new ArrayList<>();
+		File dir = new File(PtlTestConfig.getInstance().getPersisterConfig().getFile().getResultDirectory(), resultId);
+		File file = new File(dir, "explorer-change-log.json");
+		if (!file.exists()) {
+			return changeRecordList;
+		}
+		if (log.isDebugEnabled()) {
+			log.debug("[Load Changelog] ({})", file);
+		}
+		try {
+			changeRecordList = JSONUtils.readValue(file, new TypeReference<List<ChangeRecord>>() {
+			});
+		} catch (JSONException e) {
+			if (log.isDebugEnabled()) {
+				log.debug("Failed to load Changelog.", e);
+			}
+			throw e;
+		}
+		return changeRecordList;
+	}
+
 	private void saveChangelog(String resultId, List<ChangeRecord> changeRecordList) {
 		File dir = new File(PtlTestConfig.getInstance().getPersisterConfig().getFile().getResultDirectory(), resultId);
 		File file = new File(dir, "explorer-change-log.json");
-
 		if (log.isDebugEnabled()) {
 			log.debug("[Save Changelog] ({})", file);
 		}

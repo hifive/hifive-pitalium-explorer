@@ -1,16 +1,24 @@
 package com.htmlhifive.pitalium.explorer.log;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.htmlhifive.pitalium.core.model.IndexDomSelector;
-import com.htmlhifive.pitalium.core.model.ScreenAreaResult;
 
 public class TargetResultChangePoint {
 	private final ScreenshotResultChangePoint screenshot;
 
-	private final ScreenAreaResult target;
+	private final IndexDomSelector target;
 
-	public TargetResultChangePoint(ScreenshotResultChangePoint screenshot, ScreenAreaResult target) {
-		this.target = target;
+	/**
+	 *
+	 * @param screenshot
+	 * @param target
+	 */
+	@JsonCreator
+	public TargetResultChangePoint(@JsonProperty("screenshot") ScreenshotResultChangePoint screenshot,
+			@JsonProperty("target") IndexDomSelector target) {
 		this.screenshot = screenshot;
+		this.target = target;
 	}
 
 	public ScreenshotResultChangePoint getScreenshot() {
@@ -18,6 +26,6 @@ public class TargetResultChangePoint {
 	}
 
 	public IndexDomSelector getTarget() {
-		return target.getSelector();
+		return target;
 	}
 }
