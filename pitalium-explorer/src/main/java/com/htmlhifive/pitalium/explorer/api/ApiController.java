@@ -122,7 +122,7 @@ public class ApiController {
 	@ResponseBody
 	public ResponseEntity<List<ChangeRecord>> updateExecResult(@RequestBody List<ExecResultChangeRequest> inputModelList) {
 		for (ExecResultChangeRequest request : inputModelList) {
-			if (!validateChangeRequest(request)) {
+			if (!validateExecResultChangeRequest(request)) {
 				return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 			}
 		}
@@ -136,7 +136,7 @@ public class ApiController {
 	@ResponseBody
 	public ResponseEntity<List<ChangeRecord>> updateScreenshotComparisonResult(@RequestBody List<ScreenshotResultChangeRequest> inputModelList) {
 		for (ScreenshotResultChangeRequest request : inputModelList) {
-			if (!validateChangeRequest(request)) {
+			if (!validateScreenshotResultChangeRequest(request)) {
 				return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 			}
 		}
@@ -150,13 +150,34 @@ public class ApiController {
 	@ResponseBody
 	public ResponseEntity<List<ChangeRecord>> updateTargetComparisonResult(@RequestBody List<TargetResultChangeRequest> inputModelList) {
 		for (TargetResultChangeRequest request : inputModelList) {
-			if (!validateChangeRequest(request)) {
+			if (!validateTargetResultChangeRequest(request)) {
 				return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 			}
 		}
 
 		List<ChangeRecord> screenshotList = service.updateTargetComparisonResult(inputModelList);
 		return new ResponseEntity<List<ChangeRecord>>(screenshotList, HttpStatus.OK);
+	}
+
+	private boolean validateExecResultChangeRequest(ExecResultChangeRequest request) {
+		if (request.getTestExecutionId() == null) {
+			return false;
+		}
+		return validateChangeRequest(request);
+	}
+
+	private boolean validateScreenshotResultChangeRequest(ScreenshotResultChangeRequest request) {
+		if (request.getScreenshotId() == null) {
+			return false;
+		}
+		return validateChangeRequest(request);
+	}
+
+	private boolean validateTargetResultChangeRequest(TargetResultChangeRequest request) {
+		if (request.getScreenshotId() == null || request.getTargetId() == null) {
+			return false;
+		}
+		return validateChangeRequest(request);
 	}
 
 	private boolean validateChangeRequest(ChangeRequest request) {
