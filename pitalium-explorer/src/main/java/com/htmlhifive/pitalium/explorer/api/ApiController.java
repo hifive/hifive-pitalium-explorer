@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.htmlhifive.pitalium.explorer.entity.Screenshot;
 import com.htmlhifive.pitalium.explorer.entity.TestExecutionAndEnvironment;
 import com.htmlhifive.pitalium.explorer.log.ChangeRecord;
+import com.htmlhifive.pitalium.explorer.request.ChangeRequest;
 import com.htmlhifive.pitalium.explorer.request.ExecResultChangeRequest;
 import com.htmlhifive.pitalium.explorer.request.ScreenshotResultChangeRequest;
 import com.htmlhifive.pitalium.explorer.request.TargetResultChangeRequest;
@@ -120,6 +121,12 @@ public class ApiController {
 			produces = "application/json;charset=utf-8")
 	@ResponseBody
 	public ResponseEntity<List<ChangeRecord>> updateExecResult(@RequestBody List<ExecResultChangeRequest> inputModelList) {
+		for (ExecResultChangeRequest request : inputModelList) {
+			if (!validateChangeRequest(request)) {
+				return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+			}
+		}
+
 		List<ChangeRecord> testExecutionResultList = service.updateExecResult(inputModelList);
 		return new ResponseEntity<List<ChangeRecord>>(testExecutionResultList, HttpStatus.OK);
 	}
@@ -128,6 +135,12 @@ public class ApiController {
 			produces = "application/json;charset=utf-8")
 	@ResponseBody
 	public ResponseEntity<List<ChangeRecord>> updateScreenshotComparisonResult(@RequestBody List<ScreenshotResultChangeRequest> inputModelList) {
+		for (ScreenshotResultChangeRequest request : inputModelList) {
+			if (!validateChangeRequest(request)) {
+				return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+			}
+		}
+
 		List<ChangeRecord> testExecutionResultList = service.updateScreenshotComparisonResult(inputModelList);
 		return new ResponseEntity<List<ChangeRecord>>(testExecutionResultList, HttpStatus.OK);
 	}
@@ -136,7 +149,21 @@ public class ApiController {
 			produces = "application/json;charset=utf-8")
 	@ResponseBody
 	public ResponseEntity<List<ChangeRecord>> updateTargetComparisonResult(@RequestBody List<TargetResultChangeRequest> inputModelList) {
+		for (TargetResultChangeRequest request : inputModelList) {
+			if (!validateChangeRequest(request)) {
+				return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+			}
+		}
+
 		List<ChangeRecord> screenshotList = service.updateTargetComparisonResult(inputModelList);
 		return new ResponseEntity<List<ChangeRecord>>(screenshotList, HttpStatus.OK);
+	}
+
+	private boolean validateChangeRequest(ChangeRequest request) {
+		Integer result = request.getResult();
+		if (result == null || (result != 0 && result != 1)) {
+			return false;
+		}
+		return true;
 	}
 }
