@@ -635,20 +635,20 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 
 			// 変更記録の作成。
 			ChangeRecord changeRecord = createChangeRecord(fileOutputList.size() + 1,  im, updateTime);
+			changeRecord.setResultId(resultId);
 			fileOutputList.add(changeRecord);
 			// 返却用の変更記録リストにも追加。
 			changeRecordList.add(changeRecord);
 
 			// 変更箇所
 			ChangePoint point = new ChangePoint();
-			changeRecord.setChangePoints(point);
-			changeRecord.setResultId(resultId);
 			// スクリーンショット変更箇所格納用
 			List<ScreenshotResultChangePoint> screenshotResults = new ArrayList<>();
 			point.setScreenshotResults(screenshotResults);
 			// ターゲット変更箇所格納用
 			List<TargetResultChangePoint> targetResults = new ArrayList<>();
 			point.setTargetResults(targetResults);
+			changeRecord.setChangePoints(point);
 
 			// テストクラス全体の実行結果格納用
 			List<TestResult> newTestResultList = new ArrayList<>();
@@ -731,6 +731,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 	@Override
 	public List<ChangeRecord> updateScreenshotComparisonResult(List<ScreenshotResultChangeRequest> inputModelList) {
 		Map<Integer, ExecResult> resultMap = new HashMap<>();
+		// キャッシュしている情報の更新
 		for (ScreenshotResultChangeRequest im : inputModelList) {
 			ExecResult execResult = convert(im.getResult());
 			Boolean comparisonResult = execResult == ExecResult.SUCCESS;
@@ -787,20 +788,20 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 
 			// 変更記録の作成。
 			ChangeRecord changeRecord = createChangeRecord(fileOutputList.size() + 1,  im, updateTime);
+			changeRecord.setResultId(resultId);
 			fileOutputList.add(changeRecord);
 			// 返却用の変更記録リストにも追加。
 			changeRecordList.add(changeRecord);
 
 			// 変更箇所
 			ChangePoint point = new ChangePoint();
-			changeRecord.setChangePoints(point);
-			changeRecord.setResultId(resultId);
 			// スクリーンショット変更箇所格納用
 			List<ScreenshotResultChangePoint> screenshotResults = new ArrayList<>();
 			point.setScreenshotResults(screenshotResults);
 			// ターゲット変更箇所格納用
 			List<TargetResultChangePoint> targetResults = new ArrayList<>();
 			point.setTargetResults(targetResults);
+			changeRecord.setChangePoints(point);
 
 			List<TestResult> testResultList = testResultMap.get(testExecutionId);
 
@@ -900,14 +901,9 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 
 	@Override
 	public List<ChangeRecord> updateTargetComparisonResult(List<TargetResultChangeRequest> inputModelList) {
-		Map<Integer, String> messageMap = new HashMap<>();
-
 		Map<Integer, ExecResult> resultMap = new HashMap<>();
+		// キャッシュしている情報の更新
 		for (TargetResultChangeRequest im : inputModelList) {
-			// screenshotIdをキーにmessageを格納。
-			// ファイルに出力する際に使用する。
-			messageMap.put(im.getTargetId(), im.getComment());
-
 			// キャッシュしているデータの更新
 			ExecResult execResult = convert(im.getResult());
 			Boolean comparisonResult = execResult == ExecResult.SUCCESS;
@@ -978,20 +974,20 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 
 			// 変更記録の作成。
 			ChangeRecord changeRecord = createChangeRecord(fileOutputList.size() + 1,  im, updateTime);
+			changeRecord.setResultId(resultId);
 			fileOutputList.add(changeRecord);
 			// 返却用の変更記録リストにも追加。
 			changeRecordList.add(changeRecord);
 
 			// 変更箇所
 			ChangePoint point = new ChangePoint();
-			changeRecord.setChangePoints(point);
-			changeRecord.setResultId(resultId);
 			// スクリーンショット変更箇所格納用
 			List<ScreenshotResultChangePoint> screenshotResults = new ArrayList<>();
 			point.setScreenshotResults(screenshotResults);
 			// ターゲット変更箇所格納用
 			List<TargetResultChangePoint> targetResults = new ArrayList<>();
 			point.setTargetResults(targetResults);
+			changeRecord.setChangePoints(point);
 
 			List<TestResult> testResultList = testResultMap.get(testExecutionId);
 
