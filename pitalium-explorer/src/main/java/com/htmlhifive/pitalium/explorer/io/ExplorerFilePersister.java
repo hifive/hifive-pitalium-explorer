@@ -634,8 +634,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 			List<ChangeRecord> fileOutputList = loadChangeLog(resultId);
 
 			// 変更記録の作成。
-			ChangeRecord changeRecord = createChangeRecord(fileOutputList.size() + 1,  im, updateTime);
-			changeRecord.setResultId(resultId);
+			ChangeRecord changeRecord = createChangeRecord(fileOutputList.size() + 1, im, resultId, updateTime);
 			fileOutputList.add(changeRecord);
 			// 返却用の変更記録リストにも追加。
 			changeRecordList.add(changeRecord);
@@ -787,8 +786,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 			List<ChangeRecord> fileOutputList = loadChangeLog(resultId);
 
 			// 変更記録の作成。
-			ChangeRecord changeRecord = createChangeRecord(fileOutputList.size() + 1,  im, updateTime);
-			changeRecord.setResultId(resultId);
+			ChangeRecord changeRecord = createChangeRecord(fileOutputList.size() + 1, im, resultId, updateTime);
 			fileOutputList.add(changeRecord);
 			// 返却用の変更記録リストにも追加。
 			changeRecordList.add(changeRecord);
@@ -973,8 +971,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 			List<ChangeRecord> fileOutputList = loadChangeLog(resultId);
 
 			// 変更記録の作成。
-			ChangeRecord changeRecord = createChangeRecord(fileOutputList.size() + 1,  im, updateTime);
-			changeRecord.setResultId(resultId);
+			ChangeRecord changeRecord = createChangeRecord(fileOutputList.size() + 1, im, resultId, updateTime);
 			fileOutputList.add(changeRecord);
 			// 返却用の変更記録リストにも追加。
 			changeRecordList.add(changeRecord);
@@ -1130,49 +1127,47 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 		return new PersistMetadata(result.getResultId(), result.getScreenshotResults().get(0).getTestClass());
 	}
 
-	private ChangeRecord createChangeRecord(int index, ExecResultChangeRequest request, Date updateTime) {
-		Map<String, Object> requestParams = new TreeMap<>();	// キーを昇順の並びで出力
+	private ChangeRecord createChangeRecord(int index, ExecResultChangeRequest request, String resultId, Date updateTime) {
+		Map<String, Object> requestParams = new TreeMap<>();	// キーを昇順の並びで出力するためにTreeMapを使用している。
 		requestParams.put("testExecutionId", request.getTestExecutionId());
 		requestParams.put("execResult", convert(request.getResult()));
-		return createChangeRecord(index, requestParams, request.getComment(), updateTime);
+		return createChangeRecord(index, requestParams, request.getComment(), resultId, updateTime);
 	}
 
-	private ChangeRecord createChangeRecord(int index, ScreenshotResultChangeRequest request, Date updateTime) {
-		Map<String, Object> requestParams = new TreeMap<>();	// キーを昇順の並びで出力
+	private ChangeRecord createChangeRecord(int index, ScreenshotResultChangeRequest request, String resultId, Date updateTime) {
+		Map<String, Object> requestParams = new TreeMap<>();	// キーを昇順の並びで出力するためにTreeMapを使用している。
 		requestParams.put("screenshotId", request.getScreenshotId());
 		requestParams.put("execResult", convert(request.getResult()));
-		return createChangeRecord(index, requestParams, request.getComment(), updateTime);
+		return createChangeRecord(index, requestParams, request.getComment(), resultId, updateTime);
 	}
 
-	private ChangeRecord createChangeRecord(int index, TargetResultChangeRequest request, Date updateTime) {
-		Map<String, Object> requestParams = new TreeMap<>();	// キーを昇順の並びで出力
+	private ChangeRecord createChangeRecord(int index, TargetResultChangeRequest request, String resultId, Date updateTime) {
+		Map<String, Object> requestParams = new TreeMap<>();	// キーを昇順の並びで出力するためにTreeMapを使用している。
 		requestParams.put("screenshotId", request.getScreenshotId());
 		requestParams.put("targetId", request.getTargetId());
 		requestParams.put("execResult", convert(request.getResult()));
-		return createChangeRecord(index, requestParams, request.getComment(), updateTime);
+		return createChangeRecord(index, requestParams, request.getComment(), resultId, updateTime);
 	}
 
-	private ChangeRecord createChangeRecord(int index, Map<String, Object> requestParams, String comment, Date updateTime) {
-		ChangeRecord record = new ChangeRecord();
-		record.setId(index);
-		record.setRequestParams(requestParams);
-		record.setUpdateTime(updateTime);
-		record.setComment(comment);
-		return record;
+	private ChangeRecord createChangeRecord(int index, Map<String, Object> requestParams, String comment, String resultId,
+			Date updateTime) {
+		return new ChangeRecord(index, requestParams, comment, resultId, updateTime);
+//		ChangeRecord record = new ChangeRecord();
+//		record.setId(index);
+//		record.setRequestParams(requestParams);
+//		record.setUpdateTime(updateTime);
+//		record.setComment(comment);
+//		return record;
 	}
 
-	private TargetResultChangePoint creatTargetResultChangePoint(TargetResult targetResult, ScreenshotResultChangePoint screenshotResultChangePoint) {
-		TargetResultChangePoint point = new TargetResultChangePoint(screenshotResultChangePoint, targetResult.getTarget().getSelector());
-		return point;
+	private TargetResultChangePoint creatTargetResultChangePoint(TargetResult targetResult,
+			ScreenshotResultChangePoint screenshotResultChangePoint) {
+		return new TargetResultChangePoint(screenshotResultChangePoint, targetResult.getTarget().getSelector());
 	}
 
 	private ScreenshotResultChangePoint createScreenshotResultChangePoint(ScreenshotResult screenshotResult) {
-		ScreenshotResultChangePoint point = new ScreenshotResultChangePoint(
-		screenshotResult.getScreenshotId()
-		,screenshotResult.getTestClass()
-		,screenshotResult.getTestMethod()
-		,screenshotResult.getCapabilities());
-		return point;
+		return new ScreenshotResultChangePoint(screenshotResult.getScreenshotId(),
+				screenshotResult.getTestClass(), screenshotResult.getTestMethod(), screenshotResult.getCapabilities());
 	}
 
 	private boolean isMatchedScreenshot(Screenshot screenshot, ScreenshotResult screenshotResult) {

@@ -3,6 +3,9 @@ package com.htmlhifive.pitalium.explorer.log;
 import java.util.Date;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /**
  * 変更記録
  *
@@ -10,22 +13,33 @@ import java.util.Map;
  */
 public class ChangeRecord {
 	/** ID */
-	private Integer id;
+	private final Integer id;
 
 	/** リクエストパラメータ */
-	private Map<String, ?> requestParams;
+	private final Map<String, ?> requestParams;
 
 	/** コメント */
-	private String comment;
+	private final String comment;
 
 	/** 結果ID */
-	private String resultId;
+	private final String resultId;
 
 	/** 更新日時 */
-	private Date updateTime;
+	private final Date updateTime;
 
 	/** 変更箇所 */
 	private ChangePoint changePoints;
+
+	@JsonCreator
+	public ChangeRecord(@JsonProperty("id") int id, @JsonProperty("requestParams") Map<String, ?> requestParams,
+			@JsonProperty("comment") String comment, @JsonProperty("resultId") String resultId,
+			@JsonProperty("updateTime") Date updateTime) {
+		this.id = id;
+		this.requestParams = requestParams;
+		this.comment = comment;
+		this.resultId = resultId;
+		this.updateTime  = updateTime;
+	}
 
 	/**
 	 * IDを取得する。
@@ -34,15 +48,6 @@ public class ChangeRecord {
 	 */
 	public Integer getId() {
 		return id;
-	}
-
-	/**
-	 * IDを設定する。
-	 *
-	 * @param id ID
-	 */
-	public void setId(Integer id) {
-		this.id = id;
 	}
 
 	/**
@@ -55,30 +60,12 @@ public class ChangeRecord {
 	}
 
 	/**
-	 * リクエストパラメータを設定する。
-	 *
-	 * @param requestParams リクエストパラメータ
-	 */
-	public void setRequestParams(Map<String, ?> requestParams) {
-		this.requestParams = requestParams;
-	}
-
-	/**
 	 * コメントを取得する。
 	 *
 	 * @return コメント
 	 */
 	public String getComment() {
 		return comment;
-	}
-
-	/**
-	 * コメントを設定する。
-	 *
-	 * @param comment コメント
-	 */
-	public void setComment(String comment) {
-		this.comment = comment;
 	}
 
 	/**
@@ -91,30 +78,12 @@ public class ChangeRecord {
 	}
 
 	/**
-	 * 結果IDを設定する。
-	 *
-	 * @param resultId 結果ID
-	 */
-	public void setResultId(String resultId) {
-		this.resultId = resultId;
-	}
-
-	/**
 	 * 更新日時を取得する。
 	 *
 	 * @return 更新日時
 	 */
 	public Date getUpdateTime() {
 		return updateTime;
-	}
-
-	/**
-	 * 更新日時を設定する。
-	 *
-	 * @param updateTime 更新日時
-	 */
-	public void setUpdateTime(Date updateTime) {
-		this.updateTime = updateTime;
 	}
 
 	/**
