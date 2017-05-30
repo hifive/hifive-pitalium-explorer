@@ -71,9 +71,9 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 	private Map<Integer, Target> targetMap;
 
 	// 更新処理のために保持
-	private Map<Integer, List<TestResult>> testResultMap;
-	private Map<ScreenshotResult, Integer> screenshotIdMap;
-	private Map<TargetResult, Integer> targetIdMap;
+	private Map<Integer, List<TestResult>> testResultMap;		// IDと結果オブジェクト（リスト）を紐付けするためのもの
+	private Map<ScreenshotResult, Integer> screenshotIdMap;		// 結果オブジェクトとIDを紐付けするためのもの
+	private Map<TargetResult, Integer> targetIdMap;				// 結果オブジェクトとIDを紐付けするためのもの
 
 	public ExplorerFilePersister() {
 		// FIXME 独自のConfigに差し替える必要があるかも
@@ -622,7 +622,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 		List<ChangeRecord> changeRecordList = new ArrayList<>();
 
 		for (ExecResultChangeRequest im : inputModelList) {
-			ExecResult execResult = convert(im.getResult());
+			ExecResult execResult = convertToExecResult(im.getResult());
 
 			// ファイルの更新
 			Integer testExecutionId = im.getTestExecutionId();
@@ -729,10 +729,11 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 
 	@Override
 	public List<ChangeRecord> updateScreenshotComparisonResult(List<ScreenshotResultChangeRequest> inputModelList) {
-		Map<Integer, ExecResult> resultMap = new HashMap<>();
+		// TestExecutionIdとExecResultを紐付けするためのもの
+		Map<Integer, ExecResult> execResultMap = new HashMap<>();
 		// キャッシュしている情報の更新
 		for (ScreenshotResultChangeRequest im : inputModelList) {
-			ExecResult execResult = convert(im.getResult());
+			ExecResult execResult = convertToExecResult(im.getResult());
 			Boolean comparisonResult = execResult == ExecResult.SUCCESS;
 
 			// screenshotのキャッシュ更新。
@@ -766,7 +767,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 			// 履歴ファイルに書き込む際に使用する情報を確保。
 			ExecResult execAllResult =
 					s.getTestExecution().getExecResult() != null ? ExecResult.valueOf(s.getTestExecution().getExecResult()) : null;
-			resultMap.put(testExecutionId, execAllResult);
+			execResultMap.put(testExecutionId, execAllResult);
 		}
 
 		// explorer-change-log.jsonの更新
@@ -775,7 +776,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 		List<ChangeRecord> changeRecordList = new ArrayList<>();
 
 		for (ScreenshotResultChangeRequest im : inputModelList) {
-			ExecResult execResult = convert(im.getResult());
+			ExecResult execResult = convertToExecResult(im.getResult());
 
 			Screenshot screenshot = screenshotMap.get(im.getScreenshotId());
 			TestExecution testExecution = screenshot.getTestExecution();
@@ -810,7 +811,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 				}
 
 				// 結果が一致しないものについては、変更個所として格納
-				if (testResult.getResult() != resultMap.get(testExecutionId)) {
+				if (testResult.getResult() != execResultMap.get(testExecutionId)) {
 					point.setExecResult(Boolean.TRUE);
 				}
 
@@ -841,7 +842,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 		}
 
 		// result.jsの更新の更新
-		for (Entry<Integer, ExecResult> entry : resultMap.entrySet()) {
+		for (Entry<Integer, ExecResult> entry : execResultMap.entrySet()) {
 			// ファイルの更新
 			Integer testExecutionId = entry.getKey();
 			List<TestResult> testResultList = testResultMap.get(testExecutionId);
@@ -856,7 +857,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 
 					// スクリーンショットの結果の値を取得
 					Boolean comparisonResult = screenshotMap.get(screenshotId).getComparisonResult();
-					ExecResult ssExecResult  = convert(comparisonResult);
+					ExecResult ssExecResult  = convertToExecResult(comparisonResult);
 
 					// 対象領域の実行結果格納用
 					List<TargetResult> newTargetResultList = new ArrayList<>();
@@ -899,11 +900,12 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 
 	@Override
 	public List<ChangeRecord> updateTargetComparisonResult(List<TargetResultChangeRequest> inputModelList) {
-		Map<Integer, ExecResult> resultMap = new HashMap<>();
+		// TestExecutionIdとExecResultを紐付けするためのもの
+		Map<Integer, ExecResult> execResultMap = new HashMap<>();
 		// キャッシュしている情報の更新
 		for (TargetResultChangeRequest im : inputModelList) {
 			// キャッシュしているデータの更新
-			ExecResult execResult = convert(im.getResult());
+			ExecResult execResult = convertToExecResult(im.getResult());
 			Boolean comparisonResult = execResult == ExecResult.SUCCESS;
 
 			// targetのキャッシュ更新。
@@ -950,7 +952,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 			// ファイルに書き込む際に使用する情報を確保。
 			ExecResult execAllResult =
 					s.getTestExecution().getExecResult() != null ? ExecResult.valueOf(s.getTestExecution().getExecResult()) : null;
-			resultMap.put(testExecutionId, execAllResult);
+			execResultMap.put(testExecutionId, execAllResult);
 		}
 
 		// explorer-change-log.jsonの更新
@@ -959,7 +961,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 		List<ChangeRecord> changeRecordList = new ArrayList<>();
 
 		for (TargetResultChangeRequest im : inputModelList) {
-			ExecResult execResult = convert(im.getResult());
+			ExecResult execResult = convertToExecResult(im.getResult());
 
 			Target target = targetMap.get(im.getTargetId());
 			Screenshot screenshot = screenshotMap.get(im.getScreenshotId());
@@ -995,7 +997,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 				}
 
 				// 結果が一致しないものについては、変更個所として格納
-				if (testResult.getResult() != resultMap.get(testExecutionId)) {
+				if (testResult.getResult() != execResultMap.get(testExecutionId)) {
 					point.setExecResult(Boolean.TRUE);
 				}
 
@@ -1008,7 +1010,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 					ScreenshotResultChangePoint screenshotResultChangePoint =
 							createScreenshotResultChangePoint(screenshotResult);
 					// 結果が一致しないものについては、変更個所として格納
-					if (screenshotResult.getResult() != convert(screenshot.getComparisonResult())) {
+					if (screenshotResult.getResult() != convertToExecResult(screenshot.getComparisonResult())) {
 						screenshotResults.add(screenshotResultChangePoint);
 					}
 
@@ -1031,7 +1033,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 		}
 
 		// result.jsの更新の更新
-		for (Entry<Integer, ExecResult> entry : resultMap.entrySet()) {
+		for (Entry<Integer, ExecResult> entry : execResultMap.entrySet()) {
 			Integer testExecutionId = entry.getKey();
 			List<TestResult> testResultList = testResultMap.get(testExecutionId);
 
@@ -1047,7 +1049,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 						// 対象領域の結果の値を取得
 						Integer targetId = targetIdMap.get(orgTargetResult);
 						Boolean comparisonResult = targetMap.get(targetId).getComparisonResult();
-						ExecResult targetExecResult = convert(comparisonResult);
+						ExecResult targetExecResult = convertToExecResult(comparisonResult);
 
 						// メモリにキャッシュしている対象領域の結果を置換
 						TargetResult newTargetResult = createTargetResult(orgTargetResult, targetExecResult);
@@ -1060,7 +1062,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 					// スクリーンショットの結果の値を取得
 					Integer screenshotId = screenshotIdMap.get(orgScreenshotResult);
 					Boolean comparisonResult = screenshotMap.get(screenshotId).getComparisonResult();
-					ExecResult ssExecResult  = convert(comparisonResult);
+					ExecResult ssExecResult  = convertToExecResult(comparisonResult);
 
 					// nullの場合は既存の結果の値を使用する。
 					ssExecResult = ssExecResult != null ? ssExecResult : orgScreenshotResult.getResult();
@@ -1087,7 +1089,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 		return changeRecordList;
 	}
 
-	private ExecResult convert(Integer resultCd) {
+	private ExecResult convertToExecResult(Integer resultCd) {
 		switch (resultCd) {
 			case 0:
 				return ExecResult.SUCCESS;
@@ -1098,7 +1100,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 		}
 	}
 
-	private ExecResult convert(Boolean result) {
+	private ExecResult convertToExecResult(Boolean result) {
 		if (result == null) {
 			return null;
 		}
@@ -1130,14 +1132,14 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 	private ChangeRecord createChangeRecord(int index, ExecResultChangeRequest request, String resultId, Date updateTime) {
 		Map<String, Object> requestParams = new TreeMap<>();	// キーを昇順の並びで出力するためにTreeMapを使用している。
 		requestParams.put("testExecutionId", request.getTestExecutionId());
-		requestParams.put("execResult", convert(request.getResult()));
+		requestParams.put("execResult", convertToExecResult(request.getResult()));
 		return createChangeRecord(index, requestParams, request.getComment(), resultId, updateTime);
 	}
 
 	private ChangeRecord createChangeRecord(int index, ScreenshotResultChangeRequest request, String resultId, Date updateTime) {
 		Map<String, Object> requestParams = new TreeMap<>();	// キーを昇順の並びで出力するためにTreeMapを使用している。
 		requestParams.put("screenshotId", request.getScreenshotId());
-		requestParams.put("execResult", convert(request.getResult()));
+		requestParams.put("execResult", convertToExecResult(request.getResult()));
 		return createChangeRecord(index, requestParams, request.getComment(), resultId, updateTime);
 	}
 
@@ -1145,7 +1147,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 		Map<String, Object> requestParams = new TreeMap<>();	// キーを昇順の並びで出力するためにTreeMapを使用している。
 		requestParams.put("screenshotId", request.getScreenshotId());
 		requestParams.put("targetId", request.getTargetId());
-		requestParams.put("execResult", convert(request.getResult()));
+		requestParams.put("execResult", convertToExecResult(request.getResult()));
 		return createChangeRecord(index, requestParams, request.getComment(), resultId, updateTime);
 	}
 
