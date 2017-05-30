@@ -117,6 +117,12 @@ public class ApiController {
 		return new ResponseEntity<Page<TestExecutionAndEnvironment>>(testPage, HttpStatus.OK);
 	}
 
+	/**
+	 * テスト全体の実行結果を更新する。
+	 *
+	 * @param inputModelList 変更内容のリスト
+	 * @return 変更記録のリスト
+	 */
 	@RequestMapping(value = "executions/update", method = RequestMethod.POST, consumes = "application/json;charset=utf-8",
 			produces = "application/json;charset=utf-8")
 	@ResponseBody
@@ -131,6 +137,12 @@ public class ApiController {
 		return new ResponseEntity<List<ChangeRecord>>(testExecutionResultList, HttpStatus.OK);
 	}
 
+	/**
+	 * スクリーンショットの実行結果を更新する。
+	 *
+	 * @param inputModelList 変更内容のリスト
+	 * @return 変更記録のリスト
+	 */
 	@RequestMapping(value = "screenshots/update", method = RequestMethod.POST, consumes = "application/json;charset=utf-8",
 			produces = "application/json;charset=utf-8")
 	@ResponseBody
@@ -145,6 +157,12 @@ public class ApiController {
 		return new ResponseEntity<List<ChangeRecord>>(testExecutionResultList, HttpStatus.OK);
 	}
 
+	/**
+	 * 対象領域の実行結果を更新する。
+	 *
+	 * @param inputModelList 変更内容のリスト
+	 * @return 変更記録のリスト
+	 */
 	@RequestMapping(value = "targets/update", method = RequestMethod.POST, consumes = "application/json;charset=utf-8",
 			produces = "application/json;charset=utf-8")
 	@ResponseBody
