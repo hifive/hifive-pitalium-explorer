@@ -1152,12 +1152,6 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 	private ChangeRecord createChangeRecord(int index, Map<String, Object> requestParams, String comment, String resultId,
 			Date updateTime) {
 		return new ChangeRecord(index, requestParams, comment, resultId, updateTime);
-//		ChangeRecord record = new ChangeRecord();
-//		record.setId(index);
-//		record.setRequestParams(requestParams);
-//		record.setUpdateTime(updateTime);
-//		record.setComment(comment);
-//		return record;
 	}
 
 	private TargetResultChangePoint creatTargetResultChangePoint(TargetResult targetResult,

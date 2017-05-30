@@ -30,6 +30,15 @@ public class ChangeRecord {
 	/** 変更箇所 */
 	private ChangePoint changePoints;
 
+	/**
+	 * コンストラクタ
+	 *
+	 * @param id ID
+	 * @param requestParams リクエストパラメータ
+	 * @param comment コメント
+	 * @param resultId 結果ID
+	 * @param updateTime 更新日時
+	 */
 	@JsonCreator
 	public ChangeRecord(@JsonProperty("id") int id, @JsonProperty("requestParams") Map<String, ?> requestParams,
 			@JsonProperty("comment") String comment, @JsonProperty("resultId") String resultId,
