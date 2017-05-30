@@ -105,9 +105,27 @@ public interface ExplorerPersister extends Persister {
 
 	void saveProcessedImage(Integer screenshotId, String algorithm, String edgeFileName);
 
+	/**
+	 * テスト全体の実行結果を更新する。
+	 *
+	 * @param inputModelList 変更内容のリスト
+	 * @return 変更記録のリスト
+	 */
 	List<ChangeRecord> updateExecResult(List<ExecResultChangeRequest> inputModelList);
 
+	/**
+	 * スクリーンショットの実行結果を更新する。
+	 *
+	 * @param inputModelList 変更内容のリスト
+	 * @return 変更記録のリスト
+	 */
 	List<ChangeRecord> updateScreenshotComparisonResult(List<ScreenshotResultChangeRequest> inputModelList);
 
+	/**
+	 * 対象領域の実行結果を更新する。
+	 *
+	 * @param inputModelList 変更内容のリスト
+	 * @return 変更記録のリスト
+	 */
 	List<ChangeRecord> updateTargetComparisonResult(List<TargetResultChangeRequest> inputModelList);
 }
