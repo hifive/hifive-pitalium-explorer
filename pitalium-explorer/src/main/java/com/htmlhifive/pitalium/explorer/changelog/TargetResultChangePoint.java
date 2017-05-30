@@ -1,4 +1,4 @@
-package com.htmlhifive.pitalium.explorer.log;
+package com.htmlhifive.pitalium.explorer.changelog;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;

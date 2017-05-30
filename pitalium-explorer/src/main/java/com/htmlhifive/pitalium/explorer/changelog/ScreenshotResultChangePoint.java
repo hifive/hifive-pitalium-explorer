@@ -1,4 +1,4 @@
-package com.htmlhifive.pitalium.explorer.log;
+package com.htmlhifive.pitalium.explorer.changelog;
 
 import java.util.Map;
 
