@@ -1141,6 +1141,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 		Map<String, Object> requestParams = new TreeMap<>();	// キーを昇順の並びで出力するためにTreeMapを使用している。
 		requestParams.put("testExecutionId", request.getTestExecutionId());
 		requestParams.put("execResult", convertToExecResult(request.getResult()));
+		// 変更要求(ID)で示された対象情報を追加。
 		Map<String, String> map = new HashMap<>();
 		map.put("resultId", resultId);
 		requestParams.put("targetChangePoint", map);
