@@ -827,6 +827,9 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 					if (screenshotResult.getResult() != execResult) {
 						screenshotResults.add(screenshotResultChangePoint);
 					}
+					// 変更要求(ID)で示された対象情報を追加。
+					Map<String, Object> requestParams = changeRecord.getRequestParams();
+					requestParams.put("targetChangePoint", screenshotResultChangePoint);
 
 					// 対象領域の結果を変更
 					for (TargetResult targetResult : screenshotResult.getTargetResults()) {
@@ -1022,9 +1025,14 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 						}
 
 						// 結果が一致しないものについては、変更個所として格納
+						TargetResultChangePoint targetResultChangePoint =
+								creatTargetResultChangePoint(targetResult, screenshotResultChangePoint);
 						if (targetResult.getResult() != execResult) {
-							targetResults.add(creatTargetResultChangePoint(targetResult, screenshotResultChangePoint));
+							targetResults.add(targetResultChangePoint);
 						}
+						// 変更要求(ID)で示された対象情報を追加。
+						Map<String, Object> requestParams = changeRecord.getRequestParams();
+						requestParams.put("targetChangePoint", targetResultChangePoint);
 					}
 				}
 			}
@@ -1133,6 +1141,9 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 		Map<String, Object> requestParams = new TreeMap<>();	// キーを昇順の並びで出力するためにTreeMapを使用している。
 		requestParams.put("testExecutionId", request.getTestExecutionId());
 		requestParams.put("execResult", convertToExecResult(request.getResult()));
+		Map<String, String> map = new HashMap<>();
+		map.put("resultId", resultId);
+		requestParams.put("targetChangePoint", map);
 		return createChangeRecord(index, requestParams, request.getComment(), resultId, updateTime);
 	}
 

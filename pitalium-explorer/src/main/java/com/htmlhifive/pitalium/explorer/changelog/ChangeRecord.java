@@ -16,7 +16,7 @@ public class ChangeRecord {
 	private final Integer id;
 
 	/** リクエストパラメータ */
-	private final Map<String, ?> requestParams;
+	private final Map<String, Object> requestParams;
 
 	/** コメント */
 	private final String comment;
@@ -40,7 +40,7 @@ public class ChangeRecord {
 	 * @param updateTime 更新日時
 	 */
 	@JsonCreator
-	public ChangeRecord(@JsonProperty("id") int id, @JsonProperty("requestParams") Map<String, ?> requestParams,
+	public ChangeRecord(@JsonProperty("id") int id, @JsonProperty("requestParams") Map<String, Object> requestParams,
 			@JsonProperty("comment") String comment, @JsonProperty("resultId") String resultId,
 			@JsonProperty("updateTime") Date updateTime) {
 		this.id = id;
@@ -64,7 +64,7 @@ public class ChangeRecord {
 	 *
 	 * @return リクエストパラメータ
 	 */
-	public Map<String, ?> getRequestParams() {
+	public Map<String, Object> getRequestParams() {
 		return requestParams;
 	}
 
