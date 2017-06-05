@@ -47,6 +47,7 @@ import com.htmlhifive.pitalium.explorer.changelog.ChangePoint;
 import com.htmlhifive.pitalium.explorer.changelog.ChangeRecord;
 import com.htmlhifive.pitalium.explorer.changelog.ScreenshotResultChangePoint;
 import com.htmlhifive.pitalium.explorer.changelog.TargetResultChangePoint;
+import com.htmlhifive.pitalium.explorer.conf.ExplorerPersisterConfig;
 import com.htmlhifive.pitalium.explorer.entity.Area;
 import com.htmlhifive.pitalium.explorer.entity.Screenshot;
 import com.htmlhifive.pitalium.explorer.entity.Target;
@@ -76,8 +77,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 	private Map<TargetResult, Integer> targetIdMap;				// 結果オブジェクトとIDを紐付けするためのもの
 
 	public ExplorerFilePersister() {
-		// FIXME 独自のConfigに差し替える必要があるかも
-		super();
+		super(PtlTestConfig.getInstance().getConfig(ExplorerPersisterConfig.class).getFile());
 	}
 
 	public ExplorerFilePersister(FilePersisterConfig config) {
@@ -92,7 +92,12 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 
 	@Override
 	public Page<TestExecutionResult> findTestExecution(String searchTestMethod, String searchTestScreen, int page,
-			int pageSize) {
+			int pageSize, String resultDirectoryKey) {
+		if (resultDirectoryKey != null && !resultDirectoryKey.isEmpty()) {
+			ExplorerPersisterConfig persisterConfig = PtlTestConfig.getInstance().getConfig(ExplorerPersisterConfig.class);
+			config = persisterConfig.getFiles().get(resultDirectoryKey);
+		}
+
 		File root = super.getResultDirectoryFile();
 		if (!root.exists() || !root.isDirectory()) {
 			log.error("Directory(" + root.getAbsolutePath() + ") Not Found.");

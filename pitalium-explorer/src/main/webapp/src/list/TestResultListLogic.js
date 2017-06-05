@@ -3,6 +3,8 @@
  * Copyright (C) 2015 NS Solutions Corporation, All Rights Reserved.
  */
 (function($) {
+	var utils = hifive.pitalium.explorer.utils;
+
 	/**
 	 * This class is a &quot;Logic&quot; for the list page of test results.
 	 * 
@@ -45,7 +47,8 @@
 				'page': page,
 				'limit': pageSize,
 				'searchTestMethod': this.searchTestMethod,
-				'searchTestScreen': this.searchTestScreen
+				'searchTestScreen': this.searchTestScreen,
+				resultDirectoryKey: utils.getParameters().resultDirectoryKey
 			};
 
 			return h5.ajax({

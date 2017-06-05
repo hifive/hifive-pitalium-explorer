@@ -88,8 +88,8 @@ public class ExplorerService implements Serializable {
 	}
 
 	public Page<TestExecutionResult> findTestExecution(String searchTestMethod, String searchTestScreen, int page,
-			int pageSize) {
-		return persisterService.findTestExecution(searchTestMethod, searchTestScreen, page, pageSize);
+			int pageSize, String resultDirectoryKey) {
+		return persisterService.findTestExecution(searchTestMethod, searchTestScreen, page, pageSize, resultDirectoryKey);
 	}
 
 	public List<Screenshot> findScreenshot(Integer testExecutionId, String searchTestMethod, String searchTestScreen) {

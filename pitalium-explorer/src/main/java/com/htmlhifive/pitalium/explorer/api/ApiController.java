@@ -6,6 +6,7 @@ package com.htmlhifive.pitalium.explorer.api;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.context.WebApplicationContext;
 
 import com.htmlhifive.pitalium.explorer.changelog.ChangeRecord;
 import com.htmlhifive.pitalium.explorer.entity.Screenshot;
@@ -26,6 +28,7 @@ import com.htmlhifive.pitalium.explorer.request.TargetResultChangeRequest;
 import com.htmlhifive.pitalium.explorer.response.TestExecutionResult;
 import com.htmlhifive.pitalium.explorer.service.ExplorerService;
 
+@Scope(scopeName=WebApplicationContext.SCOPE_SESSION)
 @Controller
 public class ApiController {
 
@@ -45,9 +48,10 @@ public class ApiController {
 	public ResponseEntity<Page<TestExecutionResult>> listTestExecution(
 			@RequestParam(value = "page", defaultValue = "1") int page,
 			@RequestParam(value = "limit", defaultValue = "0") int pageSize,
+			@RequestParam(value = "resultDirectoryKey", defaultValue = "") String resultDirectoryKey,
 			@RequestParam(value = "searchTestMethod", defaultValue = "") String searchTestMethod,
 			@RequestParam(value = "searchTestScreen", defaultValue = "") String searchTestScreen) {
-		Page<TestExecutionResult> list = service.findTestExecution(searchTestMethod, searchTestScreen, page, pageSize);
+		Page<TestExecutionResult> list = service.findTestExecution(searchTestMethod, searchTestScreen, page, pageSize, resultDirectoryKey);
 		return new ResponseEntity<Page<TestExecutionResult>>(list, HttpStatus.OK);
 	}
 

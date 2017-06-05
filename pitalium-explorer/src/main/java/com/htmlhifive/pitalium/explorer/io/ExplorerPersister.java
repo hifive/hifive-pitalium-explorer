@@ -36,7 +36,7 @@ public interface ExplorerPersister extends Persister {
 	 * @return TestExecutionのリスト
 	 */
 	Page<TestExecutionResult> findTestExecution(String searchTestMethod, String searchTestScreen, int page,
-			int pageSize);
+			int pageSize, String resultDirectoryKey);
 
 	/**
 	 * Screenshotのリストを取得する。 引数のメソッド名、スクリーンショットを含む（like検索）Screenshotのリストを取得する。

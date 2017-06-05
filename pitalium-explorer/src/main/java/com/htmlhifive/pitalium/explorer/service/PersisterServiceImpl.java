@@ -89,8 +89,8 @@ public class PersisterServiceImpl implements PersisterService {
 
 	@Override
 	public Page<TestExecutionResult> findTestExecution(String searchTestMethod, String searchTestScreen, int page,
-			int pageSize) {
-		return persister.findTestExecution(searchTestMethod, searchTestScreen, page, pageSize);
+			int pageSize, String resultDirectoryKey) {
+		return persister.findTestExecution(searchTestMethod, searchTestScreen, page, pageSize, resultDirectoryKey);
 	}
 
 	@Override

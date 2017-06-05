@@ -1,0 +1,11 @@
+{
+	"files": {
+		"result1": {
+			"resultDirectory": "pitalium-results1"
+		},
+		"result2": {
+			"resultDirectory": "pitalium-results2"
+		}
+	},
+	"key": "result1"
+}

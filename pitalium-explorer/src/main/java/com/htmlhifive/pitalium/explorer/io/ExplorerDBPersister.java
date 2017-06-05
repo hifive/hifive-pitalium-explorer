@@ -78,7 +78,7 @@ public class ExplorerDBPersister extends DBPersister implements ExplorerPersiste
 
 	@Override
 	public Page<TestExecutionResult> findTestExecution(String searchTestMethod, String searchTestScreen, int page,
-			int pageSize) {
+			int pageSize, String resultDirectoryKey) {
 		if (pageSize == 0) {
 			pageSize = defaultPageSize;
 		} else if (pageSize == -1) {
