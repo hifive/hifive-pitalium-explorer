@@ -7,5 +7,5 @@
 			"resultDirectory": "pitalium-results2"
 		}
 	},
-	"key": "result1"
+	"defaultResultKey": "result1"
 }

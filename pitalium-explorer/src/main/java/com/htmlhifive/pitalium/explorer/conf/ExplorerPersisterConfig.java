@@ -11,7 +11,7 @@ public class ExplorerPersisterConfig extends PersisterConfig {
 
 	private Map<String, FilePersisterConfig> files;
 
-	private String key;
+	private String defaultResultKey;
 
 	public Map<String, FilePersisterConfig> getFiles() {
 		return files;
@@ -21,12 +21,12 @@ public class ExplorerPersisterConfig extends PersisterConfig {
 		this.files = files;
 	}
 
-	public String getKey() {
-		return key;
+	public String getDefaultResultKey() {
+		return defaultResultKey;
 	}
 
-	public void setKey(String key) {
-		this.key = key;
+	public void setDefaultResultKey(String key) {
+		this.defaultResultKey = key;
 	}
 
 	@Override
@@ -35,8 +35,8 @@ public class ExplorerPersisterConfig extends PersisterConfig {
 			return super.getFile();
 		}
 
-		if (key != null) {
-			return files.get(key);
+		if (defaultResultKey != null) {
+			return files.get(defaultResultKey);
 		}
 
 		return (FilePersisterConfig) files.values().toArray()[0];
