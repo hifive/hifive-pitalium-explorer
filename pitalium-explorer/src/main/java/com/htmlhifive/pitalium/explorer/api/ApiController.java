@@ -51,7 +51,7 @@ public class ApiController {
 			@RequestParam(value = "resultDirectoryKey", defaultValue = "") String resultDirectoryKey,
 			@RequestParam(value = "searchTestMethod", defaultValue = "") String searchTestMethod,
 			@RequestParam(value = "searchTestScreen", defaultValue = "") String searchTestScreen) {
-		Page<TestExecutionResult> list = service.findTestExecution(searchTestMethod, searchTestScreen, page, pageSize, resultDirectoryKey);
+		Page<TestExecutionResult> list = service.findTestExecution(searchTestMethod, searchTestScreen, page, pageSize, resultDirectoryKey.split("#")[0]);
 		return new ResponseEntity<Page<TestExecutionResult>>(list, HttpStatus.OK);
 	}
 
