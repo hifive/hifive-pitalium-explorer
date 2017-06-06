@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletResponse;
@@ -30,8 +31,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.htmlhifive.pitalium.core.config.FilePersisterConfig;
+import com.htmlhifive.pitalium.core.config.PtlTestConfig;
 import com.htmlhifive.pitalium.explorer.changelog.ChangeRecord;
 import com.htmlhifive.pitalium.explorer.conf.ApplicationConfig;
+import com.htmlhifive.pitalium.explorer.conf.ExplorerPersisterConfig;
 import com.htmlhifive.pitalium.explorer.entity.Area;
 import com.htmlhifive.pitalium.explorer.entity.ConfigRepository;
 import com.htmlhifive.pitalium.explorer.entity.ProcessedImageRepository;
@@ -394,5 +398,16 @@ public class ExplorerService implements Serializable {
 
 	public List<ChangeRecord> updateTargetComparisonResult(List<TargetResultChangeRequest> inputModelList) {
 		return persisterService.updateTargetComparisonResult(inputModelList);
+	}
+
+	/**
+	 * 設定されているresultsフォルダのキーのリストを取得する
+	 * @return 設定されているresultsフォルダのキーのリスト
+	 */
+	public List<String> listResultDirectoryKeys() {
+		ExplorerPersisterConfig persisterConfig = PtlTestConfig.getInstance().getConfig(ExplorerPersisterConfig.class);
+		Map<String, FilePersisterConfig> files = persisterConfig.getFiles();
+
+		return new ArrayList<>(files.keySet());
 	}
 }

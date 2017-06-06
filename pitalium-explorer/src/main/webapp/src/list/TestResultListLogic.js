@@ -77,6 +77,20 @@
 					searchTestScreen: this.searchTestScreen
 				}
 			});
+		},
+
+		/**
+		 * Gets a list of result directory keys.
+		 * 
+		 * @memberOf hifive.pitalium.explorer.logic.TestResultListLogic
+		 * @returns {JqXHRWrapper}
+		 */
+		 getResultDirectoryKeys: function() {
+			return h5.ajax({
+				type: 'get',
+				dataType: 'json',
+				url: 'directoryKeys/list'
+			});
 		}
 	};
 	h5.core.expose(testResultListLogic);

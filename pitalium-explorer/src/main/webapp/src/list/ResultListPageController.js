@@ -48,6 +48,7 @@
 		 */
 		__ready: function() {
 			this.collectSearchParameters();
+			this._appendResultDirectoryKeys();
 			this.onHashChange();
 			$(window).on('hashchange', this.own(this.onHashChange));
 		},
@@ -230,6 +231,19 @@
 					})).always(function() {
 				indicator.hide();
 			});
+		},
+
+		/**
+		 * Append result directory key list.
+		 * 
+		 * @memberOf hifive.pitalium.explorer.controller.ResultListPageController
+		 */
+		_appendResultDirectoryKeys: function() {
+			this._testResultListLogic.getResultDirectoryKeys().done(this.own(function(keys) {
+				this.view.append($('.result-directory-keys'), 'resultDirectoryKeys', {
+					keys: keys
+				});
+			}));
 		}
 	};
 	h5.core.expose(resultListPageController);

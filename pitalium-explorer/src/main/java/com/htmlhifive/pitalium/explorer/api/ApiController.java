@@ -181,6 +181,18 @@ public class ApiController {
 		return new ResponseEntity<List<ChangeRecord>>(screenshotList, HttpStatus.OK);
 	}
 
+	/**
+	 * 設定されているresultsフォルダのキーのリストを取得する。
+	 *
+	 * @return 設定されているresultsフォルダのキーのリスト
+	 */
+	@RequestMapping(value = "directoryKeys/list", method = RequestMethod.GET, produces = "application/json;charset=utf-8")
+	@ResponseBody
+	public ResponseEntity<List<String>> listResultDirectoryKeys() {
+		List<String> list = service.listResultDirectoryKeys();
+		return new ResponseEntity<List<String>>(list, HttpStatus.OK);
+	}
+
 	private boolean validateExecResultChangeRequest(ExecResultChangeRequest request) {
 		if (request.getTestExecutionId() == null) {
 			return false;
