@@ -239,7 +239,7 @@
 					return;
 				}
 
-				this.view.append($('#navbar'), 'resultDirectoryKeys', {
+				this.view.append('#navbar', 'resultDirectoryKeys', {
 					keys: keys
 				});
 			}));
