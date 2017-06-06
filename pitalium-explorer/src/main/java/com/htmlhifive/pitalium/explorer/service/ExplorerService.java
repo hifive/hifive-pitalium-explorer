@@ -408,6 +408,10 @@ public class ExplorerService implements Serializable {
 		ExplorerPersisterConfig persisterConfig = PtlTestConfig.getInstance().getConfig(ExplorerPersisterConfig.class);
 		Map<String, FilePersisterConfig> files = persisterConfig.getFiles();
 
-		return new ArrayList<>(files.keySet());
+		if (files != null && files.size() != 0) {
+			return new ArrayList<>(files.keySet());
+		}
+
+		return new ArrayList<>();
 	}
 }

@@ -79,13 +79,7 @@
 			});
 		},
 
-		/**
-		 * Gets a list of result directory keys.
-		 * 
-		 * @memberOf hifive.pitalium.explorer.logic.TestResultListLogic
-		 * @returns {JqXHRWrapper}
-		 */
-		 getResultDirectoryKeys: function() {
+		getResultDirectoryKeys: function() {
 			return h5.ajax({
 				type: 'get',
 				dataType: 'json',
