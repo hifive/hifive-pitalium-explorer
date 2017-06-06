@@ -184,6 +184,12 @@ public class ExplorerService implements Serializable {
 
 	public Boolean getComparisonResult(Integer sourceScreenshotId, Integer targetScreenshotId, Integer sourceTargetId,
 			Integer targetTargetId) {
+		Screenshot sourceScreenshot = persisterService.getScreenshot(sourceScreenshotId);
+		Screenshot targetScreenshot = persisterService.getScreenshot(targetScreenshotId);
+		if (sourceScreenshot.getExpectedScreenshotId().equals(targetScreenshot.getId())) {
+			return sourceScreenshot.getComparisonResult();
+		}
+
 		try {
 			File sourceFile = persisterService.getImage(sourceScreenshotId, sourceTargetId);
 			File targetFile = persisterService.getImage(targetScreenshotId, targetTargetId);
