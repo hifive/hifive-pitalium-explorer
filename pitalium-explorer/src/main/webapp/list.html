@@ -35,7 +35,8 @@
 						var testExecution = testExecutions[i].testExecution;
 						var passedCount = testExecutions[i].passedCount;
 						var totalCount = testExecutions[i].totalCount;
-						var execResult = testExecutions[i].testExecution.execResult;
+						var execResult = testExecution.execResult;
+						var updated = testExecution.updated;
 						var passedPercentage = parseInt(passedCount / totalCount * 100);
 						var headerTarget = 'heading' + i;
 						var collapseTarget = 'collapse' + i;
@@ -65,6 +66,9 @@
 									<img class="test-result-icon" src="res/img/checkmark.png" alt="○" aria-label="All tests passed">
 								[% } else if (execResult == 'FAILURE') { %]
 									<img class="test-result-icon" src="res/img/xmark.png" alt="×" aria-label="Some tests failed">
+								[% } %]
+								[% if (updated) { %]
+									<a href=""><span class="updated-mark">updated</span></a>
 								[% } %]
 							</div>
 						</div>
@@ -150,6 +154,9 @@
 							%]<img class="test-result-icon" src="res/img/xmark.png" alt="×" aria-label="Failed">[%
 						} else {
 							%]-[%
+						}
+						if (screenshot.update) {
+							%]<a href=""><span class="updated-mark">updated</span></a>[%
 						}
 					%]</td>
 				</tr>

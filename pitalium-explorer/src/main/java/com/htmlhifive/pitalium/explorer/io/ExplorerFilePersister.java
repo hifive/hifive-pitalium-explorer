@@ -72,9 +72,9 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 	private Map<Integer, Target> targetMap;
 
 	// 更新処理のために保持
-	private Map<Integer, List<TestResult>> testResultMap;		// IDと結果オブジェクト（リスト）を紐付けするためのもの
-	private Map<ScreenshotResult, Integer> screenshotIdMap;		// 結果オブジェクトとIDを紐付けするためのもの
-	private Map<TargetResult, Integer> targetIdMap;				// 結果オブジェクトとIDを紐付けするためのもの
+	private Map<Integer, List<TestResult>> testResultMap; // IDと結果オブジェクト（リスト）を紐付けするためのもの
+	private Map<ScreenshotResult, Integer> screenshotIdMap; // 結果オブジェクトとIDを紐付けするためのもの
+	private Map<TargetResult, Integer> targetIdMap; // 結果オブジェクトとIDを紐付けするためのもの
 
 	public ExplorerFilePersister() {
 		super(PtlTestConfig.getInstance().getConfig(ExplorerPersisterConfig.class).getFile());
@@ -94,7 +94,8 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 	public Page<TestExecutionResult> findTestExecution(String searchTestMethod, String searchTestScreen, int page,
 			int pageSize, String resultDirectoryKey) {
 		if (resultDirectoryKey != null && !resultDirectoryKey.isEmpty()) {
-			ExplorerPersisterConfig persisterConfig = PtlTestConfig.getInstance().getConfig(ExplorerPersisterConfig.class);
+			ExplorerPersisterConfig persisterConfig = PtlTestConfig.getInstance()
+					.getConfig(ExplorerPersisterConfig.class);
 			config = persisterConfig.getFiles().get(resultDirectoryKey);
 		}
 
@@ -175,6 +176,9 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 				}
 			}
 
+			List<ChangeRecord> changeLogs = loadChangeLog(testExecution.getTimeString());
+			testExecution.setIsUpdated(!changeLogs.isEmpty());
+
 			List<Screenshot> screenshotList = new ArrayList<>();
 			for (ScreenshotResult screenshotResult : testResult.getScreenshotResults()) {
 				int screenshotId = screenshotIdService.nextId(ScreenshotIdService.ScreenshotType.PITALIUM_FILE);
@@ -194,6 +198,22 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 					testEnvironment = workEnvList.get(index);
 				}
 				screenshot.setTestEnvironment(testEnvironment);
+
+				// change logがあるか
+
+				outside: for (ChangeRecord record : changeLogs) {
+					List<ScreenshotResultChangePoint> changeScreenshotResults = record.getChangePoints()
+							.getScreenshotResults();
+					for (ScreenshotResultChangePoint changePoint : changeScreenshotResults) {
+						if (changePoint.getCapabilities().equals(capabilities)
+								&& changePoint.getScreenshotId().equals(screenshot.getScreenshotName())
+								&& changePoint.getTestClass().equals(screenshot.getTestClass())
+								&& changePoint.getTestMethod().equals(screenshot.getTestMethod())) {
+							screenshot.setIsUpdated(true);
+							break outside;
+						}
+					}
+				}
 
 				// Target
 				List<TargetResult> targetResultList = screenshotResult.getTargetResults();
@@ -667,8 +687,8 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 				// スクリーンショットの実行結果格納用
 				List<ScreenshotResult> newScreenshotResultList = new ArrayList<>();
 				for (ScreenshotResult orgScreenshotResult : orgTestResult.getScreenshotResults()) {
-					ScreenshotResultChangePoint screenshotResultChangePoint =
-							createScreenshotResultChangePoint(orgScreenshotResult);
+					ScreenshotResultChangePoint screenshotResultChangePoint = createScreenshotResultChangePoint(
+							orgScreenshotResult);
 					// 結果が一致しないものについては、変更個所として格納
 					if (orgScreenshotResult.getResult() != execResult) {
 						screenshotResults.add(screenshotResultChangePoint);
@@ -679,7 +699,8 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 					for (TargetResult orgTargetResult : orgScreenshotResult.getTargetResults()) {
 						// 結果が一致しないものについては、変更個所として格納
 						if (orgTargetResult.getResult() != execResult) {
-							targetResults.add(creatTargetResultChangePoint(orgTargetResult, screenshotResultChangePoint));
+							targetResults
+									.add(creatTargetResultChangePoint(orgTargetResult, screenshotResultChangePoint));
 						}
 
 						// メモリにキャッシュしている対象領域の結果を置換
@@ -692,8 +713,8 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 					}
 
 					// メモリにキャッシュしているスクリーンショットの結果を置換
-					ScreenshotResult newScreenshotResult =
-							createScreenshotResult(orgScreenshotResult, execResult, newTargetResultList);
+					ScreenshotResult newScreenshotResult = createScreenshotResult(orgScreenshotResult, execResult,
+							newTargetResultList);
 					Integer screenshotId = screenshotIdMap.get(orgScreenshotResult);
 					screenshotIdMap.remove(orgScreenshotResult);
 					screenshotIdMap.put(newScreenshotResult, screenshotId);
@@ -772,8 +793,8 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 			}
 
 			// 履歴ファイルに書き込む際に使用する情報を確保。
-			ExecResult execAllResult =
-					s.getTestExecution().getExecResult() != null ? ExecResult.valueOf(s.getTestExecution().getExecResult()) : null;
+			ExecResult execAllResult = s.getTestExecution().getExecResult() != null
+					? ExecResult.valueOf(s.getTestExecution().getExecResult()) : null;
 			execResultMap.put(testExecutionId, execAllResult);
 		}
 
@@ -828,8 +849,8 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 						continue;
 					}
 
-					ScreenshotResultChangePoint screenshotResultChangePoint =
-							createScreenshotResultChangePoint(screenshotResult);
+					ScreenshotResultChangePoint screenshotResultChangePoint = createScreenshotResultChangePoint(
+							screenshotResult);
 					// 結果が一致しないものについては、変更個所として格納
 					if (screenshotResult.getResult() != execResult) {
 						screenshotResults.add(screenshotResultChangePoint);
@@ -867,7 +888,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 
 					// スクリーンショットの結果の値を取得
 					Boolean comparisonResult = screenshotMap.get(screenshotId).getComparisonResult();
-					ExecResult ssExecResult  = convertToExecResult(comparisonResult);
+					ExecResult ssExecResult = convertToExecResult(comparisonResult);
 
 					// 対象領域の実行結果格納用
 					List<TargetResult> newTargetResultList = new ArrayList<>();
@@ -887,8 +908,8 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 					// nullの場合は既存の結果の値を使用する。
 					ssExecResult = ssExecResult != null ? ssExecResult : orgScreenshotResult.getResult();
 					// メモリにキャッシュしているスクリーンショットの結果を置換
-					ScreenshotResult newScreenshotResult =
-							createScreenshotResult(orgScreenshotResult, ssExecResult, newTargetResultList);
+					ScreenshotResult newScreenshotResult = createScreenshotResult(orgScreenshotResult, ssExecResult,
+							newTargetResultList);
 					screenshotIdMap.remove(orgScreenshotResult);
 					screenshotIdMap.put(newScreenshotResult, screenshotId);
 
@@ -960,8 +981,8 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 			}
 
 			// ファイルに書き込む際に使用する情報を確保。
-			ExecResult execAllResult =
-					s.getTestExecution().getExecResult() != null ? ExecResult.valueOf(s.getTestExecution().getExecResult()) : null;
+			ExecResult execAllResult = s.getTestExecution().getExecResult() != null
+					? ExecResult.valueOf(s.getTestExecution().getExecResult()) : null;
 			execResultMap.put(testExecutionId, execAllResult);
 		}
 
@@ -1017,8 +1038,8 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 						continue;
 					}
 
-					ScreenshotResultChangePoint screenshotResultChangePoint =
-							createScreenshotResultChangePoint(screenshotResult);
+					ScreenshotResultChangePoint screenshotResultChangePoint = createScreenshotResultChangePoint(
+							screenshotResult);
 					// 結果が一致しないものについては、変更個所として格納
 					if (screenshotResult.getResult() != convertToExecResult(screenshot.getComparisonResult())) {
 						screenshotResults.add(screenshotResultChangePoint);
@@ -1032,8 +1053,8 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 						}
 
 						// 結果が一致しないものについては、変更個所として格納
-						TargetResultChangePoint targetResultChangePoint =
-								creatTargetResultChangePoint(targetResult, screenshotResultChangePoint);
+						TargetResultChangePoint targetResultChangePoint = creatTargetResultChangePoint(targetResult,
+								screenshotResultChangePoint);
 						if (targetResult.getResult() != execResult) {
 							targetResults.add(targetResultChangePoint);
 						}
@@ -1077,13 +1098,13 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 					// スクリーンショットの結果の値を取得
 					Integer screenshotId = screenshotIdMap.get(orgScreenshotResult);
 					Boolean comparisonResult = screenshotMap.get(screenshotId).getComparisonResult();
-					ExecResult ssExecResult  = convertToExecResult(comparisonResult);
+					ExecResult ssExecResult = convertToExecResult(comparisonResult);
 
 					// nullの場合は既存の結果の値を使用する。
 					ssExecResult = ssExecResult != null ? ssExecResult : orgScreenshotResult.getResult();
 					// メモリにキャッシュしているスクリーンショットの結果を置換
-					ScreenshotResult newScreenshotResult =
-							createScreenshotResult(orgScreenshotResult, ssExecResult, newTargetResultList);
+					ScreenshotResult newScreenshotResult = createScreenshotResult(orgScreenshotResult, ssExecResult,
+							newTargetResultList);
 					screenshotIdMap.remove(orgScreenshotResult);
 					screenshotIdMap.put(newScreenshotResult, screenshotId);
 
@@ -1127,16 +1148,19 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 	}
 
 	private TargetResult createTargetResult(TargetResult original, ExecResult result) {
-		return new TargetResult( result, original.getTarget(), original.getExcludes(), original.isMoveTarget(),
+		return new TargetResult(result, original.getTarget(), original.getExcludes(), original.isMoveTarget(),
 				original.getHiddenElementSelectors(), original.getImage(), original.getOptions());
 	}
 
-	private ScreenshotResult createScreenshotResult(ScreenshotResult original, ExecResult result, List<TargetResult> targetResultList) {
+	private ScreenshotResult createScreenshotResult(ScreenshotResult original, ExecResult result,
+			List<TargetResult> targetResultList) {
 		return new ScreenshotResult(original.getScreenshotId(), result, original.getExpectedId(), targetResultList,
-				original.getTestClass(), original.getTestMethod(), original.getCapabilities(), original.getEntireScreenshotImage());
+				original.getTestClass(), original.getTestMethod(), original.getCapabilities(),
+				original.getEntireScreenshotImage());
 	}
 
-	private TestResult createTestResult(TestResult original, ExecResult result, List<ScreenshotResult> screenshotResultList) {
+	private TestResult createTestResult(TestResult original, ExecResult result,
+			List<ScreenshotResult> screenshotResultList) {
 		return new TestResult(original.getResultId(), result, screenshotResultList);
 	}
 
@@ -1144,8 +1168,9 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 		return new PersistMetadata(result.getResultId(), result.getScreenshotResults().get(0).getTestClass());
 	}
 
-	private ChangeRecord createChangeRecord(int index, ExecResultChangeRequest request, String resultId, Date updateTime) {
-		Map<String, Object> requestParams = new TreeMap<>();	// キーを昇順の並びで出力するためにTreeMapを使用している。
+	private ChangeRecord createChangeRecord(int index, ExecResultChangeRequest request, String resultId,
+			Date updateTime) {
+		Map<String, Object> requestParams = new TreeMap<>(); // キーを昇順の並びで出力するためにTreeMapを使用している。
 		requestParams.put("testExecutionId", request.getTestExecutionId());
 		requestParams.put("execResult", convertToExecResult(request.getResult()));
 		// 変更要求(ID)で示された対象情報を追加。
@@ -1155,23 +1180,25 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 		return createChangeRecord(index, requestParams, request.getComment(), resultId, updateTime);
 	}
 
-	private ChangeRecord createChangeRecord(int index, ScreenshotResultChangeRequest request, String resultId, Date updateTime) {
-		Map<String, Object> requestParams = new TreeMap<>();	// キーを昇順の並びで出力するためにTreeMapを使用している。
+	private ChangeRecord createChangeRecord(int index, ScreenshotResultChangeRequest request, String resultId,
+			Date updateTime) {
+		Map<String, Object> requestParams = new TreeMap<>(); // キーを昇順の並びで出力するためにTreeMapを使用している。
 		requestParams.put("screenshotId", request.getScreenshotId());
 		requestParams.put("execResult", convertToExecResult(request.getResult()));
 		return createChangeRecord(index, requestParams, request.getComment(), resultId, updateTime);
 	}
 
-	private ChangeRecord createChangeRecord(int index, TargetResultChangeRequest request, String resultId, Date updateTime) {
-		Map<String, Object> requestParams = new TreeMap<>();	// キーを昇順の並びで出力するためにTreeMapを使用している。
+	private ChangeRecord createChangeRecord(int index, TargetResultChangeRequest request, String resultId,
+			Date updateTime) {
+		Map<String, Object> requestParams = new TreeMap<>(); // キーを昇順の並びで出力するためにTreeMapを使用している。
 		requestParams.put("screenshotId", request.getScreenshotId());
 		requestParams.put("targetId", request.getTargetId());
 		requestParams.put("execResult", convertToExecResult(request.getResult()));
 		return createChangeRecord(index, requestParams, request.getComment(), resultId, updateTime);
 	}
 
-	private ChangeRecord createChangeRecord(int index, Map<String, Object> requestParams, String comment, String resultId,
-			Date updateTime) {
+	private ChangeRecord createChangeRecord(int index, Map<String, Object> requestParams, String comment,
+			String resultId, Date updateTime) {
 		return new ChangeRecord(index, requestParams, comment, resultId, updateTime);
 	}
 
@@ -1181,8 +1208,8 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 	}
 
 	private ScreenshotResultChangePoint createScreenshotResultChangePoint(ScreenshotResult screenshotResult) {
-		return new ScreenshotResultChangePoint(screenshotResult.getScreenshotId(),
-				screenshotResult.getTestClass(), screenshotResult.getTestMethod(), screenshotResult.getCapabilities());
+		return new ScreenshotResultChangePoint(screenshotResult.getScreenshotId(), screenshotResult.getTestClass(),
+				screenshotResult.getTestMethod(), screenshotResult.getCapabilities());
 	}
 
 	private boolean isMatchedScreenshot(Screenshot screenshot, ScreenshotResult screenshotResult) {
@@ -1199,19 +1226,19 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 			return false;
 		}
 		if (testEnvironment.getPlatform() != null) {
-			if (capabilities.get("platform") == null){
+			if (capabilities.get("platform") == null) {
 				return false;
 			}
 			if (!testEnvironment.getPlatform().equals(capabilities.get("platform"))) {
 				return false;
 			}
 		}
-		if (!testEnvironment.getBrowserName().equals(capabilities.get("browserName"))){
+		if (!testEnvironment.getBrowserName().equals(capabilities.get("browserName"))) {
 			return false;
 		}
 
 		// バージョンについては、nullが入ることがあるため判定処理を別にしている。
-		String version = (String)capabilities.get("version");
+		String version = (String) capabilities.get("version");
 		if (testEnvironment.getBrowserVersion() == null && version == null) {
 			return true;
 		} else {

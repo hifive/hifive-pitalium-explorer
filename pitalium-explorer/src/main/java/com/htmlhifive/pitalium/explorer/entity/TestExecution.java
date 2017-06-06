@@ -13,8 +13,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 
-import com.htmlhifive.pitalium.core.model.ExecResult;
-
 @Entity
 public class TestExecution implements Serializable {
 
@@ -30,6 +28,8 @@ public class TestExecution implements Serializable {
 	private Timestamp time;
 
 	private String execResult;
+
+	private Boolean isUpdated;
 
 	public Integer getId() {
 		return id;
@@ -68,6 +68,14 @@ public class TestExecution implements Serializable {
 		this.execResult = execResult;
 	}
 
+	public Boolean isUpdated() {
+		return isUpdated;
+	}
+
+	public void setIsUpdated(Boolean isUpdated) {
+		this.isUpdated = isUpdated;
+	}
+
 	@Override
 	public int hashCode() {
 		return this.id;
@@ -82,4 +90,5 @@ public class TestExecution implements Serializable {
 		TestExecution other = (TestExecution) obj;
 		return this.id == other.id;
 	}
+
 }

@@ -36,6 +36,8 @@ public class Screenshot implements Serializable {
 
 	private Boolean comparisonResult;
 
+	private Boolean isUpdated;
+
 	private String testClass;
 
 	private String testMethod;
@@ -91,6 +93,14 @@ public class Screenshot implements Serializable {
 
 	public void setComparisonResult(Boolean comparisonResult) {
 		this.comparisonResult = comparisonResult;
+	}
+
+	public Boolean isUpdated() {
+		return isUpdated;
+	}
+
+	public void setIsUpdated(Boolean isUpdate) {
+		this.isUpdated = isUpdate;
 	}
 
 	public String getTestClass() {
