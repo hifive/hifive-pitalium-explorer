@@ -128,6 +128,8 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 		int areaId = 0;
 		int environmentId = 0;
 
+		screenshotIdService.clearTypes();
+
 		File[] files = collection.toArray(new File[collection.size()]);
 		for (int i = 0, len = files.length; i < len; i++) {
 			String executionDate = files[i].getParentFile().getParentFile().getName();
