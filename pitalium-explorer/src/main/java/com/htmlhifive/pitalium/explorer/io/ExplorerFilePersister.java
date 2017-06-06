@@ -1189,13 +1189,27 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 		TestEnvironment testEnvironment = screenshot.getTestEnvironment();
 		Map<String, ?> capabilities = screenshotResult.getCapabilities();
 		// 各パラメータが一致しないものは変更記録の対象外とする。
-		if (!screenshot.getTestClass().equals(screenshotResult.getTestClass())
-				|| !screenshot.getTestMethod().equals(screenshotResult.getTestMethod())
-				|| !screenshot.getTestScreen().equals(screenshotResult.getScreenshotId())
-				|| !testEnvironment.getPlatform().equals(capabilities.get("platform"))
-				|| !testEnvironment.getBrowserName().equals(capabilities.get("browserName"))){
+		if (!screenshot.getTestClass().equals(screenshotResult.getTestClass())) {
 			return false;
 		}
+		if (!screenshot.getTestMethod().equals(screenshotResult.getTestMethod())) {
+			return false;
+		}
+		if (!screenshot.getTestScreen().equals(screenshotResult.getScreenshotId())) {
+			return false;
+		}
+		if (testEnvironment.getPlatform() != null) {
+			if (capabilities.get("platform") == null){
+				return false;
+			}
+			if (!testEnvironment.getPlatform().equals(capabilities.get("platform"))) {
+				return false;
+			}
+		}
+		if (!testEnvironment.getBrowserName().equals(capabilities.get("browserName"))){
+			return false;
+		}
+
 		// バージョンについては、nullが入ることがあるため判定処理を別にしている。
 		String version = (String)capabilities.get("version");
 		if (testEnvironment.getBrowserVersion() == null && version == null) {
@@ -1224,7 +1238,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 
 	private List<ChangeRecord> loadChangeLog(String resultId) {
 		List<ChangeRecord> changeRecordList = null;
-		File dir = new File(PtlTestConfig.getInstance().getPersisterConfig().getFile().getResultDirectory(), resultId);
+		File dir = new File(config.getResultDirectory(), resultId);
 		File file = new File(dir, "explorer-change-log.json");
 		if (!file.exists()) {
 			changeRecordList = new ArrayList<>();
@@ -1247,7 +1261,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 	}
 
 	private void saveChangelog(String resultId, List<ChangeRecord> changeRecordList) {
-		File dir = new File(PtlTestConfig.getInstance().getPersisterConfig().getFile().getResultDirectory(), resultId);
+		File dir = new File(config.getResultDirectory(), resultId);
 		File file = new File(dir, "explorer-change-log.json");
 		if (log.isDebugEnabled()) {
 			log.debug("[Save Changelog] ({})", file);
