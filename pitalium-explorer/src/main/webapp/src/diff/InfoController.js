@@ -62,13 +62,14 @@
 			var $content = this.$find('#update_result_popup');
 
 			var $checkboxes = $content.find('[name="result"]');
-			$checkboxes.parent().removeClass('active');
-			$checkboxes.attr('checked', true);
+			$checkboxes.parent().css('display', 'none');
+			$checkboxes.attr('checked', false);
 
 			if (this._comparisonResult != null) {
-				var index = this._comparisonResult ? 0 : 1;
-				$checkboxes.eq(index).attr('checked', true);
-				$checkboxes.eq(index).parent().addClass('active');
+				var index = this._comparisonResult ? 1 : 0;
+				var $targetInput = $checkboxes.eq(index);
+				$targetInput.attr('checked', true);
+				$targetInput.parent().css('display', '');
 			}
 
 			this._showPopup('update_result_popup', "Update this target's result",

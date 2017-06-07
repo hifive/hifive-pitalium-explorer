@@ -116,14 +116,16 @@
 				targetId: this._targetId
 			});
 
-			this.indicator({
+			var indicator = this.indicator({
 				message: '更新中...',
-				promises: promise
+				promises: promise,
+				target: document.body
 			}).show();
 
 			promise.done(this.own(function() {
 				this._infoController.updateComparisonResult(context.evArg.result === '0');
 			}));
+			;
 		},
 
 		'#list selectScreenshot': function(context, $el) {

@@ -16,6 +16,7 @@
 
 		__init: function(context) {
 			this._popup = context.args.popup;
+			this._orgResult = this.$find('[name="result"]:checked').val();
 		},
 
 		'.ok click': function() {
