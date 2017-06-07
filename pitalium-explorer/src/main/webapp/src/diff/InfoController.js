@@ -31,10 +31,15 @@
 				comparisonResult: comparisonResult,
 				update: update
 			});
-			if (comparisonResult == null) {
-				this.$find('#update_result').addClass()
-			}
 			this._changeTitle(comparisonResult);
+		},
+
+		enableUpdateResultButton: function() {
+			this.$find('#update_result').removeClass('disabled');
+		},
+
+		disableUpdateResultButton: function() {
+			this.$find('#update_result').addClass('disabled');
 		},
 
 		_changeTitle: function(comparisonResult) {

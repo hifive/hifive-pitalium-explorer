@@ -35,6 +35,8 @@
 
 		_screenshot: null,
 
+		_isRecordedResult: true,
+
 		__meta: {
 			_infoController: {
 				rootElement: '#info'
@@ -137,12 +139,14 @@
 
 			this._testResultDiffLogic.getScreenshot(id).done(
 					this.own(function(screenshot) {
+						var orgExpectedId = screenshot.expectedScreenshotId;
 						// expectedの値を書き換える
 						screenshot.expectedScreenshotId = expectedId;
 						// 比較結果を書き換える
 						if (expectedId == null) {
 							this._testResultDiffController.showResult(screenshot, null);
 							this._infoController.showInfo(screenshot, null);
+							this._infoController.disableUpdateResultButton();
 						} else {
 							this._testResultDiffLogic.getScreenshot(expectedId).done(
 									this.own(function(expectedScreenshot) {
@@ -151,6 +155,13 @@
 										this._infoController.showInfo(screenshot,
 												expectedScreenshot);
 									}));
+							this._isRecordedResult = expectedId == orgExpectedId;
+							if (this._isRecordedResult) {
+								this._infoController.enableUpdateResultButton();
+							} else {
+								this._infoController.disableUpdateResultButton();
+							}
+
 						}
 						this._currentScreenshotId = id;
 						this._currentExpectedScreenshotId = expectedId;
@@ -172,7 +183,7 @@
 			}
 
 			this._infoController.updateComparisonResult(context.evArg.comparisonResult,
-					this._target.updated);
+					this._target.updated && this._isRecordedResult);
 		},
 
 		'{window} [resize]': function() {
