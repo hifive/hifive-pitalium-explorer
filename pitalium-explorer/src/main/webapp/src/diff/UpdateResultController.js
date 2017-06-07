@@ -19,7 +19,7 @@
 			this._orgResult = this.$find('[name="result"]:checked').val();
 		},
 
-		'.ok click': function() {
+		'.ok click': function(context) {
 			context.event.preventDefault();
 			this._popup.close({
 				result: this.$find('[name="result"]:checked').val(),

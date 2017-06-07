@@ -113,7 +113,7 @@
 				result: context.evArg.result,
 				comment: context.evArg.comment,
 				screenshotId: this._currentScreenshotId,
-				targetId: this._targetId
+				targetId: this._target.targetId
 			});
 
 			var indicator = this.indicator({
@@ -162,9 +162,17 @@
 		},
 
 		'#main updateComparisonResult': function(context, $el) {
-			this._targetId = context.evArg.targetId;
+			var targetId = context.evArg.targetId;
+			var targets = this._screenshot.targets;
+			for (var i = 0, len = targets.length; i < len; i++) {
+				if (targets[i].targetId == targetId) {
+					this._target = targets[i];
+					break;
+				}
+			}
+
 			this._infoController.updateComparisonResult(context.evArg.comparisonResult,
-					this._screenshot.update);
+					this._target.updated);
 		},
 
 		'{window} [resize]': function() {
