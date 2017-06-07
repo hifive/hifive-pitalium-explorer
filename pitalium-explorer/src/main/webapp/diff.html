@@ -34,6 +34,7 @@
 	<script src="src/common/util.js"></script>
 	<script src="src/diff/TestResultDiffLogic.js"></script>
 	<script src="src/diff/SelectExecutionController.js"></script>
+	<script src="src/diff/UpdateResultController.js"></script>
 	<script src="src/diff/TestResultDiffController.js"></script>
 	<script src="src/diff/InfoController.js"></script>
 	<script src="src/diff/ScreenshotListController.js"></script>
@@ -145,42 +146,77 @@
 		<div id="container">
 			<div id="info" class="panel panel-default">
 				<div class="panel-heading">
-					<h4 class="panel-title row">
-						<a class="col-xs-11" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="false">
+					<div class="btn-group">
+						<button class="btn btn-default btn-xs toggle-dropdown" data-toggle="dropdown">
+							Actions
+							<span class="caret"></span>
+						</button>
+						<ul class="dropdown-menu dropdown-menu-right">
+							<li id="select_execution"><a href="">Select Executions</a>
+							<li id="update_result"><a href="">Update Result</a>
+						</ul>
+					</div>
+					<h4 class="panel-title">
+						<a data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="false">
 							Result Information
 							<span id="comparisonResult"></span>
 						</a>
-						<button id="select_execution"  class="btn btn-info col-xs-1">Select Executions</button>
 					</h4>
+					<div class="clearfix"></div>
 				</div>
 				<div id="collapseOne" class="panel-collapse collapse in">
 					<div class="panel-body">
 						<div id="detail"></div>
 					</div>
 				</div>
-				<div id="popup_content" style="display:none">
-					<div id="execution_list"></div>
-					<div>
-						<table class="table">
-							<tr id="actualExecution">
-								<td><button class="actual btn btn-danger btn-sm" style="float: left;">Actual</button></td>
-								<td id="executionTime"></td>
-								<td id="platform"></td>
-								<td id="browserName"></td>
-								<td id="browserVersion"></td>
-							</tr>
-							<tr id="expectedExecution">
-								<td><button class="expected btn btn-info btn-sm" style="float: left;">Expected</button></td>
-								<td id="executionTime"></td>
-								<td id="platform"></td>
-								<td id="browserName"></td>
-								<td id="browserVersion"></td>
-							</tr>
-						</table>
+				<div id="popup_contents" style="display:none">
+					<div id="execution_popup">
+						<div id="execution_list"></div>
+						<div>
+							<table class="table">
+								<tr id="actualExecution">
+									<td><button class="actual btn btn-danger btn-sm" style="float: left;">Actual</button></td>
+									<td id="executionTime"></td>
+									<td id="platform"></td>
+									<td id="browserName"></td>
+									<td id="browserVersion"></td>
+								</tr>
+								<tr id="expectedExecution">
+									<td><button class="expected btn btn-info btn-sm" style="float: left;">Expected</button></td>
+									<td id="executionTime"></td>
+									<td id="platform"></td>
+									<td id="browserName"></td>
+									<td id="browserVersion"></td>
+								</tr>
+							</table>
+						</div>
+						<div>
+							<button class="cancel btn btn-primary">Cancel</button>
+							<button class="ok btn btn-primary" style="display:none">Select</button>
+						</div>
 					</div>
-					<div>
-						<button class="cancel btn btn-primary">Cancel</button>
-						<button class="ok btn btn-primary" style="display:none">Select</button>
+					<div id="update_result_popup">
+						<form>
+							<div class="form-group">
+								<label>Result:</label>
+								<div class="btn-group" data-toggle="buttons">
+									<label class="btn btn-default">
+										<input type="radio" name="result" autocomplete="off" value="0"><img class="test-result-icon" src="res/img/checkmark.png">
+									</label>
+									<label class="btn btn-default">
+										<input type="radio" name="result" autocomplete="off" value="1"><img class="test-result-icon" src="res/img/xmark.png">
+									</label>
+								</div>
+							</div>
+							<div class="form-group">
+								<label>Comment：</label>
+								<textarea name="comment" class="form-control" rows="7"></textarea>
+							</div>
+							<div>
+								<button class="cancel btn btn-primary">Cancel</button>
+								<button class="ok btn btn-primary">Update</button>
+							</div>
+						</form>
 					</div>
 				</div>
 			</div>
@@ -313,6 +349,31 @@
 	  								</div>
 	  							</div>
 	  						</div>
+						</div>
+						<div id="popup_content" style="display:none">
+							<div id="execution_list"></div>
+							<div>
+								<table class="table">
+									<tr id="actualExecution">
+										<td><button class="actual btn btn-danger btn-sm" style="float: left;">Actual</button></td>
+										<td id="executionTime"></td>
+										<td id="platform"></td>
+										<td id="browserName"></td>
+										<td id="browserVersion"></td>
+									</tr>
+									<tr id="expectedExecution">
+										<td><button class="expected btn btn-info btn-sm" style="float: left;">Expected</button></td>
+										<td id="executionTime"></td>
+										<td id="platform"></td>
+										<td id="browserName"></td>
+										<td id="browserVersion"></td>
+									</tr>
+								</table>
+							</div>
+							<div>
+								<button class="cancel btn btn-primary">Cancel</button>
+								<button class="ok btn btn-primary" style="display:none">Select</button>
+							</div>
 						</div>
 					</div>
 				</div>

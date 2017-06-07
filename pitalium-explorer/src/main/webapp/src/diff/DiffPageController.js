@@ -33,6 +33,8 @@
 		_currentScreenshotId: null,
 		_currentExpectedScreenshotId: null,
 
+		_screenshot: null,
+
 		__meta: {
 			_infoController: {
 				rootElement: '#info'
@@ -68,6 +70,7 @@
 			// Get screenshot details
 			this._testResultDiffLogic.getScreenshot(id).done(
 					this.own(function(screenshot) {
+						this._screenshot = screenshot;
 						var expectedScreenshotId = screenshot.expectedScreenshotId;
 						this._currentExpectedScreenshotId = expectedScreenshotId;
 
@@ -105,6 +108,24 @@
 			this._screenshotListController.showList(context.evArg.screenshot);
 		},
 
+		'#info updateTargetResult': function(context) {
+			var promise = this._testResultDiffLogic.updateTargetResult({
+				result: context.evArg.result,
+				comment: context.evArg.comment,
+				screenshotId: this._currentScreenshotId,
+				targetId: this._targetId
+			});
+
+			this.indicator({
+				message: '更新中...',
+				promises: promise
+			}).show();
+
+			promise.done(this.own(function() {
+				this._infoController.updateComparisonResult(context.evArg.result === '0');
+			}));
+		},
+
 		'#list selectScreenshot': function(context, $el) {
 			var id = context.evArg.id;
 			var expectedId = context.evArg.expectedId;
@@ -139,6 +160,7 @@
 		},
 
 		'#main updateComparisonResult': function(context, $el) {
+			this._targetId = context.evArg.targetId;
 			this._infoController.updateComparisonResult(context.evArg.comparisonResult);
 		},
 

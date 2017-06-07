@@ -99,6 +99,15 @@
 				type: 'GET',
 				dataType: 'json'
 			});
+		},
+
+		updateTargetResult: function(changes) {
+			return h5.ajax('targets/update', {
+				data: JSON.stringify([changes]),
+				type: 'POST',
+				contentType: 'application/json',
+				dataType: 'json'
+			});
 		}
 	};
 
