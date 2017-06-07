@@ -20,6 +20,7 @@
 		},
 
 		'.ok click': function() {
+			context.event.preventDefault();
 			this._popup.close({
 				result: this.$find('[name="result"]:checked').val(),
 				comment: this.$find('[name="comment"]').val()
