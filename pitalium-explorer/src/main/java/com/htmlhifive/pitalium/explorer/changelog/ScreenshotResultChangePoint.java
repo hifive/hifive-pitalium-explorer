@@ -76,4 +76,49 @@ public class ScreenshotResultChangePoint {
 	public Map<String, ?> getCapabilities() {
 		return capabilities;
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((capabilities == null) ? 0 : capabilities.hashCode());
+		result = prime * result + ((screenshotId == null) ? 0 : screenshotId.hashCode());
+		result = prime * result + ((testClass == null) ? 0 : testClass.hashCode());
+		result = prime * result + ((testMethod == null) ? 0 : testMethod.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ScreenshotResultChangePoint other = (ScreenshotResultChangePoint) obj;
+		if (capabilities == null) {
+			if (other.capabilities != null)
+				return false;
+		} else if (!capabilities.equals(other.capabilities))
+			return false;
+		if (screenshotId == null) {
+			if (other.screenshotId != null)
+				return false;
+		} else if (!screenshotId.equals(other.screenshotId))
+			return false;
+		if (testClass == null) {
+			if (other.testClass != null)
+				return false;
+		} else if (!testClass.equals(other.testClass))
+			return false;
+		if (testMethod == null) {
+			if (other.testMethod != null)
+				return false;
+		} else if (!testMethod.equals(other.testMethod))
+			return false;
+		return true;
+	}
+
+
 }

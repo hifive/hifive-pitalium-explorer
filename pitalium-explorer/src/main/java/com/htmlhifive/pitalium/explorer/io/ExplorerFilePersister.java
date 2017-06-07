@@ -176,8 +176,14 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 				}
 			}
 
+			// change logがあるか
 			List<ChangeRecord> changeLogs = loadChangeLog(testExecution.getTimeString());
-			testExecution.setIsUpdated(!changeLogs.isEmpty());
+			for (ChangeRecord record: changeLogs) {
+				if (record.getChangePoints().getExecResult() != null) {
+					testExecution.setIsUpdated(true);
+					break;
+				}
+			}
 
 			List<Screenshot> screenshotList = new ArrayList<>();
 			for (ScreenshotResult screenshotResult : testResult.getScreenshotResults()) {
@@ -201,14 +207,19 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 
 				// change logがあるか
 
+				ScreenshotResultChangePoint currentScreenshotChangePoint = null;
 				outside: for (ChangeRecord record : changeLogs) {
 					List<ScreenshotResultChangePoint> changeScreenshotResults = record.getChangePoints()
 							.getScreenshotResults();
+					if (changeScreenshotResults == null) {
+						continue;
+					}
 					for (ScreenshotResultChangePoint changePoint : changeScreenshotResults) {
 						if (changePoint.getCapabilities().equals(capabilities)
 								&& changePoint.getScreenshotId().equals(screenshot.getScreenshotName())
 								&& changePoint.getTestClass().equals(screenshot.getTestClass())
 								&& changePoint.getTestMethod().equals(screenshot.getTestMethod())) {
+							currentScreenshotChangePoint = changePoint;
 							screenshot.setIsUpdated(true);
 							break outside;
 						}
@@ -237,6 +248,23 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 						areaId++;
 					}
 					target.setExcludeAreas(exculdeAreaList);
+
+					outside: for (ChangeRecord record : changeLogs) {
+						List<TargetResultChangePoint> changeTargetResults = record.getChangePoints()
+								.getTargetResults();
+						if (changeTargetResults == null) {
+							continue;
+						}
+						for (TargetResultChangePoint changePoint : changeTargetResults) {
+							if (currentScreenshotChangePoint != null
+									&& currentScreenshotChangePoint.equals(changePoint.getScreenshot())
+									&& changePoint.getTarget().equals(screenAreaResult.getSelector())) {
+								target.setIsUpdated(true);
+								break outside;
+							}
+						}
+					}
+
 					targetMap.put(targetId, target);
 					targetId++;
 				}
@@ -943,6 +971,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 			Integer targetId = im.getTargetId();
 			Target t = targetMap.get(targetId);
 			t.setComparisonResult(comparisonResult);
+			t.setIsUpdated(true);
 
 			Integer screenshotId = im.getScreenshotId();
 			boolean matchScreenshot = true;
@@ -957,6 +986,12 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 					break;
 				}
 			}
+
+			if (s.getComparisonResult() != comparisonResult) {
+				// 結果が変わっていれば、updateフラグをtrueにする
+				s.setIsUpdated(true);
+			}
+
 			if (matchScreenshot) {
 				s.setComparisonResult(comparisonResult);
 			} else {
