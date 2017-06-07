@@ -25,10 +25,11 @@
 			});
 		},
 
-		updateComparisonResult: function(comparisonResult) {
+		updateComparisonResult: function(comparisonResult, update) {
 			this._comparisonResult = comparisonResult;
 			this.view.update('#comparisonResult', 'comparisonResultTemplate', {
-				comparisonResult: comparisonResult
+				comparisonResult: comparisonResult,
+				update: update
 			});
 			if (comparisonResult == null) {
 				this.$find('#update_result').addClass()

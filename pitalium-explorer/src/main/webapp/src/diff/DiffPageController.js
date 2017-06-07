@@ -123,7 +123,7 @@
 			}).show();
 
 			promise.done(this.own(function() {
-				this._infoController.updateComparisonResult(context.evArg.result === '0');
+				this._infoController.updateComparisonResult(context.evArg.result === '0', true);
 			}));
 			;
 		},
@@ -163,7 +163,8 @@
 
 		'#main updateComparisonResult': function(context, $el) {
 			this._targetId = context.evArg.targetId;
-			this._infoController.updateComparisonResult(context.evArg.comparisonResult);
+			this._infoController.updateComparisonResult(context.evArg.comparisonResult,
+					this._screenshot.update);
 		},
 
 		'{window} [resize]': function() {

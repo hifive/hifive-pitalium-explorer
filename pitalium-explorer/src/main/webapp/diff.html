@@ -117,6 +117,10 @@
 			<img class="test-result-icon" src="res/img/checkmark.png" alt="○" aria-label="All tests passed">
 		[% } else if (comparisonResult === false) { %]
 			<img class="test-result-icon" src="res/img/xmark.png" alt="×" aria-label="Some tests failed">
+		[% }
+		if (update) {
+		%]
+			<a href=""><span class="updated-mark">updated</span></a>
 		[% } %]
 	</script>
 	</head>
