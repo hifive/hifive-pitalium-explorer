@@ -50,7 +50,7 @@
 				draggable: true
 			});
 			popup.promise.done(this.own(this._triggerSelectExecution));
-			popup.setContentsSize(500, 550);
+			popup.setContentsSize(600, 550);
 			popup.show();
 		},
 

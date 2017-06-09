@@ -102,7 +102,7 @@
 						var e = executions[i];
 				%]
 				<tr class="explorer-test-result"  data-explorer-index="[%= i %]">
-					<td><input type="radio" name="execution"></td>
+					<td><button type="button" class="actual btn btn-danger btn-sm" style="width: 50%">Actual</button><button type="button" class="expected btn btn-info btn-sm" style="width: 50%">Expected</button></td>
 					<td>[%= e.executionTime %]</td>
 					<td>[%= e.platform %]</td>
 					<td>[%= e.browserName %]</td>
@@ -163,24 +163,24 @@
 					<div>
 						<table class="table">
 							<tr id="actualExecution">
-								<td><button class="actual btn btn-danger btn-sm" style="float: left;">Actual</button></td>
-								<td id="executionTime"></td>
-								<td id="platform"></td>
-								<td id="browserName"></td>
-								<td id="browserVersion"></td>
+								<td style="width: 20%;"><span class="label label-danger" style="float: left; width: 100%; font-size: 100%;">Actual</span></td>
+								<td class="executionTime" style="width: 30%"></td>
+								<td class="platform" style="width: 20%"></td>
+								<td class="browserName" style="width: 25%"></td>
+								<td class="browserVersion" style="width: 5%"></td>
 							</tr>
 							<tr id="expectedExecution">
-								<td><button class="expected btn btn-info btn-sm" style="float: left;">Expected</button></td>
-								<td id="executionTime"></td>
-								<td id="platform"></td>
-								<td id="browserName"></td>
-								<td id="browserVersion"></td>
+								<td style="width: 20%;"><span class="label label-info" style="float: left; width: 100%; font-size: 100%;">Expected</span></td>
+								<td class="executionTime" style="width: 30%"></td>
+								<td class="platform" style="width: 20%"></td>
+								<td class="browserName" style="width: 25%"></td>
+								<td class="browserVersion" style="width: 5%"></td>
 							</tr>
 						</table>
 					</div>
 					<div>
 						<button class="cancel btn btn-primary">Cancel</button>
-						<button class="ok btn btn-primary" style="display:none">Select</button>
+						<button class="ok btn btn-primary" disabled>Select</button>
 					</div>
 				</div>
 			</div>

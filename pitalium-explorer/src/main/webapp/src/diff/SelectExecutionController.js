@@ -21,8 +21,6 @@
 		 */
 		_testResultDiffLogic: hifive.pitalium.explorer.logic.TestResultDiffLogic,
 
-		_$selected: null,
-
 		_executionList: null,
 
 		__init: function(context) {
@@ -39,49 +37,55 @@
 					}));
 		},
 
-		'[name="execution"] change': function(context, $el) {
-			if (this._$selected) {
-				this._$selected.removeClass('success');
-			}
-			this._$selected = $el.parent().parent();
-			this._$selected.addClass('success');
-		},
-
-		'.actual click': function() {
-			if (!this._$selected) {
+		'.actual click': function(context, $el) {
+			if ($el.hasClass('active')) {
 				return;
 			}
 
-			var index = this._$selected.data('explorerIndex');
+			this.$find('button.actual.active').removeClass('active');
+			$el.addClass('active');
+
+			this.$find('button.expected[disabled]').prop('disabled', false);
+			var $expectedButton = $el.next();
+			$expectedButton.prop('disabled', true);
+
+			var index = $el.parent().parent().data('explorerIndex');
 			var e = this._executionList[index];
 
 			this.$find('#actualExecution').attr('data-actual-explorer-index', index);
-			this.$find('#actualExecution #executionTime').text(e.executionTime);
-			this.$find('#actualExecution #platform').text(e.platform);
-			this.$find('#actualExecution #browserName').text(e.browserName);
-			this.$find('#actualExecution #browserVersion').text(e.browserVersion);
+			this.$find('#actualExecution .executionTime').text(e.executionTime);
+			this.$find('#actualExecution .platform').text(e.platform);
+			this.$find('#actualExecution .browserName').text(e.browserName);
+			this.$find('#actualExecution .browserVersion').text(e.browserVersion);
 
 			if (this.$find('#expectedExecution').data('expectedExplorerIndex') != null) {
-				this.$find('.ok').show();
+				this.$find('.ok').prop('disabled', false);
 			}
 		},
 
-		'.expected click': function() {
-			if (!this._$selected) {
+		'.expected click': function(context, $el) {
+			if ($el.hasClass('active')) {
 				return;
 			}
 
-			var index = this._$selected.data('explorerIndex');
+			this.$find('button.expected.active').removeClass('active');
+			$el.addClass('active');
+
+			this.$find('button.actual[disabled]').prop('disabled', false);
+			var $actualButton = $el.prev();
+			$actualButton.prop('disabled', true);
+
+			var index = $el.parent().parent().data('explorerIndex');
 			var e = this._executionList[index];
 
 			this.$find('#expectedExecution').attr('data-expected-explorer-index', index);
-			this.$find('#expectedExecution #executionTime').text(e.executionTime);
-			this.$find('#expectedExecution #platform').text(e.platform);
-			this.$find('#expectedExecution #browserName').text(e.browserName);
-			this.$find('#expectedExecution #browserVersion').text(e.browserVersion);
+			this.$find('#expectedExecution .executionTime').text(e.executionTime);
+			this.$find('#expectedExecution .platform').text(e.platform);
+			this.$find('#expectedExecution .browserName').text(e.browserName);
+			this.$find('#expectedExecution .browserVersion').text(e.browserVersion);
 
 			if (this.$find('#actualExecution').data('actualExplorerIndex') != null) {
-				this.$find('.ok').show();
+				this.$find('.ok').prop('disabled', false);
 			}
 		},
 
