@@ -1,23 +1,99 @@
+/*global h5, hifive, window, document */
+/*
+ * Copyright (C) 2015 NS Solutions Corporation, All Rights Reserved.
+ */
 (function() {
 	'use strict';
 
 	/**
-	 * @class hifive.pitalium.explorer.newList.PageLogic
+	 * This class is a &quot;Logic&quot; for the list page of test results.
+	 * 
+	 * @class
+	 * @name TestResultListLogic
 	 */
+
 	/**
-	 * @lends hifive.pitalium.explorer.newList.PageLogic#
+	 * @lends hifive.pitalium.explorer.logic.TestResultListLogic#
 	 */
 	var PageLogic = {
 		/**
 		 * @ignore
 		 */
-		__name: 'hifive.pitalium.explorer.newList.PageLogic',
+		__name: 'hifive.pitalium.explorer.logic.TestResultListLogic',
 
 		/**
-		 * @returns {JQueryPromise}
+		 * The search keyword for test method.
+		 * 
+		 * @type String
+		 * @memberOf hifive.pitalium.explorer.logic.TestResultListLogic
 		 */
-		fetchList: function() {
-			return h5.ajax('./_results/list.json');
+		searchTestMethod: "",
+
+		/**
+		 * The search keyword for test screen.
+		 * 
+		 * @type String
+		 * @memberOf hifive.pitalium.explorer.logic.TestResultListLogic
+		 */
+		searchTestScreen: "",
+
+		/**
+		 * Gets a list of test execution.
+		 * 
+		 * @memberOf hifive.pitalium.explorer.logic.TestResultListLogic
+		 * @param {Number} page desired
+		 * @param {number} pageSize new page size
+		 * @returns {JqXHRWrapper}
+		 */
+		getTestExecutionList: function(page, pageSize) {
+			var data = {
+				'page': page,
+				'limit': pageSize,
+				'searchTestMethod': this.searchTestMethod,
+				'searchTestScreen': this.searchTestScreen
+			};
+
+			return h5.ajax({
+				type: 'get',
+				dataType: 'json',
+				url: hifive.pitalium.explorer.utils.formatUrl('executions/list'),
+				data: data
+			});
+		},
+
+		/**
+		 * Gets a list of screenshots.
+		 * 
+		 * @memberOf hifive.pitalium.explorer.logic.TestResultListLogic
+		 * @param {string} testExecutionId The time the test was run.
+		 * @returns {JqXHRWrapper}
+		 */
+		getScreenshotList: function(testExecutionId) {
+			var dfd = this.deferred();
+			h5.ajax({
+				type: 'get',
+				dataType: 'json',
+				url: 'screenshots/search',
+				data: {
+					testExecutionId: testExecutionId,
+					searchTestMethod: this.searchTestMethod,
+					searchTestScreen: this.searchTestScreen
+				}
+			}).done(function(screenshotList) {
+				var testClassResult = {};
+				for (var i = 0, len = screenshotList.length; i < len; i++) {
+					var screenshot = screenshotList[i];
+					var testClass = screenshot.testClass;
+					var list = testClassResult[testClass];
+					if (!list) {
+						list = [];
+						testClassResult[testClass] = list;
+					}
+					list.push(screenshot);
+				}
+				dfd.resolve(testClassResult);
+			});
+			return dfd.promise();
 		},
 
 		/**
@@ -39,7 +115,6 @@
 		},
 
 		/**
-		 *
 		 * @param {String} targets
 		 * @param {String} expected
 		 * @returns {JQueryPromise}

@@ -6,6 +6,15 @@
 	 * @namespace hifive.pitalium.explorer.utils
 	 */
 
+	var DATE_FORMAT_OPTIONS = {
+		weekday: "long",
+		year: "numeric",
+		month: "short",
+		day: "numeric",
+		hour: "2-digit",
+		minute: "2-digit"
+	};
+
 	h5.u.obj.expose('hifive.pitalium.explorer.utils', {
 		/**
 		 * Get page query parameters as a key-value object.
@@ -66,7 +75,7 @@
 
 		/**
 		 * Compare properties of two objects.
-		 *
+		 * 
 		 * @param {Object} obj1
 		 * @param {Object} obj2
 		 * @param {Array} props
@@ -80,6 +89,14 @@
 			}
 
 			return true;
+		},
+
+		/**
+		 * @param {Date} date
+		 * @returns {String}
+		 */
+		toLocaleTimeString: function(date) {
+			return date.toLocaleTimeString('en', DATE_FORMAT_OPTIONS);
 		}
 	});
 })();
