@@ -102,7 +102,10 @@
 						var e = executions[i];
 				%]
 				<tr class="explorer-test-result"  data-explorer-index="[%= i %]">
-					<td><button type="button" class="actual btn btn-danger btn-sm" style="width: 50%">Actual</button><button type="button" class="expected btn btn-info btn-sm" style="width: 50%">Expected</button></td>
+					<td>
+						<button type="button" class="actual btn btn-default btn-sm">Actual</button>
+						<button type="button" class="expected btn btn-default btn-sm">Expected</button>
+					</td>
 					<td>[%= e.executionTime %]</td>
 					<td>[%= e.platform %]</td>
 					<td>[%= e.browserName %]</td>

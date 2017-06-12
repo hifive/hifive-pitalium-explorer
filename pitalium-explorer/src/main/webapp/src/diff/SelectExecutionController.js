@@ -38,54 +38,86 @@
 		},
 
 		'.actual click': function(context, $el) {
-			if ($el.hasClass('active')) {
+			if ($el.hasClass('btn-danger')) {
 				return;
 			}
 
-			this.$find('button.actual.active').removeClass('active');
-			$el.addClass('active');
+			var $actualButton = this.$find('button.actual.btn-danger');
+			if ($actualButton.length !== 0) {
+				$actualButton.removeClass('btn-danger').addClass('btn-default');
+			}
 
-			this.$find('button.expected[disabled]').prop('disabled', false);
 			var $expectedButton = $el.next();
-			$expectedButton.prop('disabled', true);
+			var $expectedExecution = this.$find('#expectedExecution');
+			if ($expectedButton.hasClass('btn-info')) {
+				$expectedButton.removeClass('btn-info').addClass('btn-default');
+
+				$expectedExecution.removeAttr('data-expected-explorer-index');
+				$expectedExecution.removeData('expectedExplorerIndex');
+				$expectedExecution.find('.executionTime').empty();
+				$expectedExecution.find('.platform').empty();
+				$expectedExecution.find('.browserName').empty();
+				$expectedExecution.find('.browserVersion').empty();
+			}
+
+			$el.addClass('btn-danger');
 
 			var index = $el.parent().parent().data('explorerIndex');
 			var e = this._executionList[index];
 
-			this.$find('#actualExecution').attr('data-actual-explorer-index', index);
-			this.$find('#actualExecution .executionTime').text(e.executionTime);
-			this.$find('#actualExecution .platform').text(e.platform);
-			this.$find('#actualExecution .browserName').text(e.browserName);
-			this.$find('#actualExecution .browserVersion').text(e.browserVersion);
+			var $actualExecution = this.$find('#actualExecution');
+			$actualExecution.attr('data-actual-explorer-index', index);
+			$actualExecution.find('.executionTime').text(e.executionTime);
+			$actualExecution.find('.platform').text(e.platform);
+			$actualExecution.find('.browserName').text(e.browserName);
+			$actualExecution.find('.browserVersion').text(e.browserVersion);
 
-			if (this.$find('#expectedExecution').data('expectedExplorerIndex') != null) {
+			if ($expectedExecution.data('expectedExplorerIndex') != null) {
 				this.$find('.ok').prop('disabled', false);
+			} else {
+				this.$find('.ok').prop('disabled', true);
 			}
 		},
 
 		'.expected click': function(context, $el) {
-			if ($el.hasClass('active')) {
+			if ($el.hasClass('btn-info')) {
 				return;
 			}
 
-			this.$find('button.expected.active').removeClass('active');
-			$el.addClass('active');
+			var $expectedButton = this.$find('button.expected.btn-info');
+			if ($expectedButton.length !== 0) {
+				$expectedButton.removeClass('btn-info').addClass('btn-default');
+			}
 
-			this.$find('button.actual[disabled]').prop('disabled', false);
 			var $actualButton = $el.prev();
-			$actualButton.prop('disabled', true);
+			var $actualExecution = this.$find('#actualExecution');
+			if ($actualButton.hasClass('btn-danger')) {
+				$actualButton.removeClass('btn-danger').addClass('btn-default');
+
+				$actualExecution.removeAttr('data-actual-explorer-index');
+				$actualExecution.removeData('actualExplorerIndex');
+				$actualExecution.find('.executionTime').empty();
+				$actualExecution.find('.platform').empty();
+				$actualExecution.find('.browserName').empty();
+				$actualExecution.find('.browserVersion').empty();
+			}
+
+			$el.addClass('btn-info');
 
 			var index = $el.parent().parent().data('explorerIndex');
 			var e = this._executionList[index];
 
-			this.$find('#expectedExecution').attr('data-expected-explorer-index', index);
-			this.$find('#expectedExecution .executionTime').text(e.executionTime);
-			this.$find('#expectedExecution .platform').text(e.platform);
-			this.$find('#expectedExecution .browserName').text(e.browserName);
-			this.$find('#expectedExecution .browserVersion').text(e.browserVersion);
+			var $expectedExecution = this.$find('#expectedExecution');
+			$expectedExecution.attr('data-expected-explorer-index', index);
+			$expectedExecution.find('.executionTime').text(e.executionTime);
+			$expectedExecution.find('.platform').text(e.platform);
+			$expectedExecution.find('.browserName').text(e.browserName);
+			$expectedExecution.find('.browserVersion').text(e.browserVersion);
 
-			if (this.$find('#actualExecution').data('actualExplorerIndex') != null) {
+			if ($actualExecution.data('actualExplorerIndex') != null) {
 				this.$find('.ok').prop('disabled', false);
+			} else {
+				this.$find('.ok').prop('disabled', true);
 			}
 		},
 
