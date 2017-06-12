@@ -208,7 +208,7 @@ body {
 			
 				
 			}
-			.result_info {
+			.result_info, .result_info_table {
 				cursor:pointer;
 				margin: 5px 0;
 			}

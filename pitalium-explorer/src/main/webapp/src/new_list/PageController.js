@@ -141,6 +141,11 @@
 		 * @param {jQuery} $el the event target element
 		 */
 		'.table tr click': function(context, $el) {
+			if ($el.closest('.result_info_container').find('[data-mode="result"]').css('display') === 'inline-block') {
+				// 比較モード時は画面遷移しない
+				return;
+			}
+
 			var id = $el.data('screenshotId');
 			var url = hifive.pitalium.explorer.utils.formatUrl('diff.html', {
 				id: id
@@ -165,7 +170,6 @@
 		},
 
 		'.expected click': function(context, $el) {
-			context.event.stopPropagation();
 			var directory = $el.data("directory");
 			var target = $el.val();
 
@@ -180,14 +184,21 @@
 
 			all_checkbox.show();//To show [compare elements checkboxes]
 
-			all_checkbox.prop("checked", true);
+			var $tds = $el.parent().parent().children();
+			var testMethod = $tds.eq(0).text();
+			var testScreen = $tds.eq(1).text();
+
+			for (var i = 0, len = all_checkbox.length; i < len; i++) {
+				var $tds = all_checkbox.eq(i).parent().parent().children();
+				all_checkbox.eq(i).prop('checked',
+						$tds.eq(0).text() === testMethod && $tds.eq(1).text() === testScreen);
+			}
 
 			this_checkbox.hide(); //To hide [expected element's campare checkbox]
 			this_checkbox.removeAttr("checked");
 		},
 
 		'.btn-run click': function(context, $el) {
-			context.event.stopPropagation();
 			$el.hide();
 
 			var loading = $el.parent().find("img");
@@ -263,7 +274,8 @@
 				var $resultContent = $resultInfoContainer.closest('.result_content');
 				var timeStr = $resultContent.data('timestamp');
 				var id = $resultContent.data('testExecutionId');
-				this._appendComparisonResult(timeStr + '/' + $resultInfoContainer.data('testClass'), id);
+				this._appendComparisonResult(
+						timeStr + '/' + $resultInfoContainer.data('testClass'), id);
 			}
 		},
 
@@ -271,7 +283,7 @@
 			var directory = $el.data("directory");
 			var id = $el.data("resultid");
 
-			this.$find("#result_info_" + id).remove();
+			$el.closest('.result_info_table').remove();
 			alert("Results deleted!");
 
 			this._testResultListLogic.deleteScreenshot(directory, id);
@@ -319,21 +331,24 @@
 		},
 
 		_appendComparisonResult: function(path, id) {
-			this._testResultListLogic.fetchScreenshotList(path, true).done(this.own(function(data) {
-				var resultList = data.resultList;
-				for (var i = 0; i < resultList.length; i++) {
-					var result = resultList[i];
-					var tStamp = new Date(parseInt(result.executionTime));
+			this._testResultListLogic.fetchScreenshotList(path, true).done(
+					this.own(function(data) {
+						var resultList = data.resultList;
+						for (var i = 0; i < resultList.length; i++) {
+							var result = resultList[i];
+							var tStamp = new Date(parseInt(result.executionTime));
 
-					this.view.append('#result_ul_' + id + ' .result_list_table', "result_info_table", {
-						id: result.id,
-						resultList: result.resultList,
-						expected: result.expectedFilename,
-						timestamp: hifive.pitalium.explorer.utils.toLocaleTimeString(tStamp),
-						directory: path
-					});
-				}
-			}));
+							this.view.append('#result_ul_' + id + ' .result_list_table',
+									"result_info_table", {
+										id: result.id,
+										resultList: result.resultList,
+										expected: result.expectedFilename,
+										timestamp: hifive.pitalium.explorer.utils
+												.toLocaleTimeString(tStamp),
+										directory: path
+									});
+						}
+					}));
 		},
 
 		/**
