@@ -5,13 +5,26 @@
 (function() {
 	'use strict';
 
+	var LOADED_FLG_STR = 'hifive.pitalium.explorer-load';
+
+	function isResultLoaded($el) {
+		return $el.hasClass(LOADED_FLG_STR);
+	}
+
+	function markAsResultLoaded($el) {
+		$el.addClass(LOADED_FLG_STR);
+	}
+
 	/**
-	 * @class hifive.pitalium.explorer.newList.PageController
+	 * This class is a controller for the list page of test results.
+	 * 
+	 * @class hifive.pitalium.explorer.newList.ResultListPageController
+	 * @name ResultListPageController
 	 */
 	/**
-	 * @lends hifive.pitalium.explorer.newList.PageController#
+	 * @lends hifive.pitalium.explorer.newList.ResultListPageController#
 	 */
-	var PageController = {
+	var resultListPageController = {
 		/**
 		 * @ignore
 		 */
@@ -82,9 +95,9 @@
 		 * @param {jQuery} $el the event target element
 		 */
 		'.appendTable click': function(context, $el) {
-			var testExecutionId = $el.data('testExecutionId');
+			var $resultContent = $el.closest('.result_content');
 
-			var $table_list = this.$find("#table_list_" + testExecutionId);
+			var $table_list = $resultContent.find(".table_list");
 			var $resultContent = $table_list.closest('.result_content');
 			$table_list.slideToggle({
 				complete: this.own(function() {
@@ -93,11 +106,11 @@
 			});
 
 			// Check the loaded flag and do nothing if exists.
-			if ($table_list.hasClass('hifive.pitalium.explorer-load')) {
+			if (isResultLoaded($table_list)) {
 				return;
 			}
 
-			$table_list.addClass('hifive.pitalium.explorer-load');
+			markAsResultLoaded($table_list);
 
 			// Show indicator
 			var indicator = this.indicator({
@@ -105,16 +118,35 @@
 				target: document
 			}).show();
 
+			var testExecutionId = $resultContent.data('testExecutionId');
+
 			//to get screenshots list from API
 			this._testResultListLogic.getScreenshotList(testExecutionId).done(
 					this.own(function(data) {
 						this.view.update("#result_ul_" + testExecutionId, "screenshot_list", {
-							screenshots: data
+							screenshots: data,
+							id: testExecutionId
 						});
 					})).always(function() {
 				indicator.hide();
-				;
 			});
+		},
+
+		/**
+		 * Called when a test result has been clicked.<br>
+		 * Go to a new page which shows the difference images of the selected test result.
+		 * 
+		 * @memberOf hifive.pitalium.explorer.controller.ResultListPageController
+		 * @param {Object} context the event context
+		 * @param {jQuery} $el the event target element
+		 */
+		'.table tr click': function(context, $el) {
+			var id = $el.data('screenshotId');
+			var url = hifive.pitalium.explorer.utils.formatUrl('diff.html', {
+				id: id
+			});
+
+			window.open(url, '_diff');
 		},
 
 		'{window} scroll': function() {
@@ -133,6 +165,7 @@
 		},
 
 		'.expected click': function(context, $el) {
+			context.event.stopPropagation();
 			var directory = $el.data("directory");
 			var target = $el.val();
 
@@ -154,6 +187,7 @@
 		},
 
 		'.btn-run click': function(context, $el) {
+			context.event.stopPropagation();
 			$el.hide();
 
 			var loading = $el.parent().find("img");
@@ -175,8 +209,17 @@
 		},
 
 		'.result_info click': function(context, $el) {
+			var info_table = $el.parent().find(".result_list_table");
+			this._toggleResultInfo($el, info_table);
+		},
+
+		'.result_info_table click': function(context, $el) {
 			var info_table = $el.parent().find(".info_table_div");
-			var $resultContent = $el.closest('.result_content');
+			this._toggleResultInfo($el, info_table);
+		},
+
+		_toggleResultInfo: function($el, info_table) {
+			var $resultContent = info_table.closest('.result_content');
 			info_table.slideToggle({
 				complete: this.own(function() {
 					this._updateResultContentHeight($resultContent);
@@ -213,6 +256,14 @@
 			} else if (mode == 'compare') {
 				$resultCol.hide();
 				$compareCol.show();
+				if (isResultLoaded($resultInfoContainer)) {
+					return;
+				}
+				markAsResultLoaded($resultInfoContainer);
+				var $resultContent = $resultInfoContainer.closest('.result_content');
+				var timeStr = $resultContent.data('timestamp');
+				var id = $resultContent.data('testExecutionId');
+				this._appendComparisonResult(timeStr + '/' + $resultInfoContainer.data('testClass'), id);
 			}
 		},
 
@@ -274,8 +325,7 @@
 					var result = resultList[i];
 					var tStamp = new Date(parseInt(result.executionTime));
 
-					this.$find("#result_h_" + id).show();
-					this.view.append('#result_ul_' + id, "result_info_table", {
+					this.view.append('#result_ul_' + id + ' .result_list_table', "result_info_table", {
 						id: result.id,
 						resultList: result.resultList,
 						expected: result.expectedFilename,
@@ -284,6 +334,62 @@
 					});
 				}
 			}));
+		},
+
+		/**
+		 * Called when the search form has been opened.<br>
+		 * Update button label.
+		 * 
+		 * @memberOf hifive.pitalium.explorer.controller.ResultListPageController
+		 * @param {Object} context the event context
+		 * @param {jQuery} $el the event target element
+		 */
+		'#searchPanel show.bs.collapse': function(context, $el) {
+			this.$find('#toggleSearchPanel').text('Close search');
+		},
+
+		/**
+		 * Called when the search form has been closed.<br>
+		 * Update button label.
+		 * 
+		 * @memberOf hifive.pitalium.explorer.controller.ResultListPageController
+		 * @param {Object} context the event context
+		 * @param {jQuery} $el the event target element
+		 */
+		'#searchPanel hide.bs.collapse': function(context, $el) {
+			this.$find('#toggleSearchPanel').text('Open search');
+		},
+
+		/**
+		 * Called when the search form has been submitted.<br>
+		 * Collect input parameters, search test results asynchronously, and update views.
+		 * 
+		 * @memberOf hifive.pitalium.explorer.controller.ResultListPageController
+		 * @param {Object} context the event context
+		 * @param {jQuery} $el the event target element
+		 */
+		'#searchTest submit': function(context, $el) {
+			// Stop submit
+			context.event.preventDefault();
+
+			this.collectSearchParameters($el);
+			if (window.location.hash) {
+				window.location.hash = '';
+			} else {
+				this.updatePage();
+			}
+		},
+
+		/**
+		 * Called when the page size select value has been changed. Updates view.
+		 * 
+		 * @memberOf hifive.pitalium.explorer.controller.ResultListPageController
+		 * @param {Object} context the event context
+		 * @param {jQuery} $el the event target element
+		 */
+		'#select-page-size change': function(context, $el) {
+			this._pageSize = $el.val();
+			this.updatePage();
 		},
 
 		/**
@@ -350,7 +456,7 @@
 			this.own(function(response) {
 				// Update views
 				this.view.update('#result_list', 'testExecutionListTemplate', {
-					contents: response.content
+					testExecutionsPage: response
 				});
 			})).always(function() {
 				indicator.hide();
@@ -358,7 +464,7 @@
 		}
 	};
 
-	h5.core.expose(PageController);
+	h5.core.expose(resultListPageController);
 
 
 })();

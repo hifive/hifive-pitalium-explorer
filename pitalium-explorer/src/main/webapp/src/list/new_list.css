@@ -149,15 +149,6 @@ body {
 				opacity:0.3;"
 			}
 			
-			
-		.platform {
-			cursor:pointer;
-			min-width: 105px;
-		}
-		.platform:hover {
-			background-color:#C8E6C9;
-		}
-		
 		#result_list {
 			margin-top:20px;
 		}
@@ -186,6 +177,10 @@ body {
 			.info_table th{
 				background-color:#FF8A65;
 			}
+			.table tr[data-screenshot-id] {
+				cursor: pointer;
+			}
+
 			.table td {
 				border:none;
 				vertical-align: middle;
