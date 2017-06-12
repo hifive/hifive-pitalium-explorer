@@ -1,12 +1,11 @@
 package com.htmlhifive.pitalium.explorer.image;
 
-import com.htmlhifive.pitalium.image.util.ImageUtils;
-
-import java.awt.image.BufferedImage;
 import java.awt.Rectangle;
+import java.awt.image.BufferedImage;
 import java.awt.image.Raster;
 import java.util.List;
-import java.lang.Math;
+
+import com.htmlhifive.pitalium.image.util.ImageUtils;
 
 /**
  * For given two images which are expected and actual,

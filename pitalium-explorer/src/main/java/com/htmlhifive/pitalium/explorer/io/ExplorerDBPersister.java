@@ -7,14 +7,15 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
-import com.htmlhifive.pitalium.explorer.service.ScreenshotIdService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
+import com.htmlhifive.pitalium.explorer.changelog.ChangeRecord;
 import com.htmlhifive.pitalium.explorer.entity.Area;
 import com.htmlhifive.pitalium.explorer.entity.AreaRepository;
 import com.htmlhifive.pitalium.explorer.entity.Config;
@@ -27,10 +28,17 @@ import com.htmlhifive.pitalium.explorer.entity.Screenshot;
 import com.htmlhifive.pitalium.explorer.entity.ScreenshotRepository;
 import com.htmlhifive.pitalium.explorer.entity.Target;
 import com.htmlhifive.pitalium.explorer.entity.TargetRepository;
-import com.htmlhifive.pitalium.explorer.entity.TestExecutionRepository;
 import com.htmlhifive.pitalium.explorer.entity.TestExecutionAndEnvironment;
+import com.htmlhifive.pitalium.explorer.entity.TestExecutionRepository;
 import com.htmlhifive.pitalium.explorer.file.FileUtility;
+import com.htmlhifive.pitalium.explorer.image.ComparedRectangle;
+import com.htmlhifive.pitalium.explorer.request.ExecResultChangeRequest;
+import com.htmlhifive.pitalium.explorer.request.ScreenshotResultChangeRequest;
+import com.htmlhifive.pitalium.explorer.request.TargetResultChangeRequest;
+import com.htmlhifive.pitalium.explorer.response.ResultDirectory;
+import com.htmlhifive.pitalium.explorer.response.ResultListOfExpected;
 import com.htmlhifive.pitalium.explorer.response.TestExecutionResult;
+import com.htmlhifive.pitalium.explorer.service.ScreenshotIdService;
 
 public class ExplorerDBPersister extends DBPersister implements ExplorerPersister {
 
@@ -74,7 +82,7 @@ public class ExplorerDBPersister extends DBPersister implements ExplorerPersiste
 
 	@Override
 	public Page<TestExecutionResult> findTestExecution(String searchTestMethod, String searchTestScreen, int page,
-			int pageSize) {
+			int pageSize, String resultDirectoryKey) {
 		if (pageSize == 0) {
 			pageSize = defaultPageSize;
 		} else if (pageSize == -1) {
@@ -243,6 +251,61 @@ public class ExplorerDBPersister extends DBPersister implements ExplorerPersiste
 		newEntry.setAlgorithm(algorithm);
 		newEntry.setFileName(edgeFileName);
 		processedImageRepo.saveAndFlush(newEntry);
+	}
+
+	@Override
+	public List<ChangeRecord> updateExecResult(List<ExecResultChangeRequest> inputModelList) {
+		// FIXME
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public List<ChangeRecord> updateScreenshotComparisonResult(List<ScreenshotResultChangeRequest> inputModelList) {
+		// FIXME
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public List<ChangeRecord> updateTargetComparisonResult(List<TargetResultChangeRequest> inputModelList) {
+		// FIXME
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public Page<ResultDirectory> findResultDirectory(String searchTestMethod, String searchTestScreen, int page,
+			int pageSize, boolean refresh) {
+		// TODO 自動生成されたメソッド・スタブ
+		return null;
+	}
+
+	@Override
+	public Map<String, List> findScreenshotFiles(String path, boolean refresh) {
+		// TODO 自動生成されたメソッド・スタブ
+		return null;
+	}
+
+	@Override
+	public ResultListOfExpected executeComparing(String expectedFilePath, String[] targetFilePaths) {
+		// TODO 自動生成されたメソッド・スタブ
+		return null;
+	}
+
+	@Override
+	public Map<String, byte[]> getImages(String expectedFilePath, String targetFilePath) {
+		// TODO 自動生成されたメソッド・スタブ
+		return null;
+	}
+
+	@Override
+	public List<ComparedRectangle> getComparedResult(String path, int resultListId, int targetResultId) {
+		// TODO 自動生成されたメソッド・スタブ
+		return null;
+	}
+
+	@Override
+	public String deleteResults(String path, int resultListId) {
+		// TODO 自動生成されたメソッド・スタブ
+		return null;
 	}
 
 }

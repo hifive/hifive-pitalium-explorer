@@ -48,6 +48,7 @@
 		 */
 		__ready: function() {
 			this.collectSearchParameters();
+			this._showResultDirectoryKeys();
 			this.onHashChange();
 			$(window).on('hashchange', this.own(this.onHashChange));
 		},
@@ -230,6 +231,18 @@
 					})).always(function() {
 				indicator.hide();
 			});
+		},
+
+		_showResultDirectoryKeys: function() {
+			this._testResultListLogic.getResultDirectoryKeys().done(this.own(function(keys) {
+				if (!keys || keys.length == 0) {
+					return;
+				}
+
+				this.view.append('#navbar', 'resultDirectoryKeys', {
+					keys: keys
+				});
+			}));
 		}
 	};
 	h5.core.expose(resultListPageController);

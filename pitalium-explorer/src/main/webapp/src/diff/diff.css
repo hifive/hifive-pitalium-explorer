@@ -49,11 +49,16 @@ body {
 	margin: 0px;
 }
 
-#select_execution {
-	padding: 0px;
+#info .panel-heading .btn-group {
+	float:right;
 }
 
 /* detail area */
+#main .panel-heading {
+	padding-top: 9px;
+	padding-bottom: 9px;
+}
+
 .legend {
 	vertical-align: top;
 }

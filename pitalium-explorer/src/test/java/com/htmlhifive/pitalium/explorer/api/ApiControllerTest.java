@@ -106,7 +106,7 @@ public class ApiControllerTest {
 		reset(testExecutionRepo);
 		when(testExecutionRepo.search(eq(""), eq(""), any(Pageable.class))).thenReturn(page);
 
-		ResponseEntity<Page<TestExecutionResult>> response = this.apiController.listTestExecution(1, 0, "", "");
+		ResponseEntity<Page<TestExecutionResult>> response = this.apiController.listTestExecution(1, 0, "", "", null);
 		Assert.assertEquals(200, response.getStatusCode().value());
 		List<TestExecutionResult> responseBody = response.getBody().getContent();
 		for (int i = 0; i < responseBody.size(); i++) {
@@ -132,7 +132,7 @@ public class ApiControllerTest {
 		when(testExecutionRepo.search(eq(""), eq(""), any(Pageable.class))).thenReturn(page);
 		when(testExecutionRepo.count()).thenReturn((long) converted.size());
 
-		ResponseEntity<Page<TestExecutionResult>> response = this.apiController.listTestExecution(1, 20, "", "");
+		ResponseEntity<Page<TestExecutionResult>> response = this.apiController.listTestExecution(1, 20, "", "", null);
 		Assert.assertEquals(200, response.getStatusCode().value());
 		List<TestExecutionResult> responseBody = response.getBody().getContent();
 		for (int i = 0; i < responseBody.size(); i++) {
@@ -158,7 +158,7 @@ public class ApiControllerTest {
 		when(testExecutionRepo.search(eq(""), eq(""), any(Pageable.class))).thenReturn(page);
 		when(testExecutionRepo.count()).thenReturn((long) converted.size());
 
-		ResponseEntity<Page<TestExecutionResult>> response = this.apiController.listTestExecution(1, -1, "", "");
+		ResponseEntity<Page<TestExecutionResult>> response = this.apiController.listTestExecution(1, -1, "", "", null);
 		Assert.assertEquals(200, response.getStatusCode().value());
 		List<TestExecutionResult> responseBody = response.getBody().getContent();
 		for (int i = 0; i < responseBody.size(); i++) {
@@ -195,7 +195,7 @@ public class ApiControllerTest {
 		when(testExecutionRepo.count()).thenReturn((long) converted.size());
 
 		ResponseEntity<Page<TestExecutionResult>> response = this.apiController.listTestExecution(1, 20, "thod1",
-				"screen1");
+				"screen1", null);
 		Assert.assertEquals(200, response.getStatusCode().value());
 		List<TestExecutionResult> responseBody = response.getBody().getContent();
 

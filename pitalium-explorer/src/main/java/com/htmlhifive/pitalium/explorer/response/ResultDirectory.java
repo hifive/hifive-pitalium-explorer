@@ -1,7 +1,5 @@
 package com.htmlhifive.pitalium.explorer.response;
 
-import java.sql.Time;
-
 public class ResultDirectory {
 	private Integer id;
 

@@ -38,4 +38,6 @@ public interface ScreenshotIdService {
 	 */
 	ScreenshotType getScreenshotType(int id);
 
+	void clearTypes();
+
 }

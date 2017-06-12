@@ -35,7 +35,8 @@
 						var testExecution = testExecutions[i].testExecution;
 						var passedCount = testExecutions[i].passedCount;
 						var totalCount = testExecutions[i].totalCount;
-						var execResult = testExecutions[i].testExecution.execResult;
+						var execResult = testExecution.execResult;
+						var updated = testExecution.updated;
 						var passedPercentage = parseInt(passedCount / totalCount * 100);
 						var headerTarget = 'heading' + i;
 						var collapseTarget = 'collapse' + i;
@@ -65,6 +66,9 @@
 									<img class="test-result-icon" src="res/img/checkmark.png" alt="○" aria-label="All tests passed">
 								[% } else if (execResult == 'FAILURE') { %]
 									<img class="test-result-icon" src="res/img/xmark.png" alt="×" aria-label="Some tests failed">
+								[% } %]
+								[% if (updated) { %]
+									<a href=""><span class="updated-mark">updated</span></a>
 								[% } %]
 							</div>
 						</div>
@@ -151,11 +155,28 @@
 						} else {
 							%]-[%
 						}
+						if (screenshot.updated) {
+							%]<a href=""><span class="updated-mark">updated</span></a>[%
+						}
 					%]</td>
 				</tr>
 				[% } %]
 			</tbody>
 		</table>
+	</script>
+	<script type="text/ejs" id="resultDirectoryKeys">
+		<ul class="nav navbar-nav navbar-right">
+			<li class="dropdown result-directory-keys">
+				<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Result Directory <span class="caret"></span></a>
+				<ul class="dropdown-menu">
+					[% for(var i = 0, len = keys.length; i < len; i++) {
+						var key = keys[i];
+					%]
+						<li><a href="?resultDirectoryKey=[%= key %]">[%= key %]</a></li>
+					[% } %]
+				</ul>
+			</li>
+		</ul>
 	</script>
 	</head>
 	<body>
@@ -173,8 +194,7 @@
 				</div>
 				<div id="navbar" class="navbar-collapse collapse">
 					<ul class="nav navbar-nav">
-						<li class="active"><a href="list.html">Original Explorer</a></li>
-						<li ><a href="new_list.html">Second Explorer</a></li>
+						<li class="active"><a href="list.html">Home</a></li>
 						<li><a href="fileDiff.html">Diff any images</a></li>
 					</ul>
 				</div><!--/.nav-collapse -->

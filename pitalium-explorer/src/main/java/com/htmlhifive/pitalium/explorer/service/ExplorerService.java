@@ -28,11 +28,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.htmlhifive.pitalium.core.config.FilePersisterConfig;
+import com.htmlhifive.pitalium.core.config.PtlTestConfig;
+import com.htmlhifive.pitalium.explorer.changelog.ChangeRecord;
 import com.htmlhifive.pitalium.explorer.conf.ApplicationConfig;
+import com.htmlhifive.pitalium.explorer.conf.ExplorerPersisterConfig;
 import com.htmlhifive.pitalium.explorer.entity.Area;
 import com.htmlhifive.pitalium.explorer.entity.ConfigRepository;
 import com.htmlhifive.pitalium.explorer.entity.ProcessedImageRepository;
@@ -45,10 +48,11 @@ import com.htmlhifive.pitalium.explorer.entity.TestExecutionRepository;
 import com.htmlhifive.pitalium.explorer.image.ComparedRectangle;
 import com.htmlhifive.pitalium.explorer.image.EdgeDetector;
 import com.htmlhifive.pitalium.explorer.io.ExplorerPersister;
-import com.htmlhifive.pitalium.explorer.response.Result;
+import com.htmlhifive.pitalium.explorer.request.ExecResultChangeRequest;
+import com.htmlhifive.pitalium.explorer.request.ScreenshotResultChangeRequest;
+import com.htmlhifive.pitalium.explorer.request.TargetResultChangeRequest;
 import com.htmlhifive.pitalium.explorer.response.ResultDirectory;
 import com.htmlhifive.pitalium.explorer.response.ResultListOfExpected;
-import com.htmlhifive.pitalium.explorer.response.ScreenshotFile;
 import com.htmlhifive.pitalium.explorer.response.TestExecutionResult;
 import com.htmlhifive.pitalium.image.model.DiffPoints;
 import com.htmlhifive.pitalium.image.util.ImageUtils;
@@ -115,8 +119,8 @@ public class ExplorerService implements Serializable {
 
 
 	public Page<TestExecutionResult> findTestExecution(String searchTestMethod, String searchTestScreen, int page,
-			int pageSize) {
-		return persisterService.findTestExecution(searchTestMethod, searchTestScreen, page, pageSize);
+			int pageSize, String resultDirectoryKey) {
+		return persisterService.findTestExecution(searchTestMethod, searchTestScreen, page, pageSize, resultDirectoryKey);
 	}
 
 	public List<Screenshot> findScreenshot(Integer testExecutionId, String searchTestMethod, String searchTestScreen) {
@@ -207,6 +211,12 @@ public class ExplorerService implements Serializable {
 
 	public Boolean getComparisonResult(Integer sourceScreenshotId, Integer targetScreenshotId, Integer sourceTargetId,
 			Integer targetTargetId) {
+		Screenshot sourceScreenshot = persisterService.getScreenshot(sourceScreenshotId);
+		Screenshot targetScreenshot = persisterService.getScreenshot(targetScreenshotId);
+		if (sourceScreenshot.getExpectedScreenshotId().equals(targetScreenshot.getId())) {
+			return sourceScreenshot.getComparisonResult();
+		}
+
 		try {
 			File sourceFile = persisterService.getImage(sourceScreenshotId, sourceTargetId);
 			File targetFile = persisterService.getImage(targetScreenshotId, targetTargetId);
@@ -411,6 +421,30 @@ public class ExplorerService implements Serializable {
 		}
 	}
 
+	public List<ChangeRecord> updateExecResult(List<ExecResultChangeRequest> inputModelList) {
+		return persisterService.updateExecResult(inputModelList);
+	}
 
-	
+	public List<ChangeRecord> updateScreenshotComparisonResult(List<ScreenshotResultChangeRequest> inputModelList) {
+		return persisterService.updateScreenshotComparisonResult(inputModelList);
+	}
+
+	public List<ChangeRecord> updateTargetComparisonResult(List<TargetResultChangeRequest> inputModelList) {
+		return persisterService.updateTargetComparisonResult(inputModelList);
+	}
+
+	/**
+	 * 設定されているresultsフォルダのキーのリストを取得する
+	 * @return 設定されているresultsフォルダのキーのリスト
+	 */
+	public List<String> listResultDirectoryKeys() {
+		ExplorerPersisterConfig persisterConfig = PtlTestConfig.getInstance().getConfig(ExplorerPersisterConfig.class);
+		Map<String, FilePersisterConfig> files = persisterConfig.getFiles();
+
+		if (files != null && files.size() != 0) {
+			return new ArrayList<>(files.keySet());
+		}
+
+		return new ArrayList<>();
+	}
 }

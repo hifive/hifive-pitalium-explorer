@@ -10,6 +10,8 @@ import javax.annotation.PreDestroy;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -132,6 +134,19 @@ public class ImageController {
 	public List<Integer> multipartUpload(@RequestParam("files") List<MultipartFile> files) throws Exception {
 		return temporaryFileService.upload(files);
 	}
+
+	/**
+	 * 設定されているresultsフォルダのキーのリストを取得する。
+	 *
+	 * @return 設定されているresultsフォルダのキーのリスト
+	 */
+	@RequestMapping(value = "directoryKeys/list", method = RequestMethod.GET, produces = "application/json;charset=utf-8")
+	@ResponseBody
+	public ResponseEntity<List<String>> listResultDirectoryKeys() {
+		List<String> list = service.listResultDirectoryKeys();
+		return new ResponseEntity<List<String>>(list, HttpStatus.OK);
+	}
+
 
 	@Deprecated
 	@RequestMapping(value = "files/diff", method = RequestMethod.GET)

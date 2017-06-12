@@ -10,19 +10,21 @@ import java.io.FileFilter;
 import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.sql.Date;
 import java.sql.Timestamp;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
+import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -41,10 +43,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.htmlhifive.pitalium.common.exception.JSONException;
 import com.htmlhifive.pitalium.common.util.JSONUtils;
 import com.htmlhifive.pitalium.core.config.FilePersisterConfig;
+import com.htmlhifive.pitalium.core.config.PtlTestConfig;
 import com.htmlhifive.pitalium.core.io.FilePersister;
 import com.htmlhifive.pitalium.core.io.PersistMetadata;
 import com.htmlhifive.pitalium.core.model.ExecResult;
@@ -55,6 +58,11 @@ import com.htmlhifive.pitalium.core.model.SelectorType;
 import com.htmlhifive.pitalium.core.model.TargetResult;
 import com.htmlhifive.pitalium.core.model.TestResult;
 import com.htmlhifive.pitalium.core.selenium.PtlCapabilities;
+import com.htmlhifive.pitalium.explorer.changelog.ChangePoint;
+import com.htmlhifive.pitalium.explorer.changelog.ChangeRecord;
+import com.htmlhifive.pitalium.explorer.changelog.ScreenshotResultChangePoint;
+import com.htmlhifive.pitalium.explorer.changelog.TargetResultChangePoint;
+import com.htmlhifive.pitalium.explorer.conf.ExplorerPersisterConfig;
 import com.htmlhifive.pitalium.explorer.entity.Area;
 import com.htmlhifive.pitalium.explorer.entity.Screenshot;
 import com.htmlhifive.pitalium.explorer.entity.Target;
@@ -64,12 +72,14 @@ import com.htmlhifive.pitalium.explorer.entity.TestExecutionAndEnvironment;
 import com.htmlhifive.pitalium.explorer.file.FileUtility;
 import com.htmlhifive.pitalium.explorer.image.ComparedRectangle;
 import com.htmlhifive.pitalium.explorer.image.ImagePair;
-import com.htmlhifive.pitalium.explorer.image.SimilarityUnit;
-import com.htmlhifive.pitalium.explorer.response.TestExecutionResult;
+import com.htmlhifive.pitalium.explorer.request.ExecResultChangeRequest;
+import com.htmlhifive.pitalium.explorer.request.ScreenshotResultChangeRequest;
+import com.htmlhifive.pitalium.explorer.request.TargetResultChangeRequest;
 import com.htmlhifive.pitalium.explorer.response.Result;
 import com.htmlhifive.pitalium.explorer.response.ResultDirectory;
 import com.htmlhifive.pitalium.explorer.response.ResultListOfExpected;
 import com.htmlhifive.pitalium.explorer.response.ScreenshotFile;
+import com.htmlhifive.pitalium.explorer.response.TestExecutionResult;
 import com.htmlhifive.pitalium.explorer.service.ScreenshotIdService;
 import com.htmlhifive.pitalium.image.model.RectangleArea;
 
@@ -83,9 +93,13 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 	private Map<Integer, List<Screenshot>> screenshotListMap;
 	private Map<Integer, Target> targetMap;
 
+	// 更新処理のために保持
+	private Map<Integer, List<TestResult>> testResultMap; // IDと結果オブジェクト（リスト）を紐付けするためのもの
+	private Map<ScreenshotResult, Integer> screenshotIdMap; // 結果オブジェクトとIDを紐付けするためのもの
+	private Map<TargetResult, Integer> targetIdMap; // 結果オブジェクトとIDを紐付けするためのもの
+
 	public ExplorerFilePersister() {
-		// FIXME 独自のConfigに差し替える必要があるかも
-		super();
+		super(PtlTestConfig.getInstance().getConfig(ExplorerPersisterConfig.class).getFile());
 	}
 
 	public ExplorerFilePersister(FilePersisterConfig config) {
@@ -135,18 +149,18 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 					log.error("timestamp parsing error: " + timestampString);
 					timestamp = 0;
 				}
-				
+
 				File[] methodDirectories = timeDirectory.listFiles(new FileFilter(){
 					@Override
 					public boolean accept(File f){
 						return f.isDirectory();
 					}
 				});
-				
+
 				for(int j=0; j<methodDirectories.length; j++){
 					File directory = methodDirectories[j];
 					String methodName = directory.getName();
-					
+
 					File resultListOfExpectedJson = new File(new File(directory, "comparisonResults"), "resultList.json");
 					List<ResultListOfExpected> resultListOfExpectedList = null;
 					if (resultListOfExpectedJson.exists()){
@@ -157,7 +171,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 						numberOfResults = resultListOfExpectedList.size();
 					}
 
-					
+
 //					File[] results = new File(directory, "comparisonResults").listFiles(new FilenameFilter(){
 //						@Override
 //						public boolean accept(File dir, String name) {
@@ -168,7 +182,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 //					if(results != null){
 //						numberOfResults = results.length;
 //					}
-					
+
 					File[] screenshots = directory.listFiles(new FilenameFilter() {
 						@Override
 						public boolean accept(File dir, String name) {
@@ -183,7 +197,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 						numberOfScreenshots = screenshots.length;
 					}
 
-					HashSet<String> browsers = new HashSet<String>();
+					Set<String> browsers = new HashSet<String>();
 					for(File screenshot : screenshots){
 						if(screenshot.getName().toLowerCase().contains("chrome")) browsers.add("chrome");
 						else if(screenshot.getName().toLowerCase().contains("safari")) browsers.add("safari");
@@ -192,7 +206,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 						else browsers.add("unknown");
 					}
 					int numberOfBrowsers = browsers.size();
-					
+
 					ResultDirectory resultDirectory = new ResultDirectory(++id, methodName, timestamp, timestampString,
 							numberOfResults, numberOfScreenshots, numberOfBrowsers);
 					resultDirectoriesList.add(resultDirectory);
@@ -252,7 +266,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 		PageRequest pageable = new PageRequest(page - 1, pageSize);
 		return new PageImpl<ResultDirectory>(resultDirectoriesList, pageable, size);
 	}
-	
+
 	@Override
 	public Map<String, List> findScreenshotFiles(String path, boolean refresh){
 		File root = super.getResultDirectoryFile();
@@ -351,7 +365,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 		ret.put("resultList", resultList);
 		return ret;
 	}
-	
+
 	@Override
 	public ResultListOfExpected executeComparing(String expectedFilePath, String[] targetFilePaths) {
 		File root = super.getResultDirectoryFile();
@@ -360,9 +374,9 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 //			return new ArrayList<Result>();
 			return new ResultListOfExpected();
 		}
-						
+
 		File expectedFile = new File(root, expectedFilePath);
-		if(!expectedFile.exists()){ 
+		if(!expectedFile.exists()){
 			log.error("File(" + expectedFile.getAbsolutePath() + ") Not Found.");
 //			return new ArrayList<Result>();
 			return new ResultListOfExpected();
@@ -398,18 +412,18 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 		if(resultList.size() != 0){
 			id = resultList.get(resultList.size()-1).getId()+1;
 		}
-		
+
 		List<Result> pairResultList= new LinkedList<Result>();
 		for(int i=0; i<targetFilePaths.length; i++){
 			String targetFilePath = targetFilePaths[i];
 			File targetFile = new File(root, targetFilePath);
-			if(!targetFile.exists()){ 
+			if(!targetFile.exists()){
 				log.error("Directory(" + targetFile.getAbsolutePath() + ") Not Found.");
 				continue;
 			}
 
 			List<ComparedRectangle> comparedRectangles;
-			
+
 			String filenamePair = FileUtility.getPairResultFilename(expectedFilePath, targetFilePath, id);
 			File filenamePairJson = new File(comparisonResultsDir, filenamePair);
 
@@ -420,7 +434,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 				log.error("get buffered image error:: " + targetFile.getAbsolutePath());
 				continue;
 			}
-			
+
 			ImagePair imagePair = new ImagePair(expectedImage, targetImage);
 			comparedRectangles = imagePair.getComparedRectangles();
 
@@ -429,11 +443,11 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 			int offsetX = imagePair.getDominantOffset().getX();
 			int offsetY = imagePair.getDominantOffset().getY();
 			boolean moveExpected = imagePair.isExpectedMoved();
-			
+
 //			Result result = new Result(expectedFilename, targetFilename, entireSimilarity, comparedRectangles.size());
 			Result result = new Result(i+1, targetFilePath, entireSimilarity, minSimilarity, comparedRectangles.size(), offsetX, offsetY, moveExpected);
 			pairResultList.add(result);
-			
+
 			try {
 				FileWriter fw = new FileWriter(filenamePairJson.getPath());
 				fw.write(JSONUtils.toString(comparedRectangles));
@@ -443,7 +457,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 			}
 		}
 		ResultListOfExpected resultListOfExpected = new ResultListOfExpected(id, expectedFilePath, pairResultList, System.currentTimeMillis());
-		
+
 		resultList.add(resultListOfExpected);
 
 		try {
@@ -465,7 +479,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 		}
 
 		File expectedFile = new File(root, expectedFilePath);
-		if(!expectedFile.exists()){ 
+		if(!expectedFile.exists()){
 			log.error("Directory(" + expectedFile.getAbsolutePath() + ") Not Found.");
 			return new HashMap<String, byte[]>();
 		}
@@ -479,7 +493,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 		}
 
 		File targetFile = new File(root, targetFilePath);
-		if(!targetFile.exists()){ 
+		if(!targetFile.exists()){
 			log.error("Directory(" + targetFile.getAbsolutePath() + ") Not Found.");
 			return new HashMap<String, byte[]>();
 		}
@@ -491,7 +505,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 			log.error("get buffered image error:: " + targetFile.getAbsolutePath());
 			return new HashMap<String, byte[]>();
 		}
-		
+
 
 		ByteArrayOutputStream expectedBao= new ByteArrayOutputStream();
 		ByteArrayOutputStream targetBao= new ByteArrayOutputStream();
@@ -502,14 +516,14 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 			log.error("Change to bytearray Error");
 			return new HashMap<String, byte[]>();
 		}
-		
+
 		Map<String, byte[]> imageMap= new HashMap<String, byte[]>();
 		imageMap.put("expectedImage", expectedBao.toByteArray());
 		imageMap.put("targetImage", targetBao.toByteArray());
-		
+
 		return imageMap;
 	}
-	
+
 	public List<ComparedRectangle> getComparedResult(String path, int resultListId, int targetResultId){
 		File root = super.getResultDirectoryFile();
 		if (!root.exists() || !root.isDirectory()) {
@@ -528,13 +542,13 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 			log.error("Directory(" + comparisonResultsDir.getAbsolutePath() + ") Not Found.");
 			return new ArrayList<ComparedRectangle>();
 		}
-		
+
 		File resultListJson = new File(comparisonResultsDir, "resultList.json");
 		if(!resultListJson.exists()){
 			log.error("Directory(" + resultListJson.getAbsolutePath() + ") Not Found.");
 			return new ArrayList<ComparedRectangle>();
 		}
-		
+
 		List<ResultListOfExpected> resultList;
 		try{
 			resultList = JSONUtils.readValue(resultListJson, new TypeReference<List<ResultListOfExpected>>(){});
@@ -542,7 +556,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 			log.error("json read value error: " + resultListJson.getAbsolutePath());
 			return new ArrayList<ComparedRectangle>();
 		}
-		
+
 		String expectedFilePath = "";
 		String targetFilePath = "";
 		for(ResultListOfExpected resultListOfExpected: resultList){
@@ -555,10 +569,10 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 				}
 			}
 		}
-		
+
 		String filenamePair = FileUtility.getPairResultFilename(expectedFilePath, targetFilePath, resultListId);
 		File filenamePairJson = new File(comparisonResultsDir, filenamePair);
-		if(!filenamePairJson.exists()){ 
+		if(!filenamePairJson.exists()){
 			log.error("File(" + filenamePairJson.getAbsolutePath() + ") Not Found.");
 			return new ArrayList<ComparedRectangle>();
 		}
@@ -573,7 +587,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 		}
 		return comparedRectangleList;
 	}
-	
+
 	@Override
 	public String deleteResults(String path, int resultListId){
 		File root = super.getResultDirectoryFile();
@@ -593,7 +607,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 			log.error("Directory(" + comparisonResultsDir.getAbsolutePath() + ") Not Found.");
 			return "Fail";
 		}
-		
+
 		File resultListJson = new File(comparisonResultsDir, "resultList.json");
 		if(!resultListJson.exists()){
 			log.error("Directory(" + resultListJson.getAbsolutePath() + ") Not Found.");
@@ -606,7 +620,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 			log.error("json read value error: " + resultListJson.getAbsolutePath());
 			return "Fail";
 		}
-		
+
 		String expectedFilePath = "";
 		List<String> targetFilePaths = new LinkedList<String>();
 //		for(int i = 0; i < resultList.size(); i++){
@@ -637,11 +651,11 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 		} catch (Exception e) {
 			log.error("file write error: can not write " + resultListJson.getPath());
 		}
-		
+
 		for(String targetFilePath: targetFilePaths){
 			String filenamePair = FileUtility.getPairResultFilename(expectedFilePath, targetFilePath, resultListId);
 			File filenamePairJson = new File(comparisonResultsDir, filenamePair);
-			if(!filenamePairJson.exists()){ 
+			if(!filenamePairJson.exists()){
 				log.error("File(" + filenamePairJson.getAbsolutePath() + ") Not Found.");
 				return "Fail";
 			}
@@ -650,10 +664,15 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 		return "Success";
 	}
 
-
 	@Override
 	public Page<TestExecutionResult> findTestExecution(String searchTestMethod, String searchTestScreen, int page,
-			int pageSize) {
+			int pageSize, String resultDirectoryKey) {
+		if (resultDirectoryKey != null && !resultDirectoryKey.isEmpty()) {
+			ExplorerPersisterConfig persisterConfig = PtlTestConfig.getInstance()
+					.getConfig(ExplorerPersisterConfig.class);
+			config = persisterConfig.getFiles().get(resultDirectoryKey);
+		}
+
 		File root = super.getResultDirectoryFile();
 		if (!root.exists() || !root.isDirectory()) {
 			log.error("Directory(" + root.getAbsolutePath() + ") Not Found.");
@@ -667,6 +686,10 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 		screenshotListMap = new HashMap<>();
 		targetMap = new HashMap<>();
 
+		testResultMap = new HashMap<>();
+		screenshotIdMap = new HashMap<>();
+		targetIdMap = new HashMap<>();
+
 		// 後続のページング処理用
 		List<TestExecution> testExecutionList = new ArrayList<>();
 		// Screenshotの関連を貼るための処理用
@@ -679,6 +702,8 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 		int targetId = 0;
 		int areaId = 0;
 		int environmentId = 0;
+
+		screenshotIdService.clearTypes();
 
 		File[] files = collection.toArray(new File[collection.size()]);
 		for (int i = 0, len = files.length; i < len; i++) {
@@ -700,10 +725,20 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 				}
 			}
 
+			List<TestResult> testResultList;
 			if (!exists) {
 				testExecutionList.add(testExecution);
 				testExecution.setId(executionId);
+				// 元データを追加する。
+				testResultList = new ArrayList<>();
+				testResultList.add(testResult);
+				testResultMap.put(executionId, testResultList);
+				// IDをインクリメント
 				executionId++;
+			} else {
+				// 元データを追加する。
+				testResultList = testResultMap.get(testExecution.getId());
+				testResultList.add(testResult);
 			}
 
 			ExecResult result = testResult.getResult();
@@ -712,6 +747,15 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 					testExecution.setExecResult(ExecResult.FAILURE.name());
 				} else {
 					testExecution.setExecResult(ExecResult.SUCCESS.name());
+				}
+			}
+
+			// change logがあるか
+			List<ChangeRecord> changeLogs = loadChangeLog(testExecution.getTimeString());
+			for (ChangeRecord record: changeLogs) {
+				if (record.getChangePoints().getExecResult() != null) {
+					testExecution.setIsUpdated(true);
+					break;
 				}
 			}
 
@@ -735,6 +779,27 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 				}
 				screenshot.setTestEnvironment(testEnvironment);
 
+				// change logがあるか
+
+				ScreenshotResultChangePoint currentScreenshotChangePoint = null;
+				outside: for (ChangeRecord record : changeLogs) {
+					List<ScreenshotResultChangePoint> changeScreenshotResults = record.getChangePoints()
+							.getScreenshotResults();
+					if (changeScreenshotResults == null) {
+						continue;
+					}
+					for (ScreenshotResultChangePoint changePoint : changeScreenshotResults) {
+						if (changePoint.getCapabilities().equals(capabilities)
+								&& changePoint.getScreenshotId().equals(screenshot.getScreenshotName())
+								&& changePoint.getTestClass().equals(screenshot.getTestClass())
+								&& changePoint.getTestMethod().equals(screenshot.getTestMethod())) {
+							currentScreenshotChangePoint = changePoint;
+							screenshot.setIsUpdated(true);
+							break outside;
+						}
+					}
+				}
+
 				// Target
 				List<TargetResult> targetResultList = screenshotResult.getTargetResults();
 				List<Target> targetList = new ArrayList<>();
@@ -757,6 +822,23 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 						areaId++;
 					}
 					target.setExcludeAreas(exculdeAreaList);
+
+					outside: for (ChangeRecord record : changeLogs) {
+						List<TargetResultChangePoint> changeTargetResults = record.getChangePoints()
+								.getTargetResults();
+						if (changeTargetResults == null) {
+							continue;
+						}
+						for (TargetResultChangePoint changePoint : changeTargetResults) {
+							if (currentScreenshotChangePoint != null
+									&& currentScreenshotChangePoint.equals(changePoint.getScreenshot())
+									&& changePoint.getTarget().equals(screenAreaResult.getSelector())) {
+								target.setIsUpdated(true);
+								break outside;
+							}
+						}
+					}
+
 					targetMap.put(targetId, target);
 					targetId++;
 				}
@@ -843,6 +925,8 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 	}
 
 	private Screenshot createScreenshot(Integer screenshotId, ScreenshotResult screenshotResult) {
+		// 更新処理用にscreenshotResultとscreenshotIdをマッピングする。
+		screenshotIdMap.put(screenshotResult, screenshotId);
 		Screenshot screenshot = new Screenshot();
 		screenshot.setId(screenshotId);
 		screenshot.setScreenshotName(screenshotResult.getScreenshotId());
@@ -888,6 +972,8 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 
 	private Target createTarget(Integer targetId, Integer screenshotId, TargetResult targetResult,
 			ScreenshotResult screenshotResult) {
+		// 更新処理用にtargetResultとtargetIdをマッピングする。
+		targetIdMap.put(targetResult, targetId);
 		Target target = new Target();
 		target.setTargetId(targetId);
 		target.setScreenshotId(screenshotId);
@@ -1156,4 +1242,673 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
+	public List<ChangeRecord> updateExecResult(List<ExecResultChangeRequest> inputModelList) {
+
+		// result.jsの更新、およびexplorer-change-log.jsonの更新
+		Date updateTime = new Date();
+		// 返却用の変更記録リスト
+		List<ChangeRecord> changeRecordList = new ArrayList<>();
+
+		for (ExecResultChangeRequest im : inputModelList) {
+			ExecResult execResult = convertToExecResult(im.getResult());
+
+			// ファイルの更新
+			Integer testExecutionId = im.getTestExecutionId();
+			List<TestResult> testResultList = testResultMap.get(testExecutionId);
+			// 変更記録ファイルの格納先に使用する。
+			String resultId = testResultList.get(0).getResultId();
+
+			// 変更履歴ファイルの読み込み。
+			List<ChangeRecord> fileOutputList = loadChangeLog(resultId);
+
+			// 変更記録の作成。
+			ChangeRecord changeRecord = createChangeRecord(fileOutputList.size() + 1, im, resultId, updateTime);
+			fileOutputList.add(changeRecord);
+			// 返却用の変更記録リストにも追加。
+			changeRecordList.add(changeRecord);
+
+			// 変更箇所
+			ChangePoint point = new ChangePoint();
+			// スクリーンショット変更箇所格納用
+			List<ScreenshotResultChangePoint> screenshotResults = new ArrayList<>();
+			point.setScreenshotResults(screenshotResults);
+			// ターゲット変更箇所格納用
+			List<TargetResultChangePoint> targetResults = new ArrayList<>();
+			point.setTargetResults(targetResults);
+			changeRecord.setChangePoints(point);
+
+			// テストクラス全体の実行結果格納用
+			List<TestResult> newTestResultList = new ArrayList<>();
+			for (TestResult orgTestResult : testResultList) {
+				// 結果が一致しないものについては、変更個所として格納
+				if (orgTestResult.getResult() != execResult) {
+					point.setExecResult(Boolean.TRUE);
+				}
+
+				// スクリーンショットの実行結果格納用
+				List<ScreenshotResult> newScreenshotResultList = new ArrayList<>();
+				for (ScreenshotResult orgScreenshotResult : orgTestResult.getScreenshotResults()) {
+					ScreenshotResultChangePoint screenshotResultChangePoint = createScreenshotResultChangePoint(
+							orgScreenshotResult);
+					// 結果が一致しないものについては、変更個所として格納
+					if (orgScreenshotResult.getResult() != execResult) {
+						screenshotResults.add(screenshotResultChangePoint);
+					}
+
+					// 対象領域の実行結果格納用
+					List<TargetResult> newTargetResultList = new ArrayList<>();
+					for (TargetResult orgTargetResult : orgScreenshotResult.getTargetResults()) {
+						// 結果が一致しないものについては、変更個所として格納
+						if (orgTargetResult.getResult() != execResult) {
+							targetResults
+									.add(creatTargetResultChangePoint(orgTargetResult, screenshotResultChangePoint));
+						}
+
+						// メモリにキャッシュしている対象領域の結果を置換
+						TargetResult newTargetResult = createTargetResult(orgTargetResult, execResult);
+						Integer targetId = targetIdMap.get(orgTargetResult);
+						targetIdMap.remove(orgTargetResult);
+						targetIdMap.put(newTargetResult, targetId);
+
+						newTargetResultList.add(newTargetResult);
+					}
+
+					// メモリにキャッシュしているスクリーンショットの結果を置換
+					ScreenshotResult newScreenshotResult = createScreenshotResult(orgScreenshotResult, execResult,
+							newTargetResultList);
+					Integer screenshotId = screenshotIdMap.get(orgScreenshotResult);
+					screenshotIdMap.remove(orgScreenshotResult);
+					screenshotIdMap.put(newScreenshotResult, screenshotId);
+
+					newScreenshotResultList.add(newScreenshotResult);
+				}
+
+				// result.jsの更新
+				TestResult newTestResult = createTestResult(orgTestResult, execResult, newScreenshotResultList);
+				newTestResultList.add(newTestResult);
+				PersistMetadata metadata = createPersistMetadata(orgTestResult);
+				saveTestResult(metadata, newTestResult);
+			}
+			// 変更履歴をファイルに出力。
+			saveChangelog(resultId, fileOutputList);
+
+			// メモリにキャッシュしているテストクラス全体の結果を置換
+			testResultMap.put(testExecutionId, newTestResultList);
+
+			// メモリにキャッシュしているテスト実行、スクリーンショット、対象領域を置換
+			List<Screenshot> screenshotList = screenshotListMap.get(testExecutionId);
+			for (Screenshot s : screenshotList) {
+				Boolean comparisonResult = execResult == ExecResult.SUCCESS;
+				// screenshotのキャッシュ更新。
+				s.setComparisonResult(comparisonResult);
+
+				// targetのキャッシュ更新。
+				List<Target> targets = s.getTargets();
+				for (Target t : targets) {
+					t.setComparisonResult(comparisonResult);
+				}
+
+				// testExecutionのキャッシュ更新。
+				s.getTestExecution().setExecResult(execResult.name());
+			}
+		}
+
+		return changeRecordList;
+	}
+
+	@Override
+	public List<ChangeRecord> updateScreenshotComparisonResult(List<ScreenshotResultChangeRequest> inputModelList) {
+		// TestExecutionIdとExecResultを紐付けするためのもの
+		Map<Integer, ExecResult> execResultMap = new HashMap<>();
+		// キャッシュしている情報の更新
+		for (ScreenshotResultChangeRequest im : inputModelList) {
+			ExecResult execResult = convertToExecResult(im.getResult());
+			Boolean comparisonResult = execResult == ExecResult.SUCCESS;
+
+			// screenshotのキャッシュ更新。
+			Integer screenshotId = im.getScreenshotId();
+			Screenshot s = screenshotMap.get(screenshotId);
+			s.setComparisonResult(comparisonResult);
+
+			// targetのキャッシュ更新。
+			List<Target> targets = s.getTargets();
+			for (Target t : targets) {
+				t.setComparisonResult(comparisonResult);
+			}
+
+			// testExecutionのキャッシュ更新。
+			Integer testExecutionId = s.getTestExecution().getId();
+			boolean matchAll = true;
+			List<Screenshot> screenshotList = screenshotListMap.get(testExecutionId);
+			for (Screenshot screenshot : screenshotList) {
+				// 1つでも一致しないものがあった場合は、FAILUREにする。
+				if (comparisonResult != screenshot.getComparisonResult()) {
+					matchAll = false;
+					break;
+				}
+			}
+			if (matchAll) {
+				s.getTestExecution().setExecResult(execResult.name());
+			} else {
+				s.getTestExecution().setExecResult(ExecResult.FAILURE.name());
+			}
+
+			// 履歴ファイルに書き込む際に使用する情報を確保。
+			ExecResult execAllResult = s.getTestExecution().getExecResult() != null
+					? ExecResult.valueOf(s.getTestExecution().getExecResult()) : null;
+			execResultMap.put(testExecutionId, execAllResult);
+		}
+
+		// explorer-change-log.jsonの更新
+		Date updateTime = new Date();
+		// 返却用の変更記録リスト
+		List<ChangeRecord> changeRecordList = new ArrayList<>();
+
+		for (ScreenshotResultChangeRequest im : inputModelList) {
+			ExecResult execResult = convertToExecResult(im.getResult());
+
+			Screenshot screenshot = screenshotMap.get(im.getScreenshotId());
+			TestExecution testExecution = screenshot.getTestExecution();
+			Integer testExecutionId = testExecution.getId();
+			String resultId = testExecution.getTimeString();
+
+			// 変更履歴ファイルの読み込み。
+			List<ChangeRecord> fileOutputList = loadChangeLog(resultId);
+
+			// 変更記録の作成。
+			ChangeRecord changeRecord = createChangeRecord(fileOutputList.size() + 1, im, resultId, updateTime);
+			fileOutputList.add(changeRecord);
+			// 返却用の変更記録リストにも追加。
+			changeRecordList.add(changeRecord);
+
+			// 変更箇所
+			ChangePoint point = new ChangePoint();
+			// スクリーンショット変更箇所格納用
+			List<ScreenshotResultChangePoint> screenshotResults = new ArrayList<>();
+			point.setScreenshotResults(screenshotResults);
+			// ターゲット変更箇所格納用
+			List<TargetResultChangePoint> targetResults = new ArrayList<>();
+			point.setTargetResults(targetResults);
+			changeRecord.setChangePoints(point);
+
+			List<TestResult> testResultList = testResultMap.get(testExecutionId);
+
+			for (TestResult testResult : testResultList) {
+				// テストクラス名が一致しないものは変更記録の対象外とする。
+				if (!screenshot.getTestClass().equals(testResult.getScreenshotResults().get(0).getTestClass())) {
+					continue;
+				}
+
+				// 結果が一致しないものについては、変更個所として格納
+				if (testResult.getResult() != execResultMap.get(testExecutionId)) {
+					point.setExecResult(Boolean.TRUE);
+				}
+
+				for (ScreenshotResult screenshotResult : testResult.getScreenshotResults()) {
+					// 各パラメータが一致しないものは変更記録の対象外とする。
+					if (!isMatchedScreenshot(screenshot, screenshotResult)) {
+						continue;
+					}
+
+					ScreenshotResultChangePoint screenshotResultChangePoint = createScreenshotResultChangePoint(
+							screenshotResult);
+					// 結果が一致しないものについては、変更個所として格納
+					if (screenshotResult.getResult() != execResult) {
+						screenshotResults.add(screenshotResultChangePoint);
+					}
+					// 変更要求(ID)で示された対象情報を追加。
+					Map<String, Object> requestParams = changeRecord.getRequestParams();
+					requestParams.put("targetChangePoint", screenshotResultChangePoint);
+
+					// 対象領域の結果を変更
+					for (TargetResult targetResult : screenshotResult.getTargetResults()) {
+						// 結果が一致しないものについては、変更個所として格納
+						if (targetResult.getResult() != execResult) {
+							targetResults.add(creatTargetResultChangePoint(targetResult, screenshotResultChangePoint));
+						}
+					}
+				}
+			}
+			// 変更履歴をファイルに出力。
+			saveChangelog(resultId, fileOutputList);
+		}
+
+		// result.jsの更新の更新
+		for (Entry<Integer, ExecResult> entry : execResultMap.entrySet()) {
+			// ファイルの更新
+			Integer testExecutionId = entry.getKey();
+			List<TestResult> testResultList = testResultMap.get(testExecutionId);
+
+			// テストクラス全体の実行結果格納用
+			List<TestResult> newTestResultList = new ArrayList<>();
+			for (TestResult orgTestResult : testResultList) {
+				// スクリーンショットの実行結果格納用
+				List<ScreenshotResult> newScreenshotResultList = new ArrayList<>();
+				for (ScreenshotResult orgScreenshotResult : orgTestResult.getScreenshotResults()) {
+					Integer screenshotId = screenshotIdMap.get(orgScreenshotResult);
+
+					// スクリーンショットの結果の値を取得
+					Boolean comparisonResult = screenshotMap.get(screenshotId).getComparisonResult();
+					ExecResult ssExecResult = convertToExecResult(comparisonResult);
+
+					// 対象領域の実行結果格納用
+					List<TargetResult> newTargetResultList = new ArrayList<>();
+					for (TargetResult orgTargetResult : orgScreenshotResult.getTargetResults()) {
+						// スクリーンショットの結果の値がnullの場合は既存の結果の値を使用する。
+						ExecResult targetExecResult = ssExecResult != null ? ssExecResult : orgTargetResult.getResult();
+
+						// メモリにキャッシュしている対象領域の結果を置換
+						TargetResult newTargetResult = createTargetResult(orgTargetResult, targetExecResult);
+						Integer targetId = targetIdMap.get(orgTargetResult);
+						targetIdMap.remove(orgTargetResult);
+						targetIdMap.put(newTargetResult, targetId);
+
+						newTargetResultList.add(newTargetResult);
+					}
+
+					// nullの場合は既存の結果の値を使用する。
+					ssExecResult = ssExecResult != null ? ssExecResult : orgScreenshotResult.getResult();
+					// メモリにキャッシュしているスクリーンショットの結果を置換
+					ScreenshotResult newScreenshotResult = createScreenshotResult(orgScreenshotResult, ssExecResult,
+							newTargetResultList);
+					screenshotIdMap.remove(orgScreenshotResult);
+					screenshotIdMap.put(newScreenshotResult, screenshotId);
+
+					newScreenshotResultList.add(newScreenshotResult);
+				}
+
+				// result.jsの更新
+				TestResult newTestResult = createTestResult(orgTestResult, entry.getValue(), newScreenshotResultList);
+				newTestResultList.add(newTestResult);
+				PersistMetadata metadata = createPersistMetadata(orgTestResult);
+				saveTestResult(metadata, newTestResult);
+			}
+
+			// メモリにキャッシュしているテストクラス全体の結果を置換
+			testResultMap.put(testExecutionId, newTestResultList);
+		}
+		return changeRecordList;
+	}
+
+	@Override
+	public List<ChangeRecord> updateTargetComparisonResult(List<TargetResultChangeRequest> inputModelList) {
+		// TestExecutionIdとExecResultを紐付けするためのもの
+		Map<Integer, ExecResult> execResultMap = new HashMap<>();
+		// キャッシュしている情報の更新
+		for (TargetResultChangeRequest im : inputModelList) {
+			// キャッシュしているデータの更新
+			ExecResult execResult = convertToExecResult(im.getResult());
+			Boolean comparisonResult = execResult == ExecResult.SUCCESS;
+
+			// targetのキャッシュ更新。
+			Integer targetId = im.getTargetId();
+			Target t = targetMap.get(targetId);
+			t.setComparisonResult(comparisonResult);
+			t.setIsUpdated(true);
+
+			Integer screenshotId = im.getScreenshotId();
+			boolean matchScreenshot = true;
+			Screenshot s = screenshotMap.get(screenshotId);
+
+			// スクリーンショットのキャッシュを更新する。
+			List<Target> targetList = s.getTargets();
+			for (Target target : targetList) {
+				// 1つでも一致しないものがあった場合は、falseにする。
+				if (comparisonResult != target.getComparisonResult()) {
+					matchScreenshot = false;
+					break;
+				}
+			}
+
+			if (s.getComparisonResult() != comparisonResult) {
+				// 結果が変わっていれば、updateフラグをtrueにする
+				s.setIsUpdated(true);
+			}
+
+			if (matchScreenshot) {
+				s.setComparisonResult(comparisonResult);
+			} else {
+				s.setComparisonResult(false);
+			}
+
+			// 全体結果のキャッシュを更新する。
+			Integer testExecutionId = s.getTestExecution().getId();
+			boolean matchAll = true;
+			List<Screenshot> screenshotList = screenshotListMap.get(testExecutionId);
+			for (Screenshot screenshot : screenshotList) {
+				// 1つでも一致しないものがあった場合は、FAILUREにする。
+				if (comparisonResult != screenshot.getComparisonResult()) {
+					matchAll = false;
+					break;
+				}
+			}
+			if (matchAll) {
+				s.getTestExecution().setExecResult(execResult.name());
+			} else {
+				s.getTestExecution().setExecResult(ExecResult.FAILURE.name());
+			}
+
+			// ファイルに書き込む際に使用する情報を確保。
+			ExecResult execAllResult = s.getTestExecution().getExecResult() != null
+					? ExecResult.valueOf(s.getTestExecution().getExecResult()) : null;
+			execResultMap.put(testExecutionId, execAllResult);
+		}
+
+		// explorer-change-log.jsonの更新
+		Date updateTime = new Date();
+		// 返却用の変更記録リスト
+		List<ChangeRecord> changeRecordList = new ArrayList<>();
+
+		for (TargetResultChangeRequest im : inputModelList) {
+			ExecResult execResult = convertToExecResult(im.getResult());
+
+			Target target = targetMap.get(im.getTargetId());
+			Screenshot screenshot = screenshotMap.get(im.getScreenshotId());
+			TestExecution testExecution = screenshot.getTestExecution();
+			Integer testExecutionId = testExecution.getId();
+			String resultId = testExecution.getTimeString();
+
+			// 変更履歴ファイルの読み込み。
+			List<ChangeRecord> fileOutputList = loadChangeLog(resultId);
+
+			// 変更記録の作成。
+			ChangeRecord changeRecord = createChangeRecord(fileOutputList.size() + 1, im, resultId, updateTime);
+			fileOutputList.add(changeRecord);
+			// 返却用の変更記録リストにも追加。
+			changeRecordList.add(changeRecord);
+
+			// 変更箇所
+			ChangePoint point = new ChangePoint();
+			// スクリーンショット変更箇所格納用
+			List<ScreenshotResultChangePoint> screenshotResults = new ArrayList<>();
+			point.setScreenshotResults(screenshotResults);
+			// ターゲット変更箇所格納用
+			List<TargetResultChangePoint> targetResults = new ArrayList<>();
+			point.setTargetResults(targetResults);
+			changeRecord.setChangePoints(point);
+
+			List<TestResult> testResultList = testResultMap.get(testExecutionId);
+
+			for (TestResult testResult : testResultList) {
+				// テストクラス名が一致しないものは変更記録の対象外とする。
+				if (!screenshot.getTestClass().equals(testResult.getScreenshotResults().get(0).getTestClass())) {
+					continue;
+				}
+
+				// 結果が一致しないものについては、変更個所として格納
+				if (testResult.getResult() != execResultMap.get(testExecutionId)) {
+					point.setExecResult(Boolean.TRUE);
+				}
+
+				for (ScreenshotResult screenshotResult : testResult.getScreenshotResults()) {
+					// 各パラメータが一致しないものは変更記録の対象外とする。
+					if (!isMatchedScreenshot(screenshot, screenshotResult)) {
+						continue;
+					}
+
+					ScreenshotResultChangePoint screenshotResultChangePoint = createScreenshotResultChangePoint(
+							screenshotResult);
+					// 結果が一致しないものについては、変更個所として格納
+					if (screenshotResult.getResult() != convertToExecResult(screenshot.getComparisonResult())) {
+						screenshotResults.add(screenshotResultChangePoint);
+					}
+
+					// 対象領域の結果を変更
+					for (TargetResult targetResult : screenshotResult.getTargetResults()) {
+						// 各パラメータが一致しないものは変更記録の対象外とする。
+						if (!isMatchedTarget(target, targetResult)) {
+							continue;
+						}
+
+						// 結果が一致しないものについては、変更個所として格納
+						TargetResultChangePoint targetResultChangePoint = creatTargetResultChangePoint(targetResult,
+								screenshotResultChangePoint);
+						if (targetResult.getResult() != execResult) {
+							targetResults.add(targetResultChangePoint);
+						}
+						// 変更要求(ID)で示された対象情報を追加。
+						Map<String, Object> requestParams = changeRecord.getRequestParams();
+						requestParams.put("targetChangePoint", targetResultChangePoint);
+					}
+				}
+			}
+			// 変更履歴をファイルに出力。
+			saveChangelog(resultId, fileOutputList);
+		}
+
+		// result.jsの更新の更新
+		for (Entry<Integer, ExecResult> entry : execResultMap.entrySet()) {
+			Integer testExecutionId = entry.getKey();
+			List<TestResult> testResultList = testResultMap.get(testExecutionId);
+
+			// テストクラス全体の実行結果格納用
+			List<TestResult> newTestResultList = new ArrayList<>();
+			for (TestResult orgTestResult : testResultList) {
+				// スクリーンショットの実行結果格納用
+				List<ScreenshotResult> newScreenshotResultList = new ArrayList<>();
+				for (ScreenshotResult orgScreenshotResult : orgTestResult.getScreenshotResults()) {
+					// 対象領域の実行結果格納用
+					List<TargetResult> newTargetResultList = new ArrayList<>();
+					for (TargetResult orgTargetResult : orgScreenshotResult.getTargetResults()) {
+						// 対象領域の結果の値を取得
+						Integer targetId = targetIdMap.get(orgTargetResult);
+						Boolean comparisonResult = targetMap.get(targetId).getComparisonResult();
+						ExecResult targetExecResult = convertToExecResult(comparisonResult);
+
+						// メモリにキャッシュしている対象領域の結果を置換
+						TargetResult newTargetResult = createTargetResult(orgTargetResult, targetExecResult);
+						targetIdMap.remove(orgTargetResult);
+						targetIdMap.put(newTargetResult, targetId);
+
+						newTargetResultList.add(newTargetResult);
+					}
+
+					// スクリーンショットの結果の値を取得
+					Integer screenshotId = screenshotIdMap.get(orgScreenshotResult);
+					Boolean comparisonResult = screenshotMap.get(screenshotId).getComparisonResult();
+					ExecResult ssExecResult = convertToExecResult(comparisonResult);
+
+					// nullの場合は既存の結果の値を使用する。
+					ssExecResult = ssExecResult != null ? ssExecResult : orgScreenshotResult.getResult();
+					// メモリにキャッシュしているスクリーンショットの結果を置換
+					ScreenshotResult newScreenshotResult = createScreenshotResult(orgScreenshotResult, ssExecResult,
+							newTargetResultList);
+					screenshotIdMap.remove(orgScreenshotResult);
+					screenshotIdMap.put(newScreenshotResult, screenshotId);
+
+					newScreenshotResultList.add(newScreenshotResult);
+				}
+
+				// result.jsの更新
+				TestResult newTestResult = createTestResult(orgTestResult, entry.getValue(), newScreenshotResultList);
+				newTestResultList.add(newTestResult);
+				PersistMetadata metadata = createPersistMetadata(orgTestResult);
+				saveTestResult(metadata, newTestResult);
+			}
+
+			// メモリにキャッシュしているテストクラス全体の結果を置換
+			testResultMap.put(testExecutionId, newTestResultList);
+		}
+
+		return changeRecordList;
+	}
+
+	private ExecResult convertToExecResult(Integer resultCd) {
+		switch (resultCd) {
+			case 0:
+				return ExecResult.SUCCESS;
+			case 1:
+				return ExecResult.FAILURE;
+			default:
+				return null;
+		}
+	}
+
+	private ExecResult convertToExecResult(Boolean result) {
+		if (result == null) {
+			return null;
+		}
+		if (result) {
+			return ExecResult.SUCCESS;
+		} else {
+			return ExecResult.FAILURE;
+		}
+	}
+
+	private TargetResult createTargetResult(TargetResult original, ExecResult result) {
+		return new TargetResult(result, original.getTarget(), original.getExcludes(), original.isMoveTarget(),
+				original.getHiddenElementSelectors(), original.getImage(), original.getOptions());
+	}
+
+	private ScreenshotResult createScreenshotResult(ScreenshotResult original, ExecResult result,
+			List<TargetResult> targetResultList) {
+		return new ScreenshotResult(original.getScreenshotId(), result, original.getExpectedId(), targetResultList,
+				original.getTestClass(), original.getTestMethod(), original.getCapabilities(),
+				original.getEntireScreenshotImage());
+	}
+
+	private TestResult createTestResult(TestResult original, ExecResult result,
+			List<ScreenshotResult> screenshotResultList) {
+		return new TestResult(original.getResultId(), result, screenshotResultList);
+	}
+
+	private PersistMetadata createPersistMetadata(TestResult result) {
+		return new PersistMetadata(result.getResultId(), result.getScreenshotResults().get(0).getTestClass());
+	}
+
+	private ChangeRecord createChangeRecord(int index, ExecResultChangeRequest request, String resultId,
+			Date updateTime) {
+		Map<String, Object> requestParams = new TreeMap<>(); // キーを昇順の並びで出力するためにTreeMapを使用している。
+		requestParams.put("testExecutionId", request.getTestExecutionId());
+		requestParams.put("execResult", convertToExecResult(request.getResult()));
+		// 変更要求(ID)で示された対象情報を追加。
+		Map<String, String> map = new HashMap<>();
+		map.put("resultId", resultId);
+		requestParams.put("targetChangePoint", map);
+		return createChangeRecord(index, requestParams, request.getComment(), resultId, updateTime);
+	}
+
+	private ChangeRecord createChangeRecord(int index, ScreenshotResultChangeRequest request, String resultId,
+			Date updateTime) {
+		Map<String, Object> requestParams = new TreeMap<>(); // キーを昇順の並びで出力するためにTreeMapを使用している。
+		requestParams.put("screenshotId", request.getScreenshotId());
+		requestParams.put("execResult", convertToExecResult(request.getResult()));
+		return createChangeRecord(index, requestParams, request.getComment(), resultId, updateTime);
+	}
+
+	private ChangeRecord createChangeRecord(int index, TargetResultChangeRequest request, String resultId,
+			Date updateTime) {
+		Map<String, Object> requestParams = new TreeMap<>(); // キーを昇順の並びで出力するためにTreeMapを使用している。
+		requestParams.put("screenshotId", request.getScreenshotId());
+		requestParams.put("targetId", request.getTargetId());
+		requestParams.put("execResult", convertToExecResult(request.getResult()));
+		return createChangeRecord(index, requestParams, request.getComment(), resultId, updateTime);
+	}
+
+	private ChangeRecord createChangeRecord(int index, Map<String, Object> requestParams, String comment,
+			String resultId, Date updateTime) {
+		return new ChangeRecord(index, requestParams, comment, resultId, updateTime);
+	}
+
+	private TargetResultChangePoint creatTargetResultChangePoint(TargetResult targetResult,
+			ScreenshotResultChangePoint screenshotResultChangePoint) {
+		return new TargetResultChangePoint(screenshotResultChangePoint, targetResult.getTarget().getSelector());
+	}
+
+	private ScreenshotResultChangePoint createScreenshotResultChangePoint(ScreenshotResult screenshotResult) {
+		return new ScreenshotResultChangePoint(screenshotResult.getScreenshotId(), screenshotResult.getTestClass(),
+				screenshotResult.getTestMethod(), screenshotResult.getCapabilities());
+	}
+
+	private boolean isMatchedScreenshot(Screenshot screenshot, ScreenshotResult screenshotResult) {
+		TestEnvironment testEnvironment = screenshot.getTestEnvironment();
+		Map<String, ?> capabilities = screenshotResult.getCapabilities();
+		// 各パラメータが一致しないものは変更記録の対象外とする。
+		if (!screenshot.getTestClass().equals(screenshotResult.getTestClass())) {
+			return false;
+		}
+		if (!screenshot.getTestMethod().equals(screenshotResult.getTestMethod())) {
+			return false;
+		}
+		if (!screenshot.getTestScreen().equals(screenshotResult.getScreenshotId())) {
+			return false;
+		}
+		if (testEnvironment.getPlatform() != null) {
+			if (capabilities.get("platform") == null) {
+				return false;
+			}
+			if (!testEnvironment.getPlatform().equals(capabilities.get("platform"))) {
+				return false;
+			}
+		}
+		if (!testEnvironment.getBrowserName().equals(capabilities.get("browserName"))) {
+			return false;
+		}
+
+		// バージョンについては、nullが入ることがあるため判定処理を別にしている。
+		String version = (String) capabilities.get("version");
+		if (testEnvironment.getBrowserVersion() == null && version == null) {
+			return true;
+		} else {
+			if (testEnvironment.getBrowserVersion() != null && version != null
+					&& testEnvironment.getBrowserVersion().equals(version)) {
+				return true;
+			} else {
+				return false;
+			}
+		}
+	}
+
+	private boolean isMatchedTarget(Target target, TargetResult targetResult) {
+		Area area = target.getArea();
+		IndexDomSelector selector = targetResult.getTarget().getSelector();
+		// 各パラメータが一致しないものは変更記録の対象外とする。
+		if (!area.getSelectorType().equals(selector.getType().name())
+				|| !area.getSelectorValue().equals(selector.getValue())
+				|| area.getSelectorIndex() != selector.getIndex()) {
+			return false;
+		}
+		return true;
+	}
+
+	private List<ChangeRecord> loadChangeLog(String resultId) {
+		List<ChangeRecord> changeRecordList = null;
+		File dir = new File(config.getResultDirectory(), resultId);
+		File file = new File(dir, "explorer-change-log.json");
+		if (!file.exists()) {
+			changeRecordList = new ArrayList<>();
+			return changeRecordList;
+		}
+
+		if (log.isDebugEnabled()) {
+			log.debug("[Load Changelog] ({})", file);
+		}
+		try {
+			changeRecordList = JSONUtils.readValue(file, new TypeReference<List<ChangeRecord>>() {
+			});
+		} catch (JSONException e) {
+			if (log.isDebugEnabled()) {
+				log.debug("Failed to load Changelog.", e);
+			}
+			throw e;
+		}
+		return changeRecordList;
+	}
+
+	private void saveChangelog(String resultId, List<ChangeRecord> changeRecordList) {
+		File dir = new File(config.getResultDirectory(), resultId);
+		File file = new File(dir, "explorer-change-log.json");
+		if (log.isDebugEnabled()) {
+			log.debug("[Save Changelog] ({})", file);
+		}
+		try {
+			JSONUtils.writeValueWithIndent(file, changeRecordList);
+		} catch (JSONException e) {
+			if (log.isDebugEnabled()) {
+				log.debug("Failed to save Changelog.", e);
+			}
+			throw e;
+		}
+	}
 }

@@ -4,10 +4,10 @@
 
 package com.htmlhifive.pitalium.explorer.service;
 
-import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import org.springframework.stereotype.Service;
 
 @Service
 public class ScreenshotIdServiceImpl implements ScreenshotIdService {
@@ -28,6 +28,11 @@ public class ScreenshotIdServiceImpl implements ScreenshotIdService {
 			throw new IllegalArgumentException();
 
 		return types.get(id);
+	}
+
+	@Override
+	public void clearTypes() {
+		types.clear();
 	}
 
 }

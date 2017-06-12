@@ -8,57 +8,62 @@
     <updateXml>true</updateXml>
     <warLocation></warLocation>
     <extraInfo></extraInfo>
+    <mavenClasspath>false</mavenClasspath>
     <webPath>pitalium-explorer</webPath>
     <webClassPathEntries>
         <webClassPathEntry>/pitalium-explorer/lib/antlr-2.7.7.jar</webClassPathEntry>
         <webClassPathEntry>/pitalium-explorer/lib/aopalliance-1.0.jar</webClassPathEntry>
-        <webClassPathEntry>/pitalium-explorer/lib/aspectjrt-1.8.4.jar</webClassPathEntry>
+        <webClassPathEntry>/pitalium-explorer/lib/aspectjrt-1.8.10.jar</webClassPathEntry>
         <webClassPathEntry>/pitalium-explorer/lib/cal10n-api-0.8.1.jar</webClassPathEntry>
-        <webClassPathEntry>/pitalium-explorer/lib/commons-dbcp2-2.1.jar</webClassPathEntry>
-        <webClassPathEntry>/pitalium-explorer/lib/commons-fileupload-1.3.1.jar</webClassPathEntry>
-        <webClassPathEntry>/pitalium-explorer/lib/commons-io-2.4.jar</webClassPathEntry>
-        <webClassPathEntry>/pitalium-explorer/lib/commons-lang3-3.3.2.jar</webClassPathEntry>
+        <webClassPathEntry>/pitalium-explorer/lib/classmate-1.3.0.jar</webClassPathEntry>
+        <webClassPathEntry>/pitalium-explorer/lib/commons-dbcp2-2.1.1.jar</webClassPathEntry>
+        <webClassPathEntry>/pitalium-explorer/lib/commons-fileupload-1.3.2.jar</webClassPathEntry>
+        <webClassPathEntry>/pitalium-explorer/lib/commons-io-2.5.jar</webClassPathEntry>
+        <webClassPathEntry>/pitalium-explorer/lib/commons-lang3-3.5.jar</webClassPathEntry>
         <webClassPathEntry>/pitalium-explorer/lib/commons-logging-1.2.jar</webClassPathEntry>
-        <webClassPathEntry>/pitalium-explorer/lib/commons-pool2-2.3.jar</webClassPathEntry>
+        <webClassPathEntry>/pitalium-explorer/lib/commons-pool2-2.4.2.jar</webClassPathEntry>
         <webClassPathEntry>/pitalium-explorer/lib/dom4j-1.6.1.jar</webClassPathEntry>
-        <webClassPathEntry>/pitalium-explorer/lib/guava-19.0.jar</webClassPathEntry>
+        <webClassPathEntry>/pitalium-explorer/lib/guava-21.0.jar</webClassPathEntry>
         <webClassPathEntry>/pitalium-explorer/lib/hamcrest-core-1.3.jar</webClassPathEntry>
-        <webClassPathEntry>/pitalium-explorer/lib/hibernate-commons-annotations-4.0.5.Final.jar</webClassPathEntry>
-        <webClassPathEntry>/pitalium-explorer/lib/hibernate-core-4.3.8.Final.jar</webClassPathEntry>
-        <webClassPathEntry>/pitalium-explorer/lib/hibernate-entitymanager-4.3.8.Final.jar</webClassPathEntry>
+        <webClassPathEntry>/pitalium-explorer/lib/hibernate-commons-annotations-5.0.1.Final.jar</webClassPathEntry>
+        <webClassPathEntry>/pitalium-explorer/lib/hibernate-core-5.2.9.Final.jar</webClassPathEntry>
+        <webClassPathEntry>/pitalium-explorer/lib/hibernate-entitymanager-5.2.9.Final.jar</webClassPathEntry>
         <webClassPathEntry>/pitalium-explorer/lib/hibernate-jpa-2.1-api-1.0.0.Final.jar</webClassPathEntry>
-        <webClassPathEntry>/pitalium-explorer/lib/hsqldb-2.3.2.jar</webClassPathEntry>
-        <webClassPathEntry>/pitalium-explorer/lib/jackson-annotations-2.6.0.jar</webClassPathEntry>
-        <webClassPathEntry>/pitalium-explorer/lib/jackson-core-2.6.3.jar</webClassPathEntry>
-        <webClassPathEntry>/pitalium-explorer/lib/jackson-databind-2.6.3.jar</webClassPathEntry>
-        <webClassPathEntry>/pitalium-explorer/lib/jandex-1.1.0.Final.jar</webClassPathEntry>
-        <webClassPathEntry>/pitalium-explorer/lib/javassist-3.18.1-GA.jar</webClassPathEntry>
-        <webClassPathEntry>/pitalium-explorer/lib/jboss-logging-3.1.3.GA.jar</webClassPathEntry>
-        <webClassPathEntry>/pitalium-explorer/lib/jboss-logging-annotations-1.2.0.Beta1.jar</webClassPathEntry>
-        <webClassPathEntry>/pitalium-explorer/lib/jboss-transaction-api_1.2_spec-1.0.0.Final.jar</webClassPathEntry>
-        <webClassPathEntry>/pitalium-explorer/lib/joda-time-2.8.1.jar</webClassPathEntry>
+        <webClassPathEntry>/pitalium-explorer/lib/hsqldb-2.3.4.jar</webClassPathEntry>
+        <webClassPathEntry>/pitalium-explorer/lib/jackson-annotations-2.8.0.jar</webClassPathEntry>
+        <webClassPathEntry>/pitalium-explorer/lib/jackson-core-2.8.7.jar</webClassPathEntry>
+        <webClassPathEntry>/pitalium-explorer/lib/jackson-databind-2.8.7.jar</webClassPathEntry>
+        <webClassPathEntry>/pitalium-explorer/lib/jandex-2.0.3.Final.jar</webClassPathEntry>
+        <webClassPathEntry>/pitalium-explorer/lib/javassist-3.20.0-GA.jar</webClassPathEntry>
+        <webClassPathEntry>/pitalium-explorer/lib/jboss-logging-3.3.0.Final.jar</webClassPathEntry>
+        <webClassPathEntry>/pitalium-explorer/lib/jboss-logging-annotations-2.0.2.Final.jar</webClassPathEntry>
+        <webClassPathEntry>/pitalium-explorer/lib/jboss-transaction-api_1.2_spec-1.0.1.Final.jar</webClassPathEntry>
+        <webClassPathEntry>/pitalium-explorer/lib/joda-time-2.9.9.jar</webClassPathEntry>
         <webClassPathEntry>/pitalium-explorer/lib/junit-4.12.jar</webClassPathEntry>
-        <webClassPathEntry>/pitalium-explorer/lib/log4j-api-2.4.1.jar</webClassPathEntry>
-        <webClassPathEntry>/pitalium-explorer/lib/log4j-core-2.4.1.jar</webClassPathEntry>
-        <webClassPathEntry>/pitalium-explorer/lib/log4j-slf4j-impl-2.4.1.jar</webClassPathEntry>
+        <webClassPathEntry>/pitalium-explorer/lib/log4j-api-2.8.1.jar</webClassPathEntry>
+        <webClassPathEntry>/pitalium-explorer/lib/log4j-core-2.8.1.jar</webClassPathEntry>
+        <webClassPathEntry>/pitalium-explorer/lib/log4j-slf4j-impl-2.8.1.jar</webClassPathEntry>
         <webClassPathEntry>/pitalium-explorer/lib/mockito-all-1.10.19.jar</webClassPathEntry>
-        <webClassPathEntry>/pitalium-explorer/lib/pitalium-1.1.0.jar</webClassPathEntry>
-        <webClassPathEntry>/pitalium-explorer/lib/selenium-api-2.50.1.jar</webClassPathEntry>
-        <webClassPathEntry>/pitalium-explorer/lib/slf4j-api-1.7.13.jar</webClassPathEntry>
-        <webClassPathEntry>/pitalium-explorer/lib/slf4j-ext-1.7.13.jar</webClassPathEntry>
-        <webClassPathEntry>/pitalium-explorer/lib/spring-aop-3.2.13.RELEASE.jar</webClassPathEntry>
-        <webClassPathEntry>/pitalium-explorer/lib/spring-beans-3.2.13.RELEASE.jar</webClassPathEntry>
-        <webClassPathEntry>/pitalium-explorer/lib/spring-context-3.2.13.RELEASE.jar</webClassPathEntry>
-        <webClassPathEntry>/pitalium-explorer/lib/spring-core-3.2.13.RELEASE.jar</webClassPathEntry>
-        <webClassPathEntry>/pitalium-explorer/lib/spring-data-commons-1.8.5.RELEASE.jar</webClassPathEntry>
-        <webClassPathEntry>/pitalium-explorer/lib/spring-data-jpa-1.6.5.RELEASE.jar</webClassPathEntry>
-        <webClassPathEntry>/pitalium-explorer/lib/spring-expression-3.2.13.RELEASE.jar</webClassPathEntry>
-        <webClassPathEntry>/pitalium-explorer/lib/spring-jdbc-3.2.13.RELEASE.jar</webClassPathEntry>
-        <webClassPathEntry>/pitalium-explorer/lib/spring-orm-3.2.13.RELEASE.jar</webClassPathEntry>
-        <webClassPathEntry>/pitalium-explorer/lib/spring-test-3.2.13.RELEASE.jar</webClassPathEntry>
-        <webClassPathEntry>/pitalium-explorer/lib/spring-tx-3.2.13.RELEASE.jar</webClassPathEntry>
-        <webClassPathEntry>/pitalium-explorer/lib/spring-web-3.2.13.RELEASE.jar</webClassPathEntry>
-        <webClassPathEntry>/pitalium-explorer/lib/spring-webmvc-3.2.13.RELEASE.jar</webClassPathEntry>
+        <webClassPathEntry>/pitalium-explorer/lib/pitalium-1.1.2.jar</webClassPathEntry>
+        <webClassPathEntry>/pitalium-explorer/lib/selenium-api-3.3.1.jar</webClassPathEntry>
+        <webClassPathEntry>/pitalium-explorer/lib/selenium-remote-driver-3.3.1.jar</webClassPathEntry>
+        <webClassPathEntry>/pitalium-explorer/lib/slf4j-api-1.7.25.jar</webClassPathEntry>
+        <webClassPathEntry>/pitalium-explorer/lib/slf4j-ext-1.7.25.jar</webClassPathEntry>
+        <webClassPathEntry>/pitalium-explorer/lib/spring-aop-4.3.7.RELEASE.jar</webClassPathEntry>
+        <webClassPathEntry>/pitalium-explorer/lib/spring-beans-4.3.7.RELEASE.jar</webClassPathEntry>
+        <webClassPathEntry>/pitalium-explorer/lib/spring-context-4.3.7.RELEASE.jar</webClassPathEntry>
+        <webClassPathEntry>/pitalium-explorer/lib/spring-core-4.3.7.RELEASE.jar</webClassPathEntry>
+        <webClassPathEntry>/pitalium-explorer/lib/spring-data-commons-1.13.1.RELEASE.jar</webClassPathEntry>
+        <webClassPathEntry>/pitalium-explorer/lib/spring-data-jpa-1.11.1.RELEASE.jar</webClassPathEntry>
+        <webClassPathEntry>/pitalium-explorer/lib/spring-expression-4.3.7.RELEASE.jar</webClassPathEntry>
+        <webClassPathEntry>/pitalium-explorer/lib/spring-jdbc-4.3.7.RELEASE.jar</webClassPathEntry>
+        <webClassPathEntry>/pitalium-explorer/lib/spring-orm-4.3.7.RELEASE.jar</webClassPathEntry>
+        <webClassPathEntry>/pitalium-explorer/lib/spring-test-4.3.7.RELEASE.jar</webClassPathEntry>
+        <webClassPathEntry>/pitalium-explorer/lib/spring-tx-4.3.7.RELEASE.jar</webClassPathEntry>
+        <webClassPathEntry>/pitalium-explorer/lib/spring-web-4.3.7.RELEASE.jar</webClassPathEntry>
+        <webClassPathEntry>/pitalium-explorer/lib/spring-webmvc-4.3.7.RELEASE.jar</webClassPathEntry>
+        <webClassPathEntry>/pitalium-explorer/lib/sqltool-2.3.4.jar</webClassPathEntry>
+        <webClassPathEntry>/pitalium-explorer/lib/validation-api-1.1.0.Final.jar</webClassPathEntry>
         <webClassPathEntry>/pitalium-explorer/src/main/webapp/WEB-INF/classes</webClassPathEntry>
         <webClassPathEntry>/pitalium-explorer/target/classes</webClassPathEntry>
     </webClassPathEntries>

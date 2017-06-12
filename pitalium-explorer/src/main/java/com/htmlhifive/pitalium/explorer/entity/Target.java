@@ -17,7 +17,7 @@ import javax.persistence.Transient;
 public class Target implements Serializable {
 
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 1L;
 
@@ -31,6 +31,8 @@ public class Target implements Serializable {
 	private String fileName;
 
 	private Boolean comparisonResult;
+
+	private Boolean isUpdated;
 
 	@Transient
 	private Area area;
@@ -87,6 +89,14 @@ public class Target implements Serializable {
 
 	public void setExcludeAreas(List<Area> excludeAreas) {
 		this.excludeAreas = excludeAreas;
+	}
+
+	public Boolean isUpdated() {
+		return isUpdated;
+	}
+
+	public void setIsUpdated(Boolean isUpdated) {
+		this.isUpdated = isUpdated;
 	}
 
 }

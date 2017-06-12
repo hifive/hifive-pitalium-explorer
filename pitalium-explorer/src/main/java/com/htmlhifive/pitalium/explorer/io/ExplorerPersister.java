@@ -8,43 +8,44 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-import com.htmlhifive.pitalium.explorer.service.ScreenshotIdService;
 import org.springframework.data.domain.Page;
-import org.springframework.http.ResponseEntity;
 
 import com.htmlhifive.pitalium.core.io.Persister;
+import com.htmlhifive.pitalium.explorer.changelog.ChangeRecord;
 import com.htmlhifive.pitalium.explorer.entity.Screenshot;
 import com.htmlhifive.pitalium.explorer.entity.Target;
 import com.htmlhifive.pitalium.explorer.entity.TestExecutionAndEnvironment;
 import com.htmlhifive.pitalium.explorer.image.ComparedRectangle;
-import com.htmlhifive.pitalium.explorer.response.Result;
+import com.htmlhifive.pitalium.explorer.request.ExecResultChangeRequest;
+import com.htmlhifive.pitalium.explorer.request.ScreenshotResultChangeRequest;
+import com.htmlhifive.pitalium.explorer.request.TargetResultChangeRequest;
 import com.htmlhifive.pitalium.explorer.response.ResultDirectory;
 import com.htmlhifive.pitalium.explorer.response.ResultListOfExpected;
-import com.htmlhifive.pitalium.explorer.response.ScreenshotFile;
 import com.htmlhifive.pitalium.explorer.response.TestExecutionResult;
+import com.htmlhifive.pitalium.explorer.service.ScreenshotIdService;
 
 public interface ExplorerPersister extends Persister {
 
 	int defaultPageSize = 20;
 
 	void setScreenshotIdService(ScreenshotIdService screenshotIdService);
-	
+
 	/**
 	 * Get the list of sub-directories under 'results' directory.
-	 * 
+	 *
 	 * @param searchTestMethod
 	 * @param searchTestScreen
 	 * @param page
 	 * @param pageSize
-	 * @param refresh 
+	 * @param refresh
 	 * @return Directories under 'results' folder
 	 */
 	Page<ResultDirectory> findResultDirectory(String searchTestMethod, String searchTestScreen, int page, int pageSize, boolean refresh);
-	
+
 	/**
 	 * Get the screenshot files under selected sub-directory of 'results' folder
-	 * 
-	 * @param name2 
+	 *
+	 * @param name2
 	 * @return Screenshot files under subdirectory of 'results' folder
 	 */
 	Map<String, List> findScreenshotFiles(String path, boolean refresh);
@@ -53,9 +54,10 @@ public interface ExplorerPersister extends Persister {
 	Map<String, byte[]> getImages(String expectedFilePath, String targetFilePath);
 	List<ComparedRectangle> getComparedResult(String path, int resultListId, int targetResultId);
 	String deleteResults(String path, int resultListId);
+
 	/**
 	 * TestExecutionのリストを取得する。 引数のメソッド名、スクリーンショットを含む（like検索）Screenshotを持つ TestExecutionのリストを取得する。
-	 * 
+	 *
 	 * @param searchTestMethod メソッド名
 	 * @param searchTestScreen スクリーンショット
 	 * @param page 表示ページ番号
@@ -63,11 +65,11 @@ public interface ExplorerPersister extends Persister {
 	 * @return TestExecutionのリスト
 	 */
 	Page<TestExecutionResult> findTestExecution(String searchTestMethod, String searchTestScreen, int page,
-			int pageSize);
+			int pageSize, String resultDirectoryKey);
 
 	/**
 	 * Screenshotのリストを取得する。 引数のメソッド名、スクリーンショットを含む（like検索）Screenshotのリストを取得する。
-	 * 
+	 *
 	 * @param testExecutionId テスト実行ID
 	 * @param searchTestMethod メソッド名
 	 * @param searchTestScreen スクリーンショット
@@ -77,7 +79,7 @@ public interface ExplorerPersister extends Persister {
 
 	/**
 	 * Screenshotを取得する。
-	 * 
+	 *
 	 * @param screenshotid スクリーンショットID
 	 * @return Screenshot
 	 */
@@ -85,7 +87,7 @@ public interface ExplorerPersister extends Persister {
 
 	/**
 	 * Targetを取得する。
-	 * 
+	 *
 	 * @param screenshotId スクリーンショットID
 	 * @param targetId 比較対象のID
 	 * @return Target
@@ -94,7 +96,7 @@ public interface ExplorerPersister extends Persister {
 
 	/**
 	 * 画像ファイルを取得する。
-	 * 
+	 *
 	 * @param screenshotId スクリーンショットID
 	 * @param targetId 比較対象のID
 	 * @return 画像ファイル
@@ -104,7 +106,7 @@ public interface ExplorerPersister extends Persister {
 
 	/**
 	 * Screenshotのリストを取得する。 引数のテスト実行ID、テスト環境IDと一致するScreenshotのリストを取得する。
-	 * 
+	 *
 	 * @param testExecutionId テスト実行ID
 	 * @param testEnvironmentId テスト環境ID
 	 * @param page 表示ページ番号
@@ -115,7 +117,7 @@ public interface ExplorerPersister extends Persister {
 
 	/**
 	 * TestExecutionAndEnvironmentのリストを取得する。
-	 * 
+	 *
 	 * @param page 表示ページ番号
 	 * @param pageSize 1ページあたりの表示数
 	 * @return TestExecutionAndEnviromentのリスト
@@ -132,8 +134,27 @@ public interface ExplorerPersister extends Persister {
 
 	void saveProcessedImage(Integer screenshotId, String algorithm, String edgeFileName);
 
+	/**
+	 * テスト全体の実行結果を更新する。
+	 *
+	 * @param inputModelList 変更内容のリスト
+	 * @return 変更記録のリスト
+	 */
+	List<ChangeRecord> updateExecResult(List<ExecResultChangeRequest> inputModelList);
 
+	/**
+	 * スクリーンショットの実行結果を更新する。
+	 *
+	 * @param inputModelList 変更内容のリスト
+	 * @return 変更記録のリスト
+	 */
+	List<ChangeRecord> updateScreenshotComparisonResult(List<ScreenshotResultChangeRequest> inputModelList);
 
-
-	
+	/**
+	 * 対象領域の実行結果を更新する。
+	 *
+	 * @param inputModelList 変更内容のリスト
+	 * @return 変更記録のリスト
+	 */
+	List<ChangeRecord> updateTargetComparisonResult(List<TargetResultChangeRequest> inputModelList);
 }

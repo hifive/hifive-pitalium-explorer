@@ -24,11 +24,11 @@
 	<link rel="stylesheet" href="src/common/common.css">
 	<link rel="stylesheet" href="src/fileDiff/fileDiff.css">
 
-	<script src="/hifive-res/ext/jquery/jquery-2.1.4.js"></script>
+	<script src="/hifive-res/ext/jquery/jquery-2.js"></script>
 	<script src="/hifive-res/ext/bootstrap/3.3.5/js/bootstrap.js"></script>
 	<script src="/hifive-res/ext/jqplugins/jstree/3.0.8/jstree.min.js"></script>
 	<script src="/hifive-res/fw/current/ejs-h5mod.js" data-h5-module="hifive:ejs"></script>
-	<script src="/hifive-res/fw/current/h5.dev.js" data-h5-module="hifive"></script>
+	<script src="/hifive-res/fw/current/h5.js" data-h5-module="hifive"></script>
 
 	<script src="lib/hifive-ui/DividedBox.js"></script>
 	<script src="lib/hifive-ui/popup.js"></script>
@@ -97,8 +97,20 @@
 <nav class="navbar navbar-default navbar-static-top">
 	<div class="container-fluid">
 		<div class="navbar-header">
+			<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+				<span class="sr-only">Toggle navigation</span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+			</button>
 			<a class="navbar-brand" href="list.html">Pitalium Explorer</a>
 		</div>
+		<div id="navbar" class="navbar-collapse collapse">
+			<ul class="nav navbar-nav">
+				<li><a href="list.html">Home</a></li>
+				<li class="active"><a href="fileDiff.html">Diff any images</a></li>
+			</ul>
+		</div><!--/.nav-collapse -->
 	</div>
 </nav>
 <!-- Navigation -->

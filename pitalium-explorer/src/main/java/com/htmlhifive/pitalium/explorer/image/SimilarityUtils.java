@@ -1,9 +1,8 @@
 package com.htmlhifive.pitalium.explorer.image;
 
-import java.awt.image.BufferedImage;
-import java.awt.Rectangle;
 import java.awt.Color;
-import java.lang.Math;
+import java.awt.Rectangle;
+import java.awt.image.BufferedImage;
 
 /**
  * Utility class to calculate similarity.

@@ -24,13 +24,15 @@
 		 */
 		_testResultDiffLogic: hifive.pitalium.explorer.logic.TestResultDiffLogic,
 
-		_screenshot:  {
+		_screenshot: {
 			'expected': null,
 			'actual': null
 		},
 		_comparisonResult: null,
 
 		_imageLoadDeferred: null,
+
+		_targetId: null,
 
 		/** original title */
 		_orgTitle: null,
@@ -128,6 +130,8 @@
 		},
 
 		_compareImages: function(targetId) {
+			this._targetId = targetId;
+
 			if (targetId !== null) {
 				this._screenshot.actual.targetId = targetId;
 				if (this._screenshot.expected != null) {
@@ -142,6 +146,7 @@
 							// Fire change event and show images.
 							this._setImage();
 							this.trigger('updateComparisonResult', {
+								targetId: targetId,
 								comparisonResult: comparisonResult
 							});
 						}));
@@ -153,6 +158,7 @@
 			// Fire change event and show images.
 			this._setImage();
 			this.trigger('updateComparisonResult', {
+				targetId: null,
 				comparisonResult: null
 			});
 		},
@@ -243,8 +249,10 @@
 
 		/**
 		 * @memberOf hifive.pitalium.explorer.controller.TestResultDiffController
-		 * @param {object} expected object which contains ID of expected image and ID the target area to be used for image comparison
-		 * @param {object} actual object which contains ID of actual image and ID the target area to be used for image comparison
+		 * @param {object} expected object which contains ID of expected image and ID the target
+		 *            area to be used for image comparison
+		 * @param {object} actual object which contains ID of actual image and ID the target area to
+		 *            be used for image comparison
 		 */
 		_initEdgeOverlapping: function(expected, actual) {
 			// Initialize <canvas>
