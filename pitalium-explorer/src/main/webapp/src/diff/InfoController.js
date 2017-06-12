@@ -90,7 +90,7 @@
 						draggable: true
 					});
 			popup.promise.done(doneHandler);
-			popup.setContentsSize(500, null);
+			popup.setContentsSize(600, null);
 			popup.show();
 		},
 
