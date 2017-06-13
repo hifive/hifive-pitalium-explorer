@@ -51,7 +51,6 @@ import com.htmlhifive.pitalium.explorer.io.ExplorerPersister;
 import com.htmlhifive.pitalium.explorer.request.ExecResultChangeRequest;
 import com.htmlhifive.pitalium.explorer.request.ScreenshotResultChangeRequest;
 import com.htmlhifive.pitalium.explorer.request.TargetResultChangeRequest;
-import com.htmlhifive.pitalium.explorer.response.ResultDirectory;
 import com.htmlhifive.pitalium.explorer.response.ResultListOfExpected;
 import com.htmlhifive.pitalium.explorer.response.TestExecutionResult;
 import com.htmlhifive.pitalium.image.model.DiffPoints;
@@ -94,11 +93,8 @@ public class ExplorerService implements Serializable {
 		return persisterService;
 	}
 
-	public Page<ResultDirectory> findResultDirectory(String searchTestMethod, String searchTestScreen, int page, int pageSize, boolean refresh){
-		return persisterService.findResultDirectory(searchTestMethod, searchTestScreen, page, pageSize, refresh);
-	}
-	public Map<String, List> findScreenshotFiles(String path, boolean refresh){
-		return persisterService.findScreenshotFiles(path, refresh);
+	public List<ResultListOfExpected> findScreenshotFiles(String path){
+		return persisterService.findScreenshotFiles(path);
 	}
 	public ResultListOfExpected executeComparing(String expectedFilePath, String[] targetFilePaths) {
 		return persisterService.executeComparing(expectedFilePath, targetFilePaths);

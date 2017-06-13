@@ -35,7 +35,6 @@ import com.htmlhifive.pitalium.explorer.image.ComparedRectangle;
 import com.htmlhifive.pitalium.explorer.request.ExecResultChangeRequest;
 import com.htmlhifive.pitalium.explorer.request.ScreenshotResultChangeRequest;
 import com.htmlhifive.pitalium.explorer.request.TargetResultChangeRequest;
-import com.htmlhifive.pitalium.explorer.response.ResultDirectory;
 import com.htmlhifive.pitalium.explorer.response.ResultListOfExpected;
 import com.htmlhifive.pitalium.explorer.response.TestExecutionResult;
 import com.htmlhifive.pitalium.explorer.service.ScreenshotIdService;
@@ -272,14 +271,7 @@ public class ExplorerDBPersister extends DBPersister implements ExplorerPersiste
 	}
 
 	@Override
-	public Page<ResultDirectory> findResultDirectory(String searchTestMethod, String searchTestScreen, int page,
-			int pageSize, boolean refresh) {
-		// TODO 自動生成されたメソッド・スタブ
-		return null;
-	}
-
-	@Override
-	public Map<String, List> findScreenshotFiles(String path, boolean refresh) {
+	public List<ResultListOfExpected> findScreenshotFiles(String path) {
 		// TODO 自動生成されたメソッド・スタブ
 		return null;
 	}

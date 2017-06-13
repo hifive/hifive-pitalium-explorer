@@ -28,7 +28,6 @@ import com.htmlhifive.pitalium.explorer.request.ChangeRequest;
 import com.htmlhifive.pitalium.explorer.request.ExecResultChangeRequest;
 import com.htmlhifive.pitalium.explorer.request.ScreenshotResultChangeRequest;
 import com.htmlhifive.pitalium.explorer.request.TargetResultChangeRequest;
-import com.htmlhifive.pitalium.explorer.response.ResultDirectory;
 import com.htmlhifive.pitalium.explorer.response.ResultListOfExpected;
 import com.htmlhifive.pitalium.explorer.response.TestExecutionResult;
 import com.htmlhifive.pitalium.explorer.service.ExplorerService;
@@ -41,27 +40,6 @@ public class ApiController {
 	private ExplorerService service;
 
 	/**
-	 * Gets list of sub-directories under 'results' directory with the comparison results information.
-	 * Parameters usage is same with listTestExecution API.
-	 *
-	 * @param page
-	 * @param pageSize
-	 * @param searchTestMethod
-	 * @param searchTestScreen
-	 * @return
-	 */
-	@RequestMapping(value = "_results/list", method = RequestMethod.GET, produces="application/json;charset=utf-8")
-	@ResponseBody
-	public ResponseEntity<Page<ResultDirectory>> getList(
-			@RequestParam(value = "page", defaultValue = "1") int page,
-			@RequestParam(value = "limit", defaultValue = "0") int pageSize,
-			@RequestParam(value = "searchTestMethod", defaultValue = "") String searchTestMethod,
-			@RequestParam(value = "searchTestScreen", defaultValue = "") String searchTestScreen,
-			@RequestParam(value = "refresh", defaultValue = "true") boolean refresh) {
-		Page<ResultDirectory> list = service.findResultDirectory(searchTestMethod, searchTestScreen, page, pageSize, refresh);
-		return new ResponseEntity<Page<ResultDirectory>>(list, HttpStatus.OK);
-	}
-	/**
 	 *
 	 * @param name
 	 * @param refresh
@@ -69,11 +47,11 @@ public class ApiController {
 	 */
 	@RequestMapping(value = "_screenshots/list", method = RequestMethod.GET, produces="application/json;charset=utf-8")
 	@ResponseBody
-	public ResponseEntity<Map<String, List>> getScreenshotFiles(
+	public ResponseEntity<List> getScreenshotFiles(
 			@RequestParam(value = "path", defaultValue = "0") String path,
 			@RequestParam(value = "refresh", defaultValue = "true") boolean refresh){
-		Map<String, List> map = service.findScreenshotFiles(path, refresh);
-		return new ResponseEntity<Map<String, List>>(map, HttpStatus.OK);
+		List<ResultListOfExpected> list = service.findScreenshotFiles(path);
+		return new ResponseEntity<List>(list, HttpStatus.OK);
 	}
 	/**
 	 *

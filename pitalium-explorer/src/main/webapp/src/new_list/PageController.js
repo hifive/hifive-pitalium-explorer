@@ -332,8 +332,7 @@
 
 		_appendComparisonResult: function(path, id) {
 			this._testResultListLogic.fetchScreenshotList(path, true).done(
-					this.own(function(data) {
-						var resultList = data.resultList;
+					this.own(function(resultList) {
 						for (var i = 0; i < resultList.length; i++) {
 							var result = resultList[i];
 							var tStamp = new Date(parseInt(result.executionTime));

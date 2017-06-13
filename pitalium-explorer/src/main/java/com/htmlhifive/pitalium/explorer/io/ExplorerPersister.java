@@ -19,7 +19,6 @@ import com.htmlhifive.pitalium.explorer.image.ComparedRectangle;
 import com.htmlhifive.pitalium.explorer.request.ExecResultChangeRequest;
 import com.htmlhifive.pitalium.explorer.request.ScreenshotResultChangeRequest;
 import com.htmlhifive.pitalium.explorer.request.TargetResultChangeRequest;
-import com.htmlhifive.pitalium.explorer.response.ResultDirectory;
 import com.htmlhifive.pitalium.explorer.response.ResultListOfExpected;
 import com.htmlhifive.pitalium.explorer.response.TestExecutionResult;
 import com.htmlhifive.pitalium.explorer.service.ScreenshotIdService;
@@ -31,24 +30,12 @@ public interface ExplorerPersister extends Persister {
 	void setScreenshotIdService(ScreenshotIdService screenshotIdService);
 
 	/**
-	 * Get the list of sub-directories under 'results' directory.
-	 *
-	 * @param searchTestMethod
-	 * @param searchTestScreen
-	 * @param page
-	 * @param pageSize
-	 * @param refresh
-	 * @return Directories under 'results' folder
-	 */
-	Page<ResultDirectory> findResultDirectory(String searchTestMethod, String searchTestScreen, int page, int pageSize, boolean refresh);
-
-	/**
 	 * Get the screenshot files under selected sub-directory of 'results' folder
 	 *
 	 * @param name2
 	 * @return Screenshot files under subdirectory of 'results' folder
 	 */
-	Map<String, List> findScreenshotFiles(String path, boolean refresh);
+	List<ResultListOfExpected> findScreenshotFiles(String path);
 
 	ResultListOfExpected executeComparing(String expectedFilePath, String[] targetFilePaths);
 	Map<String, byte[]> getImages(String expectedFilePath, String targetFilePath);
