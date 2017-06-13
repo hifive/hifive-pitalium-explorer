@@ -90,10 +90,39 @@
 		/**
 		 * Set scale.
 		 * 
+		 * @param {Number} scale magnifier scale.
 		 * @memberOf hifive.pitalium.explorer.controller.TestResultDiffController
 		 */
 		setScale: function(scale) {
 			this._scale = scale;
+		},
+
+		/**
+		 * Get scale.
+		 * 
+		 * @returns {Number} magnifier scale.
+		 * @memberOf hifive.pitalium.explorer.controller.TestResultDiffController
+		 */
+		getScale: function() {
+			return this._scale;
+		},
+
+		'.plus-scale-button click': function() {
+			var scale = this.getScale();
+			scale += 0.5;
+			if (scale <= 3.0) {
+				this.setScale(scale);
+				this.$find('.current-scale').text(scale.toFixed(1));
+			}
+		},
+
+		'.minus-scale-button click': function() {
+			var scale = this.getScale();
+			scale -= 0.5;
+			if (scale >= 0.5) {
+				this.setScale(scale);
+				this.$find('.current-scale').text(scale.toFixed(1));
+			}
 		},
 
 		/**
@@ -343,6 +372,8 @@
 							});
 						}
 					});
+
+			this.$find('.current-scale').text(this.getScale().toFixed(1));
 		},
 
 		/**
