@@ -34,6 +34,38 @@
 						this.view.update('#execution_list', 'screenshotListTemplate', {
 							executions: this._executionList
 						});
+
+						var that = this;
+						var $results = $('#detail .explorer-test-result');
+						$results.each(function(index, elem) {
+							var $tds = $(elem).find('td');
+							var screenshot = {
+								executionTime: $tds[0].textContent,
+								platform: $tds[4].textContent,
+								browserName: $tds[5].textContent,
+								browserVersion: $tds[6].textContent
+							};
+							if (screenshot.browserVersion === '') {
+								screenshot.browserVersion = null;
+							}
+
+							for (var i = 0, len = that._executionList.length; i < len; i++) {
+								var e = that._executionList[i];
+								if (screenshot.executionTime === e.executionTime
+										&& screenshot.platform === e.platform
+										&& screenshot.browserName === e.browserName
+										&& screenshot.browserVersion === e.browserVersion) {
+									var selector;
+									if (index === 0) {
+										selector = '.actual:eq(' + i + ')';
+									} else if (index === 1) {
+										selector = '.expected:eq(' + i + ')';
+									}
+									that.$find(selector).click();
+									break;
+								}
+							}
+						});
 					}));
 		},
 
@@ -66,6 +98,7 @@
 			var e = this._executionList[index];
 
 			var $actualExecution = this.$find('#actualExecution');
+			$actualExecution.data('actualExplorerIndex', index);
 			$actualExecution.attr('data-actual-explorer-index', index);
 			$actualExecution.find('.executionTime').text(e.executionTime);
 			$actualExecution.find('.platform').text(e.platform);
@@ -108,6 +141,7 @@
 			var e = this._executionList[index];
 
 			var $expectedExecution = this.$find('#expectedExecution');
+			$expectedExecution.data('expectedExplorerIndex', index);
 			$expectedExecution.attr('data-expected-explorer-index', index);
 			$expectedExecution.find('.executionTime').text(e.executionTime);
 			$expectedExecution.find('.platform').text(e.platform);
