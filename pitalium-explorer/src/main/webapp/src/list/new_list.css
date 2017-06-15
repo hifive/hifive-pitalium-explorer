@@ -66,6 +66,10 @@
 	color:#B3E5FC;
 }
 
+.background-pattern .menu {
+	margin-right: 0;
+}
+
 .compare_mode {
 	display: none;
 }
@@ -131,10 +135,6 @@
 
 .result_info:hover {
 	background-color:#ECEFF1;
-}
-
-.title_div{
-	border-bottom: 2px solid #E1F5FE;
 }
 
 .delete-btn {

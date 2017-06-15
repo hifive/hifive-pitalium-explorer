@@ -31,7 +31,16 @@ a {
 	padding-bottom: 15px;
 	padding-left:18px;
 	font-weight:300;
-	
+}
+
+.menu .dropdown {
+	padding: 5px;
+}
+
+.menu .dropdown a {
+	padding: 10px 13px;
+    border-radius: 10px;
+    background-color: white;
 }
 
 .footer {
@@ -68,4 +77,18 @@ a {
 .no-padding {
 	padding-left:0px;
 	padding-right:0px;
+}
+
+.title_div{
+	border-bottom: 2px solid #E1F5FE;
+}
+
+.title-label {
+	color: #039BE5;
+}
+
+.panel {
+	box-shadow: 0 2px 5px rgba(0,0,0,0.26);
+	border-radius: 0;
+	margin-bottom: 10px;
 }

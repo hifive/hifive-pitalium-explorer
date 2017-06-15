@@ -25,7 +25,15 @@
 <body>
 
 <div class="background-pattern">
-	<h2>Pitalium explorer</h2>
+	<ul class="nav navbar-nav navbar-right menu">
+		<li class="dropdown">
+			<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span class="glyphicon glyphicon-menu-hamburger"></span></a>
+			<ul class="dropdown-menu">
+				<li><a href="fileDiff.html">Compare any images</a></li>
+			</ul>
+		</li>
+	</ul>
+	<h2>Pitalium Explorer</h2>
 	<p>The best explorer to analyze the results of Pitalium.</p>
 </div>
 
@@ -34,70 +42,25 @@
 	<div class="container-fluid">
 		<div class="navbar-header" style="width:100%;">
 			<a class="navbar-brand" href="list.html">Pitalium explorer</a>
-
+			<ul class="nav navbar-nav navbar-right menu">
+				<li class="dropdown">
+					<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span class="glyphicon glyphicon-menu-hamburger"></span></a>
+					<ul class="dropdown-menu">
+						<li><a href="fileDiff.html">Compare any images</a></li>
+					</ul>
+				</li>
+			</ul>
 		</div>
 	</div>
 </nav>
 <!-- Navigation -->
 
-<div class="container col-md-8 col-md-offset-2 margin-top" id="container">
+<div class="container panel col-md-8 col-md-offset-2 margin-top" id="container">
 	<div class="title_div">
-		<h4 style="color: #039BE5;">Test results</h4>
-		<a href="/pitalium-explorer/new_list.html">
-			<p style="float:right; margin-top: -25px; color:#9E9E9E;">
-				<i class="glyphicon glyphicon-share-alt"></i> One-to-one comparison explorer
-			</p>
-		</a>
+		<h4 class="title-label">Test results</h4>
 	</div>
 
 	<div class="col-md-12" id="result_list"></div>
-
-</div>
-
-<!--
-  -- Maybe not used
-  --
-
-<div class="modal fade" id="diffDetail" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-	<div class="modal-dialog modal-lg" role="document">
-		<div class="modal-content">
-			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
-					aria-hidden="true">&times;</span></button>
-				<h4 class="modal-title" id="myModalLabel">Difference detail</h4>
-
-				<div>
-
-					<input type="checkbox" class="choice" id="checkbox_SHIFT" checked="checked" data-rectype="SHIFT"> Shift
-					<input type="checkbox" class="choice" id="checkbox_MISSING" checked="checked" data-rectype="MISSING"> Missing
-					<input type="checkbox" class="choice" id="checkbox_SCALING" checked="checked" data-rectype="SCALING"> Scale
-					<input type="checkbox" class="choice" id="checkbox_SIMILAR" checked="checked" data-rectype="SIMILAR"> Similar
-					<div style="width:200px;">
-						Diff region opacity control
-						<input id="opacity_range" type="range" min="0" max="1" step="0.1" value="0.3">
-					</div>
-
-				</div>
-
-			</div>
-
-			<div class="modal-body">
-				<div id="result_box">
-					<div id="test_result" style="position:relative;">
-					</div>
-				</div>
-			</div>
-
-		</div>
-	</div>
-</div>
-
- --
- --
- -->
-
-<div class="footer col-sm-12">
-	<p>Copyright (C) 2012-2016 NS Solutions Corporation, All Rights Reserved.</p>
 </div>
 
 <!-- Load scripts -->

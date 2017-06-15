@@ -296,6 +296,16 @@ html, body {
 .image-list .panel-heading {
 	padding-top: 8px;
 	padding-bottom: 8px;
+	color: white;
+    font-size: 12pt;
+}
+
+.image-list.expected .panel-heading {
+	background-color: #4747ff;
+}
+
+.image-list.actual .panel-heading {
+	background-color: #ff4a4a;
 }
 
 .btn-select-execution {
