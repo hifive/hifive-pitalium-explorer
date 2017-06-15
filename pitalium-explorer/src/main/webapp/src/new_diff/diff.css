@@ -1,0 +1,34 @@
+/*
+ * Copyright (C) 2015 NS Solutions Corporation, All Rights Reserved.
+ */
+
+@charset "utf-8";
+
+#memobox {
+	z-index: 1100;
+	padding: 15px;
+	display:none;
+	position:absolute;
+	background-color:#FFF9C4;
+	box-shadow: 0 2px 5px rgba(0,0,0,0.26);
+	color: #5D4037;
+	
+}
+
+.result_box {
+	overflow-x: scroll;
+	border: 3px solid #03A9F4;
+	
+}
+
+.diffDiv {
+	cursor: pointer;
+	border-radius: 5px;
+	border: 1px solid #b71c1c;
+	background-color: #d32f2f;
+	
+	position:absolute;
+	opacity:0.3;
+}
+
+			

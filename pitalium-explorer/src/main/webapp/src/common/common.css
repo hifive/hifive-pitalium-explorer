@@ -8,6 +8,12 @@ html {
 	min-height: 100%;
 }
 body {
+	font-family: "Roboto", arial, sans-serif;
+	background-color: #ECEFF1;
+}
+
+a {
+	cursor:pointer;
 }
 
 .footer {
@@ -39,4 +45,9 @@ body {
 .updated-mark {
 	font-size: 8pt;
 	color: #337ab7;
+}
+
+.no-padding {
+	padding-left:0px;
+	padding-right:0px;
 }

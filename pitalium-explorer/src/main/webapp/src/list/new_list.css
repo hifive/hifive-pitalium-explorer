@@ -3,11 +3,6 @@
  */
 
 @charset "utf-8";
-body {
-	font-family: "Roboto", arial, sans-serif;
-	background-color: #ECEFF1;
-	
-}
 
 #testExecutionList {
 	margin-top: 20px;
@@ -201,9 +196,7 @@ body {
 			.btn-run {
 				
 			}
-			a {
-				cursor:pointer;
-			}
+
 			.result_ul {
 			
 				
@@ -221,12 +214,7 @@ body {
 				border-bottom: 2px solid #E1F5FE;
 			}
 			
-			
-			
-			.no-padding {
-				padding-left:0px;
-				padding-right:0px;
-			}
+
 			.delete-btn {
 				color: #BDBDBD;
 			
