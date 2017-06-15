@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 NS Solutions Corporation, All Rights Reserved.
+ * Copyright (C) 2015-2017 NS Solutions Corporation, All Rights Reserved.
  */
 package com.htmlhifive.pitalium.explorer.api;
 
