@@ -16,6 +16,24 @@ a {
 	cursor:pointer;
 }
 
+.navbar-brand img {
+	height: 40px;
+}
+
+.navbar {
+	box-shadow: 0 2px 5px rgba(0,0,0,0.26);
+	background-color: #03A9F4;
+}
+.navbar-brand {
+	color: white;
+	text-shadow: none;
+	padding-top: 15px;
+	padding-bottom: 15px;
+	padding-left:18px;
+	font-weight:300;
+	
+}
+
 .footer {
 	position: absolute;
 	bottom: 0;
