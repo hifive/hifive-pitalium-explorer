@@ -1,5 +1,13 @@
 /*
- * Copyright (C) 2015 NS Solutions Corporation, All Rights Reserved.
+ * Copyright (C) 2015-2017 NS Solutions Corporation
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package com.htmlhifive.pitalium.explorer.io;
 
@@ -7,8 +15,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-
-import org.springframework.data.domain.Page;
 
 import com.htmlhifive.pitalium.core.io.Persister;
 import com.htmlhifive.pitalium.explorer.changelog.ChangeRecord;
@@ -21,7 +27,6 @@ import com.htmlhifive.pitalium.explorer.request.TargetResultChangeRequest;
 import com.htmlhifive.pitalium.explorer.response.ResultListOfExpected;
 import com.htmlhifive.pitalium.explorer.response.TestExecutionResult;
 import com.htmlhifive.pitalium.explorer.service.ScreenshotIdService;
-import com.htmlhifive.pitalium.image.model.ComparedRectangleArea;
 
 public interface ExplorerPersister extends Persister {
 

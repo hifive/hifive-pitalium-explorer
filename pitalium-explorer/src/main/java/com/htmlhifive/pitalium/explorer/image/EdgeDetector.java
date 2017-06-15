@@ -1,5 +1,13 @@
 /*
- * Copyright (C) 2015 NS Solutions Corporation, All Rights Reserved.
+ * Copyright (C) 2015-2017 NS Solutions Corporation
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package com.htmlhifive.pitalium.explorer.image;
 
@@ -200,7 +208,7 @@ public class EdgeDetector {
 
 	/**
 	 * Get sigma
-	 * 
+	 *
 	 * @return current sigma value
 	 */
 	public double getSigma() {
@@ -209,7 +217,7 @@ public class EdgeDetector {
 
 	/**
 	 * Set sigma for gaussian filter.
-	 * 
+	 *
 	 * @param sigma sigma value
 	 */
 	public void setSigma(double sigma) {
@@ -220,7 +228,7 @@ public class EdgeDetector {
 
 	/**
 	 * Set threshold value. The proper range for thresholds is [0, 1].
-	 * 
+	 *
 	 * @param thresholdHigh threshold value for strong edge.
 	 * @param thresholdLow threshold value for weak edge.
 	 */

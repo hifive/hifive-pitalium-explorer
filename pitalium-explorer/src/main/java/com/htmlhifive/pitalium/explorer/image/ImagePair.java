@@ -1,3 +1,14 @@
+/*
+ * Copyright (C) 2015-2017 NS Solutions Corporation
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.htmlhifive.pitalium.explorer.image;
 
 import java.awt.Rectangle;
@@ -6,18 +17,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.htmlhifive.pitalium.image.model.CompareOption;
-import com.htmlhifive.pitalium.image.model.ComparedRectangleArea;
-import com.htmlhifive.pitalium.image.model.ComparisonParameters;
-import com.htmlhifive.pitalium.image.model.DefaultComparisonParameters;
 import com.htmlhifive.pitalium.image.model.DiffPoints;
-import com.htmlhifive.pitalium.image.model.ImageComparedResult;
-import com.htmlhifive.pitalium.image.model.ObjectGroup;
-import com.htmlhifive.pitalium.image.model.Offset;
-import com.htmlhifive.pitalium.image.model.SimilarityUnit;
-import com.htmlhifive.pitalium.image.model.ThresholdComparisonParameters;
 import com.htmlhifive.pitalium.image.util.ImageComparatorFactory;
 import com.htmlhifive.pitalium.image.util.ImageUtils;
-import com.htmlhifive.pitalium.image.util.SimilarityUtils;
 
 public class ImagePair {
 
