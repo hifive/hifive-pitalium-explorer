@@ -53,11 +53,11 @@
 			this._initialize();
 		},
 
-		'#result_box scroll': function() {
+		'#result_box [scroll]': function() {
 			this._$expectedBox.scrollLeft(this._$resultBox.scrollLeft());
 		},
 
-		'#expected_box scroll': function() {
+		'#expected_box [scroll]': function() {
 			this._$resultBox.scrollLeft(this._$expectedBox.scrollLeft());
 		},
 
