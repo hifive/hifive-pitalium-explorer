@@ -163,8 +163,8 @@
 							<li id="update_result"><a href="">Update Result</a>
 						</ul>
 					</div>
-					<h4 class="panel-title">
-						<a data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="false">
+					<h4 class="panel-title row">
+						<a class="col-xs-11" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="false">
 							Result Information
 							<span id="comparisonResult"></span>
 						</a>
@@ -176,7 +176,6 @@
 						<div id="detail"></div>
 					</div>
 				</div>
-<<<<<<< HEAD
 				<div id="popup_contents" style="display:none">
 					<div id="execution_popup">
 						<div id="execution_list"></div>
@@ -346,6 +345,15 @@
 	  										<span class="expected legend">EXPECTED</span>
 	  										<span class="actual legend">ACTUAL</span>
 	  									</div>
+											<div class="pull-right" style="position: relative;">
+												<button type="button" class="minus-scale-button btn btn-xs" style="background-color: white;">
+													<i class="glyphicon glyphicon-zoom-out"></i>
+												</button>
+												<span class="current-scale"></span>
+												<button type="button" class="plus-scale-button btn btn-xs" style="background-color: white;">
+													<i class="glyphicon glyphicon-zoom-in"></i>
+												</button>
+											</div>
 	  								</div>
 	  								<div class="row">
 	  									<div class="col-xs-12 image-diff image-overlay">
@@ -355,31 +363,6 @@
 	  								</div>
 	  							</div>
 	  						</div>
-						</div>
-						<div id="popup_content" style="display:none">
-							<div id="execution_list"></div>
-							<div>
-								<table class="table">
-									<tr id="actualExecution">
-										<td><button class="actual btn btn-danger btn-sm" style="float: left;">Actual</button></td>
-										<td id="executionTime"></td>
-										<td id="platform"></td>
-										<td id="browserName"></td>
-										<td id="browserVersion"></td>
-									</tr>
-									<tr id="expectedExecution">
-										<td><button class="expected btn btn-info btn-sm" style="float: left;">Expected</button></td>
-										<td id="executionTime"></td>
-										<td id="platform"></td>
-										<td id="browserName"></td>
-										<td id="browserVersion"></td>
-									</tr>
-								</table>
-							</div>
-							<div>
-								<button class="cancel btn btn-primary">Cancel</button>
-								<button class="ok btn btn-primary" style="display:none">Select</button>
-							</div>
 						</div>
 					</div>
 				</div>
