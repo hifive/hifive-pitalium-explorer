@@ -122,6 +122,10 @@
 			var expected = queryParams.expected; //expected image path
 			var target = queryParams.target; //target image path
 
+			var $imageLabels = this.$find('.image-label');
+			$imageLabels.filter('.expected').text(expected.split('/')[2]);
+			$imageLabels.filter('.result').text(target.split('/')[2]);
+
 			var resultListId = queryParams.list_id; //result list id
 			var targetResultId = queryParams.result_id; //result_id in result list
 			var directory = queryParams.directory; //result directory

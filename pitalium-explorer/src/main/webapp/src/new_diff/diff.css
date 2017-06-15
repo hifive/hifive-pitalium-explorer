@@ -31,4 +31,16 @@
 	opacity:0.3;
 }
 
-			
+.image-label {
+	font-size: 14pt;
+	color: #ffffff;
+	text-align: center;
+}
+
+.image-label.expected {
+	background-color: blue;
+}
+
+.image-label.result {
+	background-color: red;
+}
