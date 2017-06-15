@@ -8,6 +8,39 @@ html {
 	min-height: 100%;
 }
 body {
+	font-family: "Roboto", arial, sans-serif;
+	background-color: #ECEFF1;
+}
+
+a {
+	cursor:pointer;
+}
+
+.navbar-brand img {
+	height: 40px;
+}
+
+.navbar {
+	box-shadow: 0 2px 5px rgba(0,0,0,0.26);
+	background-color: #03A9F4;
+}
+.navbar-brand {
+	color: white;
+	text-shadow: none;
+	padding-top: 15px;
+	padding-bottom: 15px;
+	padding-left:18px;
+	font-weight:300;
+}
+
+.menu .dropdown {
+	padding: 5px;
+}
+
+.menu .dropdown a {
+	padding: 10px 13px;
+    border-radius: 10px;
+    background-color: white;
 }
 
 .footer {
@@ -39,4 +72,23 @@ body {
 .updated-mark {
 	font-size: 8pt;
 	color: #337ab7;
+}
+
+.no-padding {
+	padding-left:0px;
+	padding-right:0px;
+}
+
+.title_div{
+	border-bottom: 2px solid #E1F5FE;
+}
+
+.title-label {
+	color: #039BE5;
+}
+
+.panel {
+	box-shadow: 0 2px 5px rgba(0,0,0,0.26);
+	border-radius: 0;
+	margin-bottom: 10px;
 }

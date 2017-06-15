@@ -12,7 +12,10 @@
 	<meta http-equiv="Cache-Control" content="no-cache">
 	<meta http-equiv="Expires" content="-1">
 
-	<title>Test results - Pitalium Explorer</title>
+	<title>Compare Images - Pitalium Explorer</title>
+
+	<link rel="shortcut icon" href="res/img/favicon.ico">
+	
 	<link rel="stylesheet" href="/hifive-res/ext/bootstrap/3.3.5/css/bootstrap.min.css">
 	<link rel="stylesheet" href="/hifive-res/ext/bootstrap/3.3.5/css/bootstrap-theme.min.css">
 	<link rel="stylesheet" href="/hifive-res/ext/jqplugins/jstree/3.0.8/themes/default/style.min.css">
@@ -94,7 +97,7 @@
 <body>
 
 <!-- Navigation -->
-<nav class="navbar navbar-default navbar-static-top">
+<nav class="navbar navbar-static-top">
 	<div class="container-fluid">
 		<div class="navbar-header">
 			<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
@@ -105,12 +108,14 @@
 			</button>
 			<a class="navbar-brand" href="list.html">Pitalium Explorer</a>
 		</div>
-		<div id="navbar" class="navbar-collapse collapse">
-			<ul class="nav navbar-nav">
-				<li><a href="list.html">Home</a></li>
-				<li class="active"><a href="fileDiff.html">Diff any images</a></li>
-			</ul>
-		</div><!--/.nav-collapse -->
+		<ul class="nav navbar-nav navbar-right menu">
+			<li class="dropdown">
+				<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span class="glyphicon glyphicon-menu-hamburger"></span></a>
+				<ul class="dropdown-menu">
+					<li><a href="new_list.html">Home</a></li>
+				</ul>
+			</li>
+		</ul>
 	</div>
 </nav>
 <!-- Navigation -->
@@ -123,7 +128,7 @@
 		<!-- List -->
 		<div id="imageListContainer" class="autoSize">
 			<div class="image-list expected">
-				<div class="panel panel-primary">
+				<div class="panel">
 					<div class="panel-heading">
 						<span>EXPECTED</span>
 						<button type="button" class="btn-select-execution btn btn-sm btn-info small">Executions</button>
@@ -136,7 +141,7 @@
 				</div>
 			</div>
 			<div class="image-list actual">
-				<div class="panel panel-danger">
+				<div class="panel">
 					<div class="panel-heading">
 						<span>ACTUAL</span>
 						<button type="button" class="btn-select-execution btn btn-sm btn-info small">Executions</button>

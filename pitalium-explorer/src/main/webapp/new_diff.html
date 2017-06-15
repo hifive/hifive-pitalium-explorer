@@ -1,0 +1,145 @@
+<!doctype html>
+<!--Copyright (C) 2015 NS Solutions Corporation, All Rights Reserved.  -->
+<html>
+<head>
+
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+	<meta http-equiv="Pragma" content="no-cache">
+	<meta http-equiv="Cache-Control" content="no-cache">
+	<meta http-equiv="Expires" content="-1">
+
+	<title>Comparison results - Pitalium Explorer</title>
+
+	<link rel="shortcut icon" href="res/img/favicon.ico">
+
+	<link rel="stylesheet" href="/hifive-res/ext/bootstrap/3.3.6/css/bootstrap.css">
+	<link rel="stylesheet" href="/hifive-res/fw/current/h5.css" data-h5-module="hifive">
+	<link rel="stylesheet" href="src/common/common.css">
+	<link rel="stylesheet" href="src/new_diff/diff.css">
+	<link rel="stylesheet" href="lib/jquery-ui/jquery-ui.css">
+	<link rel="stylesheet" href="lib/rangeslider/rangeslider.css">
+
+</head>
+<body>
+
+
+<!-- Navigation -->
+<nav class="navbar navbar-fixed-top">
+	<div class="container-fluid">
+		<div class="navbar-header" style="width:100%;">
+			<a class="navbar-brand" href="new_list.html">Pitalium Explorer</a>
+
+			<div style="width:280px; height:50px; float:left;">
+				<div class="dropdown" style="margin-top:8px; margin-left:20px;">
+					<button class="btn btn-default dropdown-toggle" style="color:#009688;" type="button" id="dropdownMenu1"
+									data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+						Show differences by category
+						<span class="caret"></span>
+					</button>
+					<ul class="dropdown-menu " aria-labelledby="dropdownMenu1">
+						<li>
+							<a class="click_prevent">
+								<input type="checkbox" class="choice" id="checkbox_SHIFT" checked="checked" data-rectype="SHIFT">
+								<span style="margin-left:10px;">Shift</span>
+							</a>
+						</li>
+						<li>
+							<a class="click_prevent">
+								<input type="checkbox" class="choice" id="checkbox_MISSING" checked="checked" data-rectype="MISSING">
+								<span style="margin-left:10px;">Missing</span>
+							</a>
+						</li>
+						<li>
+							<a class="click_prevent">
+								<input type="checkbox" class="choice" id="checkbox_SCALING" checked="checked" data-rectype="SCALING">
+								<span style="margin-left:10px;">Object size</span>
+							</a>
+						</li>
+						<li>
+							<a class="click_prevent">
+								<input type="checkbox" class="choice" id="checkbox_FONT" checked="checked" data-rectype="FONT">
+								<span style="margin-left:10px;">Font style</span>
+							</a>
+						</li>
+						<li>
+							<a class="click_prevent">
+								<input type="checkbox" class="choice" id="checkbox_SIMILAR" checked="checked" data-rectype="SIMILAR">
+								<span style="margin-left:10px;">Ambiguous</span>
+							</a>
+						</li>
+					</ul>
+
+				</div>
+
+			</div>
+			<div style="width:180px; float:left">
+				<p style="margin-top:8px; margin-bottom:2px; color:#455A64;">Diff region opacity control</p>
+				<input id="opacity_range" type="range" min="0" max="1" step="0.1" value="0.3">
+			</div>
+			<div style="width:180px; float:left; margin-left:20px;">
+				<p style="margin-top:8px; margin-bottom:2px; color:#455A64;">Image size control</p>
+				<input id="img_size" type="range" min="0" max="3" step="0.1" value="1">
+			</div>
+			<div style="width:180px; float:left; margin-left:20px;">
+				<p style="margin-top:8px; margin-bottom:2px; color:#455A64;">Importance control</p>
+				<input id="importance" type="range" min="0" max="1" step="0.01" value="1">
+			</div>
+			<ul class="nav navbar-nav navbar-right menu">
+				<li class="dropdown">
+					<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span class="glyphicon glyphicon-menu-hamburger"></span></a>
+					<ul class="dropdown-menu">
+						<li><a href="new_list.html">Home</a></li>
+						<li><a href="fileDiff.html">Compare any images</a></li>
+					</ul>
+				</li>
+			</ul>
+		</div>
+
+	</div>
+
+</nav>
+<!-- Navigation -->
+
+<div style="height:75px;"></div>
+
+<div class="col-xs-6 col-sm-6 col-md-6 no-padding" id="container">
+	<div class="image-diff image-label expected">
+		<div class="image-label">EXPECTED</div>
+	</div>
+	<div class="result_box" id="expected_box">
+		<div class="test_result screenshot" id="test_expected" style="position:relative;"></div>
+	</div>
+
+</div>
+
+<div class="col-xs-6 col-sm-6 col-md-6 no-padding">
+	<div class="image-diff image-label result">ACTUAL</div>
+	<div class="result_box" id="result_box">
+		<div class="test_result screenshot" id="test_result" style="position:relative;"></div>
+	</div>
+
+	<div class="col-md-12"></div>
+
+</div>
+
+<div id="memobox"></div>
+
+<script src="/hifive-res/ext/jquery/jquery-2.js"></script>
+<script src="/hifive-res/ext/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+<script src="lib/jquery-ui/jquery-ui.js"></script>
+<script src="lib/jquery-kinetic/jquery.kinetic.js"></script>
+<script src="/hifive-res/fw/current/ejs-h5mod.js" data-h5-module="hifive:ejs"></script>
+<script src="/hifive-res/fw/current/h5.dev.js" data-h5-module="hifive"></script>
+
+<script src="src/common/constant.js"></script>
+<script src="src/common/util.js"></script>
+<script src="lib/rangeslider/rangeslider.js"></script>
+
+<script src="src/new_diff/PageLogic.js"></script>
+<script src="src/new_diff/PageController.js"></script>
+<script src="src/new_diff/init.js"></script>
+
+</body>
+</html>

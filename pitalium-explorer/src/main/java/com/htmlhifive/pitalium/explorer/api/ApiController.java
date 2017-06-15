@@ -3,7 +3,9 @@
  */
 package com.htmlhifive.pitalium.explorer.api;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -25,8 +27,10 @@ import com.htmlhifive.pitalium.explorer.request.ChangeRequest;
 import com.htmlhifive.pitalium.explorer.request.ExecResultChangeRequest;
 import com.htmlhifive.pitalium.explorer.request.ScreenshotResultChangeRequest;
 import com.htmlhifive.pitalium.explorer.request.TargetResultChangeRequest;
+import com.htmlhifive.pitalium.explorer.response.ResultListOfExpected;
 import com.htmlhifive.pitalium.explorer.response.TestExecutionResult;
 import com.htmlhifive.pitalium.explorer.service.ExplorerService;
+import com.htmlhifive.pitalium.image.model.ComparedRectangleArea;
 
 @Scope(scopeName=WebApplicationContext.SCOPE_SESSION)
 @Controller
@@ -34,6 +38,71 @@ public class ApiController {
 
 	@Autowired
 	private ExplorerService service;
+
+	/**
+	 *
+	 * @param name
+	 * @param refresh
+	 * @return
+	 */
+	@RequestMapping(value = "_screenshots/list", method = RequestMethod.GET, produces="application/json;charset=utf-8")
+	@ResponseBody
+	public ResponseEntity<List> getScreenshotFiles(
+			@RequestParam(value = "path", defaultValue = "0") String path,
+			@RequestParam(value = "refresh", defaultValue = "true") boolean refresh){
+		List<ResultListOfExpected> list = service.findScreenshotFiles(path);
+		return new ResponseEntity<List>(list, HttpStatus.OK);
+	}
+	/**
+	 *
+	 * @param directoryName
+	 * @param expectedFilename
+	 * @param targetFilenames
+	 * @return
+	 */
+	@RequestMapping(value = "_screenshots/compare", method = RequestMethod.POST, produces="application/json;charset=utf-8")
+	@ResponseBody
+	public ResponseEntity<ResultListOfExpected> executeComparing(
+			@RequestParam(value = "expected", defaultValue = "") String expectedFilePath,
+			@RequestParam(value = "targets", defaultValue = "") String[] targetFilePaths
+			){
+		ResultListOfExpected resultListOfExpected = service.executeComparing(expectedFilePath, targetFilePaths);
+		return new ResponseEntity<ResultListOfExpected>(resultListOfExpected, HttpStatus.OK);
+	}
+
+	@RequestMapping(value = "_screenshots/images", method = RequestMethod.GET, produces="application/json;charset=utf-8")
+	@ResponseBody
+	public ResponseEntity<Map<String, byte[]>> getImages(
+			@RequestParam(value = "expected", defaultValue = "") String expectedFilePath,
+			@RequestParam(value = "target", defaultValue = "") String targetFilePath
+			){
+		Map<String, byte[]> map = service.getImages(expectedFilePath, targetFilePath);
+		return new ResponseEntity<Map<String, byte[]>>(map, HttpStatus.OK);
+	}
+
+	@RequestMapping(value = "_screenshots/result", method = RequestMethod.GET, produces="application/json;charset=utf-8")
+	@ResponseBody
+	public ResponseEntity<List<ComparedRectangleArea>> getComparedResult(
+			@RequestParam(value = "path", defaultValue = "") String path,
+			@RequestParam(value = "resultListId", defaultValue = "") int resultListId,
+			@RequestParam(value = "targetResultId", defaultValue = "") int targetResultId
+			){
+		List<ComparedRectangleArea> list = service.getComparedResult(path, resultListId, targetResultId);
+		return new ResponseEntity<List<ComparedRectangleArea>>(list, HttpStatus.OK);
+	}
+
+	@RequestMapping(value = "_screenshots/delete", method = RequestMethod.GET, produces="application/json;charset=utf-8")
+	@ResponseBody
+	public ResponseEntity<List<String>> deleteResults(
+			@RequestParam(value = "path", defaultValue = "") String path,
+			@RequestParam(value = "resultListId", defaultValue = "") int resultListId
+			){
+
+		String result = service.deleteResults(path, resultListId);
+		List<String> list = new ArrayList<String>();
+		list.add(result);
+		return new ResponseEntity<List<String>>(list, HttpStatus.OK);
+	}
 
 	/**
 	 * Gets list of the test execution. If pageSize equals to zero, the default page size is used. If pageSize equals to

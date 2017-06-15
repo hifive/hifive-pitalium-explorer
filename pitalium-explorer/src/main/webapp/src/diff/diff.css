@@ -15,11 +15,18 @@ body {
 
 #list {
 	width: 15%;
+	margin-right: 5px;
+}
+
+#container {
+	padding: 0 5px;
 }
 
 #main {
 	width: 80%;
 	height: auto;
+	margin-left: 5px;
+
 }
 
 .box {
@@ -54,11 +61,6 @@ body {
 }
 
 /* detail area */
-#main .panel-heading {
-	padding-top: 9px;
-	padding-bottom: 9px;
-}
-
 .legend {
 	vertical-align: top;
 }

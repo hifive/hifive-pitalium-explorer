@@ -18,6 +18,12 @@ public class FileUtility {
 	public FileUtility(Repositories repositories) {
 		this.repositories = repositories;
 	}
+	
+	public static String getPairResultFilename(String expectedFilePath, String targetFilePath, int id){
+		return expectedFilePath.replace("/", "--") + "__" +
+			   targetFilePath.replace("/",  "--") + "__" +
+			   Integer.toString(id) + ".json";
+	}
 
 	/**
 	 * Convert relativePath from DB into absolute path

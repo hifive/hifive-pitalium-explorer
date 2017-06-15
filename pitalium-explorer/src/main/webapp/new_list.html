@@ -1,0 +1,83 @@
+<!doctype html>
+<!--Copyright (C) 2015 NS Solutions Corporation, All Rights Reserved.  -->
+<html>
+<head>
+
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+	<meta http-equiv="Pragma" content="no-cache">
+	<meta http-equiv="Cache-Control" content="no-cache">
+	<meta http-equiv="Expires" content="-1">
+
+	<title>Test results - Pitalium Explorer</title>
+
+	<link rel="shortcut icon" href="res/img/favicon.ico">
+
+	<link rel="stylesheet" href="/hifive-res/ext/bootstrap/3.3.6/css/bootstrap.css">
+	<link rel="stylesheet" href="/hifive-res/fw/current/h5.css" data-h5-module="hifive">
+	<link rel="stylesheet" href="src/common/common.css">
+	<link rel="stylesheet" href="src/list/new_list.css">
+	<link rel="stylesheet" href="lib/jquery-ui/jquery-ui.css">
+	<link rel="stylesheet" href="lib/rangeslider/rangeslider.css">
+
+</head>
+<body>
+
+<div class="background-pattern">
+	<ul class="nav navbar-nav navbar-right menu">
+		<li class="dropdown">
+			<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span class="glyphicon glyphicon-menu-hamburger"></span></a>
+			<ul class="dropdown-menu">
+				<li><a href="fileDiff.html">Compare any images</a></li>
+			</ul>
+		</li>
+	</ul>
+	<h2>Pitalium Explorer</h2>
+	<p>The best explorer to analyze the results of Pitalium.</p>
+</div>
+
+<!-- Navigation -->
+<nav class="navbar navbar-fixed-top" style="display:none;">
+	<div class="container-fluid">
+		<div class="navbar-header" style="width:100%;">
+			<a class="navbar-brand" href="list.html">Pitalium explorer</a>
+			<ul class="nav navbar-nav navbar-right menu">
+				<li class="dropdown">
+					<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span class="glyphicon glyphicon-menu-hamburger"></span></a>
+					<ul class="dropdown-menu">
+						<li><a href="fileDiff.html">Compare any images</a></li>
+					</ul>
+				</li>
+			</ul>
+		</div>
+	</div>
+</nav>
+<!-- Navigation -->
+
+<div class="container panel col-md-8 col-md-offset-2 margin-top" id="container">
+	<div class="title_div">
+		<h4 class="title-label">Test results</h4>
+	</div>
+
+	<div class="col-md-12" id="result_list"></div>
+</div>
+
+<!-- Load scripts -->
+<script src="/hifive-res/ext/jquery/jquery-2.js"></script>
+<script src="/hifive-res/ext/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+<script src="lib/jquery-ui/jquery-ui.js"></script>
+<script src="lib/jquery-kinetic/jquery.kinetic.js"></script>
+<script src="/hifive-res/fw/current/ejs-h5mod.js" data-h5-module="hifive:ejs"></script>
+<script src="/hifive-res/fw/current/h5.dev.js" data-h5-module="hifive"></script>
+
+<script src="src/common/constant.js"></script>
+<script src="src/common/util.js"></script>
+<script src="lib/rangeslider/rangeslider.js"></script>
+
+<script src="src/new_list/PageLogic.js"></script>
+<script src="src/new_list/PageController.js"></script>
+<script src="src/new_list/init.js"></script>
+
+</body>
+</html>

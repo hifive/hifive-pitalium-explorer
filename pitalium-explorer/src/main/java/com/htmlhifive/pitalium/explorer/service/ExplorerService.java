@@ -50,7 +50,9 @@ import com.htmlhifive.pitalium.explorer.io.ExplorerPersister;
 import com.htmlhifive.pitalium.explorer.request.ExecResultChangeRequest;
 import com.htmlhifive.pitalium.explorer.request.ScreenshotResultChangeRequest;
 import com.htmlhifive.pitalium.explorer.request.TargetResultChangeRequest;
+import com.htmlhifive.pitalium.explorer.response.ResultListOfExpected;
 import com.htmlhifive.pitalium.explorer.response.TestExecutionResult;
+import com.htmlhifive.pitalium.image.model.ComparedRectangleArea;
 import com.htmlhifive.pitalium.image.model.DiffPoints;
 import com.htmlhifive.pitalium.image.util.ImageUtils;
 
@@ -90,6 +92,27 @@ public class ExplorerService implements Serializable {
 	public ExplorerPersister getExplorerPersister() {
 		return persisterService;
 	}
+
+	public List<ResultListOfExpected> findScreenshotFiles(String path){
+		return persisterService.findScreenshotFiles(path);
+	}
+	public ResultListOfExpected executeComparing(String expectedFilePath, String[] targetFilePaths) {
+		return persisterService.executeComparing(expectedFilePath, targetFilePaths);
+	}
+	public Map<String, byte[]> getImages(String expectedFilePath, String targetFilePath) {
+		return persisterService.getImages(expectedFilePath, targetFilePath);
+	}
+	public List<ComparedRectangleArea> getComparedResult(String path, int resultListId,
+			int targetResultId) {
+		return persisterService.getComparedResult(path, resultListId, targetResultId);
+	}
+	public String deleteResults(String path, int resultListId) {
+		return persisterService.deleteResults(path, resultListId);
+	}
+
+
+
+
 
 	public Page<TestExecutionResult> findTestExecution(String searchTestMethod, String searchTestScreen, int page,
 			int pageSize, String resultDirectoryKey) {
@@ -279,7 +302,7 @@ public class ExplorerService implements Serializable {
 		}
 
 		// Compare.
-		return ImageUtils.compare(actual, null, expected, null, null);
+		return (DiffPoints) ImageUtils.compare(actual, null, expected, null, null);
 	}
 
 	private BufferedImage getMarkedImage(File image, DiffPoints diffPoints) throws IOException {

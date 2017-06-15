@@ -1,0 +1,230 @@
+<script type="text/ejs" id="result_info_table">
+	<div class="col-sm-12 result_info_container compare_mode" data-directory="[%= directory %]" style="margin:0; padding:0;display:block">
+		<div class="result_info_table col-sm-12 col-md-12"style="margin:0; padding:0; border-bottom: 1px solid #E0E0E0;">
+			<div class="col-sm-1 col-md-1"style="margin:0; padding-right:0px; width:7%; ">
+
+				<div style="min-height:66px; padding-top: 15px; padding-bottom:15px;">
+					<i class="glyphicon glyphicon-menu-right result_icon" style="font-size:25px; margin:0; color:#8BC34A; padding-top:10px; padding-bottom:10px;"></i></div>
+				</div>
+			<div class="col-sm-10 col-md-10" style="margin:0px; padding-left:0px;">
+				<div class="col-sm-12 col-md-12" style="margin:0; word-break: break-all;">
+					<h5 style="font-size:16px;">[%=expected %]</h5>
+				</div>
+				<div class="col-sm-12 col-md-12" style="margin:0; color:#90A4AE">
+					<p>[%=timestamp%]</p>
+				</div>
+
+			</div>
+			<div class="col-sm-1 col-md-1" >
+				<div style="min-height:66px;  padding-top:15px; padding-bottom:15px;">
+					<i class="glyphicon glyphicon-trash delete-btn" data-directory="[%=directory%]" data-resultid="[%=id%]" style="font-size:20px; padding-top:10px; padding-bottom:10px;"></i>
+				</div>
+			</div>
+
+		</div>
+		<div class="col-sm-12 col-md-12 info_table_div" style="display:none;">
+			<table class="info_table table" >
+				<tr>
+					<th>
+						Compare
+					</th>
+					<th>
+						Similarity
+					</th>
+					<th>
+						Diff areas
+					</th>
+					<th>
+						Detail
+					</th>
+				</tr>
+
+
+				[%for (var i = 0; i < resultList.length; i++){ %]
+					<tr>
+						<td>[%=resultList[i]["targetFilename"]%]</td>
+						<td>[%=Math.round(resultList[i]["entireSimilarity"]*100)/100%]</td>
+						<td>[%=resultList[i]["numberOfDiffRec"]%]</td>
+
+						<td><a target="_blank" href="new_diff.html?list_id=[%=id%]&result_id=[%=resultList[i]['id']%]&directory=[%=directory%]&expected=[%=expected%]&target=[%=resultList[i]['targetFilename']%]&offsetx=[%=resultList[i]['offsetX']%]&offsety=[%=resultList[i]['offsetY']%]&offset_expected=[%=resultList[i]['moveExpected']%]&minsimilarity=[%=resultList[i]['minSimilarity']%]" class="btn btn-danger btn-detail" data-result_list_id="[%=id%]" data-target_result_id="[%=resultList[i]["id"]%]" data-expected="[%=expected%]" data-target="[%=resultList[i]["targetFilename"]%]" data-directory="[%=directory%]" >Detail</a></td>
+					<tr>
+				[%}%]
+
+			</table>
+		</div>
+	</div>
+</script>
+
+<script type="text/ejs" id="testExecutionListTemplate">
+	[% 
+		var utils = hifive.pitalium.explorer.utils;
+
+		var contents = testExecutionsPage.content;
+		for (var i = 0; i < contents.length; i++) { 
+			var content = contents[i];
+			var testExecution = content.testExecution;
+			var id = testExecution.id;
+
+			var passedCount = testExecution.passedCount;
+			var totalCount = testExecution.totalCount;
+			var execResult = testExecution.execResult;
+			var passedPercentage = parseInt(passedCount / totalCount * 100);
+
+			var tString = testExecution.time + '';
+			var tStamp = new Date(parseInt(tString));
+			var time = utils.toLocaleTimeString(tStamp);
+			var dir_timestamp = testExecution.timeString;
+
+			var passedCount = content.passedCount;
+			var totalCount = content.totalCount;
+	%]
+		<div class="result_content" data-test-execution-id="[%=id%]" data-timestamp="[%= dir_timestamp %]">
+			<div class="row">
+				<div class="col-xs-6">
+					<a class="appendTable">[%= dir_timestamp %] ([%=time%])</a>
+				</div>
+				<div class="col-xs-2 text-center">
+					[%= passedCount %] / [%= totalCount %]
+				</div>
+				<div class="col-xs-3">
+					<div class="progress">
+						<div class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100"
+							aria-valuenow="[%= passedPercentage %]"
+							style="width: [%= passedPercentage %]%;">
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-1">
+					[% if (execResult == 'SUCCESS') { %]
+						<img class="test-result-icon" src="res/img/checkmark.png" alt="○" aria-label="All tests passed">
+					[% } else if (execResult == 'FAILURE') { %]
+						<img class="test-result-icon" src="res/img/xmark.png" alt="×" aria-label="Some tests failed">
+					[% } %]
+				</div>
+			</div>
+			<div class="table_list" style="display:none;">
+				<hr style="border-bottom: 1px solid #00897B;">
+
+				<div id="result_ul_[%=id%]" class="result_ul">
+				</div>
+			</div>
+		</div>
+	[% } %]
+	<div class="page-bar">
+		<div>
+			<ul class="pagination">
+			[%
+				var currentPage = testExecutionsPage.number + 1;
+				var totalPages = testExecutionsPage.totalPages;
+				if (!testExecutionsPage.first) {
+					%]<li><a class="btn-page btn-first-page" href="#0" data-page="1">&lt;&lt;</a></li>[%
+				} else {
+					%]<li class="disabled"><a>&lt;&lt;</a></li>[%
+				}
+			%]
+			[%
+				var start = Math.max(1, currentPage - 5);
+				var end = Math.min(totalPages, currentPage + 5);
+				var size = testExecutionsPage.size;
+				for (var i = start; i <= end; i++) {
+					if (i != currentPage) {
+						%]<li><a class="btn-page" href="#[%= (i-1)*size %]" data-page="[%= i %]">[%= i %]</a></li>[%
+					} else {
+						%]<li class="active"><a>[%= i %]</a></li>[%
+					}
+				}
+			%]
+			[%
+				if (!testExecutionsPage.last) {
+					%]<li><a class="btn-page btn-last-page" href="#[%= (totalPages-1)*size %]" data-page="[%= totalPages %]">&gt;&gt;</a></li>[%
+				} else {
+					%]<li class="disabled"><a>&gt;&gt;</a></li>[%
+				}
+			%]
+			</ul>
+		</div>
+
+		<div class="page-info">
+			[%= testExecutionsPage.number + 1 %] / [%= testExecutionsPage.totalPages %]
+		</div>
+	</div>
+</script>
+
+<script type="text/ejs" id="screenshot_list">
+	[% for (var testClass in screenshots) { %]
+		<div class="col-sm-12 result_info_container" data-test-class="[%= testClass %]" style="margin:0; padding:0;">
+			<div class="result_info col-sm-12 col-md-12"style="padding:0;">
+				<div class="col-sm-1 col-md-1"style="padding-right:0px; width:7%; ">
+					<div>
+						<i class="glyphicon glyphicon-menu-right result_icon" style="font-size:15px; color:#8BC34A;"></i></div>
+					</div>
+				<div class="col-sm-8 col-md-8" style="padding-left:0px;">
+					<div class="col-sm-12 col-md-12" style="word-break: break-all;">
+						<h5 style="font-size:16px;margin: 0">[%= testClass %]</h5>
+					</div>
+				</div>
+				<div class="col-sm-3 col-md-3">
+					<div class="mode-toggle-buttons">
+						<button class="btn btn-default btn-xs toggle-mode result_mode" data-mode="compare">ブラウザ間比較</button>
+						<button class="btn btn-default btn-xs toggle-mode compare_mode" data-mode="result">テスト実行結果</button>
+					</div>
+				</div>
+			</div>
+			<div class="col-sm-12 col-md-12 result_list_table" style="display:none;">
+			<table class="table" id="table_[%= testClass %]" >
+					<tbody>
+						<tr class="th_tr" >
+							<th>Test method</th>
+							<th>Test screen</th>
+							<th>Platform</th>
+							<th>Browser name</th>
+							<th>Browser Version</th>
+							<th class="result_mode">Comparison result</th>
+							<th class="compare_mode">Expected</th>
+							<th class="compare_mode">Compare</th>
+							<th class="compare_mode">Run</th>
+						</tr>
+						[% 
+						var screenshotList = screenshots[testClass];
+						for (var i = 0, len = screenshotList.length; i < len; i++) {
+							var screenshot = screenshotList[i];
+							var id = screenshot.testExecution.id;
+							var name = screenshot.fileName;
+							var directory = screenshot.testExecution.timeString + '/' + screenshot.testClass;
+						%]
+							<tr class="tr" data-screenshot-id="[%= screenshot.id %]">
+								<td>[%= screenshot.testMethod %]</td>
+								<td>[%= screenshot.testScreen %]</td>
+								<td class="platform">[%= screenshot.testEnvironment.platform %]</td>
+								<td>[%= screenshot.testEnvironment.browserName %]</td>
+								<td>[%= screenshot.testEnvironment.browserVersion %]</td>
+								<td class="result_mode">[%
+									if (screenshot.comparisonResult === true) {
+										%]<img class="test-result-icon" src="res/img/checkmark.png" alt="○" aria-label="Passed">[%
+									}
+									else if (screenshot.comparisonResult === false) {
+										%]<img class="test-result-icon" src="res/img/xmark.png" alt="×" aria-label="Failed">[%
+									} else {
+										%]-[%
+									}
+								%]</td>
+								<td class="text-center compare_mode">
+									<input class="expected" name="expected" type="radio" value="[%=name%]" data-directory="[%=directory%]">
+								</td>
+								<td class="compare_mode">
+									<input type="checkbox" class="compare compare_checkbox" data-target="[%=name%]" data-directory="[%=directory%]" style="display:none;">
+								</td>
+								<td class="compare_mode">
+									<a class="btn-info btn btn-run" style="display:none;" data-id="[%=id%]" data-target="[%=name%]" data-directory="[%=directory%]">
+										<span class="glyphicon glyphicon-play-circle" aria-hidden="true"></span> Run
+									</a>
+									<img src="res/img/loading.gif" style="width:34px; display:none; margin-left: 20px; margin-right:20px;"/>
+								</td>
+							</tr>
+						[% } %]
+					</tbody>
+				</table>
+			</div>
+		</div>
+	[% } %]
+</script>

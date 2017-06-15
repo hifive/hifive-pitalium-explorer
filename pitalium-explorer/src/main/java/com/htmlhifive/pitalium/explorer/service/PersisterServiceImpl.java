@@ -37,7 +37,9 @@ import com.htmlhifive.pitalium.explorer.io.ExplorerPersister;
 import com.htmlhifive.pitalium.explorer.request.ExecResultChangeRequest;
 import com.htmlhifive.pitalium.explorer.request.ScreenshotResultChangeRequest;
 import com.htmlhifive.pitalium.explorer.request.TargetResultChangeRequest;
+import com.htmlhifive.pitalium.explorer.response.ResultListOfExpected;
 import com.htmlhifive.pitalium.explorer.response.TestExecutionResult;
+import com.htmlhifive.pitalium.image.model.ComparedRectangleArea;
 
 @Service("persisterService")
 public class PersisterServiceImpl implements PersisterService {
@@ -85,6 +87,27 @@ public class PersisterServiceImpl implements PersisterService {
 	@Override
 	public void setScreenshotIdService(ScreenshotIdService screenshotIdService) {
 		persister.setScreenshotIdService(screenshotIdService);
+	}
+
+	@Override
+	public List<ResultListOfExpected> findScreenshotFiles(String path){
+		return persister.findScreenshotFiles(path);
+	}
+	@Override
+	public ResultListOfExpected executeComparing(String expectedFilePath, String[] targetFilePaths) {
+		return persister.executeComparing(expectedFilePath, targetFilePaths);
+	}
+	@Override
+	public Map<String, byte[]> getImages(String expectedFilePath, String targetFilePath) {
+		return persister.getImages(expectedFilePath, targetFilePath);
+	}
+	@Override
+	public List<ComparedRectangleArea> getComparedResult(String path, int resultListId, int targetResultId){
+		return persister.getComparedResult(path, resultListId, targetResultId);
+	};
+	@Override
+	public String deleteResults(String path, int resultListId){
+		return persister.deleteResults(path, resultListId);
 	}
 
 	@Override

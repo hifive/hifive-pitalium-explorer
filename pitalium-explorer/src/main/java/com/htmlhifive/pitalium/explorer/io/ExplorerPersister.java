@@ -6,6 +6,7 @@ package com.htmlhifive.pitalium.explorer.io;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.data.domain.Page;
 
@@ -17,14 +18,29 @@ import com.htmlhifive.pitalium.explorer.entity.TestExecutionAndEnvironment;
 import com.htmlhifive.pitalium.explorer.request.ExecResultChangeRequest;
 import com.htmlhifive.pitalium.explorer.request.ScreenshotResultChangeRequest;
 import com.htmlhifive.pitalium.explorer.request.TargetResultChangeRequest;
+import com.htmlhifive.pitalium.explorer.response.ResultListOfExpected;
 import com.htmlhifive.pitalium.explorer.response.TestExecutionResult;
 import com.htmlhifive.pitalium.explorer.service.ScreenshotIdService;
+import com.htmlhifive.pitalium.image.model.ComparedRectangleArea;
 
 public interface ExplorerPersister extends Persister {
 
 	int defaultPageSize = 20;
 
 	void setScreenshotIdService(ScreenshotIdService screenshotIdService);
+
+	/**
+	 * Get the screenshot files under selected sub-directory of 'results' folder
+	 *
+	 * @param name2
+	 * @return Screenshot files under subdirectory of 'results' folder
+	 */
+	List<ResultListOfExpected> findScreenshotFiles(String path);
+
+	ResultListOfExpected executeComparing(String expectedFilePath, String[] targetFilePaths);
+	Map<String, byte[]> getImages(String expectedFilePath, String targetFilePath);
+	List<ComparedRectangleArea> getComparedResult(String path, int resultListId, int targetResultId);
+	String deleteResults(String path, int resultListId);
 
 	/**
 	 * TestExecutionのリストを取得する。 引数のメソッド名、スクリーンショットを含む（like検索）Screenshotを持つ TestExecutionのリストを取得する。

@@ -10,6 +10,9 @@
 	<meta http-equiv="Expires" content="-1">
 
 	<title>Test Result Detail- Pitalium Explorer</title>
+
+	<link rel="shortcut icon" href="res/img/favicon.ico">
+
 	<link rel="stylesheet" href="/hifive-res/ext/bootstrap/3.3.5/css/bootstrap.min.css">
 	<link rel="stylesheet" href="/hifive-res/ext/bootstrap/3.3.5/css/bootstrap-theme.min.css">
 	<link rel="stylesheet" href="/hifive-res/ext/jqplugins/jstree/3.0.8/themes/default/style.min.css">
@@ -42,7 +45,7 @@
 	<script src="src/diff/init.js"></script>
 
 	<script type="text/ejs" id="testResultListTemplate">
-		<table class="table table-striped table-hover">
+		<table class="table table-hover">
 			<thead>
 				<tr>
 					<th></th>
@@ -129,7 +132,7 @@
 	</head>
 	<body>
 		<!-- Navigation -->
-		<nav class="navbar navbar-default navbar-static-top">
+		<nav class="navbar navbar-fixed-top">
 			<div class="container-fluid">
 				<div class="navbar-header">
 					<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
@@ -140,19 +143,23 @@
 					</button>
 					<a class="navbar-brand" href="list.html">Pitalium Explorer</a>
 				</div>
-				<div id="navbar" class="navbar-collapse collapse">
-					<ul class="nav navbar-nav">
-						<li><a href="list.html">Home</a></li>
-						<li><a href="fileDiff.html">Diff any images</a></li>
-					</ul>
-				</div><!--/.nav-collapse -->
+				<ul class="nav navbar-nav navbar-right menu">
+					<li class="dropdown">
+						<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span class="glyphicon glyphicon-menu-hamburger"></span></a>
+						<ul class="dropdown-menu">
+							<li><a href="new_list.html">Home</a></li>
+							<li><a href="fileDiff.html">Compare any images</a></li>
+						</ul>
+					</li>
+				</ul>
 			</div>
 		</nav>
+		<div style="height:65px"></div>
 		<!-- Navigation -->
 
 		<div id="container">
-			<div id="info" class="panel panel-default">
-				<div class="panel-heading">
+			<div id="info" class="panel">
+				<div class="panel-heading title_div">
 					<div class="btn-group">
 						<button class="btn btn-default btn-xs toggle-dropdown" data-toggle="dropdown">
 							Actions
@@ -163,9 +170,9 @@
 							<li id="update_result"><a href="">Update Result</a>
 						</ul>
 					</div>
-					<h4 class="panel-title row">
-						<a class="col-xs-11" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="false">
-							Result Information
+					<h4 class="panel-title">
+						<a data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="false">
+							<span class="title-label">Result Information</span>
 							<span id="comparisonResult"></span>
 						</a>
 					</h4>
@@ -226,15 +233,15 @@
 				</div>
 			</div>
 			<div class="dividedbox">
-				<div id="list" class="panel panel-default autoSize">
-					<div class="panel-heading">
-						<span>Test Cases</span>
+				<div id="list" class="panel autoSize">
+					<div class="panel-heading title_div">
+						<span class="title-label">Test Cases</span>
 					</div>
 					<div id="tree_root" class="panel-body"></div>
 				</div>
-				<div id="main" class="panel panel-default autoSize">
-					<div class="panel-heading">
-						<span>Screenshots</span>
+				<div id="main" class="panel autoSize">
+					<div class="panel-heading title_div">
+						<span class="title-label">Screenshots</span>
 						<span id="selector"></span>
 					</div>
                     <div class="panel-body">
