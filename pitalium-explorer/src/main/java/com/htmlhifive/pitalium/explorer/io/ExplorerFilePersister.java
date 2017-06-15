@@ -62,7 +62,6 @@ import com.htmlhifive.pitalium.explorer.entity.TestEnvironment;
 import com.htmlhifive.pitalium.explorer.entity.TestExecution;
 import com.htmlhifive.pitalium.explorer.entity.TestExecutionAndEnvironment;
 import com.htmlhifive.pitalium.explorer.file.FileUtility;
-import com.htmlhifive.pitalium.explorer.image.ComparedRectangle;
 import com.htmlhifive.pitalium.explorer.image.ImagePair;
 import com.htmlhifive.pitalium.explorer.request.ExecResultChangeRequest;
 import com.htmlhifive.pitalium.explorer.request.ScreenshotResultChangeRequest;
@@ -71,6 +70,7 @@ import com.htmlhifive.pitalium.explorer.response.Result;
 import com.htmlhifive.pitalium.explorer.response.ResultListOfExpected;
 import com.htmlhifive.pitalium.explorer.response.TestExecutionResult;
 import com.htmlhifive.pitalium.explorer.service.ScreenshotIdService;
+import com.htmlhifive.pitalium.image.model.ComparedRectangleArea;
 import com.htmlhifive.pitalium.image.model.RectangleArea;
 
 public class ExplorerFilePersister extends FilePersister implements ExplorerPersister {
@@ -188,7 +188,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 				continue;
 			}
 
-			List<ComparedRectangle> comparedRectangles;
+			List<ComparedRectangleArea> comparedRectangles;
 
 			String filenamePair = FileUtility.getPairResultFilename(expectedFilePath, targetFilePath, id);
 			File filenamePairJson = new File(comparisonResultsDir, filenamePair);
@@ -290,29 +290,29 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 		return imageMap;
 	}
 
-	public List<ComparedRectangle> getComparedResult(String path, int resultListId, int targetResultId){
+	public List<ComparedRectangleArea> getComparedResult(String path, int resultListId, int targetResultId){
 		File root = super.getResultDirectoryFile();
 		if (!root.exists() || !root.isDirectory()) {
 			log.error("Directory(" + root.getAbsolutePath() + ") Not Found.");
-			return new ArrayList<ComparedRectangle>();
+			return new ArrayList<ComparedRectangleArea>();
 		}
 
 		File directory = new File(root, path);
 		if(!directory.exists() || !directory.isDirectory()){
 			log.error("Directory(" + directory.getAbsolutePath() + ") Not Found.");
-			return new ArrayList<ComparedRectangle>();
+			return new ArrayList<ComparedRectangleArea>();
 		}
 
 		File comparisonResultsDir = new File(directory, "comparisonResults");
 		if(!comparisonResultsDir.exists() || !comparisonResultsDir.isDirectory()){
 			log.error("Directory(" + comparisonResultsDir.getAbsolutePath() + ") Not Found.");
-			return new ArrayList<ComparedRectangle>();
+			return new ArrayList<ComparedRectangleArea>();
 		}
 
 		File resultListJson = new File(comparisonResultsDir, "resultList.json");
 		if(!resultListJson.exists()){
 			log.error("Directory(" + resultListJson.getAbsolutePath() + ") Not Found.");
-			return new ArrayList<ComparedRectangle>();
+			return new ArrayList<ComparedRectangleArea>();
 		}
 
 		List<ResultListOfExpected> resultList;
@@ -320,7 +320,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 			resultList = JSONUtils.readValue(resultListJson, new TypeReference<List<ResultListOfExpected>>(){});
 		}catch(Exception e){
 			log.error("json read value error: " + resultListJson.getAbsolutePath());
-			return new ArrayList<ComparedRectangle>();
+			return new ArrayList<ComparedRectangleArea>();
 		}
 
 		String expectedFilePath = "";
@@ -340,16 +340,16 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 		File filenamePairJson = new File(comparisonResultsDir, filenamePair);
 		if(!filenamePairJson.exists()){
 			log.error("File(" + filenamePairJson.getAbsolutePath() + ") Not Found.");
-			return new ArrayList<ComparedRectangle>();
+			return new ArrayList<ComparedRectangleArea>();
 		}
 
-		List<ComparedRectangle> comparedRectangleList;
+		List<ComparedRectangleArea> comparedRectangleList;
 		try{
-			comparedRectangleList = JSONUtils.readValue(filenamePairJson, new TypeReference<ArrayList<ComparedRectangle>>(){});
+			comparedRectangleList = JSONUtils.readValue(filenamePairJson, new TypeReference<ArrayList<ComparedRectangleArea>>(){});
 		} catch(Exception e){
 			log.error("Json to Object error: " + filenamePairJson.getAbsolutePath());
 			e.printStackTrace();
-			comparedRectangleList = new ArrayList<ComparedRectangle>();
+			comparedRectangleList = new ArrayList<ComparedRectangleArea>();
 		}
 		return comparedRectangleList;
 	}

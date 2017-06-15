@@ -31,13 +31,13 @@ import com.htmlhifive.pitalium.explorer.entity.TargetRepository;
 import com.htmlhifive.pitalium.explorer.entity.TestExecutionAndEnvironment;
 import com.htmlhifive.pitalium.explorer.entity.TestExecutionRepository;
 import com.htmlhifive.pitalium.explorer.file.FileUtility;
-import com.htmlhifive.pitalium.explorer.image.ComparedRectangle;
 import com.htmlhifive.pitalium.explorer.request.ExecResultChangeRequest;
 import com.htmlhifive.pitalium.explorer.request.ScreenshotResultChangeRequest;
 import com.htmlhifive.pitalium.explorer.request.TargetResultChangeRequest;
 import com.htmlhifive.pitalium.explorer.response.ResultListOfExpected;
 import com.htmlhifive.pitalium.explorer.response.TestExecutionResult;
 import com.htmlhifive.pitalium.explorer.service.ScreenshotIdService;
+import com.htmlhifive.pitalium.image.model.ComparedRectangleArea;
 
 public class ExplorerDBPersister extends DBPersister implements ExplorerPersister {
 
@@ -289,7 +289,7 @@ public class ExplorerDBPersister extends DBPersister implements ExplorerPersiste
 	}
 
 	@Override
-	public List<ComparedRectangle> getComparedResult(String path, int resultListId, int targetResultId) {
+	public List<ComparedRectangleArea> getComparedResult(String path, int resultListId, int targetResultId) {
 		// TODO 自動生成されたメソッド・スタブ
 		return null;
 	}

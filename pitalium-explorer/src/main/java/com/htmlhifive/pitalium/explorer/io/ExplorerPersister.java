@@ -15,13 +15,13 @@ import com.htmlhifive.pitalium.explorer.changelog.ChangeRecord;
 import com.htmlhifive.pitalium.explorer.entity.Screenshot;
 import com.htmlhifive.pitalium.explorer.entity.Target;
 import com.htmlhifive.pitalium.explorer.entity.TestExecutionAndEnvironment;
-import com.htmlhifive.pitalium.explorer.image.ComparedRectangle;
 import com.htmlhifive.pitalium.explorer.request.ExecResultChangeRequest;
 import com.htmlhifive.pitalium.explorer.request.ScreenshotResultChangeRequest;
 import com.htmlhifive.pitalium.explorer.request.TargetResultChangeRequest;
 import com.htmlhifive.pitalium.explorer.response.ResultListOfExpected;
 import com.htmlhifive.pitalium.explorer.response.TestExecutionResult;
 import com.htmlhifive.pitalium.explorer.service.ScreenshotIdService;
+import com.htmlhifive.pitalium.image.model.ComparedRectangleArea;
 
 public interface ExplorerPersister extends Persister {
 
@@ -39,7 +39,7 @@ public interface ExplorerPersister extends Persister {
 
 	ResultListOfExpected executeComparing(String expectedFilePath, String[] targetFilePaths);
 	Map<String, byte[]> getImages(String expectedFilePath, String targetFilePath);
-	List<ComparedRectangle> getComparedResult(String path, int resultListId, int targetResultId);
+	List<ComparedRectangleArea> getComparedResult(String path, int resultListId, int targetResultId);
 	String deleteResults(String path, int resultListId);
 
 	/**

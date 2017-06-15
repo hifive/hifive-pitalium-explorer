@@ -32,7 +32,6 @@ import com.htmlhifive.pitalium.explorer.entity.Target;
 import com.htmlhifive.pitalium.explorer.entity.TargetRepository;
 import com.htmlhifive.pitalium.explorer.entity.TestExecutionAndEnvironment;
 import com.htmlhifive.pitalium.explorer.entity.TestExecutionRepository;
-import com.htmlhifive.pitalium.explorer.image.ComparedRectangle;
 import com.htmlhifive.pitalium.explorer.io.ExplorerDBPersister;
 import com.htmlhifive.pitalium.explorer.io.ExplorerPersister;
 import com.htmlhifive.pitalium.explorer.request.ExecResultChangeRequest;
@@ -40,6 +39,7 @@ import com.htmlhifive.pitalium.explorer.request.ScreenshotResultChangeRequest;
 import com.htmlhifive.pitalium.explorer.request.TargetResultChangeRequest;
 import com.htmlhifive.pitalium.explorer.response.ResultListOfExpected;
 import com.htmlhifive.pitalium.explorer.response.TestExecutionResult;
+import com.htmlhifive.pitalium.image.model.ComparedRectangleArea;
 
 @Service("persisterService")
 public class PersisterServiceImpl implements PersisterService {
@@ -102,7 +102,7 @@ public class PersisterServiceImpl implements PersisterService {
 		return persister.getImages(expectedFilePath, targetFilePath);
 	}
 	@Override
-	public List<ComparedRectangle> getComparedResult(String path, int resultListId, int targetResultId){
+	public List<ComparedRectangleArea> getComparedResult(String path, int resultListId, int targetResultId){
 		return persister.getComparedResult(path, resultListId, targetResultId);
 	};
 	@Override

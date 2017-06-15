@@ -23,7 +23,6 @@ import org.springframework.web.context.WebApplicationContext;
 import com.htmlhifive.pitalium.explorer.changelog.ChangeRecord;
 import com.htmlhifive.pitalium.explorer.entity.Screenshot;
 import com.htmlhifive.pitalium.explorer.entity.TestExecutionAndEnvironment;
-import com.htmlhifive.pitalium.explorer.image.ComparedRectangle;
 import com.htmlhifive.pitalium.explorer.request.ChangeRequest;
 import com.htmlhifive.pitalium.explorer.request.ExecResultChangeRequest;
 import com.htmlhifive.pitalium.explorer.request.ScreenshotResultChangeRequest;
@@ -31,6 +30,7 @@ import com.htmlhifive.pitalium.explorer.request.TargetResultChangeRequest;
 import com.htmlhifive.pitalium.explorer.response.ResultListOfExpected;
 import com.htmlhifive.pitalium.explorer.response.TestExecutionResult;
 import com.htmlhifive.pitalium.explorer.service.ExplorerService;
+import com.htmlhifive.pitalium.image.model.ComparedRectangleArea;
 
 @Scope(scopeName=WebApplicationContext.SCOPE_SESSION)
 @Controller
@@ -82,13 +82,13 @@ public class ApiController {
 
 	@RequestMapping(value = "_screenshots/result", method = RequestMethod.GET, produces="application/json;charset=utf-8")
 	@ResponseBody
-	public ResponseEntity<List<ComparedRectangle>> getComparedResult(
+	public ResponseEntity<List<ComparedRectangleArea>> getComparedResult(
 			@RequestParam(value = "path", defaultValue = "") String path,
 			@RequestParam(value = "resultListId", defaultValue = "") int resultListId,
 			@RequestParam(value = "targetResultId", defaultValue = "") int targetResultId
 			){
-		List<ComparedRectangle> list = service.getComparedResult(path, resultListId, targetResultId);
-		return new ResponseEntity<List<ComparedRectangle>>(list, HttpStatus.OK);
+		List<ComparedRectangleArea> list = service.getComparedResult(path, resultListId, targetResultId);
+		return new ResponseEntity<List<ComparedRectangleArea>>(list, HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "_screenshots/delete", method = RequestMethod.GET, produces="application/json;charset=utf-8")

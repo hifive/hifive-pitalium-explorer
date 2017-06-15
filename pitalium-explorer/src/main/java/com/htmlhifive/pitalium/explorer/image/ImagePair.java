@@ -5,7 +5,19 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.htmlhifive.pitalium.image.model.CompareOption;
+import com.htmlhifive.pitalium.image.model.ComparedRectangleArea;
+import com.htmlhifive.pitalium.image.model.ComparisonParameters;
+import com.htmlhifive.pitalium.image.model.DefaultComparisonParameters;
 import com.htmlhifive.pitalium.image.model.DiffPoints;
+import com.htmlhifive.pitalium.image.model.ImageComparedResult;
+import com.htmlhifive.pitalium.image.model.ObjectGroup;
+import com.htmlhifive.pitalium.image.model.Offset;
+import com.htmlhifive.pitalium.image.model.SimilarityUnit;
+import com.htmlhifive.pitalium.image.model.ThresholdComparisonParameters;
+import com.htmlhifive.pitalium.image.util.ImageComparatorFactory;
+import com.htmlhifive.pitalium.image.util.ImageUtils;
+import com.htmlhifive.pitalium.image.util.SimilarityUtils;
 
 public class ImagePair {
 
@@ -18,7 +30,7 @@ public class ImagePair {
 	int sizeRelationType;
 	Offset offset;				// Dominant offset between two images
 
-	private List<ComparedRectangle> ComparedRectangles;
+	private List<ComparedRectangleArea> ComparedRectangles;
 	private double entireSimilarity, minSimilarity;
 
 	// Default criteria to split over-merged rectangle
@@ -34,16 +46,16 @@ public class ImagePair {
 	 */
 	public ImagePair(BufferedImage expectedImage, BufferedImage actualImage) {
 
-		double diffThreshold = ComparisonParameters.getDiffThreshold();
-		
+		double diffThreshold = DefaultComparisonParameters.getDiffThreshold();
+
 		// Find dominant offset
-		sizeRelationType = ImageUtils2.getSizeRelationType (expectedImage.getWidth(), expectedImage.getHeight(), actualImage.getWidth(), actualImage.getHeight());
-		offset = ImageUtils2.findDominantOffset(expectedImage, actualImage, diffThreshold);
-		
+		sizeRelationType = ImageUtils.getSizeRelationType (expectedImage.getWidth(), expectedImage.getHeight(), actualImage.getWidth(), actualImage.getHeight());
+		offset = ImageUtils.findDominantOffset(expectedImage, actualImage, diffThreshold);
+
 		// assign (sub) image with same size
-		this.expectedImage = ImageUtils2.getDominantImage (expectedImage, actualImage, offset);
-		this.actualImage = ImageUtils2.getDominantImage (actualImage, expectedImage, offset);
-		ComparedRectangles = new ArrayList<ComparedRectangle>();
+		this.expectedImage = ImageUtils.getDominantImage (expectedImage, actualImage, offset);
+		this.actualImage = ImageUtils.getDominantImage (actualImage, expectedImage, offset);
+		ComparedRectangles = new ArrayList<ComparedRectangleArea>();
 		width = Math.min(expectedImage.getWidth(), actualImage.getWidth());
 		height = Math.min(expectedImage.getHeight(), actualImage.getHeight());
 		entireSimilarity = 0;
@@ -58,19 +70,19 @@ public class ImagePair {
 	private void compareImagePair () {
 
 		// initial group distance
-		int group_distance = ComparisonParameters.getDefaultGroupDistance();
+		int group_distance = DefaultComparisonParameters.getDefaultGroupDistance();
 
-		// Do not use sizeDiffPoints and consider only intersection area 
+		// Do not use sizeDiffPoints and consider only intersection area
 		Rectangle entireFrame = new Rectangle (width, height);
 
 		// build different areas
 		List<Rectangle> rectangles  = buildDiffAreas(entireFrame, group_distance);
-	
+
 		// split over-merged rectangles into smaller ones if possible
 		SplitRectangles (rectangles, SPLIT_ITERATION, group_distance);
-		ImageUtils2.removeOverlappingRectangles(rectangles);
-		ImageUtils2.removeRedundantRectangles(rectangles,width,height);
-		
+		ImageUtils.removeOverlappingRectangles(rectangles);
+		ImageUtils.removeRedundantRectangles(rectangles,width,height);
+
 		// compare two images using given rectangle areas and calculate all similarities
 		compareAllRectangles(rectangles);
 		calcEntireSimilarity();
@@ -81,10 +93,10 @@ public class ImagePair {
 		for (Rectangle rectangle : rectangles)
 		{
 			// initialize result rectangle
-			ComparedRectangle resultRectangle = new ComparedRectangle(rectangle);
+			ComparedRectangleArea resultRectangle = new ComparedRectangleArea(rectangle);
 			Offset offset = null;	// null means that when we calculate similarity, we try to find best match by moving actual sub-image
-			Rectangle tightDiffArea = ImageUtils2.getTightDiffArea(rectangle, width, height);
-			
+			Rectangle tightDiffArea = ImageUtils.getTightDiffArea(rectangle, width, height);
+
 			/** if this rectangle is missing, set category 'MISSING' **/
 			if (Categorizer.checkMissing(expectedImage, actualImage, tightDiffArea)) {
 				resultRectangle.setType("MISSING");
@@ -107,8 +119,8 @@ public class ImagePair {
 			Rectangle actualObject = new Rectangle(rectangle);
 
 			// if object detection succeed for both images.
-			if (ImageUtils2.getObjectRectangle(expectedImage, expectedObject) 
-					&& ImageUtils2.getObjectRectangle(actualImage, actualObject)) {
+			if (ImageUtils.getObjectRectangle(expectedImage, expectedObject)
+					&& ImageUtils.getObjectRectangle(actualImage, actualObject)) {
 
 				int x1 = (int)expectedObject.getX(), y1 = (int)expectedObject.getY(),
 						w1 = (int)expectedObject.getWidth(), h1 = (int)expectedObject.getHeight(),
@@ -118,20 +130,22 @@ public class ImagePair {
 				if (w1 == w2 && h1 == h2) {
 					// case 1 : the same object size and the same location
 					if (x1 == x2 && y1 == y2) {
-						offset = new Offset(0,0);								
+						offset = new Offset(0,0);
 
 					// case 2 : the same object size but different location
 					} else {
 						offset = new Offset(x2-x1,y2-y1);
-						SimilarityUtils.calcSimilarity(expectedImage, actualImage, rectangle, resultRectangle, offset);
-						double similarityThresDiff = resultRectangle.getSimilarityUnit().getSimilarityThresDiff();
+						SimilarityUnit unit = SimilarityUtils.calcSimilarity(expectedImage, actualImage, rectangle, resultRectangle, offset);
+						double similarityThresDiff = unit.getSimilarityThresDiff();
 
 						// if so similar, regard them as the same objects with shifted location
-						if (similarityThresDiff > ComparisonParameters.getShiftSimilarityThreshold()) {
+						if (similarityThresDiff > DefaultComparisonParameters.getShiftSimilarityThreshold()) {
 							resultRectangle.setType("SHIFT");
 							resultRectangle.setXShift(x2-x1);
 							resultRectangle.setYShift(y2-y1);
 							resultRectangle.setSimilarityUnit(null);
+						} else {
+							resultRectangle.setSimilarityUnit(unit);
 						}
 						ComparedRectangles.add(resultRectangle);
 						continue;
@@ -141,19 +155,21 @@ public class ImagePair {
 				} else {
 					// check if two objects are the same but have different size
 					if (Categorizer.checkScaling (expectedImage, actualImage, expectedObject, actualObject)){
-						resultRectangle.setType("SCALING");	
+						resultRectangle.setType("SCALING");
 						double	similarityFeatureMatrix = SimilarityUtils.calcSimilarityByFeatureMatrix(expectedImage, actualImage, expectedObject, actualObject);
-						SimilarityUtils.calcSimilarity(expectedImage, actualImage, rectangle, resultRectangle, offset, similarityFeatureMatrix);
+						SimilarityUnit unit = SimilarityUtils.calcSimilarity(expectedImage, actualImage, rectangle, resultRectangle, offset, similarityFeatureMatrix);
+						resultRectangle.setSimilarityUnit(unit);
 
 						// insert the result rectangle into the list of ComparedRectangles
 						ComparedRectangles.add(resultRectangle);
 						continue;
 					}
-				}					
+				}
 			}
 
-			// implement all similarity calculations and categorization, and then build ComparedRectangle 
-			SimilarityUtils.calcSimilarity(expectedImage, actualImage, rectangle, resultRectangle, offset);
+			// implement all similarity calculations and categorization, and then build ComparedRectangle
+			SimilarityUnit unit = SimilarityUtils.calcSimilarity(expectedImage, actualImage, rectangle, resultRectangle, offset);
+			resultRectangle.setSimilarityUnit(unit);
 
 			// insert the result rectangle into the list of ComparedRectangles
 			ComparedRectangles.add(resultRectangle);
@@ -165,19 +181,19 @@ public class ImagePair {
 	 */
 	private void calcEntireSimilarity() {
 		double entireDifference = 0;
-		for (ComparedRectangle resultRectangle : ComparedRectangles) {
+		for (ComparedRectangleArea resultRectangle : ComparedRectangles) {
 			if (resultRectangle.getType() != "SHIFT" && resultRectangle.getType() != "UNCHECKED") {
 				double similarityPixelByPixel = resultRectangle.getSimilarityUnit().getSimilarityPixelByPixel();
 				if (minSimilarity > similarityPixelByPixel) {
 					minSimilarity = similarityPixelByPixel;
-				}	
+				}
 				int rectangleArea = (int)(resultRectangle.getWidth() * resultRectangle.getHeight());
 				entireDifference += (1-similarityPixelByPixel)*rectangleArea;
 			}
 		}
 		entireSimilarity = 1-entireDifference/(width*height);
 	}
-	
+
 	/**
 	 * build different rectangles in the given frame area
 	 * @param frame boundary area to build rectangles
@@ -186,7 +202,7 @@ public class ImagePair {
 	 */
 	private List<Rectangle> buildDiffAreas (Rectangle frame, int group_distance) {
 		List<ObjectGroup> objectGroups = buildObjectGroups(frame, group_distance, null);
-		List<Rectangle> rectangles = ImageUtils2.convertObjectGroupsToAreas(objectGroups);
+		List<Rectangle> rectangles = ImageUtils.convertObjectGroupsToAreas(objectGroups);
 
 		return rectangles;
 	}
@@ -202,7 +218,7 @@ public class ImagePair {
 
 		// threshold for difference of color
 		// if you want to compare STRICTLY, you should set this value as 0.
-		double diffThreshold = ComparisonParameters.getDiffThreshold();
+		double diffThreshold = DefaultComparisonParameters.getDiffThreshold();
 
 		// base case for recursive building
 		int base_bound = 50;
@@ -212,8 +228,10 @@ public class ImagePair {
 				actualFrame.setLocation((int)frame.getX()+offset.getX(), (int)frame.getY()+offset.getY());
 			}
 
-			DiffPoints DP = ImageUtils2.compare(expectedImage, frame, actualImage, actualFrame, diffThreshold);
-			return ImageUtils2.convertDiffPointsToObjectGroups(DP, group_distance);	
+			ComparisonParameters params = new ThresholdComparisonParameters(diffThreshold);
+			CompareOption[] options = new CompareOption[] {new CompareOption(null, params) };
+			ImageComparedResult DP = ImageComparatorFactory.getInstance().getImageComparator(options).compare(expectedImage, frame, actualImage, actualFrame);
+			return ImageUtils.convertDiffPointsToObjectGroups((DiffPoints) DP, group_distance);
 		}
 
 		// divide into 4 sub-frames
@@ -226,7 +244,7 @@ public class ImagePair {
 		se = new Rectangle(x+subW,y+subH,w-subW,h-subH);
 
 		// list of object groups built in each sub-frame
-		List<ObjectGroup> NW, NE, SW, SE;		
+		List<ObjectGroup> NW, NE, SW, SE;
 		NW = buildObjectGroups(nw, group_distance, offset);
 		NE = buildObjectGroups(ne, group_distance, offset);
 		SW = buildObjectGroups(sw, group_distance, offset);
@@ -240,7 +258,7 @@ public class ImagePair {
 		mergeGroups.addAll(SE);
 
 		// merge all possible object groups
-		return ObjectGroup.mergeAllPossibleObjects(mergeGroups);	
+		return ObjectGroup.mergeAllPossibleObjects(mergeGroups);
 	}
 
 	/**
@@ -250,12 +268,12 @@ public class ImagePair {
 	 */
 	private boolean canSplit (Rectangle rectangle) {
 		int width = (int)rectangle.getWidth(), height = (int)rectangle.getHeight();
-		return (width >= OVERMERGED_WIDTH && height >= OVERMERGED_HEIGHT);	
+		return (width >= OVERMERGED_WIDTH && height >= OVERMERGED_HEIGHT);
 	}
 
 	/**
 	 * Split rectangles which are over-merged into smaller ones if possible
-	 * 
+	 *
 	 * @param expectedImage
 	 * @param actualImage
 	 * @param rectangles list of Rectangles
@@ -275,7 +293,7 @@ public class ImagePair {
 		List<Rectangle> addList = new ArrayList<Rectangle>();
 
 		// for sub-rectangles, we apply split_group_distance instead of group_distance
-		int split_group_distance = ComparisonParameters.getSplitGroupDistance();
+		int split_group_distance = DefaultComparisonParameters.getSplitGroupDistance();
 
 		// split implementation for each rectangle
 		for (Rectangle rectangle : rectangles) {
@@ -287,7 +305,7 @@ public class ImagePair {
 
 				/* build inside rectangles */
 
-				// get sub rectangle by subtracting border information 
+				// get sub rectangle by subtracting border information
 				int subX = (int)rectangle.getX() + sub_margin;
 				int subY = (int)rectangle.getY() + sub_margin;
 				int subWidth = (int)rectangle.getWidth() - 2*sub_margin;
@@ -314,10 +332,10 @@ public class ImagePair {
 
 				// build different area in boundary areas
 				int minWidth = expectedImage.getWidth(), minHeight = expectedImage.getHeight();
-				ImageUtils2.reshapeRect(leftBoundary, minWidth, minHeight);
-				ImageUtils2.reshapeRect(rightBoundary, minWidth, minHeight);
-				ImageUtils2.reshapeRect(topBoundary, minWidth, minHeight);
-				ImageUtils2.reshapeRect(bottomBoundary, minWidth, minHeight);
+				ImageUtils.reshapeRect(leftBoundary, minWidth, minHeight);
+				ImageUtils.reshapeRect(rightBoundary, minWidth, minHeight);
+				ImageUtils.reshapeRect(topBoundary, minWidth, minHeight);
+				ImageUtils.reshapeRect(bottomBoundary, minWidth, minHeight);
 				List<Rectangle> boundaryList= new ArrayList<Rectangle>();
 				boundaryList.addAll(buildDiffAreas(leftBoundary, split_group_distance));
 				boundaryList.addAll(buildDiffAreas(rightBoundary, split_group_distance));
@@ -330,7 +348,7 @@ public class ImagePair {
 					// if there exists splitRectangle which is still over-merged, split it recursively
 					SplitRectangles (splitRectangles, splitIteration-1, split_group_distance);
 
-					// Record the rectangles which will be removed and added 
+					// Record the rectangles which will be removed and added
 					for (Rectangle splitRectangle : splitRectangles) {
 
 						// expand splitRectangle if it borders on subRectangle
@@ -355,7 +373,7 @@ public class ImagePair {
 						addList.addAll(expansionRectangles);
 					}
 					removeList.add(rectangle);
-				} 
+				}
 			}
 		}
 
@@ -372,8 +390,8 @@ public class ImagePair {
 
 
 	/**
-	 *  Expand the splitRectangle, if it borders on subRectangle, as much as border removed 
-	 *  
+	 *  Expand the splitRectangle, if it borders on subRectangle, as much as border removed
+	 *
 	 * @param subRectangle Rectangle for checking expansion
 	 * @param splitRectangle Rectangle which is expanded
 	 * @param sub_margin how much border removed
@@ -415,7 +433,7 @@ public class ImagePair {
 	/**
 	 * @return the list of result ComparedRectangles
 	 */
-	public List<ComparedRectangle> getComparedRectangles () {
+	public List<ComparedRectangleArea> getComparedRectangles () {
 		return ComparedRectangles;
 	}
 
@@ -460,7 +478,7 @@ public class ImagePair {
 
 				// never reach here
 			default:
-				return false;					
+				return false;
 		}
 	}
 }
