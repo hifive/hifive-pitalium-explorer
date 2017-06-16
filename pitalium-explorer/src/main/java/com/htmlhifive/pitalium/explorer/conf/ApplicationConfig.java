@@ -11,10 +11,9 @@
  */
 package com.htmlhifive.pitalium.explorer.conf;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
-
-import antlr.StringUtils;
 
 @Configuration()
 public class ApplicationConfig {

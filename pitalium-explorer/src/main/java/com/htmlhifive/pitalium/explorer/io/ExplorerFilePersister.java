@@ -11,7 +11,7 @@
  */
 package com.htmlhifive.pitalium.explorer.io;
 
-imimport java.awt.image.BufferedImage;
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileWriter;
@@ -30,11 +30,18 @@ import java.util.TreeMap;
 
 import javax.imageio.ImageIO;
 
-import org.apache.logging.log4j.core.util.FileUtils;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.filefilter.FileFilterUtils;
+import org.apache.commons.io.filefilter.IOFileFilter;
+import org.apache.commons.io.filefilter.TrueFileFilter;
+import org.apache.commons.lang3.StringUtils;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import antlr.StringUtils;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.htmlhifive.pitalium.common.exception.JSONException;
@@ -63,7 +70,6 @@ import com.htmlhifive.pitalium.explorer.entity.TestEnvironment;
 import com.htmlhifive.pitalium.explorer.entity.TestExecution;
 import com.htmlhifive.pitalium.explorer.entity.TestExecutionAndEnvironment;
 import com.htmlhifive.pitalium.explorer.file.FileUtility;
-import com.htmlhifive.pitalium.explorer.image.ImagePair;
 import com.htmlhifive.pitalium.explorer.request.ExecResultChangeRequest;
 import com.htmlhifive.pitalium.explorer.request.ScreenshotResultChangeRequest;
 import com.htmlhifive.pitalium.explorer.request.TargetResultChangeRequest;
@@ -71,7 +77,10 @@ import com.htmlhifive.pitalium.explorer.response.Result;
 import com.htmlhifive.pitalium.explorer.response.ResultListOfExpected;
 import com.htmlhifive.pitalium.explorer.response.TestExecutionResult;
 import com.htmlhifive.pitalium.explorer.service.ScreenshotIdService;
+import com.htmlhifive.pitalium.image.model.ComparedRectangleArea;
 import com.htmlhifive.pitalium.image.model.RectangleArea;
+import com.htmlhifive.pitalium.image.util.ImagePair;
+
 public class ExplorerFilePersister extends FilePersister implements ExplorerPersister {
 
 	private static Logger log = LoggerFactory.getLogger(ExplorerFilePersister.class);
@@ -201,6 +210,7 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 			}
 
 			ImagePair imagePair = new ImagePair(expectedImage, targetImage);
+			imagePair.compareImagePairAll();
 			comparedRectangles = imagePair.getComparedRectangles();
 
 			double entireSimilarity = imagePair.getEntireSimilarity();
