@@ -1,9 +1,17 @@
 /*
- * Copyright (C) 2015-2017 NS Solutions Corporation, All Rights Reserved.
+ * Copyright (C) 2015-2017 NS Solutions Corporation
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package com.htmlhifive.pitalium.explorer.io;
 
-import java.awt.image.BufferedImage;
+imimport java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileWriter;
@@ -22,18 +30,11 @@ import java.util.TreeMap;
 
 import javax.imageio.ImageIO;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.filefilter.FileFilterUtils;
-import org.apache.commons.io.filefilter.IOFileFilter;
-import org.apache.commons.io.filefilter.TrueFileFilter;
-import org.apache.commons.lang3.StringUtils;
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
+import org.apache.logging.log4j.core.util.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
+
+import antlr.StringUtils;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.htmlhifive.pitalium.common.exception.JSONException;
@@ -70,9 +71,7 @@ import com.htmlhifive.pitalium.explorer.response.Result;
 import com.htmlhifive.pitalium.explorer.response.ResultListOfExpected;
 import com.htmlhifive.pitalium.explorer.response.TestExecutionResult;
 import com.htmlhifive.pitalium.explorer.service.ScreenshotIdService;
-import com.htmlhifive.pitalium.image.model.ComparedRectangleArea;
 import com.htmlhifive.pitalium.image.model.RectangleArea;
-
 public class ExplorerFilePersister extends FilePersister implements ExplorerPersister {
 
 	private static Logger log = LoggerFactory.getLogger(ExplorerFilePersister.class);

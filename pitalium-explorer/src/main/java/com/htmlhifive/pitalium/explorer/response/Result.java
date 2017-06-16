@@ -1,3 +1,14 @@
+/*
+ * Copyright (C) 2015-2017 NS Solutions Corporation
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.htmlhifive.pitalium.explorer.response;
 
 public class Result {
@@ -11,7 +22,7 @@ public class Result {
 	int offsetY;
 	boolean moveExpected;
 //	long executionTime;
-	
+
 	public Result(int id, String targetFilename, double entireSimilarity, double minSimilarity, int numberOfDiffRec, int offsetX, int offsetY, boolean moveExpected){
 		this.id = id;
 //		this.expectedFilename = expectedFilename;
@@ -21,8 +32,8 @@ public class Result {
 		this.numberOfDiffRec = numberOfDiffRec;
 		this.offsetX = offsetX;
 		this.offsetY = offsetY;
-		this.moveExpected = moveExpected;		
-		
+		this.moveExpected = moveExpected;
+
 //		this.executionTime = System.currentTimeMillis();
 	}
 	public Result() {
