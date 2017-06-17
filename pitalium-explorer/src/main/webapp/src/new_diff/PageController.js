@@ -62,7 +62,7 @@
 		},
 
 		'.diffDiv mouseenter': function(context, $el) {
-			var rectype = $el.data("rectype");
+			var recCategory = $el.data("recCategory");
 			var method3 = $el.data("method3");
 			var xshift = $el.data("xshift");
 			var yshift = $el.data("yshift");
@@ -72,7 +72,7 @@
 			var total = $el.data("total");
 
 			var data1 = {
-				type: rectype,
+				category: recCategory,
 				xshift: xshift,
 				yshift: yshift,
 				featurematrix: featurematrix,
@@ -208,13 +208,13 @@
 					var my_data;
 					var s_unit = rec["similarityUnit"];
 
-					if (rec["type"] == "SHIFT") {
+					if (rec["category"] == "SHIFT") {
 						my_data = {
 							x: rec["x"],
 							y: rec["y"],
 							width: rec["width"],
 							height: rec["height"],
-							type: rec["type"],
+							category: rec["category"],
 							xshift: rec["xshift"],
 							yshift: rec["yshift"],
 							featureMatrix: "",
@@ -230,7 +230,7 @@
 							y: rec["y"],
 							width: rec["width"],
 							height: rec["height"],
-							type: rec["type"],
+							category: rec["category"],
 							xshift: rec["xshift"],
 							yshift: rec["yshift"],
 							featureMatrix: s_unit["similarityFeatureMatrix"],
@@ -276,7 +276,7 @@
 			var value = $el.val();
 			this.$find(".diffDiv").each(function() {
 				var thisDiv = $(this);
-				if ($("#checkbox_" + thisDiv.data("rectype")).is(":checked")) {
+				if ($("#checkbox_" + thisDiv.data("recCategory")).is(":checked")) {
 					if (thisDiv.data("pixelbypixel") > value) {
 						thisDiv.hide();
 					} else {
@@ -322,10 +322,10 @@
 		},
 
 		'.choice change': function(context, $el) {
-			var rectype = $el.data("rectype");
+			var recCategory = $el.data("recCategory");
 			var importance = parseFloat(this.$find("#importance").val());
 
-			this.$find(".diff_" + rectype).each(function() {
+			this.$find(".diff_" + recCategory).each(function() {
 				var $this = $(this);
 				if (parseFloat($this.data("pixelbypixel")) <= importance) {
 					$this.toggle();

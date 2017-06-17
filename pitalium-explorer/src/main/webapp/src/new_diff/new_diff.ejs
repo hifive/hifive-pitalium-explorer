@@ -1,6 +1,6 @@
 <script type="text/ejs" id="memo_content">
 	<h5>
-	[% switch(type){
+	[% switch(category){
 		case "SHIFT":%]
 		<i class="glyphicon glyphicon-move"></i> Shift
 	[%break;
@@ -22,7 +22,7 @@
 
 	<hr style="border-color:#8D6E63;">
 
-	[%if (type == "SHIFT"){%]
+	[%if (category == "SHIFT"){%]
 		<p>x-shift: [%=xshift%]
 		</p>
 		<p>y-shift: [%=yshift%]
@@ -49,8 +49,8 @@
 
 <script type="text/ejs" id="diffDiv">
 
-	<div class="diffDiv diff_[%=type%] diff_index_[%=index%]" style="left: [%=x%]px; top: [%=y%]px; width: [%=width%]px; height: [%=height%]px;" data-x="[%=x%]" data-y="[%=y%]" data-width="[%=width%]" data-height="[%=height%]"
-			data-rectype="[%=type%]" data-xshift="[%=xshift%]" data-yshift="[%=yshift%]"
+	<div class="diffDiv diff_[%=category%] diff_index_[%=index%]" style="left: [%=x%]px; top: [%=y%]px; width: [%=width%]px; height: [%=height%]px;" data-x="[%=x%]" data-y="[%=y%]" data-width="[%=width%]" data-height="[%=height%]"
+			data-rec-category="[%=category%]" data-xshift="[%=xshift%]" data-yshift="[%=yshift%]"
 			data-featurematrix="[%=featureMatrix%]"
 			data-pixelbypixel = "[%=pixelByPixel%]"
 			data-thres = "[%=thresDiff%]"
