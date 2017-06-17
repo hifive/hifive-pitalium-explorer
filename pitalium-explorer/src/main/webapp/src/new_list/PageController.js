@@ -214,9 +214,11 @@
 			this._testResultListLogic.compareScreenshots(targets.join(','),
 					directory_expected + "/" + expected).done(this.own(function() {
 				this._appendComparisonResult(directory_expected, $el.data("id"));
+			})).always(function() {
+				alert('failed to compare images');
 				loading.hide();
 				$el.show();
-			}));
+			});
 		},
 
 		'.result_info click': function(context, $el) {
