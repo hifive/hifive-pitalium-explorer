@@ -33,14 +33,17 @@ a {
 	font-weight:300;
 }
 
-.menu .dropdown {
-	padding: 5px;
+.menu {
+	margin-left: -15px;
 }
 
 .menu .dropdown a {
-	padding: 10px 13px;
-    border-radius: 10px;
-    background-color: white;
+	margin-top: 0px;
+	padding: 12px 10px 8px;
+}
+
+.menu .glyphicon {
+	font-size: 18pt;
 }
 
 .footer {

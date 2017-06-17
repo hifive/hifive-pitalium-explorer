@@ -66,8 +66,8 @@
 	color:#B3E5FC;
 }
 
-.background-pattern .menu {
-	margin-right: 0;
+.background-pattern .menu .dropdown > a{
+	margin-top: 11px;
 }
 
 .compare_mode {
