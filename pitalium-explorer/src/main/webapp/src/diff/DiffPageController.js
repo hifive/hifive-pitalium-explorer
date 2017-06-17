@@ -182,8 +182,10 @@
 				}
 			}
 
+			var update = this._target && this._target.updated && this._isRecordedResult;
+
 			this._infoController.updateComparisonResult(context.evArg.comparisonResult,
-					this._target.updated && this._isRecordedResult);
+					update);
 		},
 
 		'{window} [resize]': function() {

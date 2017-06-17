@@ -195,12 +195,7 @@
 			}
 
 			this._comparisonResult = null;
-			// Fire change event and show images.
 			this._setImage();
-			this.trigger('updateComparisonResult', {
-				targetId: null,
-				comparisonResult: null
-			});
 		},
 
 		_setImage: function() {
