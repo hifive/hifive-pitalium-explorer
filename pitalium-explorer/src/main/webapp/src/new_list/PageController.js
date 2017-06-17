@@ -141,7 +141,7 @@
 		 * @param {jQuery} $el the event target element
 		 */
 		'.table tr click': function(context, $el) {
-			if ($el.closest('.result_info_container').find('[data-mode="result"]').css('display') === 'inline-block') {
+			if ($el.closest('.result_info_container').find('.toggle-mode[data-mode="compare"]').hasClass('active')) {
 				// 比較モード時は画面遷移しない
 				return;
 			}
@@ -257,10 +257,13 @@
 		},
 
 		'.toggle-mode click': function(context, $el) {
-			context.event.stopPropagation();
+			context.event.preventDefault();
 			var $resultInfoContainer = $el.closest('.result_info_container');
 			var $resultCol = $resultInfoContainer.find('.result_mode');
 			var $compareCol = $resultInfoContainer.find('.compare_mode');
+
+			$el.parent().find('.toggle-mode').removeClass('active');
+			$el.addClass('active');
 
 			var mode = $el.data('mode');
 			if (mode == 'result') {
@@ -279,6 +282,8 @@
 				this._appendComparisonResult(
 						timeStr + '/' + $resultInfoContainer.data('testClass'), id);
 			}
+
+			this._updateResultContentHeight($resultInfoContainer.find('.result_content'));
 		},
 
 		'.delete-btn click': function(context, $el) {

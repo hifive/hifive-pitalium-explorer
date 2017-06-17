@@ -163,15 +163,13 @@
 						<h5 style="font-size:16px;margin: 0">[%= testClass %]</h5>
 					</div>
 				</div>
-				<div class="col-sm-3 col-md-3">
-					<div class="mode-toggle-buttons">
-						<button class="btn btn-default btn-xs toggle-mode result_mode" data-mode="compare">ブラウザ間比較</button>
-						<button class="btn btn-default btn-xs toggle-mode compare_mode" data-mode="result">テスト実行結果</button>
-					</div>
-				</div>
 			</div>
 			<div class="col-sm-12 col-md-12 result_list_table" style="display:none;">
-			<table class="table" id="table_[%= testClass %]" >
+				<ul class="nav nav-tabs">
+					<li class="toggle-mode active" data-mode="result"><a href="#" data-toggle="tab" aria-expanded="true">テスト実行結果</a></li>
+					<li class="toggle-mode" data-mode="compare"><a href="#" data-toggle="tab" aria-expanded="false">ブラウザ間比較</a></li>
+				</ul>
+				<table class="table" id="table_[%= testClass %]" >
 					<tbody>
 						<tr class="th_tr" >
 							<th>Test method</th>
