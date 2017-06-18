@@ -214,8 +214,9 @@
 			this._testResultListLogic.compareScreenshots(targets.join(','),
 					directory_expected + "/" + expected).done(this.own(function() {
 				this._appendComparisonResult(directory_expected, $el.data("id"));
-			})).always(function() {
+			})).fail(function() {
 				alert('failed to compare images');
+			}).always(function() {
 				loading.hide();
 				$el.show();
 			});
@@ -272,18 +273,20 @@
 			} else if (mode == 'compare') {
 				$resultCol.hide();
 				$compareCol.show();
-				if (isResultLoaded($resultInfoContainer)) {
+				if (!isResultLoaded($resultInfoContainer)) {
+					markAsResultLoaded($resultInfoContainer);
+					var $resultContent = $resultInfoContainer.closest('.result_content');
+					var timeStr = $resultContent.data('timestamp');
+					var id = $resultContent.data('testExecutionId');
+					this._appendComparisonResult(
+							timeStr + '/' + $resultInfoContainer.data('testClass'), id).done(this.own(function() {
+								this._updateResultContentHeight($resultInfoContainer.closest('.result_content'));			
+							}));
 					return;
 				}
-				markAsResultLoaded($resultInfoContainer);
-				var $resultContent = $resultInfoContainer.closest('.result_content');
-				var timeStr = $resultContent.data('timestamp');
-				var id = $resultContent.data('testExecutionId');
-				this._appendComparisonResult(
-						timeStr + '/' + $resultInfoContainer.data('testClass'), id);
 			}
 
-			this._updateResultContentHeight($resultInfoContainer.find('.result_content'));
+			this._updateResultContentHeight($resultInfoContainer.closest('.result_content'));
 		},
 
 		'.delete-btn click': function(context, $el) {
@@ -331,29 +334,20 @@
 		_updateResultContentHeight: function($resultContent) {
 			$resultContent.css('height', '');
 			var height = $resultContent.height();
-			$resultContent.find('.result_info_container').each(function() {
+			$resultContent.find('.result_ul > .result_info_container').each(function() {
 				height += this.offsetHeight;
 			});
 			$resultContent.height(height);
 		},
 
 		_appendComparisonResult: function(path, id) {
-			this._testResultListLogic.fetchScreenshotList(path, true).done(
+			return this._testResultListLogic.fetchScreenshotList(path, true).done(
 					this.own(function(resultList) {
-						for (var i = 0; i < resultList.length; i++) {
-							var result = resultList[i];
-							var tStamp = new Date(parseInt(result.executionTime));
-
-							this.view.append('#result_ul_' + id + ' .result_list_table',
-									"result_info_table", {
-										id: result.id,
-										resultList: result.resultList,
-										expected: result.expectedFilename,
-										timestamp: hifive.pitalium.explorer.utils
-												.toLocaleTimeString(tStamp),
-										directory: path
-									});
-						}
+						this.view.update('#result_ul_' + id + ' .compare_result_list',
+								"result_info_table", {
+									results: resultList,
+									directory: path
+								});
 					}));
 		},
 
