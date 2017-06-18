@@ -290,13 +290,16 @@
 		},
 
 		'.delete-btn click': function(context, $el) {
+			context.event.stopPropagation();
 			var directory = $el.data("directory");
 			var id = $el.data("resultid");
 
-			$el.closest('.result_info_table').remove();
-			alert("Results deleted!");
-
-			this._testResultListLogic.deleteScreenshot(directory, id);
+			var $resultInfoTable = $el.closest('.result_info_table');
+			this._testResultListLogic.deleteScreenshot(directory, id).done(this.own(function() {
+				this._updateResultContentHeight($resultInfoTable.closest('.result_content'));		
+				$resultInfoTable.remove();
+				alert("Results deleted!");
+			}));
 		},
 
 		_findInput: function(type, directory, target) {
