@@ -11,7 +11,7 @@
 				<div class="col-sm-1 col-md-1"style="margin:0; padding-right:0px; width:7%; ">
 
 					<div style="min-height:66px; padding-top: 15px; padding-bottom:15px;">
-						<i class="glyphicon glyphicon-menu-right result_icon" style="font-size:25px; margin:0; color:#8BC34A; padding-top:10px; padding-bottom:10px;"></i></div>
+						<i class="glyphicon glyphicon-menu-right result_icon" style="font-size:25px; margin:0; color:#FF8A65; padding-top:10px; padding-bottom:10px;"></i></div>
 					</div>
 				<div class="col-sm-10 col-md-10" style="margin:0px; padding-left:0px;">
 					<div class="col-sm-12 col-md-12" style="margin:0; word-break: break-all;">
@@ -181,16 +181,23 @@
 				</ul>
 				<table class="table" id="table_[%= testClass %]" >
 					<tbody>
-						<tr class="th_tr" >
+						<tr class="th_tr result_mode">
 							<th>Test method</th>
 							<th>Test screen</th>
 							<th>Platform</th>
 							<th>Browser name</th>
 							<th>Browser Version</th>
-							<th class="result_mode">Comparison result</th>
-							<th class="compare_mode">Expected</th>
-							<th class="compare_mode">Compare</th>
-							<th class="compare_mode">Run</th>
+							<th>Comparison result</th>
+						</tr>
+						<tr class="th_tr compare_mode">
+							<th>Test method</th>
+							<th>Test screen</th>
+							<th>Platform</th>
+							<th>Browser name</th>
+							<th>Browser Version</th>
+							<th>Expected</th>
+							<th>Compare</th>
+							<th>Run</th>
 						</tr>
 						[% 
 						var screenshotList = screenshots[testClass];

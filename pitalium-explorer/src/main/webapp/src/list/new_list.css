@@ -101,12 +101,15 @@
 	color: white;
 	text-align: center;
 }
-.table_list th {
+.table_list tr.result_mode th {
 	background-color:#26A69A;
-
 }
-.info_table th{
+.table_list tr.compare_mode th {
 	background-color:#FF8A65;
+}
+
+.info_table th{
+	background-color:#FFBA65;
 }
 .table tr[data-screenshot-id] {
 	cursor: pointer;
