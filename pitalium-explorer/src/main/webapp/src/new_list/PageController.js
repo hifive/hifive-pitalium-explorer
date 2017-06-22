@@ -224,15 +224,15 @@
 
 		'.result_info click': function(context, $el) {
 			var info_table = $el.parent().find(".result_list_table");
-			this._toggleResultInfo($el, info_table);
+			this._toggleResultInfo($el, info_table, true);
 		},
 
 		'.result_info_table click': function(context, $el) {
 			var info_table = $el.parent().find(".info_table_div");
-			this._toggleResultInfo($el, info_table);
+			this._toggleResultInfo($el, info_table, true);
 		},
 
-		_toggleResultInfo: function($el, info_table) {
+		_toggleResultInfo: function($el, info_table, closeOthers) {
 			var $resultContent = info_table.closest('.result_content');
 			info_table.slideToggle({
 				complete: this.own(function() {
@@ -242,7 +242,7 @@
 
 			var modeToggleButtons = $resultContent.find('.mode-toggle-buttons');
 
-			var result_icon = $el.parent().find(".result_icon");
+			var result_icon = info_table.siblings('.result_info').find(".result_icon");
 
 			if (info_table.data("hided") == "true") {
 				info_table.data("hided", "false");
@@ -250,6 +250,15 @@
 				result_icon.removeClass("glyphicon-menu-down");
 				modeToggleButtons.hide();
 			} else {
+				// 表示中のものがあれば、閉じる
+				if (closeOthers) {
+					info_table.parent().siblings().children().each(this.own(function(idx, el) {
+						var $child = $(el);
+						if ($child.data('hided') == "true") {
+							this._toggleResultInfo($el, $child, false);
+						}
+					}));
+				}
 				info_table.data("hided", "true");
 				result_icon.addClass("glyphicon-menu-down");
 				result_icon.removeClass("glyphicon-menu-right");
