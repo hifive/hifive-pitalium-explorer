@@ -141,7 +141,8 @@
 		 * @param {jQuery} $el the event target element
 		 */
 		'.table tr click': function(context, $el) {
-			if ($el.closest('.result_info_container').find('.toggle-mode[data-mode="compare"]').hasClass('active')) {
+			if ($el.closest('.result_info_container').find('.toggle-mode[data-mode="compare"]')
+					.hasClass('active')) {
 				// 比較モード時は画面遷移しない
 				return;
 			}
@@ -287,10 +288,8 @@
 					var $resultContent = $resultInfoContainer.closest('.result_content');
 					var timeStr = $resultContent.data('timestamp');
 					var id = $resultContent.data('testExecutionId');
-					this._appendComparisonResult(
-							timeStr + '/' + $resultInfoContainer.data('testClass'), id).done(this.own(function() {
-								this._updateResultContentHeight($resultInfoContainer.closest('.result_content'));			
-							}));
+					this._appendComparisonResult(timeStr + '/'
+							+ $resultInfoContainer.data('testClass'), id);
 					return;
 				}
 			}
@@ -305,7 +304,7 @@
 
 			var $resultInfoTable = $el.closest('.result_info_table');
 			this._testResultListLogic.deleteScreenshot(directory, id).done(this.own(function() {
-				this._updateResultContentHeight($resultInfoTable.closest('.result_content'));		
+				this._updateResultContentHeight($resultInfoTable.closest('.result_content'));
 				$resultInfoTable.remove();
 				alert("Results deleted!");
 			}));
@@ -354,13 +353,17 @@
 
 		_appendComparisonResult: function(path, id) {
 			return this._testResultListLogic.fetchScreenshotList(path, true).done(
-					this.own(function(resultList) {
-						this.view.update('#result_ul_' + id + ' .compare_result_list',
-								"result_info_table", {
+					this
+							.own(function(resultList) {
+								var $compareList = this.$find('#result_ul_' + id
+										+ ' .compare_result_list');
+								this.view.update($compareList, "result_info_table", {
 									results: resultList,
 									directory: path
 								});
-					}));
+								this._updateResultContentHeight($compareList
+										.closest('.result_content'));
+							}));
 		},
 
 		/**
