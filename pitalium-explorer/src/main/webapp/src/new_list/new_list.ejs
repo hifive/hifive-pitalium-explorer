@@ -170,7 +170,14 @@
 					</div>
 				<div class="col-sm-8 col-md-8" style="padding-left:0px;">
 					<div class="col-sm-12 col-md-12" style="word-break: break-all;">
-						<h5 style="font-size:16px;margin: 0">[%= testClass %]</h5>
+						<h5 style="font-size:16px;margin: 0">
+							[%= testClass %]
+							[% if (screenshots[testClass].result) { %]
+								<img class="test-result-icon" src="res/img/checkmark.png" alt="○" aria-label="All tests passed">
+							[% } else if (screenshots[testClass].result === false) { %]
+								<img class="test-result-icon" src="res/img/xmark.png" alt="×" aria-label="Some tests failed">
+							[% } %]
+						</h5>
 					</div>
 				</div>
 			</div>
@@ -200,7 +207,7 @@
 							<th>Run</th>
 						</tr>
 						[% 
-						var screenshotList = screenshots[testClass];
+						var screenshotList = screenshots[testClass].list;
 						for (var i = 0, len = screenshotList.length; i < len; i++) {
 							var screenshot = screenshotList[i];
 							var id = screenshot.testExecution.id;

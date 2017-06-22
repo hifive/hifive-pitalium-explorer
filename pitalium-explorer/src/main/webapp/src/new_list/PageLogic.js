@@ -84,12 +84,22 @@
 				for (var i = 0, len = screenshotList.length; i < len; i++) {
 					var screenshot = screenshotList[i];
 					var testClass = screenshot.testClass;
-					var list = testClassResult[testClass];
-					if (!list) {
-						list = [];
-						testClassResult[testClass] = list;
+					var classResult = testClassResult[testClass];
+					if (!classResult) {
+						classResult = {
+							list: [],
+							result: null
+						};
+						testClassResult[testClass] = classResult;
 					}
-					list.push(screenshot);
+					if (screenshot.comparisonResult && classResult.result == null) {
+						classResult.result = true;
+					}
+					if (screenshot.comparisonResult === false) {
+						classResult.result = false;
+					}
+
+					classResult.list.push(screenshot);
 				}
 				dfd.resolve(testClassResult);
 			});
