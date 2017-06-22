@@ -251,3 +251,11 @@
 		</div>
 	[% } %]
 </script>
+<script type="text/ejs" id="resultDirectoryKeys">
+	<li role="separator" class="divider"></li>
+	[% for(var i = 0, len = keys.length; i < len; i++) {
+		var key = keys[i];
+	%]
+		<li><a href="?resultDirectoryKey=[%= key %]">Change Folders to [%= key %]</a></li>
+	[% } %]
+</script>

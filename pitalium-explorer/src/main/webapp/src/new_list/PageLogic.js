@@ -153,8 +153,15 @@
 					resultListId: id
 				}
 			});
-		}
+		},
 
+		getResultDirectoryKeys: function() {
+			return h5.ajax({
+				type: 'get',
+				dataType: 'json',
+				url: 'directoryKeys/list'
+			});
+		}
 	};
 
 	h5.core.expose(PageLogic);
