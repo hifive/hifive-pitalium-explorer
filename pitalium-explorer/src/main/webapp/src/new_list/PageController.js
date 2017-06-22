@@ -140,7 +140,7 @@
 		 * @param {Object} context the event context
 		 * @param {jQuery} $el the event target element
 		 */
-		'.table tr click': function(context, $el) {
+		'.result_list_table > .table tr click': function(context, $el) {
 			if ($el.closest('.result_info_container').find('.toggle-mode[data-mode="compare"]')
 					.hasClass('active')) {
 				// 比較モード時は画面遷移しない
