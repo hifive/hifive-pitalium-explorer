@@ -55,7 +55,7 @@
 							<td>[%=Math.round(r.entireSimilarity * 100) / 100 %]</td>
 							<td>[%= r.numberOfDiffRec %]</td>
 
-							<td><a target="_blank" href="new_diff.html?list_id=[%=id%]&result_id=[%= r.id %]&directory=[%= directory %]&expected=[%= expected %]&target=[%= r.targetFilename %]&offsetx=[%= r.offsetX %]&offsety=[%= r.offsetY %]&offset_expected=[%= r.moveExpected %]&minsimilarity=[%= r.minSimilarity %]" class="btn btn-danger btn-detail" data-result_list_id="[%=id%]" data-target_result_id="[%= r.id %]" data-expected="[%= expected %]" data-target="[%=r.targetFilename %]" data-directory="[%= directory %]" >Detail</a></td>
+							<td><a target="_blank" href="browserDiff.html?list_id=[%=id%]&result_id=[%= r.id %]&directory=[%= directory %]&expected=[%= expected %]&target=[%= r.targetFilename %]&offsetx=[%= r.offsetX %]&offsety=[%= r.offsetY %]&offset_expected=[%= r.moveExpected %]&minsimilarity=[%= r.minSimilarity %]" class="btn btn-danger btn-detail" data-result_list_id="[%=id%]" data-target_result_id="[%= r.id %]" data-expected="[%= expected %]" data-target="[%=r.targetFilename %]" data-directory="[%= directory %]" >Detail</a></td>
 						<tr>
 					[%}%]
 

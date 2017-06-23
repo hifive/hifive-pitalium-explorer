@@ -18,11 +18,11 @@
 	/**
 	 * This class is a controller for the list page of test results.
 	 * 
-	 * @class hifive.pitalium.explorer.newList.ResultListPageController
+	 * @class hifive.pitalium.explorer.list.ResultListPageController
 	 * @name ResultListPageController
 	 */
 	/**
-	 * @lends hifive.pitalium.explorer.newList.ResultListPageController#
+	 * @lends hifive.pitalium.explorer.list.ResultListPageController#
 	 */
 	var resultListPageController = {
 		/**
@@ -37,7 +37,7 @@
 		/**
 		 * The &quot;logic&quot; class
 		 * 
-		 * @type {hifive.pitalium.explorer.newList.PageLogic}
+		 * @type {hifive.pitalium.explorer.list.PageLogic}
 		 */
 		_testResultListLogic: hifive.pitalium.explorer.logic.TestResultListLogic,
 
@@ -135,7 +135,7 @@
 
 		/**
 		 * Called when a test result has been clicked.<br>
-		 * Go to a new page which shows the difference images of the selected test result.
+		 * Go to a page which shows the difference images of the selected test result.
 		 * 
 		 * @memberOf hifive.pitalium.explorer.controller.ResultListPageController
 		 * @param {Object} context the event context
