@@ -50,8 +50,8 @@
 
 		<!-- pitaliumに依存 -->
 		<dependency org="com.google.guava" name="guava" rev="21.0" conf="default,test->default(*)" />
-		<dependency org="org.seleniumhq.selenium" name="selenium-api" rev="3.3.1" conf="default,test->default(*)" />
-		<dependency org="org.seleniumhq.selenium" name="selenium-remote-driver" rev="3.3.1" conf="default,test->default(*)" />
+		<dependency org="org.seleniumhq.selenium" name="selenium-api" rev="3.4.0" conf="default,test->default(*)" />
+		<dependency org="org.seleniumhq.selenium" name="selenium-remote-driver" rev="3.4.0" conf="default,test->default(*)" />
 
 		<dependency org="junit" name="junit" rev="4.12"/>
 		<dependency org="org.mockito" name="mockito-all" rev="1.10.19"/>

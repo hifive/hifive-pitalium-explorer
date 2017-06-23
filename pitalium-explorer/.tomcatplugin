@@ -45,8 +45,8 @@
         <webClassPathEntry>/pitalium-explorer/lib/log4j-slf4j-impl-2.8.1.jar</webClassPathEntry>
         <webClassPathEntry>/pitalium-explorer/lib/mockito-all-1.10.19.jar</webClassPathEntry>
         <webClassPathEntry>/pitalium-explorer/lib/pitalium-1.1.2.jar</webClassPathEntry>
-        <webClassPathEntry>/pitalium-explorer/lib/selenium-api-3.3.1.jar</webClassPathEntry>
-        <webClassPathEntry>/pitalium-explorer/lib/selenium-remote-driver-3.3.1.jar</webClassPathEntry>
+        <webClassPathEntry>/pitalium-explorer/lib/selenium-api-3.4.0.jar</webClassPathEntry>
+        <webClassPathEntry>/pitalium-explorer/lib/selenium-remote-driver-3.4.0.jar</webClassPathEntry>
         <webClassPathEntry>/pitalium-explorer/lib/slf4j-api-1.7.25.jar</webClassPathEntry>
         <webClassPathEntry>/pitalium-explorer/lib/slf4j-ext-1.7.25.jar</webClassPathEntry>
         <webClassPathEntry>/pitalium-explorer/lib/spring-aop-4.3.7.RELEASE.jar</webClassPathEntry>
