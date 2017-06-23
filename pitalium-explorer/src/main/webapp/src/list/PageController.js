@@ -32,7 +32,7 @@
 		/**
 		 * @ignore
 		 */
-		__templates: 'src/new_list/new_list.ejs',
+		__templates: 'src/list/list.ejs',
 
 		/**
 		 * The &quot;logic&quot; class
