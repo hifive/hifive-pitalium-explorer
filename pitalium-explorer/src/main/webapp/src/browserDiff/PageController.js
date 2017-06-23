@@ -2,25 +2,25 @@
 	'use strict';
 
 	/**
-	 * @class hifive.pitalium.explorer.newDiff.PageController
+	 * @class hifive.pitalium.explorer.browserDiff.PageController
 	 */
 	/**
-	 * @lends hifive.pitalium.explorer.newDiff.PageController#
+	 * @lends hifive.pitalium.explorer.browserDiff.PageController#
 	 */
 	var PageController = {
 		/**
 		 * @ignore
 		 */
-		__name: 'hifive.pitalium.explorer.newDiff.PageController',
+		__name: 'hifive.pitalium.explorer.browserDiff.PageController',
 		/**
 		 * @ignore
 		 */
-		__templates: 'src/new_diff/new_diff.ejs',
+		__templates: 'src/browserDiff/browserDiff.ejs',
 
 		/**
-		 * @type {hifive.pitalium.explorer.newDiff.PageLogic}
+		 * @type {hifive.pitalium.explorer.browserDiff.PageLogic}
 		 */
-		_pageLogic: hifive.pitalium.explorer.newDiff.PageLogic,
+		_pageLogic: hifive.pitalium.explorer.browserDiff.PageLogic,
 
 		/**
 		 * @type {JQuery}
@@ -145,106 +145,98 @@
 			 * @type {JQuery}
 			 */
 			var $testResult = this.$find('#test_result');
-			$testResult
-				.height('300')
-				.width('100%')
-				.css('background', '#fff url("res/img/big_loading.gif") center no-repeat');
+			$testResult.height('300').width('100%').css('background',
+					'#fff url("res/img/big_loading.gif") center no-repeat');
 
 			/**
 			 * @type {JQuery}
 			 */
 			var $testExpected = this.$find('#test_expected');
-			$testExpected
-				.height('300')
-				.width('100%')
-				.css('background', '#fff url("res/img/big_loading.gif") center no-repeat');
+			$testExpected.height('300').width('100%').css('background',
+					'#fff url("res/img/big_loading.gif") center no-repeat');
 
 			this.$find('.diffDiv').remove();
 
-			this._pageLogic.fetchScreenshotImages(target, expected).done(this.own(function(data) {
-				var offsets = offsetX + 'px ' + offsetY + 'px';
-				var actual = document.createElement('img');
-				actual.onload = function() {
-					$testResult
-						.height(this.height)
-						.width(this.width)
-						.data("width", this.width)
-						.data("height", this.height)
-						.css("background-image", "url('" + this.src + "')");
+			this._pageLogic.fetchScreenshotImages(target, expected).done(
+					this.own(function(data) {
+						var offsets = offsetX + 'px ' + offsetY + 'px';
+						var actual = document.createElement('img');
+						actual.onload = function() {
+							$testResult.height(this.height).width(this.width).data("width",
+									this.width).data("height", this.height).css("background-image",
+									"url('" + this.src + "')");
 
-					if (!offsetExpected) {
-						$testResult.css("background-position", offsets);
-					}
-				};
+							if (!offsetExpected) {
+								$testResult.css("background-position", offsets);
+							}
+						};
 
-				actual.src = 'data:image/png;base64,' + data.targetImage;
+						actual.src = 'data:image/png;base64,' + data.targetImage;
 
-				var expected = document.createElement('img');
-				expected.onload = function() {
-					$testExpected
-						.height(this.height)
-						.width(this.width)
-						.data("width", this.width)
-						.data("height", this.height)
-						.css("background-image", "url('" + this.src + "')");
+						var expected = document.createElement('img');
+						expected.onload = function() {
+							$testExpected.height(this.height).width(this.width).data("width",
+									this.width).data("height", this.height).css("background-image",
+									"url('" + this.src + "')");
 
-					if (offsetExpected) {
-						$testExpected.css("background-position", offsets);
-					}
-				};
-				expected.src = 'data:image/png;base64,' + data.expectedImage;
+							if (offsetExpected) {
+								$testExpected.css("background-position", offsets);
+							}
+						};
+						expected.src = 'data:image/png;base64,' + data.expectedImage;
 
-				this._drawRec(directory, resultListId, targetResultId); //this function draws all of red rectangles(divs)
-			}));
+						this._drawRec(directory, resultListId, targetResultId); //this function draws all of red rectangles(divs)
+					}));
 		},
 
 		_drawRec: function(directory, resultId, targetResultId) { //this function draws all of red rectangles(divs)
-			this._pageLogic.fetchCompareResults(directory, resultId, targetResultId).done(this.own(function(data) {
-				this.log.debug(data);
+			this._pageLogic.fetchCompareResults(directory, resultId, targetResultId).done(
+					this.own(function(data) {
+						this.log.debug(data);
 
-				for (var i = 0; i < data.length; i++) {
+						for (var i = 0; i < data.length; i++) {
 
-					var rec = data[i];
-					var my_data;
-					var s_unit = rec["similarityUnit"];
+							var rec = data[i];
+							var my_data;
+							var s_unit = rec["similarityUnit"];
 
-					if (rec["category"] == "SHIFT") {
-						my_data = {
-							x: rec["x"],
-							y: rec["y"],
-							width: rec["width"],
-							height: rec["height"],
-							category: rec["category"],
-							xshift: rec["xshift"],
-							yshift: rec["yshift"],
-							featureMatrix: "",
-							pixelByPixel: "1",
-							thresDiff: "",
-							totalDiff: "",
-							index: i
-						};
+							if (rec["category"] == "SHIFT") {
+								my_data = {
+									x: rec["x"],
+									y: rec["y"],
+									width: rec["width"],
+									height: rec["height"],
+									category: rec["category"],
+									xshift: rec["xshift"],
+									yshift: rec["yshift"],
+									featureMatrix: "",
+									pixelByPixel: "1",
+									thresDiff: "",
+									totalDiff: "",
+									index: i
+								};
 
-					} else {
-						my_data = {
-							x: rec["x"],
-							y: rec["y"],
-							width: rec["width"],
-							height: rec["height"],
-							category: rec["category"],
-							xshift: rec["xshift"],
-							yshift: rec["yshift"],
-							featureMatrix: s_unit["similarityFeatureMatrix"],
-							pixelByPixel: s_unit["similarityPixelByPixel"],
-							thresDiff: s_unit["similarityThresDiff"],
-							totalDiff: s_unit["similarityTotalDiff"],
-							index: i
-						};
-					}
+							} else {
+								my_data = {
+									x: rec["x"],
+									y: rec["y"],
+									width: rec["width"],
+									height: rec["height"],
+									category: rec["category"],
+									xshift: rec["xshift"],
+									yshift: rec["yshift"],
+									featureMatrix: s_unit["similarityFeatureMatrix"],
+									pixelByPixel: s_unit["similarityPixelByPixel"],
+									thresDiff: s_unit["similarityThresDiff"],
+									totalDiff: s_unit["similarityTotalDiff"],
+									index: i
+								};
+							}
 
-					this.view.append("#test_expected", "diffDiv", my_data);
-					this.view.append("#test_result", "diffDiv", my_data);
-				}
-			}));
+							this.view.append("#test_expected", "diffDiv", my_data);
+							this.view.append("#test_result", "diffDiv", my_data);
+						}
+					}));
 		},
 
 		'.result_info click': function(context, $el) {
@@ -297,14 +289,16 @@
 		_onImageSizeChanged: function(context, $el) {
 			var ratio = $el.val();
 
-			$(".screenshot").each(function() {
-				var $this = $(this);
-				var this_height = $this.data("height");
-				var this_width = $this.data("width");
-				$this.height(this_height * ratio);
-				$this.width(this_width * ratio);
-				$this.css("background-size", String(this_width * ratio) + "px " + String(this_height * ratio) + "px");
-			});
+			$(".screenshot").each(
+					function() {
+						var $this = $(this);
+						var this_height = $this.data("height");
+						var this_width = $this.data("width");
+						$this.height(this_height * ratio);
+						$this.width(this_width * ratio);
+						$this.css("background-size", String(this_width * ratio) + "px "
+								+ String(this_height * ratio) + "px");
+					});
 
 			$(".diffDiv").each(function() {
 				var $this = $(this);

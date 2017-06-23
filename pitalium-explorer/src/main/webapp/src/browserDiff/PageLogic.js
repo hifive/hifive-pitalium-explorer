@@ -2,16 +2,16 @@
 	'use strict';
 
 	/**
-	 * @class hifive.pitalium.explorer.newDiff.PageLogic
+	 * @class hifive.pitalium.explorer.browserDiff.PageLogic
 	 */
 	/**
-	 * @lends hifive.pitalium.explorer.newDiff.PageLogic#
+	 * @lends hifive.pitalium.explorer.browserDiff.PageLogic#
 	 */
 	var PageLogic = {
 		/**
 		 * @ignore
 		 */
-		__name: 'hifive.pitalium.explorer.newDiff.PageLogic',
+		__name: 'hifive.pitalium.explorer.browserDiff.PageLogic',
 
 		/**
 		 * @param {String} target
