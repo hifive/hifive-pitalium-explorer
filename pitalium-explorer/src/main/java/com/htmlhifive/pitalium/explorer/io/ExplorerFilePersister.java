@@ -47,6 +47,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.htmlhifive.pitalium.common.exception.JSONException;
 import com.htmlhifive.pitalium.common.util.JSONUtils;
 import com.htmlhifive.pitalium.core.config.FilePersisterConfig;
+import com.htmlhifive.pitalium.core.config.PersisterConfig;
 import com.htmlhifive.pitalium.core.config.PtlTestConfig;
 import com.htmlhifive.pitalium.core.io.FilePersister;
 import com.htmlhifive.pitalium.core.io.PersistMetadata;
@@ -97,12 +98,23 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 	private Map<TargetResult, Integer> targetIdMap; // 結果オブジェクトとIDを紐付けするためのもの
 
 	public ExplorerFilePersister() {
-		super(PtlTestConfig.getInstance().getConfig(ExplorerPersisterConfig.class).getFile());
+		super(getFilePersisterConfig());
 	}
 
 	public ExplorerFilePersister(FilePersisterConfig config) {
 		// FIXME 独自のConfigに差し替える必要があるかも
 		super(config);
+	}
+
+	private static FilePersisterConfig getFilePersisterConfig() {
+		PtlTestConfig instance = PtlTestConfig.getInstance();
+		PersisterConfig config;
+		if (new File("explorerPersisterConfig.json").exists()) {
+			config = instance.getConfig(ExplorerPersisterConfig.class);
+		} else {
+			config = instance.getConfig(PersisterConfig.class);
+		}
+		return config.getFile();
 	}
 
 	@Override
