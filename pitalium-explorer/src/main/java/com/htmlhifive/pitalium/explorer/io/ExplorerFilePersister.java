@@ -17,6 +17,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -109,7 +110,8 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 	private static FilePersisterConfig getFilePersisterConfig() {
 		PtlTestConfig instance = PtlTestConfig.getInstance();
 		PersisterConfig config;
-		if (new File("explorerPersisterConfig.json").exists()) {
+		InputStream in = PtlTestConfig.class.getClassLoader().getResourceAsStream("explorerPersisterConfig.json");
+		if (in != null) {
 			config = instance.getConfig(ExplorerPersisterConfig.class);
 		} else {
 			config = instance.getConfig(PersisterConfig.class);
