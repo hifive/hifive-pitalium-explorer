@@ -71,7 +71,7 @@
 					'targetId': targetId
 				};
 
-				if (screenshot.expectedScreenshotId) {
+				if (screenshot.expectedScreenshotId != null) {
 					this._screenshot.expected = {
 						'screenshotId': screenshot.expectedScreenshotId,
 						'targetId': targetId
