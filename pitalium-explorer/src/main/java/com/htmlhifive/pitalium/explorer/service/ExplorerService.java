@@ -217,7 +217,8 @@ public class ExplorerService implements Serializable {
 			Integer targetTargetId) {
 		Screenshot sourceScreenshot = persisterService.getScreenshot(sourceScreenshotId);
 		Screenshot targetScreenshot = persisterService.getScreenshot(targetScreenshotId);
-		if (sourceScreenshot.getExpectedScreenshotId().equals(targetScreenshot.getId())) {
+		if (sourceScreenshot.getExpectedScreenshotId() != null
+				&& sourceScreenshot.getExpectedScreenshotId().equals(targetScreenshot.getId())) {
 			return sourceScreenshot.getComparisonResult();
 		}
 
