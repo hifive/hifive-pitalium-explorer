@@ -466,7 +466,13 @@
 		 */
 		updatePage: function() {
 			var page = 1 + Math.floor(this._pageStart / this._pageSize);
-			this.loadTestExecutionList(page);
+			var search = window.location.search.substr(1);
+			var obj = search.split('&').reduce(function(o, v) {
+				var pair = v.split('=');
+				o[pair[0]] = pair[1];
+				return o;
+			}, {});
+			this.loadTestExecutionList(page, obj.resultDirectoryKey);
 		},
 
 		/**
@@ -475,23 +481,24 @@
 		 * @memberOf hifive.pitalium.explorer.controller.ResultListPageController
 		 * @param {number} page desired page number
 		 */
-		loadTestExecutionList: function(page) {
+		loadTestExecutionList: function(page, resultDirectoryKey) {
 			var indicator = this.indicator({
 				message: 'Loading...',
 				target: document
 			}).show();
 
 			// Load list of test execution
-			this._testResultListLogic.getTestExecutionList(page, this._pageSize).done(
-			// this._testResultListLogic.fetchList().done(
-			this.own(function(response) {
-				// Update views
-				this.view.update('#result_list', 'testExecutionListTemplate', {
-					testExecutionsPage: response
-				});
-			})).always(function() {
-				indicator.hide();
-			});
+			this._testResultListLogic
+					.getTestExecutionList(page, this._pageSize, resultDirectoryKey).done(
+					// this._testResultListLogic.fetchList().done(
+					this.own(function(response) {
+						// Update views
+						this.view.update('#result_list', 'testExecutionListTemplate', {
+							testExecutionsPage: response
+						});
+					})).always(function() {
+						indicator.hide();
+					});
 		},
 
 		_showResultDirectoryKeys: function() {

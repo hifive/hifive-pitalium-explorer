@@ -45,12 +45,13 @@
 		 * @param {number} pageSize new page size
 		 * @returns {JqXHRWrapper}
 		 */
-		getTestExecutionList: function(page, pageSize) {
+		getTestExecutionList: function(page, pageSize, resultDirectoryKey) {
 			var data = {
 				'page': page,
 				'limit': pageSize,
 				'searchTestMethod': this.searchTestMethod,
-				'searchTestScreen': this.searchTestScreen
+				'searchTestScreen': this.searchTestScreen,
+				'resultDirectoryKey': resultDirectoryKey
 			};
 
 			return h5.ajax({
