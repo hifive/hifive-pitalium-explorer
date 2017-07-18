@@ -28,6 +28,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
 
 import com.htmlhifive.pitalium.explorer.entity.Config;
 import com.htmlhifive.pitalium.explorer.entity.ConfigRepository;
@@ -43,6 +44,7 @@ import com.htmlhifive.pitalium.explorer.entity.TestExecutionRepository;
 import com.htmlhifive.pitalium.explorer.response.TestExecutionResult;
 
 @RunWith(SpringJUnit4ClassRunner.class)
+@WebAppConfiguration
 @ContextConfiguration("/spring/test-context.xml")
 public class ApiControllerTest {
 	@Autowired

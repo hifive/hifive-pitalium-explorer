@@ -6,7 +6,7 @@
 		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.2.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd">
 
-	<context:component-scan base-package="com.htmlhifive.pitalium.explorer.api"/>
+	<context:component-scan base-package="com.htmlhifive.pitalium.explorer"/>
 	<bean id="mockTestExecutionRepository" class="com.htmlhifive.pitalium.explorer.api.MockFactory">
 		<constructor-arg value="com.htmlhifive.pitalium.explorer.entity.TestExecutionRepository" />
 	</bean>
@@ -20,5 +20,11 @@
 		<constructor-arg value="com.htmlhifive.pitalium.explorer.entity.ProcessedImageRepository" />
 	</bean>
 	<bean id="mockHttpServlet" class="org.springframework.mock.web.MockHttpServletRequest">
+	</bean>
+	<bean id="mockAreaRepository" class="com.htmlhifive.pitalium.explorer.api.MockFactory">
+		<constructor-arg value="com.htmlhifive.pitalium.explorer.entity.AreaRepository" />
+	</bean>
+	<bean id="mockTargetRepository" class="com.htmlhifive.pitalium.explorer.api.MockFactory">
+		<constructor-arg value="com.htmlhifive.pitalium.explorer.entity.TargetRepository" />
 	</bean>
 </beans>
