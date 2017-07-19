@@ -1,6 +1,6 @@
 /*global h5, hifive, window, document */
 /*
- * Copyright (C) 2015 NS Solutions Corporation, All Rights Reserved.
+ * Copyright (C) 2015-2017 NS Solutions Corporation, All Rights Reserved.
  */
 (function($) {
 	/**
@@ -24,7 +24,7 @@
 		 */
 		_testResultDiffLogic: hifive.pitalium.explorer.logic.TestResultDiffLogic,
 
-		_screenshot:  {
+		_screenshot: {
 			'expected': null,
 			'actual': null
 		},
@@ -32,8 +32,12 @@
 
 		_imageLoadDeferred: null,
 
+		_targetId: null,
+
 		/** original title */
 		_orgTitle: null,
+
+		_scale: 2.0,
 
 		/**
 		 * Called after the controller has been initialized.<br>
@@ -67,7 +71,7 @@
 					'targetId': targetId
 				};
 
-				if (screenshot.expectedScreenshotId) {
+				if (screenshot.expectedScreenshotId != null) {
 					this._screenshot.expected = {
 						'screenshotId': screenshot.expectedScreenshotId,
 						'targetId': targetId
@@ -83,6 +87,44 @@
 			return h5.async.when(this._imageLoadPromises).done(this.own(function() {
 				this._triggerViewChange();
 			}));
+		},
+
+		/**
+		 * Set scale.
+		 * 
+		 * @param {Number} scale magnifier scale.
+		 * @memberOf hifive.pitalium.explorer.controller.TestResultDiffController
+		 */
+		setScale: function(scale) {
+			this._scale = scale;
+		},
+
+		/**
+		 * Get scale.
+		 * 
+		 * @returns {Number} magnifier scale.
+		 * @memberOf hifive.pitalium.explorer.controller.TestResultDiffController
+		 */
+		getScale: function() {
+			return this._scale;
+		},
+
+		'.plus-scale-button click': function() {
+			var scale = this.getScale();
+			scale += 0.5;
+			if (scale <= 3.0) {
+				this.setScale(scale);
+				this.$find('.current-scale').text(scale.toFixed(1));
+			}
+		},
+
+		'.minus-scale-button click': function() {
+			var scale = this.getScale();
+			scale -= 0.5;
+			if (scale >= 0.5) {
+				this.setScale(scale);
+				this.$find('.current-scale').text(scale.toFixed(1));
+			}
 		},
 
 		/**
@@ -128,6 +170,8 @@
 		},
 
 		_compareImages: function(targetId) {
+			this._targetId = targetId;
+
 			if (targetId !== null) {
 				this._screenshot.actual.targetId = targetId;
 				if (this._screenshot.expected != null) {
@@ -142,6 +186,7 @@
 							// Fire change event and show images.
 							this._setImage();
 							this.trigger('updateComparisonResult', {
+								targetId: targetId,
 								comparisonResult: comparisonResult
 							});
 						}));
@@ -150,11 +195,7 @@
 			}
 
 			this._comparisonResult = null;
-			// Fire change event and show images.
 			this._setImage();
-			this.trigger('updateComparisonResult', {
-				comparisonResult: null
-			});
 		},
 
 		_setImage: function() {
@@ -243,8 +284,10 @@
 
 		/**
 		 * @memberOf hifive.pitalium.explorer.controller.TestResultDiffController
-		 * @param {object} expected object which contains ID of expected image and ID the target area to be used for image comparison
-		 * @param {object} actual object which contains ID of actual image and ID the target area to be used for image comparison
+		 * @param {object} expected object which contains ID of expected image and ID the target
+		 *            area to be used for image comparison
+		 * @param {object} actual object which contains ID of actual image and ID the target area to
+		 *            be used for image comparison
 		 */
 		_initEdgeOverlapping: function(expected, actual) {
 			// Initialize <canvas>
@@ -271,15 +314,15 @@
 
 			$.when.apply($, [d1.promise(), d2.promise()]).done(this.own(function() {
 				var canvas = this.$find('#edge-overlapping canvas')[0];
-				var native_width = canvas.width = expectedImage.width;
-				var native_height = canvas.height = expectedImage.height;
+				canvas.width = expectedImage.width;
+				canvas.height = expectedImage.height;
 
 				var context = canvas.getContext('2d');
 				context.globalCompositeOperation = 'multiply';
 				if (context.globalCompositeOperation == 'multiply') {
 					context.drawImage(expectedImage, 0, 0);
 					context.drawImage(actualImage, 0, 0);
-					this._initImageMagnifier(native_width, native_height);
+					this._initImageMagnifier();
 				} else {
 					// IE workaround
 					var actualBlack = new Image();
@@ -289,7 +332,7 @@
 						context.drawImage(actualBlack, 0, 0);
 						context.globalCompositeOperation = 'destination-over';
 						context.drawImage(actualImage, 0, 0);
-						this._initImageMagnifier(native_width, native_height);
+						this._initImageMagnifier();
 					};
 					actualBlack.src = format('image/processed', {
 						screenshotId: actualId,
@@ -301,11 +344,12 @@
 			}));
 		},
 
-		_initImageMagnifier: function(native_width, native_height) {
+		_initImageMagnifier: function() {
 			// Image magnifier
 			var canvas = this.$find('#edge-overlapping canvas')[0];
 			var $large = this.$find('.large');
 			var $small = this.$find('.small');
+			var that = this;
 			$large.css('background-image', 'url(' + canvas.toDataURL('image/png') + ')');
 			this.$find('#edge-overlapping .image-overlay').mousemove(
 					function(e) {
@@ -319,20 +363,20 @@
 							$large.fadeOut(100);
 						}
 						if ($large.is(':visible')) {
-							var rx = Math.round(mx / $small.width() * native_width
-									- $('.large').width() / 2)
-									* -1;
-							var ry = Math.round(my / $small.height() * native_height
-									- $large.height() / 2)
-									* -1;
+							var rx = Math.round(mx * that._scale - $large.width() / 2) * -1;
+							var ry = Math.round(my * that._scale - $large.height() / 2) * -1;
 
 							$large.css({
 								left: mx - $large.width() / 2,
 								top: my - $large.height() / 2,
-								backgroundPosition: rx + 'px ' + ry + 'px'
+								backgroundPosition: rx + 'px ' + ry + 'px',
+								backgroundSize: $small.width() * that._scale + 'px '
+										+ $small.height() * that._scale + 'px'
 							});
 						}
 					});
+
+			this.$find('.current-scale').text(this.getScale().toFixed(1));
 		},
 
 		/**

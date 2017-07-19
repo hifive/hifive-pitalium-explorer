@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 NS Solutions Corporation, All Rights Reserved.
+ * Copyright (C) 2015-2017 NS Solutions Corporation, All Rights Reserved.
  */
 package com.htmlhifive.pitalium.explorer.api;
 
@@ -28,6 +28,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
 
 import com.htmlhifive.pitalium.explorer.entity.Config;
 import com.htmlhifive.pitalium.explorer.entity.ConfigRepository;
@@ -43,6 +44,7 @@ import com.htmlhifive.pitalium.explorer.entity.TestExecutionRepository;
 import com.htmlhifive.pitalium.explorer.response.TestExecutionResult;
 
 @RunWith(SpringJUnit4ClassRunner.class)
+@WebAppConfiguration
 @ContextConfiguration("/spring/test-context.xml")
 public class ApiControllerTest {
 	@Autowired
@@ -106,7 +108,7 @@ public class ApiControllerTest {
 		reset(testExecutionRepo);
 		when(testExecutionRepo.search(eq(""), eq(""), any(Pageable.class))).thenReturn(page);
 
-		ResponseEntity<Page<TestExecutionResult>> response = this.apiController.listTestExecution(1, 0, "", "");
+		ResponseEntity<Page<TestExecutionResult>> response = this.apiController.listTestExecution(1, 0, "", "", null);
 		Assert.assertEquals(200, response.getStatusCode().value());
 		List<TestExecutionResult> responseBody = response.getBody().getContent();
 		for (int i = 0; i < responseBody.size(); i++) {
@@ -132,7 +134,7 @@ public class ApiControllerTest {
 		when(testExecutionRepo.search(eq(""), eq(""), any(Pageable.class))).thenReturn(page);
 		when(testExecutionRepo.count()).thenReturn((long) converted.size());
 
-		ResponseEntity<Page<TestExecutionResult>> response = this.apiController.listTestExecution(1, 20, "", "");
+		ResponseEntity<Page<TestExecutionResult>> response = this.apiController.listTestExecution(1, 20, "", "", null);
 		Assert.assertEquals(200, response.getStatusCode().value());
 		List<TestExecutionResult> responseBody = response.getBody().getContent();
 		for (int i = 0; i < responseBody.size(); i++) {
@@ -158,7 +160,7 @@ public class ApiControllerTest {
 		when(testExecutionRepo.search(eq(""), eq(""), any(Pageable.class))).thenReturn(page);
 		when(testExecutionRepo.count()).thenReturn((long) converted.size());
 
-		ResponseEntity<Page<TestExecutionResult>> response = this.apiController.listTestExecution(1, -1, "", "");
+		ResponseEntity<Page<TestExecutionResult>> response = this.apiController.listTestExecution(1, -1, "", "", null);
 		Assert.assertEquals(200, response.getStatusCode().value());
 		List<TestExecutionResult> responseBody = response.getBody().getContent();
 		for (int i = 0; i < responseBody.size(); i++) {
@@ -195,7 +197,7 @@ public class ApiControllerTest {
 		when(testExecutionRepo.count()).thenReturn((long) converted.size());
 
 		ResponseEntity<Page<TestExecutionResult>> response = this.apiController.listTestExecution(1, 20, "thod1",
-				"screen1");
+				"screen1", null);
 		Assert.assertEquals(200, response.getStatusCode().value());
 		List<TestExecutionResult> responseBody = response.getBody().getContent();
 

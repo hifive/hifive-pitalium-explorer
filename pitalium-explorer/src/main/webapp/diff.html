@@ -1,4 +1,4 @@
-<!--Copyright (C) 2015 NS Solutions Corporation, All Rights Reserved.  -->
+<!--Copyright (C) 2015-2017 NS Solutions Corporation, All Rights Reserved.  -->
 <!doctype html>
 <html>
 <head>
@@ -10,8 +10,11 @@
 	<meta http-equiv="Expires" content="-1">
 
 	<title>Test Result Detail- Pitalium Explorer</title>
-	<link rel="stylesheet" href="/hifive-res/ext/bootstrap/3.3.5/css/bootstrap.min.css">
-	<link rel="stylesheet" href="/hifive-res/ext/bootstrap/3.3.5/css/bootstrap-theme.min.css">
+
+	<link rel="shortcut icon" href="res/img/favicon.ico">
+
+	<link rel="stylesheet" href="/hifive-res/ext/bootstrap/3.3.6/css/bootstrap.min.css">
+	<link rel="stylesheet" href="/hifive-res/ext/bootstrap/3.3.6/css/bootstrap-theme.min.css">
 	<link rel="stylesheet" href="/hifive-res/ext/jqplugins/jstree/3.0.8/themes/default/style.min.css">
 
 	<link rel="stylesheet" href="/hifive-res/fw/current/h5.css" data-h5-module="hifive">
@@ -22,7 +25,7 @@
 	<link rel="stylesheet" href="src/diff/diff.css">
 
 	<script src="/hifive-res/ext/jquery/jquery-2.js"></script>
-	<script src="/hifive-res/ext/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+	<script src="/hifive-res/ext/bootstrap/3.3.6/js/bootstrap.min.js"></script>
 	<script src="/hifive-res/ext/jqplugins/jstree/3.0.8/jstree.min.js"></script>
 
 	<script src="/hifive-res/fw/current/ejs-h5mod.js" data-h5-module="hifive:ejs"></script>
@@ -34,6 +37,7 @@
 	<script src="src/common/util.js"></script>
 	<script src="src/diff/TestResultDiffLogic.js"></script>
 	<script src="src/diff/SelectExecutionController.js"></script>
+	<script src="src/diff/UpdateResultController.js"></script>
 	<script src="src/diff/TestResultDiffController.js"></script>
 	<script src="src/diff/InfoController.js"></script>
 	<script src="src/diff/ScreenshotListController.js"></script>
@@ -41,7 +45,7 @@
 	<script src="src/diff/init.js"></script>
 
 	<script type="text/ejs" id="testResultListTemplate">
-		<table class="table table-striped table-hover">
+		<table class="table table-hover">
 			<thead>
 				<tr>
 					<th></th>
@@ -102,7 +106,10 @@
 						var e = executions[i];
 				%]
 				<tr class="explorer-test-result"  data-explorer-index="[%= i %]">
-					<td><input type="radio" name="execution"></td>
+					<td>
+						<button type="button" class="actual btn btn-default btn-sm">Actual</button>
+						<button type="button" class="expected btn btn-default btn-sm">Expected</button>
+					</td>
 					<td>[%= e.executionTime %]</td>
 					<td>[%= e.platform %]</td>
 					<td>[%= e.browserName %]</td>
@@ -116,13 +123,26 @@
 			<img class="test-result-icon" src="res/img/checkmark.png" alt="○" aria-label="All tests passed">
 		[% } else if (comparisonResult === false) { %]
 			<img class="test-result-icon" src="res/img/xmark.png" alt="×" aria-label="Some tests failed">
+		[% }
+		if (update) {
+		%]
+			<a href=""><span class="updated-mark">updated</span></a>
 		[% } %]
 	</script>
 	</head>
 	<body>
 		<!-- Navigation -->
-		<nav class="navbar navbar-default navbar-static-top">
+		<nav class="navbar navbar-fixed-top">
 			<div class="container-fluid">
+				<ul class="nav navbar-nav navbar-left menu">
+					<li class="dropdown">
+						<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span class="glyphicon glyphicon-menu-hamburger"></span></a>
+						<ul class="dropdown-menu">
+							<li><a href="list.html">Home</a></li>
+							<li><a href="fileDiff.html">Compare any images</a></li>
+						</ul>
+					</li>
+				</ul>
 				<div class="navbar-header">
 					<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
 						<span class="sr-only">Toggle navigation</span>
@@ -132,68 +152,96 @@
 					</button>
 					<a class="navbar-brand" href="list.html">Pitalium Explorer</a>
 				</div>
-				<div id="navbar" class="navbar-collapse collapse">
-					<ul class="nav navbar-nav">
-						<li><a href="list.html">Home</a></li>
-						<li><a href="fileDiff.html">Diff any images</a></li>
-					</ul>
-				</div><!--/.nav-collapse -->
 			</div>
 		</nav>
+		<div style="height:65px"></div>
 		<!-- Navigation -->
 
 		<div id="container">
-			<div id="info" class="panel panel-default">
-				<div class="panel-heading">
-					<h4 class="panel-title row">
-						<a class="col-xs-11" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="false">
-							Result Information
+			<div id="info" class="panel">
+				<div class="panel-heading title_div">
+					<div class="btn-group">
+						<button class="btn btn-default btn-xs toggle-dropdown" data-toggle="dropdown">
+							Actions
+							<span class="caret"></span>
+						</button>
+						<ul class="dropdown-menu dropdown-menu-right">
+							<li id="select_execution"><a href="">Select Executions</a>
+							<li id="update_result"><a href="">Update Result</a>
+						</ul>
+					</div>
+					<h4 class="panel-title">
+						<a data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="false">
+							<span class="title-label">Result Information</span>
 							<span id="comparisonResult"></span>
 						</a>
-						<button id="select_execution"  class="btn btn-info col-xs-1">Select Executions</button>
 					</h4>
+					<div class="clearfix"></div>
 				</div>
 				<div id="collapseOne" class="panel-collapse collapse in">
 					<div class="panel-body">
 						<div id="detail"></div>
 					</div>
 				</div>
-				<div id="popup_content" style="display:none">
-					<div id="execution_list"></div>
-					<div>
-						<table class="table">
-							<tr id="actualExecution">
-								<td><button class="actual btn btn-danger btn-sm" style="float: left;">Actual</button></td>
-								<td id="executionTime"></td>
-								<td id="platform"></td>
-								<td id="browserName"></td>
-								<td id="browserVersion"></td>
-							</tr>
-							<tr id="expectedExecution">
-								<td><button class="expected btn btn-info btn-sm" style="float: left;">Expected</button></td>
-								<td id="executionTime"></td>
-								<td id="platform"></td>
-								<td id="browserName"></td>
-								<td id="browserVersion"></td>
-							</tr>
-						</table>
+				<div id="popup_contents" style="display:none">
+					<div id="execution_popup">
+						<div id="execution_list"></div>
+						<div>
+							<table class="table">
+								<tr id="actualExecution">
+									<td style="width: 20%;"><span class="label label-danger" style="float: left; width: 100%; font-size: 100%;">Actual</span></td>
+									<td class="executionTime" style="width: 30%"></td>
+									<td class="platform" style="width: 20%"></td>
+									<td class="browserName" style="width: 25%"></td>
+									<td class="browserVersion" style="width: 5%"></td>
+								</tr>
+								<tr id="expectedExecution">
+									<td style="width: 20%;"><span class="label label-info" style="float: left; width: 100%; font-size: 100%;">Expected</span></td>
+									<td class="executionTime" style="width: 30%"></td>
+									<td class="platform" style="width: 20%"></td>
+									<td class="browserName" style="width: 25%"></td>
+									<td class="browserVersion" style="width: 5%"></td>
+								</tr>
+							</table>
+						</div>
+						<div>
+							<button class="cancel btn btn-primary">Cancel</button>
+							<button class="ok btn btn-primary disabled">Select</button>
+						</div>
 					</div>
-					<div>
-						<button class="cancel btn btn-primary">Cancel</button>
-						<button class="ok btn btn-primary" style="display:none">Select</button>
+					<div id="update_result_popup">
+						<form>
+							<div class="form-group">
+								<label>Result:</label>
+								<div class="btn-group" data-toggle="buttons">
+									<label class="btn btn-default active">
+										<span><input type="radio" name="result" autocomplete="off" value="0"><img class="test-result-icon" src="res/img/checkmark.png"></span>
+										<span><input type="radio" name="result" autocomplete="off" value="1"><img class="test-result-icon" src="res/img/xmark.png"></span>
+									</label>
+								</div>
+							</div>
+							<div class="form-group">
+								<label>Comment：</label>
+								<textarea name="comment" class="form-control" rows="7"></textarea>
+							</div>
+							<div>
+								<button class="cancel btn btn-primary">Cancel</button>
+								<button class="ok btn btn-primary">Update</button>
+							</div>
+						</form>
 					</div>
 				</div>
 			</div>
 			<div class="dividedbox">
-				<div id="list" class="panel panel-default autoSize">
-					<div class="panel-heading">
-						<span>Test Cases</span>
+				<div id="list" class="panel autoSize">
+					<div class="panel-heading title_div">
+						<span class="title-label">Test Cases</span>
 					</div>
 					<div id="tree_root" class="panel-body"></div>
 				</div>
-				<div id="main" class="panel panel-default autoSize">
-					<div class="panel-heading">
-						<span>Screenshots</span>
+				<div id="main" class="panel autoSize">
+					<div class="panel-heading title_div">
+						<span class="title-label">Screenshots</span>
 						<span id="selector"></span>
 					</div>
                     <div class="panel-body">
@@ -304,6 +352,15 @@
 	  										<span class="expected legend">EXPECTED</span>
 	  										<span class="actual legend">ACTUAL</span>
 	  									</div>
+											<div class="pull-right" style="position: relative;">
+												<button type="button" class="minus-scale-button btn btn-xs" style="background-color: white;">
+													<i class="glyphicon glyphicon-zoom-out"></i>
+												</button>
+												<span class="current-scale"></span>
+												<button type="button" class="plus-scale-button btn btn-xs" style="background-color: white;">
+													<i class="glyphicon glyphicon-zoom-in"></i>
+												</button>
+											</div>
 	  								</div>
 	  								<div class="row">
 	  									<div class="col-xs-12 image-diff image-overlay">

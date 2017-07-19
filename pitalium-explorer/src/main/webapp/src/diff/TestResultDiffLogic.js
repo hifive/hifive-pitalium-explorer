@@ -1,6 +1,6 @@
 /*global h5, hifive, window, document */
 /*
- * Copyright (C) 2015 NS Solutions Corporation, All Rights Reserved.
+ * Copyright (C) 2015-2017 NS Solutions Corporation, All Rights Reserved.
  */
 (function($) {
 	/**
@@ -97,6 +97,15 @@
 					targetTargetId: screenshot.expected.targetId
 				},
 				type: 'GET',
+				dataType: 'json'
+			});
+		},
+
+		updateTargetResult: function(changes) {
+			return h5.ajax('targets/update', {
+				data: JSON.stringify([changes]),
+				type: 'POST',
+				contentType: 'application/json',
 				dataType: 'json'
 			});
 		}

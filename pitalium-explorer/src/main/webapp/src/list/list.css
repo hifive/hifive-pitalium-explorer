@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 NS Solutions Corporation, All Rights Reserved.
+ * Copyright (C) 2015-2017 NS Solutions Corporation, All Rights Reserved.
  */
 
 @charset "utf-8";
@@ -16,6 +16,11 @@
 	text-decoration: underline;
 }
 
+.test-result-icon {
+	width: 17px;
+	height: 17px;
+}
+
 .page-bar {
 	display: block;
 	width: 100%;
@@ -25,3 +30,121 @@
 .panel-title .progress {
 	margin: 0;
 }
+
+.container {
+	background-color:white;
+	box-shadow: 0 2px 5px rgba(0,0,0,0.26);
+	padding: 20px 40px 100px 40px;
+}
+
+.margin-top {
+	margin-top: 140px;
+}
+
+.background-pattern {
+	position:absolute;
+	background-color: #03A9F4;
+
+	width:100%;
+	box-shadow: 0 2px 7px rgba(0,0,0,0.26);
+	
+	padding-left: 45px;
+	padding-top: 25px;
+	padding-bottom: 80px;
+	
+	top: 0;
+}
+
+.background-pattern h2 {
+	color: white;
+	margin-bottom: 2px;
+	font-weight:400px;
+
+}
+
+.background-pattern p {
+	color:#B3E5FC;
+}
+
+.background-pattern .menu .dropdown > a{
+	margin-top: 11px;
+}
+
+.compare_mode {
+	display: none;
+}
+
+.close {
+	color:#c62828;
+}
+
+#result_list {
+	margin-top:20px;
+}
+
+.result_content a {
+	color:#546E7A;
+	cursor: pointer;
+}
+
+.result_content {
+	border-bottom:1px solid #CFD8DC;
+	padding:10px;
+}
+
+.result_content .progress {
+	margin-bottom: 0;
+}
+
+.table th {
+	padding: 10px;
+	color: white;
+	text-align: center;
+}
+.table_list tr.result_mode th {
+	background-color:#26A69A;
+}
+.table_list tr.compare_mode th {
+	background-color:#FF8A65;
+}
+
+.info_table th{
+	background-color:#FFBA65;
+}
+.table tr[data-screenshot-id] {
+	cursor: pointer;
+}
+
+.table td {
+	border:none;
+	vertical-align: middle;
+	text-align: center;
+	word-break: break-all;
+}
+.table_list td {
+	background-color: #F1F8E9;
+	border-bottom: 1px solid #fff;
+}
+
+.table {
+	margin-top: 10px;
+	box-shadow: 0 2px 5px rgba(0,0,0,0.26);
+}
+
+.result_info, .result_info_table {
+	cursor:pointer;
+	margin: 5px 0;
+}
+
+.result_info:hover {
+	background-color:#ECEFF1;
+}
+
+.delete-btn {
+	color: #BDBDBD;
+}
+
+.delete-btn:hover {
+	color: #546E7A;
+}
+			

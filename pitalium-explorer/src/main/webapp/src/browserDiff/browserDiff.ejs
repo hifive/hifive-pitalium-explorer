@@ -1,0 +1,62 @@
+<script type="text/ejs" id="memo_content">
+	<h5>
+	[% switch(category){
+		case "SHIFT":%]
+		<i class="glyphicon glyphicon-move"></i> Shift
+	[%break;
+		case "MISSING":%]
+		<i class="glyphicon glyphicon-question-sign"></i> Missing
+	[%break;
+		case "SCALING":%]
+		<i class="glyphicon glyphicon-resize-full"></i> Object size
+	[%break;
+		case "TEXT":%]
+		<i class="glyphicon glyphicon-text-size"></i> Font style
+	[%break;
+		default: %]
+		<i class="glyphicon glyphicon-stats"></i> Ambiguous
+	[% } %]
+
+
+	</h5>
+
+	<hr style="border-color:#8D6E63;">
+
+	[%if (category == "SHIFT"){%]
+		<p>x-shift: [%=xshift%]
+		</p>
+		<p>y-shift: [%=yshift%]
+		</p>
+	[%}else{%]
+	<p>
+	feature matrix: [%=featurematrix%]
+	</p>
+
+	<p>
+	pixel by pixel: [%=pixelbypixel%]
+	</p>
+
+	<p>
+	threshold diff: [%=thres%]
+	</p>
+
+	<p>
+	total diff: [%=total%]
+	</p>
+[%}%]
+</script>
+
+
+<script type="text/ejs" id="diffDiv">
+
+	<div class="diffDiv diff_[%=category%] diff_index_[%=index%]" style="left: [%=x%]px; top: [%=y%]px; width: [%=width%]px; height: [%=height%]px;" data-x="[%=x%]" data-y="[%=y%]" data-width="[%=width%]" data-height="[%=height%]"
+			data-rec-category="[%=category%]" data-xshift="[%=xshift%]" data-yshift="[%=yshift%]"
+			data-featurematrix="[%=featureMatrix%]"
+			data-pixelbypixel = "[%=pixelByPixel%]"
+			data-thres = "[%=thresDiff%]"
+			data-total="[%=totalDiff%]" data-index="[%=index%]"
+			>
+
+		</div>
+
+</script>

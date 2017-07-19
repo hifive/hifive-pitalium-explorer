@@ -1,5 +1,13 @@
 /*
- * Copyright (C) 2015 NS Solutions Corporation, All Rights Reserved.
+ * Copyright (C) 2015-2017 NS Solutions Corporation
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package com.htmlhifive.pitalium.explorer.service;
 
@@ -15,6 +23,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletResponse;
@@ -30,7 +39,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.htmlhifive.pitalium.core.config.FilePersisterConfig;
+import com.htmlhifive.pitalium.core.config.PtlTestConfig;
+import com.htmlhifive.pitalium.explorer.changelog.ChangeRecord;
 import com.htmlhifive.pitalium.explorer.conf.ApplicationConfig;
+import com.htmlhifive.pitalium.explorer.conf.ExplorerPersisterConfig;
 import com.htmlhifive.pitalium.explorer.entity.Area;
 import com.htmlhifive.pitalium.explorer.entity.ConfigRepository;
 import com.htmlhifive.pitalium.explorer.entity.ProcessedImageRepository;
@@ -42,7 +55,12 @@ import com.htmlhifive.pitalium.explorer.entity.TestExecutionAndEnvironment;
 import com.htmlhifive.pitalium.explorer.entity.TestExecutionRepository;
 import com.htmlhifive.pitalium.explorer.image.EdgeDetector;
 import com.htmlhifive.pitalium.explorer.io.ExplorerPersister;
+import com.htmlhifive.pitalium.explorer.request.ExecResultChangeRequest;
+import com.htmlhifive.pitalium.explorer.request.ScreenshotResultChangeRequest;
+import com.htmlhifive.pitalium.explorer.request.TargetResultChangeRequest;
+import com.htmlhifive.pitalium.explorer.response.ResultListOfExpected;
 import com.htmlhifive.pitalium.explorer.response.TestExecutionResult;
+import com.htmlhifive.pitalium.image.model.ComparedRectangleArea;
 import com.htmlhifive.pitalium.image.model.DiffPoints;
 import com.htmlhifive.pitalium.image.util.ImageUtils;
 
@@ -83,9 +101,30 @@ public class ExplorerService implements Serializable {
 		return persisterService;
 	}
 
+	public List<ResultListOfExpected> findScreenshotFiles(String path){
+		return persisterService.findScreenshotFiles(path);
+	}
+	public ResultListOfExpected executeComparing(String expectedFilePath, String[] targetFilePaths) {
+		return persisterService.executeComparing(expectedFilePath, targetFilePaths);
+	}
+	public Map<String, byte[]> getImages(String expectedFilePath, String targetFilePath) {
+		return persisterService.getImages(expectedFilePath, targetFilePath);
+	}
+	public List<ComparedRectangleArea> getComparedResult(String path, int resultListId,
+			int targetResultId) {
+		return persisterService.getComparedResult(path, resultListId, targetResultId);
+	}
+	public String deleteResults(String path, int resultListId) {
+		return persisterService.deleteResults(path, resultListId);
+	}
+
+
+
+
+
 	public Page<TestExecutionResult> findTestExecution(String searchTestMethod, String searchTestScreen, int page,
-			int pageSize) {
-		return persisterService.findTestExecution(searchTestMethod, searchTestScreen, page, pageSize);
+			int pageSize, String resultDirectoryKey) {
+		return persisterService.findTestExecution(searchTestMethod, searchTestScreen, page, pageSize, resultDirectoryKey);
 	}
 
 	public List<Screenshot> findScreenshot(Integer testExecutionId, String searchTestMethod, String searchTestScreen) {
@@ -176,6 +215,13 @@ public class ExplorerService implements Serializable {
 
 	public Boolean getComparisonResult(Integer sourceScreenshotId, Integer targetScreenshotId, Integer sourceTargetId,
 			Integer targetTargetId) {
+		Screenshot sourceScreenshot = persisterService.getScreenshot(sourceScreenshotId);
+		Screenshot targetScreenshot = persisterService.getScreenshot(targetScreenshotId);
+		if (sourceScreenshot.getExpectedScreenshotId() != null
+				&& sourceScreenshot.getExpectedScreenshotId().equals(targetScreenshot.getId())) {
+			return sourceScreenshot.getComparisonResult();
+		}
+
 		try {
 			File sourceFile = persisterService.getImage(sourceScreenshotId, sourceTargetId);
 			File targetFile = persisterService.getImage(targetScreenshotId, targetTargetId);
@@ -265,7 +311,7 @@ public class ExplorerService implements Serializable {
 		}
 
 		// Compare.
-		return ImageUtils.compare(actual, null, expected, null, null);
+		return (DiffPoints) ImageUtils.compare(actual, null, expected, null, null);
 	}
 
 	private BufferedImage getMarkedImage(File image, DiffPoints diffPoints) throws IOException {
@@ -378,5 +424,32 @@ public class ExplorerService implements Serializable {
 		} catch (IOException e) {
 			response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
 		}
+	}
+
+	public List<ChangeRecord> updateExecResult(List<ExecResultChangeRequest> inputModelList) {
+		return persisterService.updateExecResult(inputModelList);
+	}
+
+	public List<ChangeRecord> updateScreenshotComparisonResult(List<ScreenshotResultChangeRequest> inputModelList) {
+		return persisterService.updateScreenshotComparisonResult(inputModelList);
+	}
+
+	public List<ChangeRecord> updateTargetComparisonResult(List<TargetResultChangeRequest> inputModelList) {
+		return persisterService.updateTargetComparisonResult(inputModelList);
+	}
+
+	/**
+	 * 設定されているresultsフォルダのキーのリストを取得する
+	 * @return 設定されているresultsフォルダのキーのリスト
+	 */
+	public List<String> listResultDirectoryKeys() {
+		ExplorerPersisterConfig persisterConfig = PtlTestConfig.getInstance().getConfig(ExplorerPersisterConfig.class);
+		Map<String, FilePersisterConfig> files = persisterConfig.getFiles();
+
+		if (files != null && files.size() != 0) {
+			return new ArrayList<>(files.keySet());
+		}
+
+		return new ArrayList<>();
 	}
 }

@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <!--
-  ~ Copyright (C) 2015 NS Solutions Corporation, All Rights Reserved.
+  ~ Copyright (C) 2015-2017 NS Solutions Corporation, All Rights Reserved.
   -->
 
 <html>
@@ -12,9 +12,12 @@
 	<meta http-equiv="Cache-Control" content="no-cache">
 	<meta http-equiv="Expires" content="-1">
 
-	<title>Test results - Pitalium Explorer</title>
-	<link rel="stylesheet" href="/hifive-res/ext/bootstrap/3.3.5/css/bootstrap.min.css">
-	<link rel="stylesheet" href="/hifive-res/ext/bootstrap/3.3.5/css/bootstrap-theme.min.css">
+	<title>Compare Images - Pitalium Explorer</title>
+
+	<link rel="shortcut icon" href="res/img/favicon.ico">
+
+	<link rel="stylesheet" href="/hifive-res/ext/bootstrap/3.3.6/css/bootstrap.min.css">
+	<link rel="stylesheet" href="/hifive-res/ext/bootstrap/3.3.6/css/bootstrap-theme.min.css">
 	<link rel="stylesheet" href="/hifive-res/ext/jqplugins/jstree/3.0.8/themes/default/style.min.css">
 	<link rel="stylesheet" href="/hifive-res/fw/current/h5.css" data-h5-module="hifive">
 
@@ -24,8 +27,8 @@
 	<link rel="stylesheet" href="src/common/common.css">
 	<link rel="stylesheet" href="src/fileDiff/fileDiff.css">
 
-	<script src="/hifive-res/ext/jquery/jquery-2.1.4.js"></script>
-	<script src="/hifive-res/ext/bootstrap/3.3.5/js/bootstrap.js"></script>
+	<script src="/hifive-res/ext/jquery/jquery-2.js"></script>
+	<script src="/hifive-res/ext/bootstrap/3.3.6/js/bootstrap.js"></script>
 	<script src="/hifive-res/ext/jqplugins/jstree/3.0.8/jstree.min.js"></script>
 	<script src="/hifive-res/fw/current/ejs-h5mod.js" data-h5-module="hifive:ejs"></script>
 	<script src="/hifive-res/fw/current/h5.js" data-h5-module="hifive"></script>
@@ -94,8 +97,16 @@
 <body>
 
 <!-- Navigation -->
-<nav class="navbar navbar-default navbar-static-top">
+<nav class="navbar navbar-static-top">
 	<div class="container-fluid">
+		<ul class="nav navbar-nav navbar-right menu">
+			<li class="dropdown">
+				<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span class="glyphicon glyphicon-menu-hamburger"></span></a>
+				<ul class="dropdown-menu">
+					<li><a href="list.html">Home</a></li>
+				</ul>
+			</li>
+		</ul>
 		<div class="navbar-header">
 			<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
 				<span class="sr-only">Toggle navigation</span>
@@ -105,12 +116,6 @@
 			</button>
 			<a class="navbar-brand" href="list.html">Pitalium Explorer</a>
 		</div>
-		<div id="navbar" class="navbar-collapse collapse">
-			<ul class="nav navbar-nav">
-				<li><a href="list.html">Home</a></li>
-				<li class="active"><a href="fileDiff.html">Diff any images</a></li>
-			</ul>
-		</div><!--/.nav-collapse -->
 	</div>
 </nav>
 <!-- Navigation -->
@@ -123,7 +128,7 @@
 		<!-- List -->
 		<div id="imageListContainer" class="autoSize">
 			<div class="image-list expected">
-				<div class="panel panel-primary">
+				<div class="panel">
 					<div class="panel-heading">
 						<span>EXPECTED</span>
 						<button type="button" class="btn-select-execution btn btn-sm btn-info small">Executions</button>
@@ -136,7 +141,7 @@
 				</div>
 			</div>
 			<div class="image-list actual">
-				<div class="panel panel-danger">
+				<div class="panel">
 					<div class="panel-heading">
 						<span>ACTUAL</span>
 						<button type="button" class="btn-select-execution btn btn-sm btn-info small">Executions</button>

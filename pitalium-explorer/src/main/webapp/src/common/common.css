@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 NS Solutions Corporation, All Rights Reserved.
+ * Copyright (C) 2015-2017 NS Solutions Corporation, All Rights Reserved.
  */
 
 @charset "utf-8";
@@ -8,6 +8,42 @@ html {
 	min-height: 100%;
 }
 body {
+	font-family: "Roboto", arial, sans-serif;
+	background-color: #ECEFF1;
+}
+
+a {
+	cursor:pointer;
+}
+
+.navbar-brand img {
+	height: 40px;
+}
+
+.navbar {
+	box-shadow: 0 2px 5px rgba(0,0,0,0.26);
+	background-color: #03A9F4;
+}
+.navbar-brand {
+	color: white;
+	text-shadow: none;
+	padding-top: 15px;
+	padding-bottom: 15px;
+	padding-left:18px;
+	font-weight:300;
+}
+
+.menu {
+	margin-left: -15px;
+}
+
+.menu .dropdown a {
+	margin-top: 0px;
+	padding: 12px 10px 8px;
+}
+
+.menu .glyphicon {
+	font-size: 18pt;
 }
 
 .footer {
@@ -34,4 +70,28 @@ body {
 .test-result-icon {
 	width: 17px;
 	height: 17px;
+}
+
+.updated-mark {
+	font-size: 8pt;
+	color: #337ab7;
+}
+
+.no-padding {
+	padding-left:0px;
+	padding-right:0px;
+}
+
+.title_div{
+	border-bottom: 2px solid #E1F5FE;
+}
+
+.title-label {
+	color: #039BE5;
+}
+
+.panel {
+	box-shadow: 0 2px 5px rgba(0,0,0,0.26);
+	border-radius: 0;
+	margin-bottom: 10px;
 }

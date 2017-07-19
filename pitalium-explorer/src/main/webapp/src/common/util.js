@@ -1,10 +1,19 @@
 /*
- * Copyright (C) 2015 NS Solutions Corporation, All Rights Reserved.
+ * Copyright (C) 2015-2017 NS Solutions Corporation, All Rights Reserved.
  */
 (function() {
 	/**
 	 * @namespace hifive.pitalium.explorer.utils
 	 */
+
+	var DATE_FORMAT_OPTIONS = {
+		weekday: "long",
+		year: "numeric",
+		month: "short",
+		day: "numeric",
+		hour: "2-digit",
+		minute: "2-digit"
+	};
 
 	h5.u.obj.expose('hifive.pitalium.explorer.utils', {
 		/**
@@ -66,7 +75,7 @@
 
 		/**
 		 * Compare properties of two objects.
-		 *
+		 * 
 		 * @param {Object} obj1
 		 * @param {Object} obj2
 		 * @param {Array} props
@@ -80,6 +89,14 @@
 			}
 
 			return true;
+		},
+
+		/**
+		 * @param {Date} date
+		 * @returns {String}
+		 */
+		toLocaleTimeString: function(date) {
+			return date.toLocaleTimeString('en', DATE_FORMAT_OPTIONS);
 		}
 	});
 })();

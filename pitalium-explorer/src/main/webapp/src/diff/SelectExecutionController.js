@@ -1,6 +1,6 @@
 /*global h5, hifive, window, document */
 /*
- * Copyright (C) 2015 NS Solutions Corporation, All Rights Reserved.
+ * Copyright (C) 2015-2017 NS Solutions Corporation, All Rights Reserved.
  */
 (function($) {
 	/**
@@ -21,8 +21,6 @@
 		 */
 		_testResultDiffLogic: hifive.pitalium.explorer.logic.TestResultDiffLogic,
 
-		_$selected: null,
-
 		_executionList: null,
 
 		__init: function(context) {
@@ -36,52 +34,124 @@
 						this.view.update('#execution_list', 'screenshotListTemplate', {
 							executions: this._executionList
 						});
+
+						var that = this;
+						var $results = $('#detail .explorer-test-result');
+						$results.each(function(index, elem) {
+							var $tds = $(elem).find('td');
+							var screenshot = {
+								executionTime: $tds[0].textContent,
+								platform: $tds[4].textContent,
+								browserName: $tds[5].textContent,
+								browserVersion: $tds[6].textContent
+							};
+							if (screenshot.browserVersion === '') {
+								screenshot.browserVersion = null;
+							}
+
+							for (var i = 0, len = that._executionList.length; i < len; i++) {
+								var e = that._executionList[i];
+								if (screenshot.executionTime === e.executionTime
+										&& screenshot.platform === e.platform
+										&& screenshot.browserName === e.browserName
+										&& screenshot.browserVersion === e.browserVersion) {
+									var selector;
+									if (index === 0) {
+										selector = '.actual:eq(' + i + ')';
+									} else if (index === 1) {
+										selector = '.expected:eq(' + i + ')';
+									}
+									that.$find(selector).click();
+									break;
+								}
+							}
+						});
 					}));
 		},
 
-		'[name="execution"] change': function(context, $el) {
-			if (this._$selected) {
-				this._$selected.removeClass('success');
-			}
-			this._$selected = $el.parent().parent();
-			this._$selected.addClass('success');
-		},
-
-		'.actual click': function() {
-			if (!this._$selected) {
+		'.actual click': function(context, $el) {
+			if ($el.hasClass('btn-danger')) {
 				return;
 			}
 
-			var index = this._$selected.data('explorerIndex');
+			var $actualButton = this.$find('button.actual.btn-danger');
+			if ($actualButton.length !== 0) {
+				$actualButton.removeClass('btn-danger').addClass('btn-default');
+			}
+
+			var $expectedButton = $el.next();
+			var $expectedExecution = this.$find('#expectedExecution');
+			if ($expectedButton.hasClass('btn-info')) {
+				$expectedButton.removeClass('btn-info').addClass('btn-default');
+
+				$expectedExecution.removeAttr('data-expected-explorer-index');
+				$expectedExecution.removeData('expectedExplorerIndex');
+				$expectedExecution.find('.executionTime').empty();
+				$expectedExecution.find('.platform').empty();
+				$expectedExecution.find('.browserName').empty();
+				$expectedExecution.find('.browserVersion').empty();
+			}
+
+			$el.addClass('btn-danger');
+
+			var index = $el.parent().parent().data('explorerIndex');
 			var e = this._executionList[index];
 
-			this.$find('#actualExecution').attr('data-actual-explorer-index', index);
-			this.$find('#actualExecution #executionTime').text(e.executionTime);
-			this.$find('#actualExecution #platform').text(e.platform);
-			this.$find('#actualExecution #browserName').text(e.browserName);
-			this.$find('#actualExecution #browserVersion').text(e.browserVersion);
+			var $actualExecution = this.$find('#actualExecution');
+			$actualExecution.data('actualExplorerIndex', index);
+			$actualExecution.attr('data-actual-explorer-index', index);
+			$actualExecution.find('.executionTime').text(e.executionTime);
+			$actualExecution.find('.platform').text(e.platform);
+			$actualExecution.find('.browserName').text(e.browserName);
+			$actualExecution.find('.browserVersion').text(e.browserVersion);
 
-			if (this.$find('#expectedExecution').data('expectedExplorerIndex') != null) {
-				this.$find('.ok').show();
+			if ($expectedExecution.data('expectedExplorerIndex') != null) {
+				this.$find('.ok').removeClass('disabled');
+			} else {
+				this.$find('.ok').addClass('disabled');
 			}
 		},
 
-		'.expected click': function() {
-			if (!this._$selected) {
+		'.expected click': function(context, $el) {
+			if ($el.hasClass('btn-info')) {
 				return;
 			}
 
-			var index = this._$selected.data('explorerIndex');
+			var $expectedButton = this.$find('button.expected.btn-info');
+			if ($expectedButton.length !== 0) {
+				$expectedButton.removeClass('btn-info').addClass('btn-default');
+			}
+
+			var $actualButton = $el.prev();
+			var $actualExecution = this.$find('#actualExecution');
+			if ($actualButton.hasClass('btn-danger')) {
+				$actualButton.removeClass('btn-danger').addClass('btn-default');
+
+				$actualExecution.removeAttr('data-actual-explorer-index');
+				$actualExecution.removeData('actualExplorerIndex');
+				$actualExecution.find('.executionTime').empty();
+				$actualExecution.find('.platform').empty();
+				$actualExecution.find('.browserName').empty();
+				$actualExecution.find('.browserVersion').empty();
+			}
+
+			$el.addClass('btn-info');
+
+			var index = $el.parent().parent().data('explorerIndex');
 			var e = this._executionList[index];
 
-			this.$find('#expectedExecution').attr('data-expected-explorer-index', index);
-			this.$find('#expectedExecution #executionTime').text(e.executionTime);
-			this.$find('#expectedExecution #platform').text(e.platform);
-			this.$find('#expectedExecution #browserName').text(e.browserName);
-			this.$find('#expectedExecution #browserVersion').text(e.browserVersion);
+			var $expectedExecution = this.$find('#expectedExecution');
+			$expectedExecution.data('expectedExplorerIndex', index);
+			$expectedExecution.attr('data-expected-explorer-index', index);
+			$expectedExecution.find('.executionTime').text(e.executionTime);
+			$expectedExecution.find('.platform').text(e.platform);
+			$expectedExecution.find('.browserName').text(e.browserName);
+			$expectedExecution.find('.browserVersion').text(e.browserVersion);
 
-			if (this.$find('#actualExecution').data('actualExplorerIndex') != null) {
-				this.$find('.ok').show();
+			if ($actualExecution.data('actualExplorerIndex') != null) {
+				this.$find('.ok').removeClass('disabled');
+			} else {
+				this.$find('.ok').addClass('disabled');
 			}
 		},
 

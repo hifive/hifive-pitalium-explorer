@@ -1,0 +1,27 @@
+/*
+ * Copyright (C) 2015-2017 NS Solutions Corporation, All Rights Reserved.
+ */
+
+@charset "utf-8";
+
+#testExecutionList {
+	margin-top: 20px;
+}
+
+.explorer-test-result {
+	cursor: pointer;
+}
+
+.explorer-test-result:hover {
+	text-decoration: underline;
+}
+
+.page-bar {
+	display: block;
+	width: 100%;
+	text-align: center;
+}
+
+.panel-title .progress {
+	margin: 0;
+}

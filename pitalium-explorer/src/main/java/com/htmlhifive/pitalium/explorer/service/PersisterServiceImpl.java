@@ -1,7 +1,14 @@
 /*
- * Copyright (C) 2015 NS Solutions Corporation, All Rights Reserved.
+ * Copyright (C) 2015-2017 NS Solutions Corporation
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
-
 package com.htmlhifive.pitalium.explorer.service;
 
 import java.awt.image.BufferedImage;
@@ -22,6 +29,7 @@ import com.htmlhifive.pitalium.core.io.PersistMetadata;
 import com.htmlhifive.pitalium.core.io.ResourceUnavailableException;
 import com.htmlhifive.pitalium.core.model.TargetResult;
 import com.htmlhifive.pitalium.core.model.TestResult;
+import com.htmlhifive.pitalium.explorer.changelog.ChangeRecord;
 import com.htmlhifive.pitalium.explorer.entity.AreaRepository;
 import com.htmlhifive.pitalium.explorer.entity.ConfigRepository;
 import com.htmlhifive.pitalium.explorer.entity.ProcessedImageRepository;
@@ -33,7 +41,12 @@ import com.htmlhifive.pitalium.explorer.entity.TestExecutionAndEnvironment;
 import com.htmlhifive.pitalium.explorer.entity.TestExecutionRepository;
 import com.htmlhifive.pitalium.explorer.io.ExplorerDBPersister;
 import com.htmlhifive.pitalium.explorer.io.ExplorerPersister;
+import com.htmlhifive.pitalium.explorer.request.ExecResultChangeRequest;
+import com.htmlhifive.pitalium.explorer.request.ScreenshotResultChangeRequest;
+import com.htmlhifive.pitalium.explorer.request.TargetResultChangeRequest;
+import com.htmlhifive.pitalium.explorer.response.ResultListOfExpected;
 import com.htmlhifive.pitalium.explorer.response.TestExecutionResult;
+import com.htmlhifive.pitalium.image.model.ComparedRectangleArea;
 
 @Service("persisterService")
 public class PersisterServiceImpl implements PersisterService {
@@ -84,9 +97,30 @@ public class PersisterServiceImpl implements PersisterService {
 	}
 
 	@Override
+	public List<ResultListOfExpected> findScreenshotFiles(String path){
+		return persister.findScreenshotFiles(path);
+	}
+	@Override
+	public ResultListOfExpected executeComparing(String expectedFilePath, String[] targetFilePaths) {
+		return persister.executeComparing(expectedFilePath, targetFilePaths);
+	}
+	@Override
+	public Map<String, byte[]> getImages(String expectedFilePath, String targetFilePath) {
+		return persister.getImages(expectedFilePath, targetFilePath);
+	}
+	@Override
+	public List<ComparedRectangleArea> getComparedResult(String path, int resultListId, int targetResultId){
+		return persister.getComparedResult(path, resultListId, targetResultId);
+	};
+	@Override
+	public String deleteResults(String path, int resultListId){
+		return persister.deleteResults(path, resultListId);
+	}
+
+	@Override
 	public Page<TestExecutionResult> findTestExecution(String searchTestMethod, String searchTestScreen, int page,
-			int pageSize) {
-		return persister.findTestExecution(searchTestMethod, searchTestScreen, page, pageSize);
+			int pageSize, String resultDirectoryKey) {
+		return persister.findTestExecution(searchTestMethod, searchTestScreen, page, pageSize, resultDirectoryKey);
 	}
 
 	@Override
@@ -214,4 +248,18 @@ public class PersisterServiceImpl implements PersisterService {
 		return persister.loadExpectedIds();
 	}
 
+	@Override
+	public List<ChangeRecord> updateExecResult(List<ExecResultChangeRequest> inputModelList) {
+		return persister.updateExecResult(inputModelList);
+	}
+
+	@Override
+	public List<ChangeRecord> updateScreenshotComparisonResult(List<ScreenshotResultChangeRequest> inputModelList) {
+		return persister.updateScreenshotComparisonResult(inputModelList);
+	}
+
+	@Override
+	public List<ChangeRecord> updateTargetComparisonResult(List<TargetResultChangeRequest> inputModelList) {
+		return persister.updateTargetComparisonResult(inputModelList);
+	}
 }

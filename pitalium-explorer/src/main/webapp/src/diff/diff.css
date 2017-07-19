@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 NS Solutions Corporation, All Rights Reserved.
+ * Copyright (C) 2015-2017 NS Solutions Corporation, All Rights Reserved.
  */
 
 @charset "utf-8";
@@ -15,11 +15,18 @@ body {
 
 #list {
 	width: 15%;
+	margin-right: 5px;
+}
+
+#container {
+	padding: 0 5px;
 }
 
 #main {
 	width: 80%;
 	height: auto;
+	margin-left: 5px;
+
 }
 
 .box {
@@ -49,8 +56,8 @@ body {
 	margin: 0px;
 }
 
-#select_execution {
-	padding: 0px;
+#info .panel-heading .btn-group {
+	float:right;
 }
 
 /* detail area */
