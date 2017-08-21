@@ -140,7 +140,13 @@ public class PersisterServiceImpl implements PersisterService {
 
 	@Override
 	public Target getTarget(Integer screenshotId, Integer targetId) {
-		ScreenshotIdService.ScreenshotType type = screenshotIdService.getScreenshotType(screenshotId);
+		ScreenshotIdService.ScreenshotType type;
+		try {
+			type = screenshotIdService.getScreenshotType(screenshotId);
+		} catch (IllegalArgumentException e) {
+			return null;
+		}
+
 		if (type == ScreenshotIdService.ScreenshotType.TEMPORARY_FILE) {
 			return temporaryFileService.getTarget(screenshotId, targetId);
 		} else {
@@ -150,7 +156,13 @@ public class PersisterServiceImpl implements PersisterService {
 
 	@Override
 	public File getImage(Integer screenshotId, Integer targetId) throws IOException {
-		ScreenshotIdService.ScreenshotType type = screenshotIdService.getScreenshotType(screenshotId);
+		ScreenshotIdService.ScreenshotType type;
+		try {
+			type = screenshotIdService.getScreenshotType(screenshotId);
+		} catch (IllegalArgumentException e) {
+			return null;
+		}
+
 		if (type == ScreenshotIdService.ScreenshotType.TEMPORARY_FILE) {
 			return temporaryFileService.getImage(screenshotId, targetId);
 		} else {
