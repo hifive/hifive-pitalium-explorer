@@ -130,7 +130,13 @@ public class PersisterServiceImpl implements PersisterService {
 
 	@Override
 	public Screenshot getScreenshot(Integer screenshotId) {
-		ScreenshotIdService.ScreenshotType type = screenshotIdService.getScreenshotType(screenshotId);
+		ScreenshotIdService.ScreenshotType type;
+		try {
+			type = screenshotIdService.getScreenshotType(screenshotId);
+		} catch (IllegalArgumentException e) {
+			return null;
+		}
+
 		if (type == ScreenshotIdService.ScreenshotType.TEMPORARY_FILE) {
 			return temporaryFileService.getScreenshot(screenshotId);
 		} else {
