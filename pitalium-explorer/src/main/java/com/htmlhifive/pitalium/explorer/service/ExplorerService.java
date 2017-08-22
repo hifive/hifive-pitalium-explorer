@@ -140,7 +140,7 @@ public class ExplorerService implements Serializable {
 		try {
 			file = persisterService.getImage(screenshotId, targetId);
 			if (file == null) {
-				response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+				response.setStatus(HttpStatus.NOT_FOUND.value());
 				return;
 			}
 
@@ -174,8 +174,8 @@ public class ExplorerService implements Serializable {
 		try {
 			File imageFile = persisterService.getImage(screenshotId, targetId);
 
-			if (!imageFile.exists()) {
-				response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+			if (imageFile == null || !imageFile.exists()) {
+				response.setStatus(HttpStatus.NOT_FOUND.value());
 				return;
 			}
 
@@ -256,8 +256,8 @@ public class ExplorerService implements Serializable {
 			File targetFile = persisterService.getImage(targetScreenshotId, targetTargetId);
 			Target target = persisterService.getTarget(sourceScreenshotId, sourceTargetId);
 
-			if (!sourceFile.exists() || !targetFile.exists()) {
-				response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+			if (sourceFile == null || targetFile == null || !sourceFile.exists() || !targetFile.exists()) {
+				response.setStatus(HttpStatus.NOT_FOUND.value());
 				return;
 			}
 
