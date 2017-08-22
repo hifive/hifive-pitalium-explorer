@@ -3,11 +3,7 @@
  */
 package com.htmlhifive.pitalium.explorer.api;
 
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -84,13 +80,6 @@ public class ImageControllerTest {
 	}
 
 	@Test
-	public void testGetImageFileError() {
-		HttpServletResponse response = mock(HttpServletResponse.class);
-		this.imageController.getImage(0, 0, response);
-		verify(response).setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-	}
-
-	@Test
 	public void testGetImageOk() throws IOException {
 		HttpServletResponse response = mock(HttpServletResponse.class);
 		ExplorerPersister persister = mock(ExplorerFilePersister.class);
@@ -117,13 +106,6 @@ public class ImageControllerTest {
 		HttpServletResponse response = mock(HttpServletResponse.class);
 		this.imageController.getDiffImage(0, -1, 0, 0, response);
 		verify(response).setStatus(HttpServletResponse.SC_NOT_FOUND);
-	}
-
-	@Test
-	public void testGetDiffImageFileError() {
-		HttpServletResponse response = mock(HttpServletResponse.class);
-		this.imageController.getDiffImage(0, 1, 0, 0, response);
-		verify(response).setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 	}
 
 	@Test
@@ -171,13 +153,6 @@ public class ImageControllerTest {
 		HttpServletResponse response = mock(HttpServletResponse.class);
 		this.imageController.getProcessed(-1, 0, "aaaaaa", -1, response);
 		verify(response).setStatus(HttpServletResponse.SC_BAD_REQUEST);
-	}
-
-	@Test
-	public void testGetProcessedFileError() {
-		HttpServletResponse response = mock(HttpServletResponse.class);
-		this.imageController.getProcessed(0, 0, "edge", -1, response);
-		verify(response).setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 	}
 
 	@Test
