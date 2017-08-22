@@ -288,7 +288,7 @@
 			});
 		},
 
-		'#img_size input change': function(context, $el) {
+		'#img_size input': function(context, $el) {
 			this._onImageSizeChanged(context, $el);
 		},
 
