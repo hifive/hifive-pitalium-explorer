@@ -16,11 +16,12 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.internal.util.reflection.Whitebox;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import com.htmlhifive.pitalium.core.result.TestResultManager;
+import com.htmlhifive.pitalium.explorer.entity.Area;
 import com.htmlhifive.pitalium.explorer.entity.Config;
 import com.htmlhifive.pitalium.explorer.entity.ConfigRepository;
 import com.htmlhifive.pitalium.explorer.entity.ProcessedImage;
@@ -33,8 +34,8 @@ import com.htmlhifive.pitalium.explorer.entity.Target;
 import com.htmlhifive.pitalium.explorer.entity.TestEnvironment;
 import com.htmlhifive.pitalium.explorer.entity.TestExecution;
 import com.htmlhifive.pitalium.explorer.entity.TestExecutionRepository;
-import com.htmlhifive.pitalium.explorer.io.ExplorerFilePersister;
-import com.htmlhifive.pitalium.explorer.io.ExplorerPersister;
+import com.htmlhifive.pitalium.explorer.service.ExplorerService;
+import com.htmlhifive.pitalium.explorer.service.PersisterService;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("/spring/test-context.xml")
@@ -58,6 +59,9 @@ public class ImageControllerTest {
 	private ArrayList<TestExecution> testExecutions;
 	private ArrayList<TestEnvironment> testEnvironments;
 
+	// ImageControllerのserviceのバックアップ
+	private ExplorerService explorerService;
+
 	/**
 	 * Initialize some mock objects for testing. This method is called before each test method.
 	 */
@@ -72,6 +76,13 @@ public class ImageControllerTest {
 		testEnvironments = r.getTestEnvironments();
 	}
 
+	@Before
+	public void testInit() {
+		// ImageControllerのserviceを各テストで置き換えるのでバックアップを取っておく
+		// バックアップを戻さないとthis.imageController.destory()でエラーがでる
+		explorerService = (ExplorerService) Whitebox.getInternalState(this.imageController, "service");
+	}
+
 	@Test
 	public void testGetImageNotFound() {
 		HttpServletResponse response = mock(HttpServletResponse.class);
@@ -80,17 +91,65 @@ public class ImageControllerTest {
 	}
 
 	@Test
-	public void testGetImageOk() throws IOException {
+	public void testGetImageFileError() throws Exception {
+		// setStatusが呼ばれたかを確認するためmockにする
 		HttpServletResponse response = mock(HttpServletResponse.class);
-		ExplorerPersister persister = mock(ExplorerFilePersister.class);
-		when(TestResultManager.getInstance().getPersister()).thenReturn(persister);
 
-		ImageController spy = spy(this.imageController);
-		doReturn(new File("src/test/resources/images/edge_detector_0.png")).when(persister).getImage(0, 0);
-		when(response.getOutputStream()).thenReturn(mock(ServletOutputStream.class));
+		// 戻り値を置き換えないのでmockにする必要がない
+		ExplorerService service = new ExplorerService();
 
-		spy.getImage(0, 0, response);
+		// getImage(), getTarget()の戻り値を置き換えるためmockにする
+		PersisterService persisterService = mock(PersisterService.class);
+		when(persisterService.getImage(0, 0)).thenThrow(new IOException());
 
+		// ExplorerServiceのprivateなfieldのpersisterServiceを用意したpersisterServiceで置き換える
+		Whitebox.setInternalState(service, "persisterService", persisterService);
+
+		// ImageControllerのprivateなfieldのserviceを用意したserviceで置き換える
+		Whitebox.setInternalState(this.imageController, "service", service);
+
+		// 実行
+		this.imageController.getImage(0, 0, response);
+
+		// setStatus()が引数HttpServletResponse.SC_INTERNAL_SERVER_ERRORで呼び出されたか確認
+		verify(response).setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+	}
+
+	@Test
+	public void testGetImageOk() throws IOException {
+		// response.getOutputStream()の戻り値用意
+		// ServletOutputStreamはインスタンス化できないので、mockを返すようにする
+		ServletOutputStream stream = mock(ServletOutputStream.class);
+
+		// setContentTypeが呼ばれたかを確認するためmockにする
+		HttpServletResponse response = mock(HttpServletResponse.class);
+		when(response.getOutputStream()).thenReturn(stream);
+
+		// 戻り値を置き換えないのでmockにする必要がない
+		ExplorerService service = new ExplorerService();
+
+		// 戻り値を置き換えるためのdummyの画像ファイル
+		File file = new File("src/test/resources/images/edge_detector_0.png");
+
+		// 戻り値を置き換えるためのAreaなしのdummyのTarget
+		Target target = new Target();
+		target.setExcludeAreas(new ArrayList<Area>());
+
+		// getImage(), getTarget()の戻り値を置き換えるためmockにする
+		PersisterService persisterService = mock(PersisterService.class);
+		when(persisterService.getImage(0, 0)).thenReturn(file);
+		when(persisterService.getTarget(0, 0)).thenReturn(target);
+
+		// ExplorerServiceのprivateなfieldのpersisterServiceを用意したpersisterServiceで置き換える
+		Whitebox.setInternalState(service, "persisterService", persisterService);
+
+		// ImageControllerのprivateなfieldのserviceを用意したexplorerSeviceで置き換える
+		Whitebox.setInternalState(this.imageController, "service", service);
+
+		// 実行
+		this.imageController.getImage(0, 0, response);
+
+		// setContentType()が引数"image/png"で呼び出されたか確認
 		verify(response).setContentType("image/png");
 	}
 
@@ -109,35 +168,105 @@ public class ImageControllerTest {
 	}
 
 	@Test
-	public void testGetDiffImageOk() throws IOException {
+	public void testGetDiffImageFileError() throws Exception {
+		// setStatusが呼ばれたかを確認するためmockにする
 		HttpServletResponse response = mock(HttpServletResponse.class);
-		ExplorerPersister persister = mock(ExplorerFilePersister.class);
-		when(TestResultManager.getInstance().getPersister()).thenReturn(persister);
-		ImageController spy = spy(this.imageController);
 
-		doReturn(new File("src/test/resources/images/edge_detector_0.png")).when(persister).getImage(0, 0);
-		doReturn(new Target()).when(persister).getTarget(0, 0);
-		when(response.getOutputStream()).thenReturn(mock(ServletOutputStream.class));
+		// 戻り値を置き換えないのでmockにする必要がない
+		ExplorerService service = new ExplorerService();
 
-		spy.getDiffImage(0, 0, 0, 0, response);
+		// getImage()の戻り値を置き換えるためmockにする
+		PersisterService persisterService = mock(PersisterService.class);
+		when(persisterService.getImage(0, 0)).thenThrow(new IOException());
 
+		// ExplorerServiceのprivateなfieldのpersisterServiceを用意したpersisterServiceで置き換える
+		Whitebox.setInternalState(service, "persisterService", persisterService);
+
+		// ImageControllerのprivateなfieldのserviceを用意したexplorerSeviceで置き換える
+		Whitebox.setInternalState(this.imageController, "service", service);
+
+		// 実行
+		this.imageController.getDiffImage(0, 1, 0, 0, response);
+
+		// setStatus()が引数HttpServletResponse.SC_INTERNAL_SERVER_ERRORで呼び出されたか確認
+		verify(response).setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+	}
+
+	@Test
+	public void testGetDiffImageOk() throws IOException {
+		// response.getOutputStream()の戻り値用意
+		// ServletOutputStreamはインスタンス化できないので、mockを返すようにする
+		ServletOutputStream stream = mock(ServletOutputStream.class);
+
+		// setContentTypeが呼ばれたかを確認するためmockにする
+		HttpServletResponse response = mock(HttpServletResponse.class);
+		when(response.getOutputStream()).thenReturn(stream);
+
+		// 戻り値を置き換えないのでmockにする必要がない
+		ExplorerService service = new ExplorerService();
+
+		// 戻り値を置き換えるためのdummyの画像ファイル
+		File file = new File("src/test/resources/images/edge_detector_0.png");
+
+		// 戻り値を置き換えるためのAreaなしのdummyのTarget
+		Target target = new Target();
+		target.setExcludeAreas(new ArrayList<Area>());
+
+		// getImage(), getTarget()の戻り値を置き換えるためmockにする
+		PersisterService persisterService = mock(PersisterService.class);
+		when(persisterService.getImage(0, 0)).thenReturn(file);
+		when(persisterService.getTarget(0, 0)).thenReturn(target);
+
+		// ExplorerServiceのprivateなfieldのpersisterServiceを用意したpersisterServiceで置き換える
+		Whitebox.setInternalState(service, "persisterService", persisterService);
+
+		// ImageControllerのprivateなfieldのserviceを用意したexplorerSeviceで置き換える
+		Whitebox.setInternalState(this.imageController, "service", service);
+
+		// 実行
+		this.imageController.getDiffImage(0, 0, 0, 0, response);
+
+		// setContentType()が引数"image/png"で呼び出されたか確認
 		verify(response).setContentType("image/png");
 	}
 
 	@Test
 	public void testGetDiffImageOkDifferent() throws IOException {
+		// response.getOutputStream()の戻り値用意
+		// ServletOutputStreamはインスタンス化できないので、mockを返すようにする
+		ServletOutputStream stream = mock(ServletOutputStream.class);
+
+		// setContentTypeが呼ばれたかを確認するためmockにする
 		HttpServletResponse response = mock(HttpServletResponse.class);
-		ExplorerPersister persister = mock(ExplorerFilePersister.class);
-		when(TestResultManager.getInstance().getPersister()).thenReturn(persister);
-		ImageController spy = spy(this.imageController);
+		when(response.getOutputStream()).thenReturn(stream);
 
-		doReturn(new File("src/test/resources/images/edge_detector_0.png")).when(persister).getImage(0, 0);
-		Screenshot sc1 = screenshotRepo.findOne(1);
-		doReturn(new File("src/test/resources/images/edge_detector_0_edge.png")).when(persister).getImage(1, 0);
-		when(response.getOutputStream()).thenReturn(mock(ServletOutputStream.class));
+		// 戻り値を置き換えないのでmockにする必要がない
+		ExplorerService service = new ExplorerService();
 
-		spy.getDiffImage(0, 1, 0, 0, response);
+		// 戻り値を置き換えるためのdummyの画像ファイル
+		File file1 = new File("src/test/resources/images/edge_detector_0.png");
+		File file2 = new File("src/test/resources/images/edge_detector_0_edge.png");
 
+		// 戻り値を置き換えるためのAreaなしのdummyのTarget
+		Target target = new Target();
+		target.setExcludeAreas(new ArrayList<Area>());
+
+		// getImage(), getTarget()の戻り値を置き換えるためmockにする
+		PersisterService persisterService = mock(PersisterService.class);
+		when(persisterService.getImage(0, 0)).thenReturn(file1);
+		when(persisterService.getImage(1, 0)).thenReturn(file2);
+		when(persisterService.getTarget(0, 0)).thenReturn(target);
+
+		// ExplorerServiceのprivateなfieldのpersisterServiceを用意したpersisterServiceで置き換える
+		Whitebox.setInternalState(service, "persisterService", persisterService);
+
+		// ImageControllerのprivateなfieldのserviceを用意したexplorerSeviceで置き換える
+		Whitebox.setInternalState(this.imageController, "service", service);
+
+		// 実行
+		this.imageController.getDiffImage(0, 1, 0, 0, response);
+
+		// setContentType()が引数"image/png"で呼び出されたか確認
 		verify(response).setContentType("image/png");
 	}
 
@@ -156,34 +285,93 @@ public class ImageControllerTest {
 	}
 
 	@Test
-	public void testGetProcessedEdgeColorIndex0() throws IOException {
+	public void testGetProcessedFileError() throws Exception {
+		// setStatusが呼ばれたかを確認するためmockにする
 		HttpServletResponse response = mock(HttpServletResponse.class);
 
-		ExplorerPersister persister = mock(ExplorerFilePersister.class);
-		when(TestResultManager.getInstance().getPersister()).thenReturn(persister);
-		ImageController spy = spy(this.imageController);
+		// 戻り値を置き換えないのでmockにする必要がない
+		ExplorerService service = new ExplorerService();
 
-		doReturn(new File("src/test/resources/images/edge_detector_0.png")).when(persister).getImage(0, 0);
-		when(response.getOutputStream()).thenReturn(mock(ServletOutputStream.class));
+		// getImage()の戻り値を置き換えるためmockにする
+		PersisterService persisterService = mock(PersisterService.class);
+		when(persisterService.getImage(0, 0)).thenThrow(new IOException());
 
-		spy.getProcessed(0, 0, "edge", 0, response);
+		// ExplorerServiceのprivateなfieldのpersisterServiceを用意したpersisterServiceで置き換える
+		Whitebox.setInternalState(service, "persisterService", persisterService);
 
+		// ImageControllerのprivateなfieldのserviceを用意したexplorerSeviceで置き換える
+		Whitebox.setInternalState(this.imageController, "service", service);
+
+		// 実行
+		this.imageController.getProcessed(0, 0, "edge", 0, response);
+
+		// setStatus()が引数HttpServletResponse.SC_INTERNAL_SERVER_ERRORで呼び出されたか確認
+		verify(response).setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+	}
+
+	@Test
+	public void testGetProcessedEdgeColorIndex0() throws IOException {
+		// response.getOutputStream()の戻り値用意
+		// ServletOutputStreamはインスタンス化できないので、mockを返すようにする
+		ServletOutputStream stream = mock(ServletOutputStream.class);
+
+		// setContentTypeが呼ばれたかを確認するためmockにする
+		HttpServletResponse response = mock(HttpServletResponse.class);
+		when(response.getOutputStream()).thenReturn(stream);
+
+		// 戻り値を置き換えないのでmockにする必要がない
+		ExplorerService service = new ExplorerService();
+
+		// 戻り値を置き換えるためのdummyの画像ファイル
+		File file = new File("src/test/resources/images/edge_detector_0.png");
+
+		// getImage()の戻り値を置き換えるためmockにする
+		PersisterService persisterService = mock(PersisterService.class);
+		when(persisterService.getImage(0, 0)).thenReturn(file);
+
+		// ExplorerServiceのprivateなfieldのpersisterServiceを用意したpersisterServiceで置き換える
+		Whitebox.setInternalState(service, "persisterService", persisterService);
+
+		// ImageControllerのprivateなfieldのserviceを用意したexplorerSeviceで置き換える
+		Whitebox.setInternalState(this.imageController, "service", service);
+
+		// 実行
+		this.imageController.getProcessed(0, 0, "edge", 0, response);
+
+		// setContentType()が引数"image/png"で呼び出されたか確認
 		verify(response).setContentType("image/png");
 	}
 
 	@Test
 	public void testGetProcessedEdgeColorIndex1() throws IOException {
+		// response.getOutputStream()の戻り値用意
+		// ServletOutputStreamはインスタンス化できないので、mockを返すようにする
+		ServletOutputStream stream = mock(ServletOutputStream.class);
+
+		// setContentTypeが呼ばれたかを確認するためmockにする
 		HttpServletResponse response = mock(HttpServletResponse.class);
+		when(response.getOutputStream()).thenReturn(stream);
 
-		ExplorerPersister persister = mock(ExplorerFilePersister.class);
-		when(TestResultManager.getInstance().getPersister()).thenReturn(persister);
-		ImageController spy = spy(this.imageController);
+		// 戻り値を置き換えないのでmockにする必要がない
+		ExplorerService service = new ExplorerService();
 
-		doReturn(new File("src/test/resources/images/edge_detector_0.png")).when(persister).getImage(0, 0);
-		when(response.getOutputStream()).thenReturn(mock(ServletOutputStream.class));
+		// 戻り値を置き換えるためのdummyの画像ファイル
+		File file = new File("src/test/resources/images/edge_detector_0.png");
 
-		spy.getProcessed(0, 0, "edge", 1, response);
+		// getImage()の戻り値を置き換えるためmockにする
+		PersisterService persisterService = mock(PersisterService.class);
+		when(persisterService.getImage(0, 0)).thenReturn(file);
 
+		// ExplorerServiceのprivateなfieldのpersisterServiceを用意したpersisterServiceで置き換える
+		Whitebox.setInternalState(service, "persisterService", persisterService);
+
+		// ImageControllerのprivateなfieldのserviceを用意したexplorerSeviceで置き換える
+		Whitebox.setInternalState(this.imageController, "service", service);
+
+		// 実行
+		this.imageController.getProcessed(0, 0, "edge", 1, response);
+
+		// setContentType()が引数"image/png"で呼び出されたか確認
 		verify(response).setContentType("image/png");
 	}
 
@@ -221,6 +409,9 @@ public class ImageControllerTest {
 	@Test
 	@After
 	public void testCleanup() throws InterruptedException {
+		// ImageControllerのserviceのバックアップを戻す
+		Whitebox.setInternalState(this.imageController, "service", explorerService);
+
 		/* must be ok to call multiple times */
 		this.imageController.destory();
 		this.imageController.destory();
