@@ -180,11 +180,18 @@
 			}
 
 			if (this._screenshot.expected != null) {
+				var indicator = this.indicator({
+					message: 'Comparing images...',
+					target: $('.indicator-area')
+				}).show();
+
 				this._testResultDiffLogic.getComparisonResult(this._screenshot).done(
 						this.own(function(comparisonResult) {
 							this._comparisonResult = comparisonResult;
 							// Fire change event and show images.
-							this._setImage();
+							this._setImage().done(function() {
+								indicator.hide();
+							});
 							this.trigger('updateComparisonResult', {
 								targetId: targetId,
 								comparisonResult: comparisonResult
@@ -234,7 +241,7 @@
 			}
 
 			this._initEdgeOverlapping(expected, actual);
-			h5.async.when(this._imageLoadPromises).done(this.own(function() {
+			return h5.async.when(this._imageLoadPromises).done(this.own(function() {
 				this._triggerViewChange();
 			}));
 		},
