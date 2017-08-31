@@ -181,7 +181,7 @@
 
 			if (this._screenshot.expected != null) {
 				var indicator = this.indicator({
-					message: '比較中...',
+					message: 'Comparing images...',
 					target: $('.indicator-area')
 				}).show();
 
