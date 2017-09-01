@@ -58,6 +58,6 @@
 	<classpathentry kind="lib" path="lib/sqltool-2.3.4.jar"/>
 	<classpathentry kind="lib" path="lib/validation-api-1.1.0.Final.jar"/>
 	<classpathentry kind="var" path="TOMCAT_HOME/lib/servlet-api.jar"/>
-	<classpathentry kind="lib" path="lib/pitalium-1.2.0.jar"/>
+	<classpathentry kind="lib" path="lib/pitalium-1.2.1.jar"/>
 	<classpathentry kind="output" path="src/main/webapp/WEB-INF/classes"/>
 </classpath>
