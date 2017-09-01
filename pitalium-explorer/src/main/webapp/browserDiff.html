@@ -67,7 +67,7 @@
 						</li>
 						<li>
 							<a class="click_prevent">
-								<input type="checkbox" class="choice" id="checkbox_FONT" checked="checked" data-rec-category="TEXT">
+								<input type="checkbox" class="choice" id="checkbox_TEXT" checked="checked" data-rec-category="TEXT">
 								<span style="margin-left:10px;">Font style</span>
 							</a>
 						</li>
@@ -81,17 +81,32 @@
 
 				</div>
 			</div>
-			<div style="width:180px; float:left">
+			<div style="float:left">
 				<p style="margin-top:8px; margin-bottom:2px; color:#455A64;">Diff region opacity control</p>
-				<input id="opacity_range" type="range" min="0" max="1" step="0.1" value="0.3">
+				<input id="opacity_range" type="range" min="0" max="1" step="0.1" value="0.3" style="width: 180px; float: left;">
+				<span class="current_value">0.3</span>
+				<div style="width: 180px;">
+					<span class="min_value">0.0</span>
+					<span class="max_value" style="float: right;">1.0</span>
+				</div>
 			</div>
-			<div style="width:180px; float:left; margin-left:20px;">
+			<div style="float:left; margin-left:20px;">
 				<p style="margin-top:8px; margin-bottom:2px; color:#455A64;">Image size control</p>
-				<input id="img_size" type="range" min="0" max="3" step="0.1" value="1">
+				<input id="img_size" type="range" min="0" max="3" step="0.1" value="1" style="width: 180px; float: left;">
+				<span class="current_value">1.0</span>
+				<div style="width: 180px;">
+					<span class="min_value">0.0</span>
+					<span class="max_value" style="float: right;">3.0</span>
+				</div>
 			</div>
-			<div style="width:180px; float:left; margin-left:20px;">
+			<div style="float:left; margin-left:20px;">
 				<p style="margin-top:8px; margin-bottom:2px; color:#455A64;">Importance control</p>
-				<input id="importance" type="range" min="0" max="1" step="0.01" value="1">
+				<input id="importance" type="range" min="0" max="1" step="0.01" value="1" style="width: 180px; float: left;">
+				<span class="current_value">1.00</span>
+				<div style="width: 180px;">
+					<span class="min_value">0.00</span>
+					<span class="max_value" style="float: right;">1.00</span>
+				</div>
 			</div>
 		</div>
 

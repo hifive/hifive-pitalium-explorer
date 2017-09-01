@@ -136,9 +136,10 @@
 
 			var minSimilarity = parseFloat(queryParams.minsimilarity); //this is for Importance control bar. It decides the importance control's minimum value.
 
-			this.$find("#importance").attr("min", minSimilarity);
+			var $importance = this.$find("#importance");
+			$importance.attr("min", minSimilarity);
+			$importance.parent().find('.min_value').text(minSimilarity.toFixed(2));
 			this.$find('input[type="range"]').rangeslider();
-
 
 			this.$find("#diffDetail").modal("show");
 			/**
@@ -243,16 +244,21 @@
 			$el.parent().find(".info_table_div").slideToggle();
 		},
 
-		'#opacity_range input': function() {
-			this._onOpacityRangeChanged();
+		'#opacity_range input': function(context, $el) {
+			this._onOpacityRangeChanged(context, $el);
 		},
 
-		'#opacity_range change': function() {
-			this._onOpacityRangeChanged();
+		'#opacity_range change': function(context, $el) {
+			this._onOpacityRangeChanged(context, $el);
 		},
 
-		_onOpacityRangeChanged: function() {
-			this.$find(".diffDiv").css("opacity", this._$opacityRange.val());
+		_onOpacityRangeChanged: function(context, $el) {
+			var value = this._$opacityRange.val();
+
+			var $curr = $el.next('.current_value');
+			$curr.text(Number(value).toFixed(1));
+
+			this.$find(".diffDiv").css("opacity", value);
 			this.$find("#radio_none").trigger("click");
 		},
 
@@ -266,6 +272,10 @@
 
 		_onImportanceChanged: function(context, $el) {
 			var value = $el.val();
+
+			var $curr = $el.next('.current_value');
+			$curr.text(Number(value).toFixed(2));
+
 			this.$find(".diffDiv").each(function() {
 				var thisDiv = $(this);
 				if ($("#checkbox_" + thisDiv.data("recCategory")).is(":checked")) {
@@ -278,7 +288,7 @@
 			});
 		},
 
-		'#img_size input change': function(context, $el) {
+		'#img_size input': function(context, $el) {
 			this._onImageSizeChanged(context, $el);
 		},
 
@@ -288,6 +298,9 @@
 
 		_onImageSizeChanged: function(context, $el) {
 			var ratio = $el.val();
+
+			var $curr = $el.next('.current_value');
+			$curr.text(Number(ratio).toFixed(1));
 
 			$(".screenshot").each(
 					function() {
