@@ -10,6 +10,8 @@
 /bin/
 /src/main/webapp/WEB-INF/classes
 /src/test/resources/processed-images/
+/build/
+/.gradle/
 
 # Misc
 *.iml
