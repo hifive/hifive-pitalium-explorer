@@ -10,7 +10,7 @@
         <hudson.model.StringParameterDefinition>
           <name>BRANCH_NAME</name>
           <description></description>
-          <defaultValue>master</defaultValue>
+          <defaultValue>dev</defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>IVY_PROXY_HOST</name>
@@ -55,8 +55,6 @@ node {
         branch: BRANCH_NAME,
         url: &apos;https://github.com/hifive/hifive-pitalium-explorer.git&apos;
     )
-    bat(&quot;copy /Y C:\\ci_build.xml pitalium-explorer\\ci_build.xml&quot;)
-    bat(&quot;copy /Y C:\\ivy.xml pitalium-explorer\\ivy.xml&quot;)
 
 	stage(&apos;ライブラリをダウンロード&apos;)
 	def antHome = tool(name: &apos;Default_Ant&apos;)
