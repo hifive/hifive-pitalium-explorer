@@ -238,9 +238,9 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 			pairResultList.add(result);
 
 			try {
-				FileWriter fw = new FileWriter(filenamePairJson.getPath());
-				fw.write(JSONUtils.toString(comparedRectangles));
-				fw.close();
+				OutputStreamWriter sw = new OutputStreamWriter(new FileOutputStream(filenamePairJson.getPath()), StandardCharsets.UTF_8);
+				sw.write(JSONUtils.toString(comparedRectangles));
+				sw.close();
 			} catch (Exception e) {
 				log.error("file write error: can not write " + filenamePairJson.getPath());
 			}
@@ -250,9 +250,9 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 		resultList.add(resultListOfExpected);
 
 		try {
-			FileWriter fw = new FileWriter(resultListJson.getPath());
-			fw.write(JSONUtils.toString(resultList));
-			fw.close();
+			OutputStreamWriter sw = new OutputStreamWriter(new FileOutputStream(resultListJson.getPath()), StandardCharsets.UTF_8);
+			sw.write(JSONUtils.toString(resultList));
+			sw.close();
 		} catch (Exception e){
 			log.error("file write error: can not write " + resultListJson.getPath());
 		}
@@ -434,9 +434,9 @@ public class ExplorerFilePersister extends FilePersister implements ExplorerPers
 		}
 
 		try {
-			FileWriter fw = new FileWriter(resultListJson.getPath());
-			fw.write(JSONUtils.toString(resultList));
-			fw.close();
+			OutputStreamWriter sw = new OutputStreamWriter(new FileOutputStream(resultListJson.getPath()), StandardCharsets.UTF_8);
+			sw.write(JSONUtils.toString(resultList));
+			sw.close();
 		} catch (Exception e) {
 			log.error("file write error: can not write " + resultListJson.getPath());
 		}
